@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="GMALEWICZ (generated)" id="1593542926392-1">
+        <addColumn tableName="course_tee">
+            <column name="tee_type" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-2">
+        <update schemaName="public" tableName="course_tee">
+       		<column name="tee_type" value="0" type="INT"/>
+        </update>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-3">
+        <addNotNullConstraint  catalogName="cat"  
+            columnDataType="int"  
+            columnName="tee_type"  
+            constraintName="tee_type_constr"    
+            schemaName="public"  
+            tableName="course_tee"/> 
+    </changeSet>
+ <!-- 
+    <changeSet author="GMALEWICZ" id="1593542926392-4">
+    	<sql  dbms="all" endDelimiter=";" splitStatements="true" stripComments="true">    
+            update course_tee set tee = concat(tee,' 1-18')
+    	</sql>  
+    </changeSet>
+ -->
+    <changeSet author="GMALEWICZ" id="1593542926392-5">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="1"/>
+        	<column name="tee" value="men red"/>
+        	<column name="cr" value="32.2"/>
+        	<column name="sr" value="109"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-6">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="1"/>
+        	<column name="tee" value="ladies red"/>
+        	<column name="cr" value="34.7"/>
+        	<column name="sr" value="125"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-7">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="1"/>
+        	<column name="tee" value="men yellow"/>
+        	<column name="cr" value="34"/>
+        	<column name="sr" value="130"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-8">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="1"/>
+        	<column name="tee" value="men red"/>
+        	<column name="cr" value="35.1"/>
+        	<column name="sr" value="132"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-9">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="1"/>
+        	<column name="tee" value="ladies red"/>
+        	<column name="cr" value="36.9"/>
+        	<column name="sr" value="130"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-10">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="1"/>
+        	<column name="tee" value="men yellow"/>
+        	<column name="cr" value="36.3"/>
+        	<column name="sr" value="140"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    
+    <changeSet author="GMALEWICZ (generated)" id="1593542926392-11">
+        <addColumn tableName="course">
+            <column name="hole_nbr" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-12">
+        <update schemaName="public" tableName="course">
+       		<column name="hole_nbr" value="18" type="int"/>
+        </update>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-13">
+        <addNotNullConstraint  catalogName="cat"  
+            columnDataType="int"  
+            columnName="hole_nbr"  
+            constraintName="hole_nbr_constr"    
+            schemaName="public"  
+            tableName="course"/> 
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="1605274553049-1">
+        <createTable tableName="favourite_course">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true" primaryKeyName="favourite_coursePK"/>
+            </column>
+            <column name="course_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1605274553049-2">
+        <addColumn tableName="online_score_card">
+            <column name="penalty" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1605274553049-3">
+        <addColumn tableName="online_score_card">
+            <column name="putt" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1605274553049-4">
+        <addColumn tableName="score_card">
+            <column name="penalty" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1605274553049-5">
+        <addColumn tableName="online_round">
+            <column name="penalties" type="boolean"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1605274553049-6">
+        <addColumn tableName="online_round">
+            <column name="putts" type="boolean"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1605274553049-7">  
+    	<addNotNullConstraint  
+            columnName="penalty"  
+            defaultNullValue="0"  
+            tableName="score_card"/>  
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1605274553049-8">
+        <addColumn tableName="online_round">
+            <column name="match_play" type="boolean">
+            	<constraints nullable="false"/>
+            </column>	
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

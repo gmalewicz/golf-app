@@ -1,0 +1,25 @@
+Configuration:
+  Appenders:
+    Console:
+      PatternLayout:
+        pattern: '%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n'
+      name: Console
+      target: SYSTEM_OUT
+    File:
+      PatternLayout:
+        pattern: '%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n'
+      name: File
+      fileName: /home/grzegorz_malewicz/logs/golf.log
+  Loggers:
+    logger:
+      - name: com.greg.golf
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: Console
+          - ref: File
+    Root:
+      AppenderRef:
+      - ref: Console
+      - ref: File
+      level: info

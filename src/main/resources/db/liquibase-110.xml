@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="GMALEWICZ (generated)" id="1590992190513-1">
+        <createTable tableName="tournament">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="tournamentPK"/>
+            </column>
+            <column name="end_date" type="timestamp">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="timestamp">
+            	<constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590992190513-2">
+        <addColumn tableName="round">
+            <column name="tournament_id" type="int8"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591280128661-1">
+        <createTable tableName="tournament_result">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="tournament_resultPK"/>
+            </column>
+            <column name="played_rounds" type="INT">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="strokes_brutto" type="INT">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="strokes_netto" type="INT">
+	            <constraints nullable="false"/>
+	        </column>
+            <column name="player_id" type="INT">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="tournament_id" type="INT">
+            	<constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591280128661-2">
+        <addForeignKeyConstraint baseColumnNames="player_id" baseTableName="tournament_result" constraintName="tournament_result_player_id_fky" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="player"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591280128661-3">
+        <addForeignKeyConstraint baseColumnNames="tournament_id" baseTableName="round" constraintName="round_tournament_player_id_fky" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="tournament"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591280128661-4">
+        <addForeignKeyConstraint baseColumnNames="tournament_id" baseTableName="tournament_result" constraintName="tournament_result_tournament_id_fky" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="tournament"/>
+    </changeSet>
+</databaseChangeLog>

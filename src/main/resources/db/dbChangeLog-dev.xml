@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-1">
+        <createSequence sequenceName="course_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-2">
+        <createSequence sequenceName="course_tee_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-3">
+        <createSequence sequenceName="game_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-4">
+        <createSequence sequenceName="hole_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-5">
+        <createSequence sequenceName="player_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-6">
+        <createSequence sequenceName="player_round_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-7">
+        <createSequence sequenceName="round_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-8">
+        <createSequence sequenceName="score_card_id_seq"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-9">
+        <createTable tableName="course">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="course_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="par" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-10">
+        <createTable tableName="course_tee">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="course_tee_pkey"/>
+            </column>
+            <column name="course_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tee" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cr" type="numeric(3, 1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sr" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-11">
+        <createTable tableName="game">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="game_pkey"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="game_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stake" type="numeric(3, 1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="game_date" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="game_data" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-12">
+        <createTable tableName="hole">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="hole_pkey"/>
+            </column>
+            <column name="course_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="par" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="si" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-13">
+        <createTable tableName="player">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="player_pkey"/>
+            </column>
+            <column name="nick" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="whs" type="numeric(3, 1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-14">
+        <createTable tableName="player_round">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="player_round_pkey"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="round_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="whs" type="numeric(3, 1)"/>
+            <column name="tee_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-15">
+        <createTable tableName="round">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="round_pkey"/>
+            </column>
+            <column name="course_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="round_date" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-16">
+        <createTable tableName="score_card">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="score_card_pkey"/>
+            </column>
+            <column name="round_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hole" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stroke" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pats" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-17">
+        <addUniqueConstraint columnNames="nick" constraintName="player_nick_key" tableName="player"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-18">
+        <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="course_tee" constraintName="course_tee_course_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="course"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-19">
+        <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="hole" constraintName="hole_course_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="course"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-20">
+        <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="round" constraintName="round_course_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="course"/>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1590569790067-21">
+        <addForeignKeyConstraint baseColumnNames="round_id" baseTableName="score_card" constraintName="score_card_round_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="round"/>
+    </changeSet>
+    <include file="initialLoad.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-110.xml" relativeToChangelogFile="true"/>  
+    <include file="liquibase-120.xml" relativeToChangelogFile="true"/>  
+    <include file="liquibase-130.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-131.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-150.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-180.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-182.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-183.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-184.xml" relativeToChangelogFile="true"/>
+</databaseChangeLog>

@@ -1,0 +1,66 @@
+spring:
+  profiles:
+    active: "dev"
+  mail:
+    test-connection: false      host: smtp.gmail.com
+    port: 587
+    username: replace_it
+    password: replace_it
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  datasource:
+    hikari:
+      connectionTimeout: 20000 
+      maximumPoolSize: 5
+    url: jdbc:postgresql://localhost:5432/golf 
+    username: golf_usr
+    password: replace_it
+  jpa:
+    open-in-view: true  
+    show_sql: true
+jwt:
+  secret: golfBackendSecret
+springdoc:
+  swagger-ui:
+    path: /api/swagger-ui.html
+  api-docs:
+    path: /api  
+google:
+  recaptcha:
+    key:
+      site: 6Lf-66YZAAAAAJc3serwf1iRoJg6PgTPJazkfNWD
+      secret: secret  
+cors:
+  allowedOrigins: dgng.pl
+round:
+  pageSize: 5
+    
+---
+
+spring:
+  profiles: dev
+  mail: 
+    properties:
+     mail:
+      debug: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/golf 
+  jpa:
+    show_sql: true
+  liquibase:
+    change-log: classpath:/db/dbChangeLog-dev.xml
+  
+---
+
+spring:
+  profiles: prod
+  datasource:
+    url: jdbc:postgresql://10.156.0.3:5432/golf 
+  jpa:
+    show_sql: false
+  liquibase:
+    change-log: classpath:/db/dbChangeLog-prod.xml

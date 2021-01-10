@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="GMALEWICZ" id="2-1">
+        <insert schemaName="public" tableName="course">
+            <column name="name" value="Sobienie Królewskie" type="VARCHAR(100)"/>
+            <column name="par" value="71" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-2">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="1" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="8" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-3">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="2" type="INT"/>
+            <column name="par" value="3" type="INT"/>
+            <column name="si" value="14" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-4">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="3" type="INT"/>
+            <column name="par" value="5" type="INT"/>
+            <column name="si" value="13" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-5">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="4" type="INT"/>
+            <column name="par" value="3" type="INT"/>
+            <column name="si" value="16" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-6">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="5" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="17" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-7">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="6" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="4" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-8">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="7" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="2" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-9">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="8" type="INT"/>
+            <column name="par" value="5" type="INT"/>
+            <column name="si" value="7" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-10">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="9" type="INT"/>
+            <column name="par" value="3" type="INT"/>
+            <column name="si" value="6" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-11">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="10" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="10" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-12">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="11" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="9" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-13">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="12" type="INT"/>
+            <column name="par" value="3" type="INT"/>
+            <column name="si" value="15" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-14">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="13" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="3" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-15">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="14" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="1" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-16">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="15" type="INT"/>
+            <column name="par" value="5" type="INT"/>
+            <column name="si" value="5" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-17">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="16" type="INT"/>
+            <column name="par" value="3" type="INT"/>
+            <column name="si" value="11" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-18">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="17" type="INT"/>
+            <column name="par" value="4" type="INT"/>
+            <column name="si" value="18" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-19">
+        <insert schemaName="public" tableName="hole">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="number" value="18" type="INT"/>
+            <column name="par" value="5" type="INT"/>
+            <column name="si" value="12" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-20">
+        <insert schemaName="public" tableName="player">
+            <column name="nick" value="golfer" type="VARCHAR(20)"/>
+            <column name="password" value="$2a$10$8qvw8TrDTpebTdV3tG4kSem/AzHzk/o44r9qmYETB/GS0xnRJItbm" type="VARCHAR(60)"/>
+            <column name="whs" value="38.4" type="numeric(3, 1)"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-21">
+        <insert schemaName="public" tableName="course_tee">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="tee" value="men red" type="VARCHAR(100)"/>
+            <column name="cr" value="66.1" type="numeric(3, 1)"/>
+            <column name="sr" value="116" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-22">
+        <insert schemaName="public" tableName="course_tee">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="tee" value="men yellow" type="VARCHAR(100)"/>
+            <column name="cr" value="70.3" type="numeric(3, 1)"/>
+            <column name="sr" value="135" type="INT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="2-23">
+        <insert schemaName="public" tableName="course_tee">
+            <column name="course_id" value="1" type="INT"/>
+            <column name="tee" value="ladies red" type="VARCHAR(100)"/>
+            <column name="cr" value="71.6" type="numeric(3, 1)"/>
+            <column name="sr" value="128" type="INT"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

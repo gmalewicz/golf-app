@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ" id="1593542926392-100">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="2"/>
+        	<column name="tee" value="men red"/>
+        	<column name="cr" value="33.1"/>
+        	<column name="sr" value="116"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-101">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="2"/>
+        	<column name="tee" value="ladies red"/>
+        	<column name="cr" value="34.8"/>
+        	<column name="sr" value="131"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-102">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="2"/>
+        	<column name="tee" value="men yellow"/>
+        	<column name="cr" value="34.8"/>
+        	<column name="sr" value="121"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-103">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="2"/>
+        	<column name="tee" value="men red"/>
+        	<column name="cr" value="33.8"/>
+        	<column name="sr" value="124"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-104">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="2"/>
+        	<column name="tee" value="ladies red"/>
+        	<column name="cr" value="35.4"/>
+        	<column name="sr" value="128"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-105">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="2"/>
+        	<column name="tee" value="men yellow"/>
+        	<column name="cr" value="34.3"/>
+        	<column name="sr" value="121"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet> 
+    <changeSet author="GMALEWICZ" id="1593542926392-106">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="3"/>
+        	<column name="tee" value="men red"/>
+        	<column name="cr" value="34.6"/>
+        	<column name="sr" value="123"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-107">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="3"/>
+        	<column name="tee" value="ladies red"/>
+        	<column name="cr" value="37.5"/>
+        	<column name="sr" value="137"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-108">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="3"/>
+        	<column name="tee" value="men yellow"/>
+        	<column name="cr" value="36.1"/>
+        	<column name="sr" value="135"/>
+        	<column name="tee_type" value="1"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-109">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="3"/>
+        	<column name="tee" value="men red"/>
+        	<column name="cr" value="34.1"/>
+        	<column name="sr" value="128"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-110">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="3"/>
+        	<column name="tee" value="ladies red"/>
+        	<column name="cr" value="36.8"/>
+        	<column name="sr" value="136"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+    <changeSet author="GMALEWICZ" id="1593542926392-111">
+    	<insert tableName="course_tee">
+        	<column name="course_id" value="3"/>
+        	<column name="tee" value="men yellow"/>
+        	<column name="cr" value="36.1"/>
+        	<column name="sr" value="141"/>
+        	<column name="tee_type" value="2"/>
+    	</insert>  
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="1608477645082-1">
+        <addColumn tableName="online_round">
+            <column name="nick2" type="varchar(20)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1608477645082-2">
+        <addColumn tableName="round">
+            <column name="match_play" type="boolean" defaultValue="false">
+            	<constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

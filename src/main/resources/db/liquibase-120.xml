@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)"
+		id="1591778666436-1">
+		<addColumn tableName="tournament">
+			<column name="player_id" type="int">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)"
+		id="1591778666436-2">
+		<addForeignKeyConstraint
+			baseColumnNames="player_id" baseTableName="tournament"
+			constraintName="tournament_player_id_fky" deferrable="false"
+			initiallyDeferred="false" referencedColumnNames="id"
+			referencedTableName="player" />
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="1591778666436-3">
+		<modifyDataType columnName="start_date"
+			newDataType="timestamp with time zone" tableName="tournament" />
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="1591778666436-4">
+		<modifyDataType columnName="end_date"
+			newDataType="timestamp with time zone" tableName="tournament" />
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1591778666436-5">
+        <addColumn tableName="player_round">
+            <column name="tournament_id" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591778666436-6">
+        <addColumn tableName="tournament_result">
+            <column name="stb_gross" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591778666436-7">
+        <addColumn tableName="tournament_result">
+            <column name="stb_net" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1591778666436-8">
+        <addColumn tableName="player">
+            <column name="role" type="int4"/>
+        </addColumn>
+    </changeSet>
+     <changeSet author="GMALEWICZ" id="1591778666436-9">
+        <update schemaName="public" tableName="player">
+       		<column name="role" value="1" type="INT"/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

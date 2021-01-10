@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="GMALEWICZ (generated)" id="1597654491709-1">
+        <createTable tableName="tournament_round">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="tournament_roundPK"/>
+            </column>
+            <column name="course_name" type="VARCHAR(100)"/>
+            <column name="scr_diff" type="numeric(3, 1)"/>
+            <column name="stb_gross" type="INT"/>
+            <column name="stb_net" type="INT"/>
+            <column name="strokes_brutto" type="INT"/>
+            <column name="strokes_netto" type="INT"/>
+            <column name="tournament_result_id" type="INT"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

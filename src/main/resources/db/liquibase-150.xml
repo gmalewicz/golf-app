@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="GMALEWICZ (generated)" id="1600073828330-1">
+        <createTable tableName="online_round">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="online_roundPK"/>
+            </column>
+            <column name="time_time" type="VARCHAR(5)">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="course_id" type="INT">
+           	 	<constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="course_tee_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1600073828330-2">
+        <createTable tableName="online_score_card">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="online_score_cardPK"/>
+            </column>
+            <column name="hole" type="INT"/>
+            <column name="stroke" type="INT"/>
+            <column name="online_round_id" type="INT">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1600073828330-3">
+        <update schemaName="public" tableName="player">
+       		<column name="role" value="0" type="INT"/>
+       		<where>id=1</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
