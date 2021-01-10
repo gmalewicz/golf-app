@@ -41,4 +41,5 @@ jobs:
         # use localhost for the host here because we are running the job on the VM.
         # If we were running the job on in a container this would be postgres
         spring_datasource_url: jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/golf
+        spring_datasource_username: ${{secrets.DB_USER_NAME}}  
         spring_datasource_password: ${{secrets.DB_USER_PASSWORD}}
