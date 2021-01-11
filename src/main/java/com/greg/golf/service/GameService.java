@@ -1,6 +1,5 @@
 package com.greg.golf.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -25,8 +24,8 @@ import lombok.extern.log4j.Log4j2;
 @Service("gameService")
 public class GameService {
 	
-	private static Map<Long, String> gameIdNameMap = null;
-
+	private static final Map<Long, String> gameIdNameMap = Map.of(1l, "Hole Stake Game", 2l, "Bingo, Bango, Bongo Game");
+			
 	@Autowired
 	private GameRepository gameRepository;
 	
@@ -36,15 +35,7 @@ public class GameService {
 	@Autowired
 	TemplateEngine templateEngine;
 	
-	GameService() {
-		
-		if (gameIdNameMap == null) {
-			gameIdNameMap = new HashMap<Long, String>();
-			gameIdNameMap.put(1l, "Hole Stake Game");
-			gameIdNameMap.put(2l, "Bingo, Bango, Bongo Game");
-		}
-		
-	}
+	GameService() {}
 
 	@Transactional
 	public Game save(Game game) {
@@ -71,7 +62,6 @@ public class GameService {
 		
 		
 		emailServiceImpl.sendEmail(gameSendData.getEmail(), "Game results", body);
-		//emailServiceImpl.sendSimpleMessage("grzegorz.malewicz@gmail.com", "test", "body");
 	}
 
 }

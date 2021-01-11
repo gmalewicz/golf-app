@@ -79,8 +79,7 @@ public class Round {
 	@JsonProperty(value = "scoreCard", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
 	// @JoinColumn(name = "round_id")
-	// private SortedSet<ScoreCard> scoreCard = new TreeSet<ScoreCard>();
-	private List<ScoreCard> scoreCard = new ArrayList<ScoreCard>();
+	private List<ScoreCard> scoreCard = new ArrayList<>();
 	
 	@EqualsAndHashCode.Exclude
 	@JsonProperty(value = "tournament", access = JsonProperty.Access.WRITE_ONLY)

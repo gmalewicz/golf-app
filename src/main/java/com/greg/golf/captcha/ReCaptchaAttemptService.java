@@ -10,7 +10,7 @@ import com.google.common.cache.LoadingCache;
 
 @Service("reCaptchaAttemptService")
 public class ReCaptchaAttemptService {
-    private final int MAX_ATTEMPT = 4;
+    private static final int MAX_ATTEMPT = 4;
     private LoadingCache<String, Integer> attemptsCache;
 
     public ReCaptchaAttemptService() {

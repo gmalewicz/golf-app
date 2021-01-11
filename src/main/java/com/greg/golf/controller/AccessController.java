@@ -39,9 +39,9 @@ public class AccessController {
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
-	
+
 	@Autowired
-    private ICaptchaService captchaService;
+	private ICaptchaService captchaService;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -50,7 +50,7 @@ public class AccessController {
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
 	@PostMapping(value = "/rest/Authenticate")
 	public ResponseEntity<Player> authenticatePlayer(
-			@Parameter(description = "Player object", required = true) @RequestBody Player player) throws Exception {
+			@Parameter(description = "Player object", required = true) @RequestBody Player player) {
 
 		log.debug("trying to authenticate player: " + player.getNick() + " with password " + player.getPassword());
 
@@ -66,10 +66,7 @@ public class AccessController {
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
 		responseHeaders.set("Jwt", token);
 
-		// userDetails.getPlayer().setToken(token);
-		// userDetails.getPlayer().setPassword(null);
-
-		return new ResponseEntity<Player>(userDetails.getPlayer(), responseHeaders, HttpStatus.OK);
+		return new ResponseEntity<>(userDetails.getPlayer(), responseHeaders, HttpStatus.OK);
 	}
 
 	@Tag(name = "Access API")
@@ -78,7 +75,7 @@ public class AccessController {
 	public HttpStatus addPlayer(@Parameter(description = "Player object", required = true) @RequestBody Player player) {
 
 		log.info("trying to add player: " + player.getNick() + " with password " + player.getPassword());
-		
+
 		captchaService.processResponse(player.getCaptcha());
 
 		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
@@ -87,17 +84,13 @@ public class AccessController {
 
 		return HttpStatus.OK;
 	}
-	
+
 	private void authenticate(String username, String password) throws BadCredentialsException {
-		//try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		//} catch (DisabledException e) {
-		//	throw new Exception("USER_DISABLED", e);
-		//} catch (BadCredentialsException e) {
-		//	throw new Exception("INVALID_CREDENTIALS", e);
-		//}
+
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		
 	}
-	
+
 	@Tag(name = "Access API")
 	@Operation(summary = "Update player. Only WHS and/or password can be updated.")
 	@PatchMapping(value = "/rest/PatchPlayer/{id}")
@@ -115,10 +108,9 @@ public class AccessController {
 
 		player = playerService.update(player);
 
-		return new ResponseEntity<Player>(player, HttpStatus.OK);
+		return new ResponseEntity<>(player, HttpStatus.OK);
 	}
 
-	
 	@Tag(name = "Access API")
 	@Operation(summary = "Administrative task: Reset password.")
 	@PatchMapping(value = "/rest/ResetPassword/{id}")
@@ -134,7 +126,7 @@ public class AccessController {
 			player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
 		}
 
-		player = playerService.resetPassword(id, player);
+		playerService.resetPassword(id, player);
 
 		return HttpStatus.OK;
 	}

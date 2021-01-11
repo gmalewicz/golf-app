@@ -131,7 +131,7 @@ public class GolfRESTController {
 
 		courseService.save(course);
 
-		return new ResponseEntity<Course>(course, HttpStatus.OK);
+		return new ResponseEntity<>(course, HttpStatus.OK);
 	}
 
 	@Tag(name = "Course API")
@@ -145,10 +145,10 @@ public class GolfRESTController {
 		try {
 			courseService.delete(id);
 		} catch (Exception e) {
-			return new ResponseEntity<Long>(id, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<Long>(id, HttpStatus.OK);
+		return new ResponseEntity<>(id, HttpStatus.OK);
 
 	}
 
@@ -204,10 +204,10 @@ public class GolfRESTController {
 		try {
 			roundService.delete(id);
 		} catch (Exception e) {
-			return new ResponseEntity<Long>(id, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<Long>(id, HttpStatus.OK);
+		return new ResponseEntity<>(id, HttpStatus.OK);
 
 	}
 
@@ -221,7 +221,7 @@ public class GolfRESTController {
 
 		gameService.save(game);
 
-		return new ResponseEntity<Game>(game, HttpStatus.OK);
+		return new ResponseEntity<>(game, HttpStatus.OK);
 	}
 
 	@Tag(name = "Game API")
@@ -424,10 +424,10 @@ public class GolfRESTController {
 		try {
 			onlineRoundService.delete(id);
 		} catch (Exception e) {
-			return new ResponseEntity<Long>(id, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<Long>(id, HttpStatus.OK);
+		return new ResponseEntity<>(id, HttpStatus.OK);
 
 	}
 	
@@ -478,10 +478,10 @@ public class GolfRESTController {
 		try {
 			onlineRoundService.deleteForOwner(ownerId);
 		} catch (Exception e) {
-			return new ResponseEntity<Long>(ownerId, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(ownerId, HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<Long>(ownerId, HttpStatus.OK);
+		return new ResponseEntity<>(ownerId, HttpStatus.OK);
 
 	}
 	

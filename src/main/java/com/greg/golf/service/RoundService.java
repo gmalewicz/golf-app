@@ -39,9 +39,6 @@ public class RoundService {
 	@Autowired
 	private PlayerRoundRepository playerRoundRepository;
 
-	//@Autowired
-	//private CourseTeeRepository courseTeeRepository;
-
 	@Autowired
 	private TournamentService tournamentService;
 
@@ -216,36 +213,16 @@ public class RoundService {
 	@Transactional(readOnly = true)
 	public PlayerRound getForPlayerRoundDetails(Long playerId, Long roundId) {
 
-		PlayerRound playerRound = playerRoundRepository.getForPlayerAndRound(playerId, roundId).orElseThrow();
+		return playerRoundRepository.getForPlayerAndRound(playerId, roundId).orElseThrow();
 
-		// CourseTee courseTee = courseTeeRepository.findById(playerRound.getTeeId()).orElseThrow();
-
-		// playerRound.setSr(courseTee.getSr());
-		// playerRound.setCr(courseTee.getCr());
-		//playerRound.setTee(courseTee.getTee());
-		// playerRound.setTeeType(courseTee.getTeeType());
-
-		return playerRound;
 	}
 	
 	
 	@Transactional(readOnly = true)
 	public List<PlayerRound> getForPlayerRoundDetails(Long roundId) {
 
-		List<PlayerRound> playerRound = playerRoundRepository.getByRoundId(roundId);
+		return playerRoundRepository.getByRoundId(roundId);
 
-		// playerRound.forEach(pr -> {
-			
-			// CourseTee courseTee = courseTeeRepository.findById(pr.getTeeId()).orElseThrow();
-
-			// pr.setSr(courseTee.getSr());
-			// pr.setCr(courseTee.getCr());
-			//pr.setTee(courseTee.getTee());
-			// pr.setTeeType(courseTee.getTeeType());
-		
-		// });
-			
-		return playerRound;
 	}
 	
 	

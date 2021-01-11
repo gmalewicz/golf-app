@@ -34,8 +34,6 @@ import lombok.extern.log4j.Log4j2;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
-	// private static final Logger logger = LogManager.getLogger(WebSecurityConfiguration.class);
-	
 	@Getter @Setter private String allowedOrigins;
 	
 	@Bean

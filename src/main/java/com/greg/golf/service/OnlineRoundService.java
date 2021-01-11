@@ -122,34 +122,43 @@ public class OnlineRoundService {
 		// get the online round from db
 		OnlineRound onlineRound = onlineRoundRepository.findById(id).orElseThrow();
 
-		// for now it is assumed that children are retrieved
+		retRound = buildRound(onlineRound);
+
+		// at the end delete the online entries
+		onlineRoundRepository.deleteById(id);
+
+		return retRound;
+
+	}
+
+	private Round buildRound(OnlineRound onlineRound) {
 
 		// create Round object and fill it in
 		Round round = new Round();
 
 		Course course = new Course();
-		List<CourseTee> tees = new ArrayList<CourseTee>();
+		List<CourseTee> tees = new ArrayList<>();
 		tees.add(onlineRound.getCourseTee());
 		course.setTees(tees);
 		course.setHoles(onlineRound.getCourse().getHoles());
 		course.setId(onlineRound.getCourse().getId());
 		round.setCourse(course);
 
-		Set<Player> players = new HashSet<Player>();
+		Set<Player> players = new HashSet<>();
 		players.add(onlineRound.getPlayer());
 		round.setPlayer(players);
 		round.setMatchPlay(onlineRound.getMatchPlay());
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(onlineRound.getDate());
 
-		gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt((String) onlineRound.getTeeTime().substring(0, 2)) + 2);
-		gc.set(Calendar.MINUTE, Integer.parseInt((String) onlineRound.getTeeTime().substring(3, 5)));
+		gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onlineRound.getTeeTime().substring(0, 2)) + 2);
+		gc.set(Calendar.MINUTE, Integer.parseInt(onlineRound.getTeeTime().substring(3, 5)));
 
 		round.setRoundDate(gc.getTime());
 
 		// create map of score cards that has been passed
 
-		Map<Integer, ScoreCard> holes = new HashMap<Integer, ScoreCard>();
+		Map<Integer, ScoreCard> holes = new HashMap<>();
 
 		for (OnlineScoreCard os : onlineRound.getScoreCard()) {
 			ScoreCard sc = new ScoreCard();
@@ -163,7 +172,7 @@ public class OnlineRoundService {
 
 		// create 18 score cards and fill not used using empty score cards
 
-		List<ScoreCard> scoreCards = new ArrayList<ScoreCard>();
+		List<ScoreCard> scoreCards = new ArrayList<>();
 		for (int i = 0; i < 18; i++) {
 
 			if (holes.containsKey(i + 1)) {
@@ -182,13 +191,7 @@ public class OnlineRoundService {
 
 		round.setScoreCard(scoreCards);
 
-		retRound = roundService.saveRound(round);
-
-		// at the end delete the online entries
-		onlineRoundRepository.deleteById(id);
-
-		return retRound;
-
+		return roundService.saveRound(round);
 	}
 
 	@Transactional
@@ -201,72 +204,12 @@ public class OnlineRoundService {
 
 		onlineRounds.forEach(onlineRound -> {
 
-			// create Round object and fill it in
-			Round round = new Round();
+			buildRound(onlineRound);
 
-			Course course = new Course();
-			List<CourseTee> tees = new ArrayList<CourseTee>();
-			tees.add(onlineRound.getCourseTee());
-			course.setTees(tees);
-			course.setHoles(onlineRound.getCourse().getHoles());
-			course.setId(onlineRound.getCourse().getId());
-			round.setCourse(course);
-
-			Set<Player> players = new HashSet<Player>();
-			players.add(onlineRound.getPlayer());
-			round.setPlayer(players);
-			round.setMatchPlay(onlineRound.getMatchPlay());
-			GregorianCalendar gc = new GregorianCalendar();
-			gc.setTime(onlineRound.getDate());
-
-			gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt((String) onlineRound.getTeeTime().substring(0, 2)));
-			gc.set(Calendar.MINUTE, Integer.parseInt((String) onlineRound.getTeeTime().substring(3, 5)));
-
-			round.setRoundDate(gc.getTime());
-
-			// create map of score cards that has been passed
-
-			Map<Integer, ScoreCard> holes = new HashMap<Integer, ScoreCard>();
-
-			for (OnlineScoreCard os : onlineRound.getScoreCard()) {
-				ScoreCard sc = new ScoreCard();
-				sc.setHole(os.getHole());
-				sc.setPats(os.getPutt());
-				sc.setPenalty(os.getPenalty());
-				sc.setStroke(os.getStroke());
-				sc.setPlayer(onlineRound.getPlayer());
-				holes.put(os.getHole(), sc);
-			}
-
-			// create 18 score cards and fill not used using empty score cards
-
-			List<ScoreCard> scoreCards = new ArrayList<ScoreCard>();
-			for (int i = 0; i < 18; i++) {
-
-				if (holes.containsKey(i + 1)) {
-					scoreCards.add(holes.get(i + 1));
-				} else {
-					ScoreCard sc = new ScoreCard();
-					sc.setHole(i + 1);
-					sc.setPats(0);
-					sc.setPenalty(0);
-					sc.setStroke(0);
-					sc.setPlayer(onlineRound.getPlayer());
-					scoreCards.add(sc);
-				}
-			}
-
-			round.setScoreCard(scoreCards);
-
-			roundService.saveRound(round);
-			
 			onlineRound.setFinalized(true);
 			onlineRoundRepository.save(onlineRound);
 
 		});
-
-		// at the end delete the online entries
-		//onlineRoundRepository.deleteByOwner(ownerId);
 	}
 
 	@Transactional(readOnly = true)
@@ -275,25 +218,18 @@ public class OnlineRoundService {
 		Course course = new Course();
 		course.setId(courseId);
 		List<OnlineRound> onlineRounds = onlineRoundRepository.findByCourse(course);
-		log.debug("Score cards: " + onlineRounds.get(0).getScoreCard());
 
 		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
-
-		log.debug("Score cards: " + onlineRounds.get(0).getScoreCardAPI());
 
 		return onlineRounds;
 	}
-	
+
 	@Transactional(readOnly = true)
 	public List<OnlineRound> getOnlineRoundsForOwner(Long ownerId) {
 
-		
 		List<OnlineRound> onlineRounds = onlineRoundRepository.findByOwner(ownerId);
-		log.debug("Score cards: " + onlineRounds.get(0).getScoreCard());
 
 		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
-
-		log.debug("Score cards: " + onlineRounds.get(0).getScoreCardAPI());
 
 		return onlineRounds;
 	}

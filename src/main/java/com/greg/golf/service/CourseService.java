@@ -39,10 +39,7 @@ public class CourseService {
 		
 		Player player = new Player();
 		player.setId(playerId);
-		//FavouriteCourse favouriteCourse = new FavouriteCourse(); 
-		//favouriteCourse.setPlayer(player);
-		//favouriteCourse.setCourse(course);
-		
+				
 		return favouriteCourseRepository.deleteByPlayerAndCourse(player, course);
 	}
 	
@@ -78,7 +75,7 @@ public class CourseService {
 	public List<Course> listFavourites(Player player) {
 		List<FavouriteCourse> favouriteCourses = favouriteCourseRepository.findByPlayer(player);
 		
-		return favouriteCourses.stream().map(fc -> fc.getCourse()).collect(Collectors.toList());
+		return favouriteCourses.stream().map(FavouriteCourse::getCourse).collect(Collectors.toList());
 	}
 	
 
