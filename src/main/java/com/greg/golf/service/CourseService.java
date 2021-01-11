@@ -64,6 +64,7 @@ public class CourseService {
 		return courseRepository.findByOrderByNameAsc();
 	}
 	
+	@Transactional(readOnly=true)
 	public List<Course> listFavourites(Long playerId) {
 		
 		Player player = new Player();

@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
@@ -248,7 +249,7 @@ public class GolfRESTController {
 
 		try {
 			gameService.sendGameDetail(gameSendData);
-		} catch (MessagingException e) {
+		} catch (MessagingException | NoSuchElementException e) {
 			log.error("Failed sending game data for: " + gameSendData.getEmail());
 			throw new SendingMailFailureException();
 		}
@@ -438,7 +439,7 @@ public class GolfRESTController {
 
 		log.info("trying to finzalie online round: " + id);
 
-		return onlineRoundService.finalize(id);
+		return onlineRoundService.finalizeById(id);
 
 	}
 	

@@ -295,7 +295,7 @@ public class TournamentService {
 		int courseHCP = getCourseHCP(playerRound, round, player);
 
 		// calculate hole HCP for player
-		int hcpAll = (int) Math.floor(courseHCP / 18);
+		int hcpAll = (int) Math.floor((double)courseHCP / 18);
 		int hcpIncMaxHole = courseHCP - (hcpAll * 18);
 		log.debug("hcpAll " + hcpAll);
 		log.debug("hcpIncMaxHole " + hcpIncMaxHole);

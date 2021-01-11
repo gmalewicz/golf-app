@@ -273,7 +273,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setUpdate(false);
 		onlineScoreCardRepository.save(onlineScoreCard);
 		
-		onlineRoundService.finalize(onlineRound.getId());
+		onlineRoundService.finalizeById(onlineRound.getId());
 		
 		assertEquals(1, roundRepository.findAll().size());
 	}
