@@ -115,7 +115,7 @@ public class OnlineRoundService {
 	}
 
 	@Transactional
-	public Round finalize(Long id) {
+	public Round finalizeById(Long id) {
 
 		Round retRound = null;
 

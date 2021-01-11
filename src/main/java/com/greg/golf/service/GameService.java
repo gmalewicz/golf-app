@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
@@ -58,13 +59,14 @@ public class GameService {
 	}
 	
 	@Transactional(readOnly = true)
-	public void sendGameDetail(GameSendData gameSendData) throws MessagingException {
+	public void sendGameDetail(GameSendData gameSendData) throws MessagingException, NoSuchElementException {
 		
 		Optional<Game> game = gameRepository.findById(gameSendData.getGameId());
 		log.debug("Game data retrived");
+		
 		Context context = new Context(); 
-		context.setVariable("gameName", gameIdNameMap.get(game.get().getGameId()));
-		context.setVariable("game", game.get());
+		context.setVariable("gameName", gameIdNameMap.get(game.orElseThrow().getGameId()));
+		context.setVariable("game", game.orElseThrow());
 		String body = templateEngine.process("GameDetailsMailTemplate.html", context);
 		
 		

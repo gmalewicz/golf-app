@@ -165,7 +165,7 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setTournament(tournament);
 
 		Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository.findByPlayerAndTournament(player, tournament);
-		assertNotNull("Tournament result should not be null", tournamentResultOpt.isEmpty());
+		assertTrue("Tournament result should not be null", tournamentResultOpt.isEmpty());
 	}
 
 	@AfterAll
