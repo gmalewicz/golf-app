@@ -20,7 +20,7 @@ public class OnlineScoreCardController {
 	
 	@MessageMapping("/hole")
 	@SendTo("/topic")
-	public OnlineScoreCard send(OnlineScoreCard onlineScoreCard) throws Exception {
+	public OnlineScoreCard send(OnlineScoreCard onlineScoreCard) {
 	    
 		log.debug("Received s -  " + onlineScoreCard);
 		
@@ -29,9 +29,6 @@ public class OnlineScoreCardController {
 		onlineScoreCard.setOnlineRound(onlineRound);
 		
 		onlineRoundService.saveOnlineScoreCard(onlineScoreCard);
-		
-		
-		
 		
 	    return onlineScoreCard;
 	}

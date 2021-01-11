@@ -31,18 +31,18 @@ public class GoogleResponse {
 	@JsonProperty("error-codes")
 	private ErrorCode[] errorCodes;
 
-	static enum ErrorCode {
-		MissingSecret, InvalidSecret, MissingResponse, InvalidResponse, BadRequest, TimeoutOrDuplicate;
+	enum ErrorCode {
+		MISSING_SECRET, INVALID_SECRET, MISSING_RESPONSE, INVALID_RESPONSE, BAD_REQUEST, TMEOUT_OR_DUPLICATE;
 
-		private static Map<String, ErrorCode> errorsMap = new HashMap<String, ErrorCode>(4);
+		private static Map<String, ErrorCode> errorsMap = new HashMap<>(4);
 
 		static {
-			errorsMap.put("missing-input-secret", MissingSecret);
-			errorsMap.put("invalid-input-secret", InvalidSecret);
-			errorsMap.put("missing-input-response", MissingResponse);
-			errorsMap.put("bad-request", InvalidResponse);
-			errorsMap.put("invalid-input-response", BadRequest);
-			errorsMap.put("timeout-or-duplicate", TimeoutOrDuplicate);
+			errorsMap.put("missing-input-secret", MISSING_SECRET);
+			errorsMap.put("invalid-input-secret", INVALID_SECRET);
+			errorsMap.put("missing-input-response", MISSING_RESPONSE);
+			errorsMap.put("bad-request", INVALID_RESPONSE);
+			errorsMap.put("invalid-input-response", BAD_REQUEST);
+			errorsMap.put("timeout-or-duplicate", TMEOUT_OR_DUPLICATE);
 		}
 
 		@JsonCreator
@@ -59,9 +59,9 @@ public class GoogleResponse {
 		}
 		for (final ErrorCode error : errors) {
 			switch (error) {
-			case InvalidResponse:
-			case MissingResponse:
-			case BadRequest:
+			case INVALID_RESPONSE:
+			case MISSING_RESPONSE:
+			case BAD_REQUEST:
 				return true;
 			default:
 				break;

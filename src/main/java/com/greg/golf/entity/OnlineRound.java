@@ -97,10 +97,10 @@ public class OnlineRound {
 	@ToString.Exclude
 	@JsonProperty(value = "onlineScoreCard", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "onlineRound", orphanRemoval = true)
-	private List<OnlineScoreCard> scoreCard = new ArrayList<OnlineScoreCard>();
+	private List<OnlineScoreCard> scoreCard = new ArrayList<>();
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@Transient
-	private List<OnlineScoreCard> scoreCardAPI = new ArrayList<OnlineScoreCard>();
+	private List<OnlineScoreCard> scoreCardAPI = new ArrayList<>();
 }

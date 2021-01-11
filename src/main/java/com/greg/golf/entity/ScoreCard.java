@@ -26,7 +26,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @Entity
 @Table(name = "score_card")
-// public class ScoreCard implements Comparable<ScoreCard>{
 public class ScoreCard {
 	
 	@Id

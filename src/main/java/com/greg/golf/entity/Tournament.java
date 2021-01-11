@@ -46,7 +46,7 @@ public class Tournament {
 	@EqualsAndHashCode.Exclude
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "tournament", orphanRemoval = false)
-	private List<Round> round = new ArrayList<Round>();
+	private List<Round> round = new ArrayList<>();
 
 	@NotNull
 	@EqualsAndHashCode.Exclude

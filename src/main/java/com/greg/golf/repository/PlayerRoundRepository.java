@@ -5,12 +5,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-//import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-//import org.springframework.transaction.annotation.Propagation;
-//import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +31,6 @@ public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
 	@Query("SELECT pr FROM PlayerRound pr WHERE pr.playerId = :playerId AND pr.roundId = :roundId")
 	Optional<PlayerRound> getForPlayerAndRound(@Param("playerId") Long playerId, @Param("roundId") Long roundId);
-	
-	
-	// Optional<PlayerRound> getByPlayerAndRound(Long player_id, Long round_id );
 	
 	List<PlayerRound> getByRoundId(Long roundId);
 

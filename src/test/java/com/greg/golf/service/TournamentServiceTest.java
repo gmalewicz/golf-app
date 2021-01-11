@@ -188,7 +188,7 @@ class TournamentServiceTest {
 	@Test
 	void getAllTournamentsTest() {
 
-		assertEquals(tournamentService.findAllTournamnets().size(), 1);
+		assertEquals(1, tournamentService.findAllTournamnets().size());
 
 	}
 	
@@ -211,7 +211,7 @@ class TournamentServiceTest {
 
 		int netStrokes = tournamentService.getNetStrokes(player, round, 99, null);
 
-		assertEquals(netStrokes, 54);
+		assertEquals(54, netStrokes);
 
 	}
 

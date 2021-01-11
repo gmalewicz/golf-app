@@ -65,13 +65,13 @@ public class Course {
 	@ToString.Exclude
 	@JsonProperty( value = "holes", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
-	private List<Hole> holes = new ArrayList<Hole>();
+	private List<Hole> holes = new ArrayList<>();
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@JsonProperty( value = "tees", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
-	private List<CourseTee> tees = new ArrayList<CourseTee>();
+	private List<CourseTee> tees = new ArrayList<>();
 	
 	public void addHole(Hole hole) {
         this.holes.add(hole);

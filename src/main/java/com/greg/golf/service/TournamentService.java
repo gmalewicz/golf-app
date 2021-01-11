@@ -98,9 +98,9 @@ public class TournamentService {
 	public Tournament addRound(Long tournamnetId, Round round, boolean updateResults) {
 
 		// preparation and checking
-		if (round.getPlayer() == null || round.getPlayer().size() == 0) {
+		if (round.getPlayer() == null || round.getPlayer().isEmpty()) {
 
-			round.setPlayer(new HashSet<Player>());
+			round.setPlayer(new HashSet<>());
 			List<PlayerRound> playerRounds = roundService.getByRoundId(round.getId());
 			playerRounds.forEach(pr -> {
 
@@ -108,7 +108,7 @@ public class TournamentService {
 				player.setId(pr.getPlayerId());
 				player.setWhs(pr.getWhs());
 				round.getPlayer().add(player);
-				round.getCourse().setTees(new ArrayList<CourseTee>());
+				round.getCourse().setTees(new ArrayList<>());
 				CourseTee courseTee = new CourseTee();
 				courseTee.setId(pr.getTeeId());
 				round.getCourse().getTees().add(courseTee);
@@ -116,7 +116,7 @@ public class TournamentService {
 			});
 		}
 
-		if (round.getScoreCard() == null || round.getScoreCard().size() == 0) {
+		if (round.getScoreCard() == null || round.getScoreCard().isEmpty()) {
 
 			round.setScoreCard(scoreCardService.listByRound(round));
 		}
@@ -173,9 +173,6 @@ public class TournamentService {
 				log.debug("Attempting to add the new round to tournamnet result");
 				// if it is the first record to be added to result than create it
 				TournamentResult tournamentResult = buildEmptyTournamentResult(player);
-				// set tournament id in player_round
-				// playerRound.setTournamentId(round.getTournament().getId());
-				// playerRoundRepository.save(playerRound);
 				// get gross and net strokes
 				tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
 				tournamentResult.setStrokesNetto(
@@ -289,7 +286,7 @@ public class TournamentService {
 	public List<Integer> updateSTB(TournamentResult tournamentResult, Round round, PlayerRound playerRound, Player player) {
 
 		//create List of ret values 
-		List<Integer> retStb= new ArrayList<Integer>();
+		List<Integer> retStb= new ArrayList<>();
 		
 		// calculate course HCP
 		int courseHCP = getCourseHCP(playerRound, round, player);
@@ -302,7 +299,7 @@ public class TournamentService {
 
 		// fill all holes with hcpAll value or initialize it with 0 if hcpAll is 0
 		round.getScoreCard().forEach(scoreCard -> scoreCard.setHcp(hcpAll));
-		if (round.getCourse().getHoles() == null || round.getCourse().getHoles().size() == 0) {
+		if (round.getCourse().getHoles() == null || round.getCourse().getHoles().isEmpty()) {
 			log.debug("getting holes");
 			round.getCourse().setHoles(courseService.getHoles(round.getCourse()));
 		}

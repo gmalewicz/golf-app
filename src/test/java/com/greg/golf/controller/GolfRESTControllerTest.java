@@ -104,7 +104,7 @@ class GolfRESTControllerTest {
 	void getTrournamentsTest() {
 
 		List<Tournament> tournaments = this.golfRESTController.getTournaments();
-		assertEquals(tournaments.size(), 1);
+		assertEquals(1, tournaments.size());
 
 	}
 	
@@ -115,7 +115,7 @@ class GolfRESTControllerTest {
 
 		tournamentRepository.deleteAll();
 		List<Tournament> tournaments = this.golfRESTController.getTournaments();
-		assertEquals(tournaments.size(), 0);
+		assertEquals(0, tournaments.size());
 
 	}
 

@@ -124,7 +124,7 @@ public class ApiExceptionHandler {
 	public ResponseEntity<ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
 		
 		StringBuilder errors = new StringBuilder();
-	    ex.getBindingResult().getAllErrors().forEach((error) -> {
+	    ex.getBindingResult().getAllErrors().forEach(error -> {
 	        String errorMessage = error.getDefaultMessage();
 	        errors.append(errorMessage);
 	        errors.append(" ");

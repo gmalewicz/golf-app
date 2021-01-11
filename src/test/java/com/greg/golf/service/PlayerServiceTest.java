@@ -1,7 +1,5 @@
 package com.greg.golf.service;
 
-
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -42,14 +40,14 @@ class PlayerServiceTest {
 	public static void setup(@Autowired PlayerRepository playerRepository) {
 
 		player = playerRepository.findById(1L).orElseThrow();
-		
+
 		Player adminPlayer = new Player();
 		adminPlayer.setNick("admin");
 		adminPlayer.setPassword(player.getPassword());
 		adminPlayer.setRole(Player.ROLE_PLAYER_ADMIN);
 		adminPlayer.setWhs(10f);
 		admin = playerRepository.save(adminPlayer);
-		
+
 		log.info("Set up completed");
 	}
 
@@ -63,55 +61,51 @@ class PlayerServiceTest {
 		assertEquals("test", player.getPassword());
 
 	}
-	
+
 	@DisplayName("Unauthorized attempt to change password")
 	@Transactional
 	@Test
 	void changePasswordUnauthorizedTest(@Autowired PlayerRepository playerRepository) {
-		
-		player.setPassword("test");		
+
+		player.setPassword("test");
 		admin.setRole(Player.ROLE_PLAYER_REGULAR);
 		admin = playerRepository.save(admin);
-		
-		assertThrows(UnauthorizedException.class, () -> {
-		      playerService.resetPassword(admin.getId(), player);
-		    });
+		Long adminId = admin.getId();
+
+		assertThrows(UnauthorizedException.class, () -> playerService.resetPassword(adminId, player));
+
 	}
-	
+
 	@DisplayName("Attempt to change password by user who does not exist")
 	@Transactional
 	@Test
 	void changePasswordAdminNoExistsTest(@Autowired PlayerRepository playerRepository) {
-		
-		player.setPassword("test");		
-		//admin.setRole(Player.ROLE_PLAYER_REGULAR);
-		//admin = playerRepository.save(admin);
-		
+
+		player.setPassword("test");
+		// admin.setRole(Player.ROLE_PLAYER_REGULAR);
+		// admin = playerRepository.save(admin);
+
 		assertThrows(EntityNotFoundException.class, () -> {
-		      playerService.resetPassword(1500L, player);
-		    });
+			playerService.resetPassword(1500L, player);
+		});
 	}
-	
+
 	@DisplayName("Attempt to change password for unexisting user")
 	@Transactional
 	@Test
 	void changePasswordForunexistingUserTest(@Autowired PlayerRepository playerRepository) {
-		
-		Player unexistingPlayer = new Player();
-		unexistingPlayer.setNick("unknown");		
-		//admin.setRole(Player.ROLE_PLAYER_REGULAR);
-		//admin = playerRepository.save(admin);
-		
-		
-		assertThrows(NoSuchElementException.class, () -> {
-		      playerService.resetPassword(admin.getId(), unexistingPlayer);
-		    });
-	}
 
+		Player unexistingPlayer = new Player();
+		unexistingPlayer.setNick("unknown");
+		// admin.setRole(Player.ROLE_PLAYER_REGULAR);
+		Long adminId = admin.getId();
+
+		assertThrows(NoSuchElementException.class, () -> playerService.resetPassword(adminId, unexistingPlayer));
+	}
 
 	@AfterAll
 	public static void done(@Autowired PlayerRepository playerRepository) {
-		
+
 		playerRepository.delete(admin);
 		log.info("Clean up completed");
 
