@@ -28,10 +28,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-
 @Data
 @Entity
 @Table(name = "player")
@@ -45,7 +41,6 @@ public class Player {
 	
 
 	@Id
-	@Schema(description = "Player identifier", example = "25", accessMode = READ_ONLY)
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -53,12 +48,10 @@ public class Player {
 	// @JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@Schema(description = "Player nick name", example = "golfer")
 	@Column(name = "nick")
 	private String nick;
 
 	@NotNull
-	@Schema(description = "Player password", example = "welcome", accessMode = READ_WRITE)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
@@ -67,7 +60,6 @@ public class Player {
 
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@Schema(description = "Player handicap", example = "38.5", accessMode = READ_WRITE)
 	@Min(value = -5)
     @Max(value = 54)
 	@Column(name = "whs")
@@ -75,7 +67,6 @@ public class Player {
 
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@Schema(description = "Player role", example = "0", accessMode = READ_WRITE)
 	@Min(value = 0)
     @Max(value = 1)
 	@Column(name = "role")

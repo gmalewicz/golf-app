@@ -1,5 +1,6 @@
 package com.greg.golf.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.greg.golf.captcha.ICaptchaService;
+import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.security.JwtTokenUtil;
 import com.greg.golf.service.PlayerService;
@@ -44,15 +46,21 @@ public class AccessController {
 	private ICaptchaService captchaService;
 
 	@Autowired
+	private ModelMapper modelMapper;
+
+	@Autowired
 	private AuthenticationManager authenticationManager;
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
 	@PostMapping(value = "/rest/Authenticate")
-	public ResponseEntity<Player> authenticatePlayer(
-			@Parameter(description = "Player object", required = true) @RequestBody Player player) {
+	public ResponseEntity<PlayerDto> authenticatePlayer(
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
-		log.debug("trying to authenticate player: " + player.getNick() + " with password " + player.getPassword());
+		log.debug(
+				"trying to authenticate player: " + playerDto.getNick() + " with password " + playerDto.getPassword());
+
+		Player player = modelMapper.map(playerDto, Player.class);
 
 		authenticate(player.getNick(), player.getPassword());
 
@@ -66,15 +74,19 @@ public class AccessController {
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
 		responseHeaders.set("Jwt", token);
 
-		return new ResponseEntity<>(userDetails.getPlayer(), responseHeaders, HttpStatus.OK);
+		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders,
+				HttpStatus.OK);
 	}
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Add player.")
 	@PostMapping(value = "/rest/AddPlayer")
-	public HttpStatus addPlayer(@Parameter(description = "Player object", required = true) @RequestBody Player player) {
+	public HttpStatus addPlayer(
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
-		log.info("trying to add player: " + player.getNick() + " with password " + player.getPassword());
+		log.info("trying to add player: " + playerDto.getNick() + " with password xxxxxx");
+
+		Player player = modelMapper.map(playerDto, Player.class);
 
 		captchaService.processResponse(player.getCaptcha());
 
@@ -85,30 +97,24 @@ public class AccessController {
 		return HttpStatus.OK;
 	}
 
-	private void authenticate(String username, String password) throws BadCredentialsException {
-
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		
-	}
-
 	@Tag(name = "Access API")
 	@Operation(summary = "Update player. Only WHS and/or password can be updated.")
-	@PatchMapping(value = "/rest/PatchPlayer/{id}")
-	public ResponseEntity<Player> updatePlayer(
-			@Parameter(required = true, description = "Id of the player for update") @PathVariable("id") Long id,
-			@Parameter(description = "Player object", required = true) @RequestBody Player player) {
+	@PatchMapping(value = "/rest/PatchPlayer")
+	public ResponseEntity<PlayerDto> updatePlayer(
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
-		log.info("trying to update player: " + player.getNick());
+		log.info("trying to update player: " + playerDto.getNick());
+
+		Player player = modelMapper.map(playerDto, Player.class);
 
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
-
-			log.info("password changed");
 			player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+			log.info("password changed");
 		}
 
 		player = playerService.update(player);
 
-		return new ResponseEntity<>(player, HttpStatus.OK);
+		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
 	}
 
 	@Tag(name = "Access API")
@@ -116,9 +122,11 @@ public class AccessController {
 	@PatchMapping(value = "/rest/ResetPassword/{id}")
 	public HttpStatus resetPassword(
 			@Parameter(required = true, description = "Id of the player who performs the update") @PathVariable("id") Long id,
-			@Parameter(description = "Player object", required = true) @RequestBody Player player) {
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
-		log.info("trying to reset the password for player: " + player.getNick());
+		log.info("trying to reset the password for player: " + playerDto.getNick());
+
+		Player player = modelMapper.map(playerDto, Player.class);
 
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
 
@@ -129,5 +137,11 @@ public class AccessController {
 		playerService.resetPassword(id, player);
 
 		return HttpStatus.OK;
+	}
+
+	private void authenticate(String username, String password) throws BadCredentialsException {
+
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
 	}
 }
