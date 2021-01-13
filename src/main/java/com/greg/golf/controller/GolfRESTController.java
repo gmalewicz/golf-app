@@ -2,11 +2,13 @@ package com.greg.golf.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.NoSuchElementException;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.greg.golf.entity.helpers.Views;
+import com.greg.golf.controller.dto.CourseDto;
+import com.greg.golf.controller.dto.HoleDto;
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.Game;
@@ -75,6 +79,9 @@ public class GolfRESTController {
 	
 	@Autowired
 	private PlayerService playerService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@Tag(name = "Course API")
 	@Operation(summary = "Get list of courses.")
@@ -88,15 +95,15 @@ public class GolfRESTController {
 	@Tag(name = "Course API")
 	@Operation(summary = "Get list of holes for course.")
 	@GetMapping(value = "/rest/Holes/{id}")
-	public List<Hole> getHoles(
+	public List<HoleDto> getHoles(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("id") Long id) {
 
 		log.info("Requested list of holes for Course id -  " + id);
 
 		Course searchCourse = new Course();
 		searchCourse.setId(id);
-
-		return courseService.getHoles(searchCourse);
+		
+		return mapList(courseService.getHoles(searchCourse), HoleDto.class);
 	}
 
 	@Tag(name = "Course API")
@@ -124,14 +131,19 @@ public class GolfRESTController {
 	@Tag(name = "Course API")
 	@Operation(summary = "Add the new course.")
 	@PostMapping(value = "/rest/Course")
-	public ResponseEntity<Course> addCourse(
-			@Parameter(description = "Course object", required = true) @Valid @RequestBody Course course) {
+	public HttpStatus addCourse(
+			@Parameter(description = "Course object", required = true) @Valid @RequestBody CourseDto courseDto) {
 
-		log.info("trying to add course: " + course);
+		log.info("trying to add course: " + courseDto);
 
+		// copy data from dto to the entity object
+		Course course = modelMapper.map(courseDto, Course.class);
+		course.setHoles(mapList(courseDto.getHoles(), Hole.class));
+		course.setTees(mapList(courseDto.getTees(), CourseTee.class));
+		
 		courseService.save(course);
 
-		return new ResponseEntity<>(course, HttpStatus.OK);
+		return HttpStatus.OK;
 	}
 
 	@Tag(name = "Course API")
@@ -554,5 +566,12 @@ public class GolfRESTController {
 		log.info("Requested players round details for round id " + roundId);
 
 		return roundService.getForPlayerRoundDetails(roundId);
+	}
+	
+	private <S, T> List<T> mapList(List<S> source, Class<T> targetClass) {
+	    return source
+	      .stream()
+	      .map(element -> modelMapper.map(element, targetClass))
+	      .collect(Collectors.toList());
 	}
 }
