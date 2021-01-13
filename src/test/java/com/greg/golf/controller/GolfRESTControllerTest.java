@@ -25,10 +25,12 @@ import com.greg.golf.controller.dto.CourseDto;
 import com.greg.golf.controller.dto.CourseTeeDto;
 import com.greg.golf.controller.dto.HoleDto;
 import com.greg.golf.entity.Course;
+import com.greg.golf.entity.FavouriteCourse;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.entity.Tournament;
+import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
@@ -49,8 +51,7 @@ class GolfRESTControllerTest {
 	private static Player player;
 	private static Round round;
 	private static Tournament tournament;
-	// private static Course course;
-
+	
 	@Autowired
 	TournamentResultRepository tournamentResultRepository;
 
@@ -171,6 +172,37 @@ class GolfRESTControllerTest {
 
 		assertEquals(HttpStatus.OK, status);
 	}
+	
+	@DisplayName("Get tees test")
+	@Transactional
+	@Test
+	void getTeesTest() {
+
+		List<CourseTeeDto> retTees = this.golfRESTController.getTees(1l);
+
+		assertEquals(9, retTees.size());
+	}
+	
+	@DisplayName("Get favourite course test")
+	@Transactional
+	@Test
+	void getFavouriteCourseTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+
+		FavouriteCourse fc = new FavouriteCourse();
+		Player player = new Player();
+		player.setId(1L);
+		Course course = new Course();
+		course.setId(1L);
+		fc.setPlayer(player);
+		fc.setCourse(course);
+		
+		favouriteCourseRepository.save(fc);
+		
+		List<CourseDto> retCourses = this.golfRESTController.getFavouriteCourses(1l);
+		
+		assertEquals(1, retCourses.size());
+	}
+	
 
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,
@@ -183,5 +215,4 @@ class GolfRESTControllerTest {
 		log.info("Clean up completed");
 
 	}
-
 }

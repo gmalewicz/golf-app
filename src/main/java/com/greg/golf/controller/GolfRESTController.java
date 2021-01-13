@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.greg.golf.entity.helpers.Views;
 import com.greg.golf.controller.dto.CourseDto;
+import com.greg.golf.controller.dto.CourseTeeDto;
 import com.greg.golf.controller.dto.HoleDto;
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
@@ -109,12 +110,12 @@ public class GolfRESTController {
 	@Tag(name = "Course API")
 	@Operation(summary = "Get list of tees for course with given id.")
 	@GetMapping(value = "/rest/Tee/{id}")
-	public List<CourseTee> getTees(
+	public List<CourseTeeDto> getTees(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("id") Long id) {
 
 		log.info("Requested list of tees for Course id -  " + id);
 
-		return courseService.getTees(id);
+		return mapList(courseService.getTees(id), CourseTeeDto.class);
 	}
 
 	@Tag(name = "Round API")
@@ -513,11 +514,12 @@ public class GolfRESTController {
 	@Tag(name = "Course API")
 	@Operation(summary = "Get list of favourite courses")
 	@GetMapping(value = "/rest/FavouriteCourses/{playerId}")
-	public List<Course> getFavouriteCourses(
+	public List<CourseDto> getFavouriteCourses(
 			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId)  {
 
 		log.info("Requested list of favourite courses");
-		return courseService.listFavourites(playerId);
+		
+		return mapList(courseService.listFavourites(playerId), CourseDto.class);
 	}
 	
 	@Tag(name = "Course API")
