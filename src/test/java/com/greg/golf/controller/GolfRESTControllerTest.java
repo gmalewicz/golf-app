@@ -203,7 +203,38 @@ class GolfRESTControllerTest {
 		assertEquals(1, retCourses.size());
 	}
 	
-
+	@DisplayName("Get course to favourites")
+	@Transactional
+	@Test
+	void getCourseToFavouritesTest() {
+		
+		CourseDto courseDto = new CourseDto();
+		courseDto.setId(1l);;
+		courseDto.setName("Test course");
+		courseDto.setHoleNbr(9);
+		courseDto.setPar(36);
+		HttpStatus status = this.golfRESTController.addCourseToFavourites(1l, courseDto);
+		
+		assertEquals(HttpStatus.OK, status);
+	}
+	
+	@DisplayName("Delete course from favourites")
+	@Transactional
+	@Test
+	void deleteCourseFromFavouritesTest() {
+		
+		CourseDto courseDto = new CourseDto();
+		courseDto.setId(1l);;
+		courseDto.setName("Test course");
+		courseDto.setHoleNbr(9);
+		courseDto.setPar(36);
+		this.golfRESTController.addCourseToFavourites(1l, courseDto);
+		HttpStatus status = this.golfRESTController.deleteCourseFromFavourites(1l, courseDto);
+		
+		assertEquals(HttpStatus.OK, status);
+	}
+	
+	
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,
 			@Autowired TournamentRepository tournamentRepository, @Autowired TournamentResultRepository tr) {

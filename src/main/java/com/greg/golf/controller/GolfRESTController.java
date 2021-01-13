@@ -527,11 +527,11 @@ public class GolfRESTController {
 	@PostMapping(value = "/rest/FavouriteCourses/{playerId}")
 	public HttpStatus addCourseToFavourites(
 			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
-			@Parameter(description = "course object", required = true) @RequestBody Course course) {
+			@Parameter(description = "course object", required = true) @RequestBody CourseDto courseDto) {
 
 		log.info("trying add course to favourites for player: " + playerId);
 
-		courseService.addToFavourites(course, playerId);
+		courseService.addToFavourites( modelMapper.map(courseDto, Course.class), playerId);
 		
 		return HttpStatus.OK;
 	}
@@ -541,11 +541,11 @@ public class GolfRESTController {
 	@PostMapping(value = "/rest/DeleteFavouriteCourse/{playerId}")
 	public HttpStatus deleteCourseFromFavourites(
 			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
-			@Parameter(description = "course object", required = true) @RequestBody Course course) {
+			@Parameter(description = "course object", required = true) @RequestBody CourseDto courseDto) {
 
 		log.info("trying to delete course from favourites for player: " + playerId);
 
-		courseService.deleteFromFavourites(course, playerId);
+		courseService.deleteFromFavourites(modelMapper.map(courseDto, Course.class), playerId);
 		
 		return HttpStatus.OK;
 	}
