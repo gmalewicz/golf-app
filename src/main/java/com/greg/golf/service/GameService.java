@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.greg.golf.controller.dto.GameSendData;
 import com.greg.golf.entity.Game;
-import com.greg.golf.entity.GameSendData;
 import com.greg.golf.entity.Player;
 import com.greg.golf.repository.GameRepository;
 

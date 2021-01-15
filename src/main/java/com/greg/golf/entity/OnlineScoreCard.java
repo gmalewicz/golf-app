@@ -73,7 +73,7 @@ public class OnlineScoreCard {
 	private Player player;
 	
 	@Transient
-	private long onlineRoundId;
+	private long orId;
 	
 	@Transient
 	private boolean update;

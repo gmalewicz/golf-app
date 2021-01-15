@@ -21,9 +21,6 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-
-import com.greg.golf.entity.helpers.Views;
 
 import javax.validation.constraints.NotNull;
 
@@ -36,19 +33,16 @@ import lombok.EqualsAndHashCode;
 @Table(name = "round")
 public class Round {
 
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@NotNull
 	@JsonProperty(value = "matchPlay")
 	@Column(name = "match_play")
 	private Boolean matchPlay;
 
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne
@@ -65,7 +59,6 @@ public class Round {
 			@JoinColumn(name = "player_id") })
 	private Set<Player> player;
 
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "round_date")

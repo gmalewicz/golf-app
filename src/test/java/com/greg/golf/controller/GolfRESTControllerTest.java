@@ -3,7 +3,9 @@ package com.greg.golf.controller;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -23,19 +25,31 @@ import org.springframework.http.HttpStatus;
 import com.greg.golf.controller.GolfRESTController;
 import com.greg.golf.controller.dto.CourseDto;
 import com.greg.golf.controller.dto.CourseTeeDto;
+import com.greg.golf.controller.dto.GameDataDto;
+import com.greg.golf.controller.dto.GameDto;
 import com.greg.golf.controller.dto.HoleDto;
+import com.greg.golf.controller.dto.PlayerDto;
+import com.greg.golf.controller.dto.PlayerRoundDto;
+import com.greg.golf.controller.dto.RoundDto;
+import com.greg.golf.controller.dto.ScoreCardDto;
+import com.greg.golf.controller.dto.TournamentDto;
+import com.greg.golf.controller.dto.TournamentResultDto;
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.FavouriteCourse;
+import com.greg.golf.entity.Game;
+import com.greg.golf.entity.GameData;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.entity.Tournament;
+import com.greg.golf.entity.TournamentResult;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.service.CourseService;
+import com.greg.golf.service.GameService;
 import com.greg.golf.service.PlayerService;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -51,9 +65,6 @@ class GolfRESTControllerTest {
 	private static Player player;
 	private static Round round;
 	private static Tournament tournament;
-	
-	@Autowired
-	TournamentResultRepository tournamentResultRepository;
 
 	@Autowired
 	private GolfRESTController golfRESTController;
@@ -109,7 +120,7 @@ class GolfRESTControllerTest {
 	@Test
 	void getTrournamentsTest() {
 
-		List<Tournament> tournaments = this.golfRESTController.getTournaments();
+		List<TournamentDto> tournaments = this.golfRESTController.getTournaments();
 		assertEquals(1, tournaments.size());
 
 	}
@@ -120,7 +131,7 @@ class GolfRESTControllerTest {
 	void getTrournamentsWithEmptyTest(@Autowired TournamentRepository tournamentRepository) {
 
 		tournamentRepository.deleteAll();
-		List<Tournament> tournaments = this.golfRESTController.getTournaments();
+		List<TournamentDto> tournaments = this.golfRESTController.getTournaments();
 		assertEquals(0, tournaments.size());
 
 	}
@@ -234,6 +245,179 @@ class GolfRESTControllerTest {
 		assertEquals(HttpStatus.OK, status);
 	}
 	
+	@DisplayName("Add round")
+	@Transactional
+	@Test
+	void addRoundTest() {
+		
+		RoundDto roundDto= new RoundDto();
+		roundDto.setMatchPlay(false);
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(2020, 5, 12);
+		roundDto.setRoundDate(calendar.getTime());
+		roundDto.setScoreCard(new ArrayList<ScoreCardDto>());
+		ScoreCardDto scoreCard = new ScoreCardDto();
+		scoreCard.setHole(1);
+		scoreCard.setPats(0);
+		scoreCard.setPenalty(0);
+		scoreCard.setStroke(5);
+		roundDto.getScoreCard().add(scoreCard);
+		CourseDto courseDto = new CourseDto();
+		courseDto.setId(1l);
+		List<CourseTeeDto> courseTeeDtoLst = new ArrayList<>();
+		CourseTeeDto courseTeeDto = new CourseTeeDto();
+		courseTeeDto.setId(1l);
+		courseTeeDtoLst.add(courseTeeDto);
+		courseDto.setTees(courseTeeDtoLst);
+		roundDto.setCourse(courseDto);
+		PlayerDto playerDto = new PlayerDto();
+		playerDto.setId(1L);
+		playerDto.setWhs(32.1f);
+		Set<PlayerDto> playerDtoLst = new HashSet<>();
+		playerDtoLst.add(playerDto);
+		roundDto.setPlayer(playerDtoLst);
+			
+		HttpStatus status = this.golfRESTController.addRound(roundDto);
+		
+		assertEquals(HttpStatus.OK, status);
+	}
+	
+	@DisplayName("Get round for player test")
+	@Transactional
+	@Test
+	void getRoundForPlayerTest() {
+		
+		List<RoundDto> roundDtoLst =  this.golfRESTController.getRound(1l, 0);
+		
+		assertEquals(1, roundDtoLst.size());
+	}
+	
+	@DisplayName("Get recent rounds")
+	@Transactional
+	@Test
+	void getRecentRoundsTest() {
+		
+		List<RoundDto> roundDtoLst =  this.golfRESTController.getRecentRounds(0);
+		
+		assertEquals(1, roundDtoLst.size());
+	}
+	
+	@DisplayName("Get scorcards")
+	@Transactional
+	@Test
+	void getScoreCardsTest() {
+		
+		List<ScoreCardDto> scoreCardDtoLst =  this.golfRESTController.getScoreCards(round.getId());
+		
+		assertEquals(2, scoreCardDtoLst.size());
+	}
+	
+	@DisplayName("Get round player details")
+	@Transactional
+	@Test
+	void getRoundPlayerDetailsTest() {
+		
+		PlayerRoundDto playerRoundDto =  this.golfRESTController.getRoundPlayerDetails(1l, round.getId());
+		
+		assertEquals(player.getWhs(), playerRoundDto.getWhs());
+	}
+	
+	@DisplayName("Get player details for round")
+	@Transactional
+	@Test
+	void getPlayerDetailsForRoundTest() {
+		
+		List<PlayerRoundDto> playerRoundDtoLst =  this.golfRESTController.getPlayersDetailsForRound(round.getId());
+		
+		assertEquals(player.getWhs(), playerRoundDtoLst.get(0).getWhs());
+	}
+	
+	@DisplayName("Add game")
+	@Transactional
+	@Test
+	void addGameTest(@Autowired ModelMapper modelMapper) {
+		
+		GameDto gameDto = new GameDto();
+		gameDto.setPlayer(modelMapper.map(player, PlayerDto.class));
+		gameDto.setGameDate(new Date());
+		gameDto.setGameId(1l);
+		gameDto.setStake(0.5f);
+		
+		GameDataDto gameDataDto = new GameDataDto();
+		String[] nicks = {"golfer", "test"};
+		gameDataDto.setPlayerNicks(nicks);
+		Integer[] score = {1, 2};
+		gameDataDto.setScore(score);;
+		Short[][] gameResult = {{1, 2}};
+		gameDataDto.setGameResult(gameResult);
+		
+		gameDto.setGameData(gameDataDto);
+		
+		HttpStatus status =  this.golfRESTController.addGame(gameDto);
+		
+		assertEquals(HttpStatus.OK, status);
+	}
+	
+	@DisplayName("Add game")
+	@Transactional
+	@Test
+	void getGamesTest(@Autowired ModelMapper modelMapper, @Autowired GameService gameService) {
+		
+		Game game = new Game();
+		game.setPlayer(player);
+		game.setGameDate(new Date());
+		game.setGameId(1l);
+		game.setStake(0.5f);
+		
+		GameData gameData = new GameData();
+		String[] nicks = {"golfer", "test"};
+		gameData.setPlayerNicks(nicks);
+		Integer[] score = {1, 2};
+		gameData.setScore(score);;
+		Short[][] gameResult = {{1, 2}};
+		gameData.setGameResult(gameResult);
+		
+		game.setGameData(gameData);
+		
+		gameService.save(game);
+		
+		List<GameDto> gameDtoLst =  this.golfRESTController.getGames(1l);
+		
+		assertEquals(1l, gameDtoLst.get(0).getGameId().longValue());
+	}
+	
+	@DisplayName("Get tournamnet results")
+	@Transactional
+	@Test
+	void getTournamnetResultsTest(@Autowired TournamentResultRepository tournamentResultRepository) {
+		
+		TournamentResult tr = new TournamentResult();
+		tr.setPlayedRounds(1);
+		tr.setPlayer(player);
+		tr.setStbGross(1);
+		tr.setStbNet(1);
+		tr.setStbNet(1);
+		tr.setStrokesBrutto(1);
+		tr.setStrokesNetto(1);
+		tr.setTournament(tournament);
+		tournamentResultRepository.save(tr);
+		
+		List<TournamentResultDto> trDtoLst =  this.golfRESTController.getTournamentResult(tournament.getId());
+		
+		assertEquals(1, trDtoLst.get(0).getStbNet().intValue());
+	}
+	
+	@DisplayName("Get rounds for tournament")
+	@Transactional
+	@Test
+	void getRoundsForTournamentTest() {
+		
+	
+		List<RoundDto> rndDtoLst =  this.golfRESTController.getTournamentRounds(tournament.getId());
+		
+		assertEquals(1, rndDtoLst.size());
+	}
+	
 	
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,
@@ -246,4 +430,5 @@ class GolfRESTControllerTest {
 		log.info("Clean up completed");
 
 	}
+
 }
