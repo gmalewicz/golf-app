@@ -16,9 +16,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -57,20 +54,18 @@ public class CourseTee {
 	@NotNull
 	@Min(value = 0, message = "0 - 18 holes, 1 - first 9, 2 - second 9")
     @Max(value = 2, message = "0 - 18 holes, 1 - first 9, 2 - second 9")
-	//@Size(min = 0, max = 2, message = "0 - 18 holes, 1 - first 9, 2 - second 9")
-	// @Pattern(regexp = "0|1|2", message = "0 - 18 holes tee, 1 - first 9, 2 - second 9")
 	@Column(name = "tee_type")
 	private Integer teeType;
 	
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@JsonIgnore
+	//@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Course course;
 	
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@JsonIgnore
+	//@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "courseTee", orphanRemoval = true)
 	private List<OnlineRound> onlineRound;
 

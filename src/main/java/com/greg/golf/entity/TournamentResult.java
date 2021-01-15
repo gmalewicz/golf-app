@@ -13,8 +13,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -33,7 +31,7 @@ public class TournamentResult {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Tournament tournament;
@@ -55,7 +53,7 @@ public class TournamentResult {
 	@NotNull
 	@Column(name = "played_rounds")
 	private Integer playedRounds;
-	
+
 	@NotNull
 	@Column(name = "stb_net")
 	private Integer stbNet;
@@ -63,10 +61,10 @@ public class TournamentResult {
 	@NotNull
 	@Column(name = "stb_gross")
 	private Integer stbGross;
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tournamentResult", orphanRemoval = true)
 	private List<TournamentRound> tournamentRound;
 }

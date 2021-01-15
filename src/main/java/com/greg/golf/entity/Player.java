@@ -15,9 +15,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,24 +25,18 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-
 @Data
 @Entity
 @Table(name = "player")
-@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+//@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Player {
-	
+
 	@Transient
 	public static final int ROLE_PLAYER_ADMIN = 0;
 	@Transient
 	public static final int ROLE_PLAYER_REGULAR = 1;
-	
 
 	@Id
-	@Schema(description = "Player identifier", example = "25", accessMode = READ_ONLY)
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -53,37 +44,33 @@ public class Player {
 	// @JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@Schema(description = "Player nick name", example = "golfer")
 	@Column(name = "nick")
 	private String nick;
 
 	@NotNull
-	@Schema(description = "Player password", example = "welcome", accessMode = READ_WRITE)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
+	// @JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
 	@Column(name = "password")
 	private String password;
 
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@Schema(description = "Player handicap", example = "38.5", accessMode = READ_WRITE)
 	@Min(value = -5)
-    @Max(value = 54)
+	@Max(value = 54)
 	@Column(name = "whs")
 	private Float whs;
 
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@Schema(description = "Player role", example = "0", accessMode = READ_WRITE)
 	@Min(value = 0)
-    @Max(value = 1)
+	@Max(value = 1)
 	@Column(name = "role")
 	private Integer role;
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@ManyToMany(cascade = { CascadeType.ALL })
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "player_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "round_id") })
@@ -91,40 +78,40 @@ public class Player {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<ScoreCard> scoreCard;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<Game> game;
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<TournamentResult> tournamentResult;
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<Tournament> tournament;
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<OnlineRound> onlineRound;
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<FavouriteCourse> favouriteCourse;
-	
+
 	@Transient
 	private String captcha;
 

@@ -19,11 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
-import com.greg.golf.entity.helpers.Views;
 
 import javax.validation.constraints.NotNull;
 
@@ -36,53 +32,49 @@ import lombok.EqualsAndHashCode;
 @Table(name = "round")
 public class Round {
 
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@NotNull
-	@JsonProperty(value = "matchPlay")
+	//@JsonProperty(value = "matchPlay")
 	@Column(name = "match_play")
 	private Boolean matchPlay;
 
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne
-	@JsonProperty(value = "course")
+	//@JsonProperty(value = "course")
 	private Course course;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	//@JsonProperty(value = "player", access = JsonProperty.Access.WRITE_ONLY)
-	@JsonProperty(value = "player")
+	//@JsonProperty(value = "player")
 	//@JsonView(Views.RoundWithPlayer.class)
 	@ManyToMany(cascade = { CascadeType.DETACH }, fetch = FetchType.LAZY)
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "round_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "player_id") })
 	private Set<Player> player;
 
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "round_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd kk:mm")
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd kk:mm")
 	private Date roundDate;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	//@SortNatural
 	//@OrderBy
-	@JsonProperty(value = "scoreCard", access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(value = "scoreCard", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
 	// @JoinColumn(name = "round_id")
 	private List<ScoreCard> scoreCard = new ArrayList<>();
 	
 	@EqualsAndHashCode.Exclude
-	@JsonProperty(value = "tournament", access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(value = "tournament", access = JsonProperty.Access.WRITE_ONLY)
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Tournament tournament;

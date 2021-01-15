@@ -15,13 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import java.util.List;
 import java.util.ArrayList;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.validation.constraints.NotNull;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,58 +42,59 @@ public class OnlineRound {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "time_time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "kk:mm")
+	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "kk:mm")
 	private String teeTime;
 
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	@JsonIgnore
+	// @JsonIgnore
 	@Column(name = "date")
 	private Date date;
-	
+
 	@NotNull
 	@ToString.Exclude
-	@JsonProperty(value = "player")
+	// @JsonProperty(value = "player")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;
-	
+
 	@NotNull
-	@JsonProperty(value = "owner")
+	// @JsonProperty(value = "owner")
 	private Long owner;
-	
+
 	@NotNull
-	@JsonProperty(value = "finalized")
+	// @JsonProperty(value = "finalized")
 	private Boolean finalized;
-	
-	@JsonProperty(value = "putts")
+
+	// @JsonProperty(value = "putts")
 	private Boolean putts;
-	
-	@JsonProperty(value = "penalties")
+
+	// @JsonProperty(value = "penalties")
 	private Boolean penalties;
-	
-	@JsonProperty(value = "matchPlay")
+
+	// @JsonProperty(value = "matchPlay")
 	@Column(name = "match_play")
 	private Boolean matchPlay;
-	
+
 	@EqualsAndHashCode.Exclude
-	@Schema(description = "Player nick name", example = "golfer")
+	// @Schema(description = "Player nick name", example = "golfer")
 	@Column(name = "nick2")
 	private String nick2;
-	
+
 	@NotNull
 	@ToString.Exclude
-	@JsonProperty(value = "tee")
+	// @JsonProperty(value = "tee")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "course_tee_id", nullable = false)
 	private CourseTee courseTee;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonProperty(value = "onlineScoreCard", access = JsonProperty.Access.WRITE_ONLY)
+	// @JsonProperty(value = "onlineScoreCard", access =
+	// JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "onlineRound", orphanRemoval = true)
 	private List<OnlineScoreCard> scoreCard = new ArrayList<>();
-	
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@Transient

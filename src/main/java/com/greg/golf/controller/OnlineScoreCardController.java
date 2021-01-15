@@ -1,10 +1,12 @@
 package com.greg.golf.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
+import com.greg.golf.controller.dto.OnlineScoreCardDto;
 import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.entity.OnlineScoreCard;
 import com.greg.golf.service.OnlineRoundService;
@@ -18,18 +20,24 @@ public class OnlineScoreCardController {
 	@Autowired
 	private OnlineRoundService onlineRoundService;
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	@MessageMapping("/hole")
 	@SendTo("/topic")
-	public OnlineScoreCard send(OnlineScoreCard onlineScoreCard) {
+	public OnlineScoreCardDto send(OnlineScoreCardDto onlineScoreCardDto) {
 	    
-		log.debug("Received s -  " + onlineScoreCard);
+		log.debug("Received s -  " + onlineScoreCardDto);
+		
+		OnlineScoreCard onlineScoreCard =  modelMapper.map(onlineScoreCardDto, OnlineScoreCard.class);
+		
 		
 		OnlineRound onlineRound = new OnlineRound();
-		onlineRound.setId(onlineScoreCard.getOnlineRoundId());
+		onlineRound.setId(onlineScoreCard.getOrId());
 		onlineScoreCard.setOnlineRound(onlineRound);
 		
 		onlineRoundService.saveOnlineScoreCard(onlineScoreCard);
 		
-	    return onlineScoreCard;
+	    return modelMapper.map(onlineScoreCard, OnlineScoreCardDto.class);
 	}
 }
