@@ -43,6 +43,6 @@ jobs:
         spring_datasource_url: jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/golf
         spring_datasource_username: ${{secrets.DB_USER_NAME}}  
         spring_datasource_password: ${{secrets.DB_USER_PASSWORD}}
-        # Google test reCaptcha credentials
+        # Google test reCaptcha credentials  
         google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
         google_recaptcha_key_secret: ${{GOOGLE_RECAPTCHA_KEY_SECRET}}
