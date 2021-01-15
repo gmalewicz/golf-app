@@ -17,10 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -44,25 +40,25 @@ public class Tournament {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@JsonIgnore
+	//@JsonIgnore
 	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "tournament", orphanRemoval = false)
 	private List<Round> round = new ArrayList<>();
 
 	@NotNull
 	@EqualsAndHashCode.Exclude
 	@Column(name = "start_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date startDate;
 	
 	@NotNull
 	@EqualsAndHashCode.Exclude
 	@Column(name = "end_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date endDate;
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
+	//@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tournament", orphanRemoval = true)
 	private List<TournamentResult> tournamentResult;
 	

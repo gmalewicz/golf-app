@@ -11,10 +11,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
@@ -27,7 +23,7 @@ public class Hole {
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@JsonIgnore
+	//@JsonIgnore
 	private Long id;
 	
 	@NotNull
@@ -50,7 +46,7 @@ public class Hole {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@JsonProperty(value = "course_id", access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(value = "course_id", access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Course course;
 	

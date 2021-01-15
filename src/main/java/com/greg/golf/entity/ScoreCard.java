@@ -12,9 +12,6 @@ import javax.persistence.Transient;
 
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
@@ -35,7 +32,7 @@ public class ScoreCard {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonProperty(value = "round_id", access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(value = "round_id", access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Round round;
 
@@ -71,19 +68,19 @@ public class ScoreCard {
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;
 
-	@JsonIgnore
+	//@JsonIgnore
 	@Transient
 	private int stbNet;
 	
-	@JsonIgnore
+	//@JsonIgnore
 	@Transient
 	private int stbGross;
 	
-	@JsonIgnore
+	//@JsonIgnore
 	@Transient
 	private int hcp;
 	
-	@JsonIgnore
+	//@JsonIgnore
 	@Transient
 	private int corStroke;
 }

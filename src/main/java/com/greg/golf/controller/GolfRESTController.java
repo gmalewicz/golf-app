@@ -89,10 +89,10 @@ public class GolfRESTController {
 	@Tag(name = "Course API")
 	@Operation(summary = "Get list of courses.")
 	@GetMapping(value = "/rest/Courses")
-	public List<Course> getCourses() {
+	public List<CourseDto> getCourses() {
 
 		log.info("Requested list of courses");
-		return courseService.list();
+		return mapList(courseService.list(), CourseDto.class);
 	}
 
 	@Tag(name = "Course API")

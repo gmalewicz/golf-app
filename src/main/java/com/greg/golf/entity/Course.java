@@ -13,9 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.ToString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,13 +52,11 @@ public class Course {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonProperty(value = "holes", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
 	private List<Hole> holes = new ArrayList<>();
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonProperty(value = "tees", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
 	private List<CourseTee> tees = new ArrayList<>();
 
@@ -77,13 +72,11 @@ public class Course {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
 	private List<Round> rounds;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
 	private List<FavouriteCourse> favouriteCourse;
 

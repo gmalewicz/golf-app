@@ -1,6 +1,9 @@
 package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
+
+import javax.validation.constraints.NotNull;
+
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,9 +18,11 @@ public class OnlineScoreCardDto {
 	@Schema(description = "Course identifier", example = "25", accessMode = READ_ONLY)
 	private Long id;
 
+	@NotNull
 	@Schema(description = "Hole number", example = "14", accessMode = READ_WRITE, minimum = "1", maximum = "18")
 	private Integer hole;
 
+	@NotNull
 	@Schema(description = "Number of strokes (including putts)", example = "6", accessMode = READ_WRITE, minimum = "1", maximum = "15")
 	private Integer stroke;
 

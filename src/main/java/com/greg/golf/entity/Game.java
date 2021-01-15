@@ -15,7 +15,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import lombok.Data;
@@ -37,7 +36,7 @@ public class Game {
 
 	@NotNull
 	@ToString.Exclude
-	@JsonProperty( value = "player", access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty( value = "player", access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;

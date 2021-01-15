@@ -2,6 +2,7 @@ package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
 
 import java.util.List;
 
@@ -50,7 +51,8 @@ public class OnlineRoundDto {
 	@JsonProperty(value = "tee")
 	private CourseTeeDto courseTee;
 
-	@Schema(description = "List of scorecard objects", accessMode = READ_WRITE)
+	@JsonProperty(value = "onlineScoreCard", access = JsonProperty.Access.WRITE_ONLY)
+	@Schema(description = "List of scorecard objects", accessMode = WRITE_ONLY)
 	private List<OnlineScoreCardDto> scoreCard;
 
 	@Schema(description = "List of scorecard AOI objects", accessMode = READ_WRITE)

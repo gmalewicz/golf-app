@@ -7,8 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.ToString;
 
@@ -18,36 +16,36 @@ import lombok.ToString;
 public class PlayerRound {
 
 	@Id
-	@JsonIgnore
+	// @JsonIgnore
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	//@JsonIgnore
+	// @JsonIgnore
 	@ToString.Exclude
 	@Column(name = "player_id")
 	private Long playerId;
 
-	@JsonIgnore
+	// @JsonIgnore
 	@ToString.Exclude
 	@Column(name = "round_id")
 	private Long roundId;
 
 	@Column(name = "whs")
 	private Float whs;
-	
-	//@JsonIgnore
+
+	// @JsonIgnore
 	@Column(name = "tee_id")
 	private Long teeId;
-	
-	@JsonIgnore
+
+	// @JsonIgnore
 	@Column(name = "tournament_id")
 	private Long tournamentId;
-	
+
 	private Float cr;
-	
+
 	private Integer sr;
-	
+
 	@Column(name = "tee_type")
 	private Integer teeType;
 }
