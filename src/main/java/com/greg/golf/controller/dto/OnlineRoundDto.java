@@ -57,4 +57,7 @@ public class OnlineRoundDto {
 
 	@Schema(description = "List of scorecard AOI objects", accessMode = READ_WRITE)
 	private List<OnlineScoreCardDto> scoreCardAPI;
+	
+	@Schema(description = "Second player nick for match play", accessMode = READ_WRITE)
+	private String nick2;
 }
