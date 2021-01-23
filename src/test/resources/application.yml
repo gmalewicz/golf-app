@@ -1,0 +1,45 @@
+spring:
+  mail:
+    test-connection: false  
+    host: smtp.gmail.com
+    port: 587
+    username: replace_it
+    password: replace_it
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
+  datasource:
+    hikari:
+      connectionTimeout: 20000 
+      maximumPoolSize: 5
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:13.1:///
+    username: golf_usr
+    password: welcome
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    open-in-view: true 
+    generate-ddl: false 
+    show_sql: true
+  liquibase:
+    change-log: classpath:/db/dbChangeLog-dev.xml
+jwt:
+  secret: golfBackendSecret
+springdoc:
+  swagger-ui:
+    path: /api/swagger-ui.html
+  api-docs:
+    path: /api  
+google:
+  recaptcha:
+    key:
+      site: 6Lf-66YZAAAAAJc3serwf1iRoJg6PgTPJazkfNWD
+      secret: secret  
+cors:
+  allowedOrigins: dgng.pl
+round:
+  pageSize: 5

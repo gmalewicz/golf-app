@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -30,15 +31,21 @@ import com.greg.golf.entity.Tournament;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.repository.TournamentResultRepository;
+import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class RoundServiceTest {
+	
+	@ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	private static Player player;
 	private static Round round;
