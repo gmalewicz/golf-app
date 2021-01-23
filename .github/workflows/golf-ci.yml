@@ -14,16 +14,6 @@ jobs:
 
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: postgres:11
-        env:
-          POSTGRES_USER: ${{secrets.DB_USER_NAME}}
-          POSTGRES_PASSWORD: ${{secrets.DB_USER_PASSWORD}}
-          POSTGRES_DB: golf
-        ports:
-          - 5432/tcp
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.13
@@ -38,11 +28,6 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file ./pom.xml 
       env:
-        # use localhost for the host here because we are running the job on the VM.
-        # If we were running the job on in a container this would be postgres
-        spring_datasource_url: jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/golf
-        spring_datasource_username: ${{secrets.DB_USER_NAME}}  
-        spring_datasource_password: ${{secrets.DB_USER_PASSWORD}}
         # Google test reCaptcha credentials
         google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
         google_recaptcha_key_secret: ${{GOOGLE_RECAPTCHA_KEY_SECRET}}
