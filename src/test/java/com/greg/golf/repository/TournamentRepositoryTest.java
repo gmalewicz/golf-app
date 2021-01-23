@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,11 +21,11 @@ import com.greg.golf.entity.Round;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.service.PlayerService;
+import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-
-
+import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -33,6 +33,9 @@ class TournamentRepositoryTest {
 
 	private static Player player;
 
+	@ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+	
 	@Autowired
 	private TournamentRepository tournamentRepository;
 
@@ -42,19 +45,6 @@ class TournamentRepositoryTest {
 		player = ps.getPlayer(1L).orElseThrow();
 	}
 	
-	/*
-	@BeforeAll
-	public static void setup(@Autowired RoundRepository roundRepository) {
-
-		Course course = new Course();
-		course.setId(1L);
-		round = new Round();
-		round.setCourse(course);
-		round.setRoundDate(new Date(1));
-		round = roundRepository.save(round);
-		log.info("Set up completed");
-	}
-*/
 	@DisplayName("Add tournament")
 	@Transactional
 	@Test

@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -20,15 +21,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.greg.golf.entity.Player;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
+import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class PlayerServiceTest {
+	
+	@ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	private static Player player;
 	private static Player admin;

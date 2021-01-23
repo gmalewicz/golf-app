@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.Optional;
 
+import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -26,9 +27,11 @@ import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.service.PlayerService;
+import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -36,6 +39,9 @@ import lombok.extern.log4j.Log4j2;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class TournamentResultRepositoryTest {
+	
+	@ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	private static Tournament tournament;
 

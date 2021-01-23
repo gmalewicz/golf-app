@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -23,9 +24,11 @@ import com.greg.golf.entity.OnlineScoreCard;
 import com.greg.golf.entity.Player;
 import com.greg.golf.repository.OnlineRoundRepository;
 import com.greg.golf.repository.OnlineScoreCardRepository;
+import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -34,7 +37,8 @@ import lombok.extern.log4j.Log4j2;
 @ExtendWith(SpringExtension.class)
 class OnlineRoundService2Test {
 
-	// private static Course course;
+	@ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	@Autowired
 	private OnlineRoundService onlineRoundService;

@@ -21,7 +21,6 @@
 		<spring.version>5.2.1.RELEASE</spring.version>
 		<guava.version>29.0-jre</guava.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 	</properties>
 
 	<dependencies>
@@ -162,6 +161,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>1.15.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
