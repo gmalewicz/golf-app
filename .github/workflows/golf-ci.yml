@@ -62,6 +62,14 @@ jobs:
         sudo mkdir /home/grzegorz_malewicz
         sudo mkdir /home/grzegorz_malewicz/logs
         
+    - name: Cache local Maven repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+        
     - name: Analyze with SonarCloud
       run: mvn -B compile sonar:sonar 
         -Dsonar.organization=gmalewicz 
@@ -75,9 +83,6 @@ jobs:
         -Dsonar.exclusions=.git/**,.settings/**,target/**
           --file ./pom.xml 
       env:
-        # Google test reCaptcha credentials
-        google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
-        google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         
