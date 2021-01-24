@@ -37,7 +37,7 @@ jobs:
           ${{ runner.os }}-maven-
 
     - name: Build with Maven
-      run: mvn -B sonar --file ./pom.xml 
+      run: mvn -B sonar:sonar --file ./pom.xml 
       env:
         # Google test reCaptcha credentials
         google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
