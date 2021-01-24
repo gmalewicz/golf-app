@@ -37,12 +37,15 @@ jobs:
           ${{ runner.os }}-maven-
 
     - name: Build with Maven
-      run: mvn -B sonar:sonar 
+      run: mvn -B package sonar:sonar 
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.login=$SONAR_TOKEN 
         -Dsonar.projectName=gmalewicz_golf-app
         -Dsonar.java.source=13
+        -Dsonar.sources=src/main/java,src/main/resources/templates
+        -Dsonar.java.binaries=target/classes
+        -Dsonar.sourceEncoding=UTF-8
         -Dsonar.exclusions=.git/**,.settings/**,target/**
           --file ./pom.xml 
       env:
