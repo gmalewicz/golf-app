@@ -38,7 +38,30 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B package --file ./pom.xml 
-
+    
+      env:
+          # Google test reCaptcha credentials
+          google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+          google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
+          
+  analyse:
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up JDK 1.13
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.13
+        
+    - name: Create log directory
+      run: |
+        sudo mkdir /home/grzegorz_malewicz
+        sudo mkdir /home/grzegorz_malewicz/logs
+        
     - name: Analyze with SonarCloud
       run: mvn -B sonar:sonar 
         -Dsonar.organization=gmalewicz 
