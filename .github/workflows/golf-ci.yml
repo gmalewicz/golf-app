@@ -63,7 +63,7 @@ jobs:
         sudo mkdir /home/grzegorz_malewicz/logs
         
     - name: Analyze with SonarCloud
-      run: mvn -B sonar:sonar 
+      run: mvn -B compile sonar:sonar 
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.login=$SONAR_TOKEN 
