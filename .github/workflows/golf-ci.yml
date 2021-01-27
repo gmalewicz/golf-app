@@ -48,8 +48,8 @@ jobs:
           google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
           google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
     
-    #- name: Set up version
-    #  run: echo "::set-env name=VERSION::$($VERSION_EXP)"
+    - name: Set up version
+      run: set-env name=VERSION::$($VERSION_EXP)
     
     - name: Assemble image
       run: docker build -t $PKG_NAME:$(VERSION_EXP) -t $PKG_NAME:latest .
