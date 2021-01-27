@@ -9,11 +9,9 @@ RUN addgroup -S golf && adduser -S golf -G golf
 
 USER golf:golf
 
-RUN sudo mkdir /usr/golf
+WORKDIR /opt/golf
 
-COPY ${APP} /usr/golf/golf.jar
-
-WORKDIR /usr/golf
+COPY ${APP} golf.jar
 
 ENTRYPOINT ["java","-jar","golf.jar"]
 
