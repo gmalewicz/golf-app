@@ -49,7 +49,7 @@ jobs:
           google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
     
     - name: Set up version
-      run: echo "VERSION=dupa" >> $GITHUB_ENV
+      run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV
     
     - name: Assemble image
       run: docker build -t $PKG_NAME:$VERSION -t $PKG_NAME:latest .
