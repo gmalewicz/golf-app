@@ -9,7 +9,7 @@ RUN addgroup -S golf && adduser -S golf -G golf
 
 USER golf:golf
 
-RUN mkdir /usr/golf
+RUN sudo mkdir /usr/golf
 
 COPY ${APP} /usr/golf/golf.jar
 
