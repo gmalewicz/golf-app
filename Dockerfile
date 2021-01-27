@@ -5,7 +5,7 @@ LABEL github="https://github.com/gmalewicz/golf-app"
 
 ARG APP=./target/golf-*.jar
 
-RUN addgroup -S helios && adduser -S golf -G golf
+RUN addgroup -S golf && adduser -S golf -G golf
 
 USER golf:golf
 
