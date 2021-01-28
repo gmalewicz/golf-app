@@ -62,7 +62,7 @@ jobs:
       run: |
         echo $GITHUB_TOKEN | docker login docker.pkg.github.com --username gmalewicz --password-stdin
         docker push $PKG_NAME:latest
-        docker push $PKG_NAME:$VERSION
+      # docker push $PKG_NAME:$VERSION
     
   analyse:
     
