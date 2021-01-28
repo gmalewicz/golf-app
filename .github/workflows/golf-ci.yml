@@ -56,10 +56,8 @@ jobs:
     - name: Publish image
       # if: startsWith(github.ref, 'refs/tags/')
       if: always()
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       run: |
-        echo $GITHUB_TOKEN | docker login docker.pkg.github.com --username gmalewicz --password-stdin
+        echo ${{secrets.GITHUB_TOKEN}} | docker login docker --username gmalewicz --password-stdin
         docker push $PKG_NAME:latest
       # docker push $PKG_NAME:$VERSION
     
