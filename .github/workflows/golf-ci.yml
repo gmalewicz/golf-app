@@ -11,7 +11,7 @@ on:
 
 env:
   VERSION_EXP: git describe --tags --always --first-parent --dirty  
-  PKG_NAME: docker.pkg.github.com/gmalewicz/golf/golf-app
+  PKG_NAME: docker.pkg.github.com/gmalewicz/golf
 
 jobs:
   build:
