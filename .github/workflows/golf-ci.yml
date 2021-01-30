@@ -52,7 +52,7 @@ jobs:
       run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV
     
     - name: Assemble image
-      run: docker build -t $PKG_NAME:$VERSION -t $PKG_NAME:latest .
+      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest .
       
     - name: Publish image
       # if: startsWith(github.ref, 'refs/tags/')
