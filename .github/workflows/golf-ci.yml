@@ -60,7 +60,7 @@ jobs:
       run: |
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $ORGANIZATION --password-stdin
         docker push $IMAGE:$VERSION
-      # docker push $PKG_NAME:$VERSION
+        docker push $IMAGE:latest
     
   analyse:
     
