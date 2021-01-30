@@ -40,16 +40,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: Build with Maven
-      run: mvn -B package --file ./pom.xml 
+    #- name: Build with Maven
+    #   run: mvn -B package --file ./pom.xml 
     
-      env:
+    #  env:
           # Google test reCaptcha credentials
-          google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
-          google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
+    #      google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+    #      google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
       
     - name: Analyze with SonarCloud
-      run: mvn -B package sonar:sonar 
+      run: mvn -B package sonar:sonar ./pom.xml 
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.login=$SONAR_TOKEN 
@@ -61,6 +61,8 @@ jobs:
         -Dsonar.exclusions=.git/**,.settings/**,target/**
           --file ./pom.xml 
       env:
+        google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+        google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
     
