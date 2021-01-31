@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>1.8.6</version>
+	<version>1.8.6.2</version>
 	<name>golf</name>
 	<description>DrunkGolfers and NiceGirls</description>
 
@@ -171,7 +171,6 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
@@ -210,11 +209,13 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 				</plugin>
+				<!-- 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
 				</plugin>
+				 -->
 				<plugin>
 					<groupId>org.sonarsource.scanner.maven</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>
@@ -226,7 +227,6 @@
 					<version>0.8.6</version>
 				</plugin>
 			</plugins>
-		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>

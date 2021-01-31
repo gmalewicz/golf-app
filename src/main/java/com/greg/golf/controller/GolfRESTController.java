@@ -332,7 +332,7 @@ public class GolfRESTController {
 
 		Tournament tournament = new Tournament();
 		tournament.setId(tournamentId);
-
+		
 		return mapList(tournamentService.findAllTournamnetsResults(tournament), TournamentResultDto.class);
 
 	}
