@@ -55,7 +55,7 @@ jobs:
      #   sed -i 's/\/home\/runner\/work\/<golf-app>\/<golf-app>\//\/github\/workspace\//g' sonar-cloud-reporter.xml
       
     - name: Buiild & analyze with SonarCloud
-      run: mvn -B -X package sonar:sonar --file ./pom.xml 
+      run: mvn -B package sonar:sonar --file ./pom.xml 
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.login=$SONAR_TOKEN 
@@ -64,6 +64,7 @@ jobs:
         -Dsonar.sources=src/main/java,src/main/resources/templates
         -Dsonar.java.binaries=target/classes
         -Dsonar.sourceEncoding=UTF-8
+        -Dsonar.coverage.jacoco.xmlReportPaths=/home/runner/work/golf-app/golf-app/target/site/jacoco
         -Dsonar.exclusions=.git/**,.settings/**,target/**
           --file ./pom.xml 
       env:
