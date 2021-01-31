@@ -3,9 +3,6 @@ package com.greg.golf.controller.dto;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 import javax.validation.constraints.NotNull;
-
-import com.greg.golf.entity.Player;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.Getter;
@@ -20,7 +17,7 @@ public class TournamentResultDto {
 
 	@NotNull
 	@Schema(description = "Player for scorecard", accessMode = READ_ONLY)
-	private Player player;
+	private PlayerDto player;
 
 	@NotNull
 	@Schema(description = "Tournament gross strokes", accessMode = READ_ONLY, minimum = "0")
