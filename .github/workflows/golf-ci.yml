@@ -48,13 +48,13 @@ jobs:
     #      google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
     #      google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
       
-    - name: fix code coverage paths
+     #- name: fix code coverage paths
      # working-directory: ./coverage
      # run: |
      #   sed -i 's/\/home\/runner\/work\/<golf-app>\/<golf-app>\//\/github\/workspace\//g' lcov.info
      #   sed -i 's/\/home\/runner\/work\/<golf-app>\/<golf-app>\//\/github\/workspace\//g' sonar-cloud-reporter.xml
       
-    - name: Analyze with SonarCloud
+    - name: Buiild & analyze with SonarCloud
       run: mvn -B package sonar:sonar --file ./pom.xml 
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
