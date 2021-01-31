@@ -6,9 +6,11 @@ name: Java GOLF CI with Maven
 on:
   push:
     branches: [ master ]
+    tags:
+     - '**' 
   pull_request:
     branches: [ master ]
-
+    
 env:
   VERSION_EXP: git describe --tags --always --first-parent --dirty  
   IMAGE: ${{ github.repository_owner }}/${{ github.event.repository.name }}
