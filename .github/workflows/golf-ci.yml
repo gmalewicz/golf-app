@@ -15,6 +15,7 @@ env:
   VERSION_EXP: git describe --tags --always --first-parent --dirty  
   IMAGE: ${{ github.repository_owner }}/${{ github.event.repository.name }}
   ORGANIZATION: ${{ github.repository_owner }} 
+  REGISTRY_HOSTNAME: gcr.io
 jobs:
   build:
 
@@ -75,26 +76,41 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
     
     - name: Set up version
-      if: startsWith(github.ref, 'refs/tags/')
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV
     
     - name: Assemble image
-      if: startsWith(github.ref, 'refs/tags/')
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
       run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest .
       
     - name: Publish image
-      if: startsWith(github.ref, 'refs/tags/')
-      # if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
+      if: always()
       run: |
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $ORGANIZATION --password-stdin
         docker push $IMAGE:$VERSION
         docker push $IMAGE:latest
 
     - name: Set up Cloud SDK
+      if: always()
       uses: google-github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
-
-    - name: Use gcloud CLI
-      run: gcloud info
+       
+    - name: Configure docker to use the gcloud command-line tool as a credential helper
+      if: always()
+      run: |
+        # Set up docker to authenticate
+        # via gcloud command-line tool.
+        gcloud auth configure-docker
+        
+    - name: Publish
+      if: always()
+      run: |
+        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+        echo $TAG
+        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$VERSION"
+        docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$VERSION" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
