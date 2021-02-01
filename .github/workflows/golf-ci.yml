@@ -15,7 +15,7 @@ env:
   VERSION_EXP: git describe --tags --always --first-parent --dirty  
   IMAGE: ${{ github.repository_owner }}/${{ github.event.repository.name }}
   ORGANIZATION: ${{ github.repository_owner }} 
-  REGISTRY_HOSTNAME: gcr.io
+  REGISTRY_HOSTNAME: eu.gcr.io
 jobs:
   build:
 
@@ -97,7 +97,7 @@ jobs:
     - name: Assemble image
       if: always()
       #if: startsWith(github.ref, 'refs/tags/')
-      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"$IMAGE":"$VERSION" .
+      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"$IMAGE":"$VERSION" .
       
     - name: Publish image
       if: startsWith(github.ref, 'refs/tags/')
@@ -112,6 +112,6 @@ jobs:
       run: |
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
-        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$VERSION"
-        docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$VERSION" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
-        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+        docker push "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"$IMAGE":"$VERSION"
+        docker tag "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"$IMAGE":"$VERSION" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+        docker push "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"$IMAGE":latest
