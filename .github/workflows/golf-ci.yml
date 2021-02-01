@@ -58,7 +58,8 @@ jobs:
      #   sed -i 's/\/home\/runner\/work\/<golf-app>\/<golf-app>\//\/github\/workspace\//g' sonar-cloud-reporter.xml
       
     - name: Buiild & analyze with SonarCloud
-      run: mvn -B verify sonar:sonar --file ./pom.xml 
+      #run: mvn -B verify sonar:sonar --file ./pom.xml 
+      run: mvn -B package --file ./pom.xml
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.login=$SONAR_TOKEN 
@@ -80,19 +81,6 @@ jobs:
       #if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV
     
-    - name: Assemble image
-      if: always()
-      #if: startsWith(github.ref, 'refs/tags/')
-      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest .
-      
-    - name: Publish image
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
-      run: |
-        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $ORGANIZATION --password-stdin
-        docker push $IMAGE:$VERSION
-        docker push $IMAGE:latest
-
     - name: Set up Cloud SDK
       if: always()
       uses: google-github-actions/setup-gcloud@master
@@ -105,6 +93,19 @@ jobs:
         # Set up docker to authenticate
         # via gcloud command-line tool.
         gcloud auth configure-docker
+    
+    - name: Assemble image
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
+      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest .
+      
+    - name: Publish image
+      if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $ORGANIZATION --password-stdin
+        docker push $IMAGE:$VERSION
+        docker push $IMAGE:latest
         
     - name: Publish
       if: always()
