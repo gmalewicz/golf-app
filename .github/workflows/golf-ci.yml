@@ -97,7 +97,7 @@ jobs:
     - name: Assemble image
       if: always()
       #if: startsWith(github.ref, 'refs/tags/')
-      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"golf-app":"$VERSION" .
+      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" .
       
     - name: Publish image
       if: startsWith(github.ref, 'refs/tags/')
@@ -112,6 +112,6 @@ jobs:
       run: |
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
-        docker push "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"golf-app":"$VERSION"
-        docker tag "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
-        docker push "$REGISTRY_HOSTNAME"/"DrunkGolfers"/"golf-app":latest
+        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION"
+        docker tag "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
