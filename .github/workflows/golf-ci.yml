@@ -42,21 +42,7 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-
-    #- name: Build with Maven
-    #   run: mvn -B package --file ./pom.xml 
-    
-    #  env:
-          # Google test reCaptcha credentials
-    #      google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
-    #      google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
-      
-     #- name: fix code coverage paths
-     # working-directory: ./coverage
-     # run: |
-     #   sed -i 's/\/home\/runner\/work\/<golf-app>\/<golf-app>\//\/github\/workspace\//g' lcov.info
-     #   sed -i 's/\/home\/runner\/work\/<golf-app>\/<golf-app>\//\/github\/workspace\//g' sonar-cloud-reporter.xml
-      
+                
     - name: Buiild & analyze with SonarCloud
       #run: mvn -B verify sonar:sonar --file ./pom.xml 
       run: mvn -B package --file ./pom.xml
@@ -87,31 +73,38 @@ jobs:
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
        
-    - name: Configure docker to use the gcloud command-line tool as a credential helper
-      if: always()
-      run: |
-        # Set up docker to authenticate
-        # via gcloud command-line tool.
-        gcloud auth configure-docker
-    
-    - name: Assemble image
-      if: always()
-      #if: startsWith(github.ref, 'refs/tags/')
-      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" .
+    - name: Copy build file to google storage
+      if: always()  
+      uses: google-github-actions/upload-cloud-storage@main
+      with:
+        path: ./target/golf-*.jar
+        destination: drungolfersweb/golf.jar
+       
+#    - name: Configure docker to use the gcloud command-line tool as a credential helper
+#      if: always()
+#      run: |
+#        # Set up docker to authenticate
+#        # via gcloud command-line tool.
+#        gcloud auth configure-docker
+ 
+#    - name: Assemble image
+#      if: always()
+#      #if: startsWith(github.ref, 'refs/tags/')
+#      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" .
       
-    - name: Publish image
-      if: startsWith(github.ref, 'refs/tags/')
-      #if: always()
-      run: |
-        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $ORGANIZATION --password-stdin
-        docker push $IMAGE:$VERSION
-        docker push $IMAGE:latest
+#    - name: Publish image
+#      if: startsWith(github.ref, 'refs/tags/')
+#      #if: always()
+#      run: |
+#        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $ORGANIZATION --password-stdin
+#        docker push $IMAGE:$VERSION
+#        docker push $IMAGE:latest
         
-    - name: Publish
-      if: always()
-      run: |
-        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-        echo $TAG
-        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION"
-        docker tag "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
-        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
+#    - name: Publish
+#      if: always()
+#      run: |
+#        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+#        echo $TAG
+#        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION"
+#        docker tag "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
+#        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
