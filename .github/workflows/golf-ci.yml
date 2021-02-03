@@ -76,7 +76,8 @@ jobs:
       
     - name: Rename the file 
       run: |
-        cp ./target/golf-*.jar golf.jar
+        cp ./target/golf-*.jar ./target/golf.jar
+        ls -ll ./target
       
     - name: Copy build file to google storage
       if: always()  
