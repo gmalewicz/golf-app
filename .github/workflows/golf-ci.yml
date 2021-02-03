@@ -77,7 +77,7 @@ jobs:
       if: always()  
       uses: google-github-actions/upload-cloud-storage@main
       with:
-        path: /home/runner/work/golf-app/golf-app/target/golf-*.jar
+        path:  /home/runner/work/golf-app/golf-app/target/golf-app-1.8.6.2.jar
         destination: drungolfersweb/golf.jar
        
 #    - name: Configure docker to use the gcloud command-line tool as a credential helper
