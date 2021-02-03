@@ -73,13 +73,17 @@ jobs:
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
-       
+      
+    - name: Rename the file 
+      run: |
+        cp ./target/golf-*.jar golf.jar
+      
     - name: Copy build file to google storage
       if: always()  
       uses: google-github-actions/upload-cloud-storage@main
       with:
-        path:  /home/runner/work/golf-app/golf-app/target/golf-app-1.8.6.2.jar
-        destination: drungolfersweb/golf.jar
+        path:  ./target/golf.jar
+        destination: drungolfersweb
        
 #    - name: Configure docker to use the gcloud command-line tool as a credential helper
 #      if: always()
