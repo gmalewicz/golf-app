@@ -64,3 +64,22 @@ spring:
     show_sql: false
   liquibase:
     change-log: classpath:/db/dbChangeLog-prod.xml
+
+---
+
+spring:
+  profiles: gcp
+  datasource:
+    url: jdbc:postgresql://10.156.0.3:5432/golf
+    password:  ${sm://spring_datasource_password}
+  jpa:
+    show_sql: false
+  liquibase:
+    change-log: classpath:/db/dbChangeLog-prod.xml
+  mail:
+    username: drunkgng@gmail.com
+    password: ${sm://spring_mail_password}
+google:
+  recaptcha:
+    key:
+      secret: ${sm://google_recaptcha_key_secret} 

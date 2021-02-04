@@ -85,13 +85,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		
-		 httpSecurity
-			.cors();
+//		 httpSecurity
+//			.cors();
 		 
-		 httpSecurity
-		 	.csrf()
-		 		.ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**")
-		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+//		 httpSecurity
+//		 	.csrf()
+//		 		.ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**")
+//		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		 		 
 	}
 	
