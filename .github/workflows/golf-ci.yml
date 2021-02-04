@@ -117,3 +117,5 @@ jobs:
         docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION"
         docker tag "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
         docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
+
+
