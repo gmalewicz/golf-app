@@ -7,9 +7,11 @@ ARG APP=./target/golf-*.jar
 
 RUN addgroup -S golf && adduser -S golf -G golf
 
-RUN mkdir -p /opt/golf/logs
-
 USER golf:golf
+
+RUN mkdir -p /home/grzegorz_malewicz/logs
+
+RUN chmod +rwx /home/grzegorz_malewicz/logs
 
 WORKDIR /opt/golf
 
