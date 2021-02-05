@@ -9,7 +9,7 @@ Configuration:
       PatternLayout:
         pattern: '%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n'
       name: File
-      fileName: /opt/golf/logs/golf.log
+      fileName: /home/grzegorz_malewicz/logs/golf.log
   Loggers:
     logger:
       - name: com.greg.golf
