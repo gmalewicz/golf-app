@@ -1,5 +1,5 @@
-runtime: java8
-env: flex
+runtime: java11
+env: standard
 instance_class: F1
 handlers:
   - url: .*
@@ -13,4 +13,4 @@ network: {}
 env_variables: 
   spring_profiles_active: prod
 vpc_access_connector:
-  name: "projects/drunkgolfers/locations/europe-west3/connectors/golf-app-db"
+  name: "projects/drunkgolfers/locations/europe-west/connectors/golf-app-db"

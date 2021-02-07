@@ -25,10 +25,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Set up JDK 1.11
+    - name: Set up JDK 1.13
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: 1.13
         
     - name: Create log directory
       run: |
@@ -71,35 +71,35 @@ jobs:
         export_default_credentials: true
       
     - name: Rename the file 
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
+      if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
       run: |
         cp ./target/golf-*.jar ./target/golf.jar
       
     - name: Copy build file to Google Cloud Storage
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
+      if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
       uses: google-github-actions/upload-cloud-storage@main
       with:
         path:   /home/runner/work/golf-app/golf-app/target/golf.jar
         destination: drungolfersweb
        
-#    - name: Set up version
-#      if: always()
-#      #if: startsWith(github.ref, 'refs/tags/')
-#      run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV   
+    - name: Set up version
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
+      run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV   
        
-#    - name: Configure docker to use the gcloud command-line tool as a credential helper
-#      if: always()
-#      run: |
-#        # Set up docker to authenticate
-#        # via gcloud command-line tool.
-#        gcloud auth configure-docker
+    - name: Configure docker to use the gcloud command-line tool as a credential helper
+      if: always()
+      run: |
+        # Set up docker to authenticate
+        # via gcloud command-line tool.
+        gcloud auth configure-docker
  
-#    - name: Assemble image
-#      if: always()
-#      #if: startsWith(github.ref, 'refs/tags/')
-#      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" .
+    - name: Assemble image
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
+      run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" .
       
 #    - name: Publish image
 #      if: startsWith(github.ref, 'refs/tags/')
@@ -109,13 +109,13 @@ jobs:
 #        docker push $IMAGE:$VERSION
 #        docker push $IMAGE:latest
         
-#    - name: Publish
-#      if: always()
-#      run: |
-#        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-#        echo $TAG
-#        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION"
-#        docker tag "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
-#        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
+    - name: Publish
+      if: always()
+      run: |
+        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+        echo $TAG
+        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION"
+        docker tag "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
+        docker push "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":latest
 
 
