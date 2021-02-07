@@ -16,7 +16,7 @@
 	<description>DrunkGolfers and NiceGirls</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>8</java.version>
 		<spring-security.version>5.2.1.RELEASE</spring-security.version>
 		<spring.version>5.2.1.RELEASE</spring.version>
 		<guava.version>29.0-jre</guava.version>
