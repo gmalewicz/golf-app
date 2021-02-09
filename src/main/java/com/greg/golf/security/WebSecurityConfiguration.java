@@ -98,11 +98,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
 		log.info("Attempt to set allowed origins: " + allowedOrigins);
-		CorsRegistration cr = registry.addMapping("/**");
-		cr.allowedOrigins("http://" + this.getAllowedOrigins(), 
-						  "https://" + this.getAllowedOrigins(),
-						  "http://www." + this.getAllowedOrigins(),
-						  "https://www." + this.getAllowedOrigins());
-		cr.allowedMethods("GET", "POST", "PATCH", "DELETE");
+		//CorsRegistration cr = registry.addMapping("/**");
+		//cr.allowedOrigins("http://" + this.getAllowedOrigins(), 
+		//				  "https://" + this.getAllowedOrigins(),
+		//				  "http://www." + this.getAllowedOrigins(),
+		//				  "https://www." + this.getAllowedOrigins());
+		//cr.allowedMethods("GET", "POST", "PATCH", "DELETE");
     }
 }
