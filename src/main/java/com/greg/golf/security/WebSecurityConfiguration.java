@@ -71,7 +71,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  
         
 		httpSecurity
-
+				.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/rest/**", "/actuator/**", "/api/**").permitAll()
 				.antMatchers("/websocket/**").authenticated()
