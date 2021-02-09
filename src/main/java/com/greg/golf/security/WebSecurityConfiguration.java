@@ -73,7 +73,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 		httpSecurity
 
 				.authorizeRequests()
-				.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**").permitAll()
+				.antMatchers("/rest/**", "/actuator/**", "/api/**").permitAll()
 				.antMatchers("/websocket/**").authenticated()
 				// all other requests need to be authenticated
 				.anyRequest().authenticated()
