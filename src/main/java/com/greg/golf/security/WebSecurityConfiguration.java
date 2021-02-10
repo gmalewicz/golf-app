@@ -73,7 +73,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 		httpSecurity
 				.csrf().disable()
 				.authorizeRequests()
-				.antMatchers("/rest/Authenticate", "rest/AddPlayer", "/actuator/**", "/api/**").permitAll()
+				.antMatchers("/rest/**", "/actuator/**", "/api/**").permitAll()
 				.antMatchers("/websocket/**").authenticated()
 				// all other requests need to be authenticated
 				.anyRequest().authenticated()
@@ -94,7 +94,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 //		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		 		 
 	}
-	
+/*	
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
 		log.info("Attempt to set allowed origins: " + allowedOrigins);
@@ -105,4 +105,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 						  "https://www." + this.getAllowedOrigins());
 			cr.allowedMethods("GET", "POST", "PATCH", "DELETE");
     }
+    */
 }
