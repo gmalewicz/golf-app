@@ -85,8 +85,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		
-		httpSecurity
-			.cors();
+		//httpSecurity
+		//	.cors();
 		 
 //		 httpSecurity
 //		 	.csrf()
