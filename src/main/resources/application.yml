@@ -33,7 +33,7 @@ google:
   recaptcha:
     key:
       site: 6Lf-66YZAAAAAJc3serwf1iRoJg6PgTPJazkfNWD
-      secret: secret  
+      secret: ${sm://google_recaptcha_key_secret} 
 cors:
   allowedOrigins: dgng.pl
 round:
@@ -79,7 +79,3 @@ spring:
   mail:
     username: drunkgng@gmail.com
     password: ${sm://spring_mail_password}
-google:
-  recaptcha:
-    key:
-      secret: ${sm://google_recaptcha_key_secret} 
