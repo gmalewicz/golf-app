@@ -71,9 +71,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  
         
 		httpSecurity
-
+				//.csrf().disable()
 				.authorizeRequests()
-				.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**").permitAll()
+				.antMatchers("/rest/Authenticate", "rest/AddPlayer", "/actuator/**", "/api/**").permitAll()
 				.antMatchers("/websocket/**").authenticated()
 				// all other requests need to be authenticated
 				.anyRequest().authenticated()
@@ -85,7 +85,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		
-		 httpSecurity
+		httpSecurity
 			.cors();
 		 
 		 httpSecurity
@@ -98,11 +98,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
 		log.info("Attempt to set allowed origins: " + allowedOrigins);
-		CorsRegistration cr = registry.addMapping("/**");
-		cr.allowedOrigins("http://" + this.getAllowedOrigins(), 
+			CorsRegistration cr = registry.addMapping("/**");
+			cr.allowedOrigins("http://" + this.getAllowedOrigins(), 
 						  "https://" + this.getAllowedOrigins(),
 						  "http://www." + this.getAllowedOrigins(),
 						  "https://www." + this.getAllowedOrigins());
-		cr.allowedMethods("GET", "POST", "PATCH", "DELETE");
+			cr.allowedMethods("GET", "POST", "PATCH", "DELETE");
     }
+   
 }
