@@ -71,8 +71,8 @@ jobs:
         export_default_credentials: true
       
     - name: Rename the file 
-      if: startsWith(github.ref, 'refs/tags/')
-      #if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
+      if: always()
       run: |
         cp ./target/golf-*.jar ./target/golf.jar
       
@@ -85,8 +85,8 @@ jobs:
         destination: drungolfersweb
        
     - name: Set up version
-      #if: always()
-      if: startsWith(github.ref, 'refs/tags/')
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV   
        
     - name: Configure docker to use the gcloud command-line tool as a credential helper
