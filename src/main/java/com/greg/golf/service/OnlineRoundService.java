@@ -75,6 +75,8 @@ public class OnlineRoundService {
 					.findByOnlineRoundAndHole(onlineScoreCard.getOnlineRound(), onlineScoreCard.getHole())
 					.orElseThrow();
 			updatedScoreCard.setStroke(onlineScoreCard.getStroke());
+			updatedScoreCard.setPutt(onlineScoreCard.getPutt());
+			updatedScoreCard.setPenalty(onlineScoreCard.getPenalty());
 			return onlineScoreCardRepository.save(updatedScoreCard);
 		}
 
