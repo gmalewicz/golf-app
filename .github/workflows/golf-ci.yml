@@ -44,8 +44,8 @@ jobs:
           ${{ runner.os }}-maven-
                 
     - name: Buiild & analyze with SonarCloud
-      #run: mvn -B verify sonar:sonar --file ./pom.xml
-      run: mvn -B package --file ./pom.xml 
+      #run: mvn -B package --file ./pom.xml
+      run: mvn -B verify sonar:sonar --file ./pom.xml
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.login=$SONAR_TOKEN 
@@ -63,43 +63,43 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         
     - name: Set up Google Cloud SDK
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
+      if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
       uses: google-github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
       
     - name: Rename the file 
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
+      if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
       run: |
         cp ./target/golf-*.jar ./target/golf.jar
       
-    - name: Copy build file to Google Cloud Storage
-      if: startsWith(github.ref, 'refs/tags/')
-      #if: always()
-      uses: google-github-actions/upload-cloud-storage@main
-      with:
-        path:   /home/runner/work/golf-app/golf-app/target/golf.jar
-        destination: drungolfersweb
+    #- name: Copy build file to Google Cloud Storage
+    #  if: startsWith(github.ref, 'refs/tags/')
+    #  #if: always()
+    #  uses: google-github-actions/upload-cloud-storage@main
+    #  with:
+    #    path:   /home/runner/work/golf-app/golf-app/target/golf.jar
+    #    destination: drungolfersweb
        
     - name: Set up version
-      if: always()
-      #if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
+      if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV   
        
     - name: Configure docker to use the gcloud command-line tool as a credential helper
-      if: always()
-      #if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
         # Set up docker to authenticate
         # via gcloud command-line tool.
         gcloud auth configure-docker
  
     - name: Assemble image
-      if: always()
-      #if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
+      if: startsWith(github.ref, 'refs/tags/')
       run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest -t "$REGISTRY_HOSTNAME"/"drunkgolfers"/"golf-app":"$VERSION" .
       
 #    - name: Publish image
@@ -111,8 +111,8 @@ jobs:
 #        docker push $IMAGE:latest
         
     - name: Publish
-      if: always()
-      #if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
