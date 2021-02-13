@@ -22,10 +22,6 @@ spring:
   jpa:
     open-in-view: true  
     show_sql: true
-  cloud:
-    gcp:
-      sql:
-        enabled: false
 jwt:
   secret: golfBackendSecret
 springdoc:
