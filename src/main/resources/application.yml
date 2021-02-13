@@ -53,6 +53,8 @@ spring:
     show_sql: true
   liquibase:
     change-log: classpath:/db/dbChangeLog-dev.xml
+  cloud:    gcp:      sql:        enabled: false
+    
   
 ---
 
@@ -64,6 +66,10 @@ spring:
     show_sql: false
   liquibase:
     change-log: classpath:/db/dbChangeLog-prod.xml
+  cloud:
+    gcp:
+      sql:
+        enabled: false
 
 ---
 
@@ -79,3 +85,29 @@ spring:
   mail:
     username: drunkgng@gmail.com
     password: ${sm://spring_mail_password}
+  cloud:
+    gcp:
+      sql:
+        enabled: false
+        
+---
+
+spring:
+  profiles: sqlCloud
+  datasource:
+    password:  ${sm://spring_datasource_password}
+  jpa:
+    show_sql: false
+  liquibase:
+    change-log: classpath:/db/dbChangeLog-prod.xml
+  mail:
+    username: drunkgng@gmail.com
+    password: ${sm://spring_mail_password}
+  cloud:
+    gcp:
+      sql:
+        enabled: true
+        database-name: golf
+        instance-connection-name: drunkgolfers:europe-west3:golf-databse
+
+        
