@@ -13,6 +13,7 @@ import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.FavouriteCourse;
 import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
+import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.repository.CourseRepository;
 import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.FavouriteCourseRepository;
@@ -20,6 +21,8 @@ import com.greg.golf.repository.HoleRepository;
 
 @Service("courseService")
 public class CourseService {
+	
+	public static final int MIN_COURE_NAME_LENGTH_FOR_SEARCH = 3;
 
 	@Autowired
 	private CourseRepository courseRepository;
@@ -32,7 +35,16 @@ public class CourseService {
 
 	@Autowired
 	private HoleRepository holeRepository;
-
+	
+	@Transactional(readOnly=true)
+	public List<Course> searchForCourses(String courseName) {
+		
+		if (courseName.length() < MIN_COURE_NAME_LENGTH_FOR_SEARCH) {
+			throw new TooShortStringForSearchException();
+		}
+		
+		return courseRepository.findByNameContainingIgnoreCase(courseName);
+	}
 	
 	@Transactional(readOnly=false)
 	public long deleteFromFavourites(Course course, Long playerId) {

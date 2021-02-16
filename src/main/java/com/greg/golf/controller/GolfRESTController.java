@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.NoSuchElementException;
 
 import javax.mail.MessagingException;
-import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.greg.golf.entity.helpers.Views;
-import com.greg.golf.controller.dto.CourseDto;
-import com.greg.golf.controller.dto.CourseTeeDto;
+
 import com.greg.golf.controller.dto.GameDto;
-import com.greg.golf.controller.dto.HoleDto;
+
 import com.greg.golf.controller.dto.OnlineRoundDto;
 import com.greg.golf.controller.dto.OnlineScoreCardDto;
 import com.greg.golf.controller.dto.PlayerDto;
@@ -34,7 +32,7 @@ import com.greg.golf.controller.dto.RoundDto;
 import com.greg.golf.controller.dto.ScoreCardDto;
 import com.greg.golf.controller.dto.TournamentDto;
 import com.greg.golf.controller.dto.TournamentResultDto;
-import com.greg.golf.entity.Course;
+
 import com.greg.golf.entity.Game;
 import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.entity.Player;
@@ -42,7 +40,7 @@ import com.greg.golf.entity.Round;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.entity.TournamentRound;
 import com.greg.golf.error.SendingMailFailureException;
-import com.greg.golf.service.CourseService;
+
 import com.greg.golf.service.GameService;
 import com.greg.golf.service.OnlineRoundService;
 import com.greg.golf.service.PlayerService;
@@ -63,11 +61,8 @@ import lombok.extern.log4j.Log4j2;
 public class GolfRESTController {
 
 	@Autowired
-	private CourseService courseService;
-
-	@Autowired
 	private RoundService roundService;
-	
+
 	@Autowired
 	private OnlineRoundService onlineRoundService;
 
@@ -79,90 +74,23 @@ public class GolfRESTController {
 
 	@Autowired
 	private TournamentService tournamentService;
-	
+
 	@Autowired
 	private PlayerService playerService;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
-
-	@Tag(name = "Course API")
-	@Operation(summary = "Get list of courses.")
-	@GetMapping(value = "/rest/Courses")
-	public List<CourseDto> getCourses() {
-
-		log.info("Requested list of courses");
-		return mapList(courseService.list(), CourseDto.class);
-	}
-
-	@Tag(name = "Course API")
-	@Operation(summary = "Get list of holes for course.")
-	@GetMapping(value = "/rest/Holes/{id}")
-	public List<HoleDto> getHoles(
-			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("id") Long id) {
-
-		log.info("Requested list of holes for Course id -  " + id);
-
-		Course searchCourse = new Course();
-		searchCourse.setId(id);
-		
-		return mapList(courseService.getHoles(searchCourse), HoleDto.class);
-	}
-
-	@Tag(name = "Course API")
-	@Operation(summary = "Get list of tees for course with given id.")
-	@GetMapping(value = "/rest/Tee/{id}")
-	public List<CourseTeeDto> getTees(
-			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("id") Long id) {
-
-		log.info("Requested list of tees for Course id -  " + id);
-
-		return mapList(courseService.getTees(id), CourseTeeDto.class);
-	}
 
 	@Tag(name = "Round API")
 	@Operation(summary = "Add the new round for a player.")
 	@PostMapping(value = "/rest/Round")
-	public HttpStatus addRound(@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
+	public HttpStatus addRound(
+			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
 		Round round = modelMapper.map(roundDto, Round.class);
 		roundService.saveRound(round);
 
 		return HttpStatus.OK;
-	}
-
-	@Tag(name = "Course API")
-	@Operation(summary = "Add the new course.")
-	@PostMapping(value = "/rest/Course")
-	public HttpStatus addCourse(
-			@Parameter(description = "Course object", required = true) @Valid @RequestBody CourseDto courseDto) {
-
-		log.info("trying to add course: " + courseDto);
-
-		// copy data from dto to the entity object
-		Course course = modelMapper.map(courseDto, Course.class);
-				
-		courseService.save(course);
-
-		return HttpStatus.OK;
-	}
-
-	@Tag(name = "Course API")
-	@Operation(summary = "Delete course with given id.")
-	@DeleteMapping("/rest/Course/{id}")
-	public ResponseEntity<Long> deleteCourse(
-			@Parameter(description = "Course id", example = "1", required = true) @PathVariable Long id) {
-
-		log.info("trying to delete course: " + id);
-
-		try {
-			courseService.delete(id);
-		} catch (Exception e) {
-			return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<>(id, HttpStatus.OK);
-
 	}
 
 	@Tag(name = "Round API")
@@ -180,7 +108,7 @@ public class GolfRESTController {
 
 		return mapList(roundService.listByPlayerPageable(player, pageId), RoundDto.class);
 	}
-	
+
 	@Tag(name = "Round API")
 	@Operation(summary = "Get recent rounds")
 	@GetMapping(value = "/rest/RecentRounds/{pageId}")
@@ -227,8 +155,7 @@ public class GolfRESTController {
 	@Tag(name = "Game API")
 	@Operation(summary = "Add Game")
 	@PostMapping(value = "/rest/Game")
-	public HttpStatus addGame(
-			@Parameter(description = "Game object", required = true) @RequestBody GameDto gameDto) {
+	public HttpStatus addGame(@Parameter(description = "Game object", required = true) @RequestBody GameDto gameDto) {
 
 		log.info("trying to add course: " + gameDto);
 
@@ -248,7 +175,7 @@ public class GolfRESTController {
 		Player player = new Player();
 		player.setId(id);
 
-		return mapList(gameService.listByPlayer(player), GameDto.class); 
+		return mapList(gameService.listByPlayer(player), GameDto.class);
 	}
 
 	@Tag(name = "Game API")
@@ -290,7 +217,8 @@ public class GolfRESTController {
 	@Tag(name = "Round API")
 	@Operation(summary = "Updates score card for given round.")
 	@PatchMapping("/rest/ScoreCard")
-	public HttpStatus updateRound(@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
+	public HttpStatus updateRound(
+			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
 		log.debug("trying to update round: " + roundDto.getId());
 
@@ -332,7 +260,7 @@ public class GolfRESTController {
 
 		Tournament tournament = new Tournament();
 		tournament.setId(tournamentId);
-		
+
 		return mapList(tournamentService.findAllTournamnetsResults(tournament), TournamentResultDto.class);
 
 	}
@@ -344,7 +272,7 @@ public class GolfRESTController {
 	public List<RoundDto> getTournamentRounds(
 			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 		log.info("Requested rounds for tournament");
-		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), RoundDto.class); 
+		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), RoundDto.class);
 	}
 
 	@Tag(name = "Tournament API")
@@ -359,7 +287,7 @@ public class GolfRESTController {
 
 		tournamentService.addRound(tournamentId, modelMapper.map(roundDto, Round.class), true);
 		log.info("Round added");
-	
+
 		return HttpStatus.OK;
 	}
 
@@ -375,7 +303,7 @@ public class GolfRESTController {
 
 		return HttpStatus.OK;
 	}
-	
+
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Return all rounds for a player belonging to the tournament")
 	@GetMapping(value = "/rest/TournamentResultRound/{resultId}")
@@ -384,7 +312,7 @@ public class GolfRESTController {
 		log.info("Requested round details for tournament");
 		return tournamentService.getTournamentRoundsForResult(resultId);
 	}
-	
+
 	@Tag(name = "Online scoreard API")
 	@Operation(summary = "Adds online rounds")
 	@PostMapping(value = "/rest/OnlineRounds")
@@ -392,13 +320,12 @@ public class GolfRESTController {
 			@Parameter(description = "List of OnlineRound objects", required = true) @RequestBody List<OnlineRoundDto> onlineRounds) {
 
 		log.info("trying to add onlineRounds");
-		List<OnlineRound> orLst =  mapList(onlineRounds, OnlineRound.class);
-		
-		
-		return  mapList(onlineRoundService.save(orLst),OnlineRoundDto.class);
+		List<OnlineRound> orLst = mapList(onlineRounds, OnlineRound.class);
 
-	}	
-	
+		return mapList(onlineRoundService.save(orLst), OnlineRoundDto.class);
+
+	}
+
 	@Tag(name = "Online scoreard API")
 	@Operation(summary = "Adds online round")
 	@PostMapping(value = "/rest/OnlineRound")
@@ -407,28 +334,28 @@ public class GolfRESTController {
 
 		log.info("trying to add onlineRound: " + onlineRoundDto);
 		OnlineRound or = modelMapper.map(onlineRoundDto, OnlineRound.class);
-				
+
 		return modelMapper.map(onlineRoundService.save(or), OnlineRoundDto.class);
 
-	}	
-	
+	}
+
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Return all online rounds")
 	@GetMapping(value = "/rest/OnlineRound")
 	public List<OnlineRoundDto> getOnlineRounds() {
 		log.info("Requested online rounds");
-		return mapList(onlineRoundService.getOnlineRounds(),OnlineRoundDto.class);
+		return mapList(onlineRoundService.getOnlineRounds(), OnlineRoundDto.class);
 	}
-	
+
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Return all score cards already saved for on-line round")
 	@GetMapping(value = "/rest/OnlineScoreCard/{onlineRoundId}")
 	public List<OnlineScoreCardDto> getOnlineScoreCards(
 			@Parameter(description = "Online round id", example = "1", required = true) @PathVariable("onlineRoundId") Long onlineRoundId) {
 		log.info("Requested online round score cards");
-		return mapList(onlineRoundService.getOnlineScoreCards(onlineRoundId),OnlineScoreCardDto.class);
+		return mapList(onlineRoundService.getOnlineScoreCards(onlineRoundId), OnlineScoreCardDto.class);
 	}
-	
+
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Delete online round with given id.")
 	@DeleteMapping("/rest/OnlineRound/{id}")
@@ -446,7 +373,7 @@ public class GolfRESTController {
 		return new ResponseEntity<>(id, HttpStatus.OK);
 
 	}
-	
+
 	@Tag(name = "Online scoreard API")
 	@Operation(summary = "Finalize online round")
 	@PostMapping(value = "/rest/FinalizeOnlineRound/{id}")
@@ -458,16 +385,16 @@ public class GolfRESTController {
 		return onlineRoundService.finalizeById(id);
 
 	}
-	
+
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Return online rounds for course")
 	@GetMapping(value = "/rest/OnlineRoundCourse/{courseId}")
 	public List<OnlineRoundDto> getOnlineRoundsCourse(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("courseId") Long courseId) {
 		log.info("Requested online rounds for course");
-		return mapList(onlineRoundService.getOnlineRoundsForCourse(courseId),OnlineRoundDto.class);
+		return mapList(onlineRoundService.getOnlineRoundsForCourse(courseId), OnlineRoundDto.class);
 	}
-	
+
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Return player for nick")
 	@GetMapping(value = "/rest/Player/{nick}")
@@ -475,14 +402,14 @@ public class GolfRESTController {
 			@Parameter(description = "nick", example = "player", required = true) @PathVariable("nick") String nick) {
 		log.info("Requested player for nick");
 		Optional<Player> player = playerService.getPlayer(nick);
-		
+
 		if (player.isEmpty()) {
 			return null;
 		}
-		
+
 		return modelMapper.map(player.get(), PlayerDto.class);
 	}
-	
+
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Delete online round with given owner id.")
 	@DeleteMapping("/rest/OnlineRoundForOwner/{ownerId}")
@@ -500,7 +427,7 @@ public class GolfRESTController {
 		return new ResponseEntity<>(ownerId, HttpStatus.OK);
 
 	}
-	
+
 	@Tag(name = "Online scoreard API")
 	@Operation(summary = "Finalize online rounds for owner")
 	@PostMapping(value = "/rest/FinalizeOnlineOwnerRounds/")
@@ -508,51 +435,12 @@ public class GolfRESTController {
 			@Parameter(description = "Owner object", required = true) @RequestBody Long ownerId) {
 
 		log.info("trying to finalize online round for owner: " + ownerId);
-		
+
 		onlineRoundService.finalizeForOwner(ownerId);
 
 		return HttpStatus.OK;
 	}
-	
-	@Tag(name = "Course API")
-	@Operation(summary = "Get list of favourite courses")
-	@GetMapping(value = "/rest/FavouriteCourses/{playerId}")
-	public List<CourseDto> getFavouriteCourses(
-			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId)  {
 
-		log.info("Requested list of favourite courses");
-		
-		return mapList(courseService.listFavourites(playerId), CourseDto.class);
-	}
-	
-	@Tag(name = "Course API")
-	@Operation(summary = "Add course to favourites")
-	@PostMapping(value = "/rest/FavouriteCourses/{playerId}")
-	public HttpStatus addCourseToFavourites(
-			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
-			@Parameter(description = "course object", required = true) @RequestBody CourseDto courseDto) {
-
-		log.info("trying add course to favourites for player: " + playerId);
-
-		courseService.addToFavourites( modelMapper.map(courseDto, Course.class), playerId);
-		
-		return HttpStatus.OK;
-	}
-	
-	@Tag(name = "Course API")
-	@Operation(summary = "Delete course from favourites")
-	@PostMapping(value = "/rest/DeleteFavouriteCourse/{playerId}")
-	public HttpStatus deleteCourseFromFavourites(
-			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
-			@Parameter(description = "course object", required = true) @RequestBody CourseDto courseDto) {
-
-		log.info("trying to delete course from favourites for player: " + playerId);
-
-		courseService.deleteFromFavourites(modelMapper.map(courseDto, Course.class), playerId);
-		
-		return HttpStatus.OK;
-	}
-	
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Return online rounds for owner")
 	@GetMapping(value = "/rest/OnlineRoundOwner/{ownerId}")
@@ -561,7 +449,7 @@ public class GolfRESTController {
 		log.info("Requested online rounds for owner");
 		return mapList(onlineRoundService.getOnlineRoundsForOwner(ownerId), OnlineRoundDto.class);
 	}
-	
+
 	@Tag(name = "Round API")
 	@Operation(summary = "Return data required for course handicap calculation")
 	@GetMapping(value = "/rest/RoundPlayersDetails/{roundId}")
@@ -572,12 +460,9 @@ public class GolfRESTController {
 
 		return mapList(roundService.getForPlayerRoundDetails(roundId), PlayerRoundDto.class);
 	}
-	
+
 	private <S, T> List<T> mapList(List<S> source, Class<T> targetClass) {
-	    return source
-	      .stream()
-	      .map(element -> modelMapper.map(element, targetClass))
-	      .collect(Collectors.toList());
+		return source.stream().map(element -> modelMapper.map(element, targetClass)).collect(Collectors.toList());
 	}
-	
+
 }

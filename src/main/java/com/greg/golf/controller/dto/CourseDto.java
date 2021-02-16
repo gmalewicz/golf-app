@@ -17,6 +17,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+
 public class CourseDto {
 
 	@JsonView(Views.RoundWithoutPlayer.class)
@@ -25,7 +26,7 @@ public class CourseDto {
 
 	@NotNull
 	@JsonView(Views.RoundWithoutPlayer.class)
-	@Schema(description = "Tee name", example = "ladies red 1-18", accessMode = READ_WRITE, maxLength = 100)
+	@Schema(description = "Course name", example = "Lisia Polana", accessMode = READ_WRITE, maxLength = 100)
 	private String name;
 
 	@NotNull
