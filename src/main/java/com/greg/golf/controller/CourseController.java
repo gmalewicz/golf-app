@@ -3,11 +3,9 @@ package com.greg.golf.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +17,7 @@ import com.greg.golf.controller.dto.CourseDto;
 import com.greg.golf.controller.dto.CourseNameDto;
 import com.greg.golf.controller.dto.CourseTeeDto;
 import com.greg.golf.controller.dto.HoleDto;
-
 import com.greg.golf.entity.Course;
-
 import com.greg.golf.service.CourseService;
 
 
@@ -95,18 +91,14 @@ public class CourseController {
 	@Tag(name = "Course API")
 	@Operation(summary = "Delete course with given id.")
 	@DeleteMapping("/rest/Course/{id}")
-	public ResponseEntity<Long> deleteCourse(
+	public HttpStatus deleteCourse(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable Long id) {
 
 		log.info("trying to delete course: " + id);
 
-		try {
-			courseService.delete(id);
-		} catch (Exception e) {
-			return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
-		}
+		courseService.delete(id);
 
-		return new ResponseEntity<>(id, HttpStatus.OK);
+		return HttpStatus.OK;
 
 	}
 

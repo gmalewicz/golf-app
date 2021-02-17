@@ -3,6 +3,8 @@ package com.greg.golf.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -11,6 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.modelmapper.ModelMapper;
@@ -27,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.CourseDto;
 import com.greg.golf.controller.dto.CourseNameDto;
 import com.greg.golf.entity.Course;
+import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 
@@ -40,7 +44,7 @@ import static org.mockito.BDDMockito.*;
 @Log4j2
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = CourseController.class)
-class GolfRESTControllerMockTest {
+class CourseControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -69,8 +73,9 @@ class GolfRESTControllerMockTest {
 		log.info("Set up completed");
 	}
 
+	@DisplayName("Search for courses with valid input")
 	@Test
-	void whenValidInput_thenReturns200() throws Exception {
+	void searchForCourses_whenValidInput_thenReturns200() throws Exception {
 
 		CourseNameDto courseNameDto = new CourseNameDto("Test");
 
@@ -78,8 +83,9 @@ class GolfRESTControllerMockTest {
 				.content(objectMapper.writeValueAsString(courseNameDto))).andExpect(status().isOk());
 	}
 
+	@DisplayName("Search for courses with null input")
 	@Test
-	void whenNullValue_thenReturns400() throws Exception {
+	void searchForCourses_whenNullValue_thenReturns400() throws Exception {
 		CourseNameDto courseNameDto = new CourseNameDto(null);
 
 		mockMvc.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
@@ -87,8 +93,9 @@ class GolfRESTControllerMockTest {
 
 	}
 
+	@DisplayName("Search for courses map to business model")
 	@Test
-	void whenValidInput_thenMapsToBusinessModel() throws Exception {
+	void searchForCourses_whenValidInput_thenMapsToBusinessModel() throws Exception {
 
 		CourseNameDto courseNameDto = new CourseNameDto("Test");
 
@@ -100,8 +107,9 @@ class GolfRESTControllerMockTest {
 		assertThat(stringCaptor.getValue()).isEqualTo("Test");
 	}
 
+	@DisplayName("Search for courses veryfying response")
 	@Test
-	void whenValidInput_thenReturnsCourseList() throws Exception {
+	void searchForCourses_whenValidInput_thenReturnsCourseList() throws Exception {
 
 		CourseNameDto courseNameDto = new CourseNameDto("Test");
 		Course c = new Course();
@@ -118,23 +126,43 @@ class GolfRESTControllerMockTest {
 		courseDto.setPar(72);
 		courseDto.setHoleNbr(18);
 		courseDto.setId(1l);
-		
+
 		List<Course> expectedResponseBody = retVal;
 
 		when(courseService.searchForCourses("Test")).thenReturn(retVal);
 		when(modelMapper.map(c, CourseDto.class)).thenReturn(courseDto);
-		
+
 		MvcResult mvcResult = mockMvc
 				.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
 						.content(objectMapper.writeValueAsString(courseNameDto)))
 				.andExpect(status().isOk()).andReturn();
-		
+
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
 
 		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
-	
+
 		assertThat(actualResponseBody)
 				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
+	}
+
+	@DisplayName("Delete course with valid input")
+	@Test
+	void deleteCourse_whenValidInput_thenReturns200() throws Exception {
+
+		mockMvc.perform(delete("/rest/Course/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Delete course with invalid id")
+	@Test
+	void deleteCourse_whenValidInput_thenReturns400_2() throws Exception {
+
+		doThrow(new IllegalArgumentException()).when(courseService).delete(1l);
+		MvcResult mvcResult = mockMvc.perform(delete("/rest/Course/1")).andExpect(status().isBadRequest()).andReturn();
+
+		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+
+		assertThat(actualResponseBody)
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("16", "Incorrect parameter")));
 	}
 
 	@AfterAll

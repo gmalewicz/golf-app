@@ -150,4 +150,12 @@ public class ApiExceptionHandler {
 		ApiErrorResponse response = new ApiErrorResponse("15", "Too short string for search");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(IllegalArgumentException ex) {
+		
+		ApiErrorResponse response = new ApiErrorResponse("16", "Incorrect parameter");
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
 }
