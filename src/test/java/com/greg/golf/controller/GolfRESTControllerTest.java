@@ -74,6 +74,9 @@ class GolfRESTControllerTest {
 
 	@Autowired
 	private GolfRESTController golfRESTController;
+	
+	@Autowired
+	private CourseController courseController;
 
 	@BeforeAll
 	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
@@ -147,7 +150,7 @@ class GolfRESTControllerTest {
 	@Test
 	void getListOfHolesTest() {
 
-		List<HoleDto> holeLst = this.golfRESTController.getHoles(1l);
+		List<HoleDto> holeLst = this.courseController.getHoles(1l);
 
 		assertEquals(18, holeLst.size());
 
@@ -185,7 +188,7 @@ class GolfRESTControllerTest {
 
 		courseDto.setTees(courseTeeDtoLst);
 
-		HttpStatus status = this.golfRESTController.addCourse(courseDto);
+		HttpStatus status = this.courseController.addCourse(courseDto);
 
 		assertEquals(HttpStatus.OK, status);
 	}
@@ -195,7 +198,7 @@ class GolfRESTControllerTest {
 	@Test
 	void getTeesTest() {
 
-		List<CourseTeeDto> retTees = this.golfRESTController.getTees(1l);
+		List<CourseTeeDto> retTees = this.courseController.getTees(1l);
 
 		assertEquals(9, retTees.size());
 	}
@@ -215,7 +218,7 @@ class GolfRESTControllerTest {
 		
 		favouriteCourseRepository.save(fc);
 		
-		List<CourseDto> retCourses = this.golfRESTController.getFavouriteCourses(1l);
+		List<CourseDto> retCourses = this.courseController.getFavouriteCourses(1l);
 		
 		assertEquals(1, retCourses.size());
 	}
@@ -230,7 +233,7 @@ class GolfRESTControllerTest {
 		courseDto.setName("Test course");
 		courseDto.setHoleNbr(9);
 		courseDto.setPar(36);
-		HttpStatus status = this.golfRESTController.addCourseToFavourites(1l, courseDto);
+		HttpStatus status = this.courseController.addCourseToFavourites(1l, courseDto);
 		
 		assertEquals(HttpStatus.OK, status);
 	}
@@ -245,8 +248,8 @@ class GolfRESTControllerTest {
 		courseDto.setName("Test course");
 		courseDto.setHoleNbr(9);
 		courseDto.setPar(36);
-		this.golfRESTController.addCourseToFavourites(1l, courseDto);
-		HttpStatus status = this.golfRESTController.deleteCourseFromFavourites(1l, courseDto);
+		this.courseController.addCourseToFavourites(1l, courseDto);
+		HttpStatus status = this.courseController.deleteCourseFromFavourites(1l, courseDto);
 		
 		assertEquals(HttpStatus.OK, status);
 	}
@@ -423,7 +426,6 @@ class GolfRESTControllerTest {
 		
 		assertEquals(1, rndDtoLst.size());
 	}
-	
 	
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,

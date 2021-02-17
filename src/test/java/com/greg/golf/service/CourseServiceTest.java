@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.FavouriteCourse;
 import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
+import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -205,6 +207,24 @@ class CourseServiceTest {
 		assertEquals(1, retVal);
 	}
 	
+	@DisplayName("Serach for courses")
+	@Transactional
+	@Test
+	void searchForCoursesTest() {
+		
+		List<Course> retVal =  courseService.searchForCourses("Sobie");
+		
+		assertEquals(1, retVal.size());
+	}
+	
+	@DisplayName("Serach for too short course string")
+	@Transactional
+	@Test
+	void searchForToShortCoursesTest() {
+		
+		assertThrows(TooShortStringForSearchException.class, () -> courseService.searchForCourses("So"));
+		
+	}
 	
 	@AfterAll
 	public static void done() {

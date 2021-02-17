@@ -21,6 +21,7 @@ import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
 import com.greg.golf.error.SendingMailFailureException;
 import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.error.TooManyPlayersException;
+import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.error.UnauthorizedException;
 
 @RestControllerAdvice
@@ -140,5 +141,21 @@ public class ApiExceptionHandler {
 		
 		ApiErrorResponse response = new ApiErrorResponse("14", "Incorrect user name or password");
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(TooShortStringForSearchException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(TooShortStringForSearchException ex) {
+		
+		ApiErrorResponse response = new ApiErrorResponse("15", "Too short string for search");
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(IllegalArgumentException ex) {
+		
+		ApiErrorResponse response = new ApiErrorResponse("16", "Incorrect parameter");
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 }
