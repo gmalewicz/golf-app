@@ -11,7 +11,7 @@ spring:
         smtp:
           auth: true
           starttls:
-            enable: false
+            enable: true
   datasource:
     hikari:
       connectionTimeout: 20000 
