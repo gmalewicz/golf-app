@@ -38,6 +38,9 @@ cors:
   allowedOrigins: dgng.pl
 round:
   pageSize: 5
+course:
+  pageSize: 5
+  minSearchLength: 3  
     
 ---
 

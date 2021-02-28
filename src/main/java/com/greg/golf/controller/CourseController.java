@@ -157,5 +157,16 @@ public class CourseController {
 	private <S, T> List<T> mapList(List<S> source, Class<T> targetClass) {
 		return source.stream().map(element -> modelMapper.map(element, targetClass)).collect(Collectors.toList());
 	}
+	
+	@Tag(name = "Course API")
+	@Operation(summary = "Get courses alphabetically")
+	@GetMapping(value = "/rest/SortedCourses/{pageId}")
+	public List<CourseDto> getSortedCourses(
+			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") Integer pageId) {
+
+		log.info("Requested list of sorted courses for page id " + pageId);
+
+		return mapList(courseService.getSortedCourses(pageId), CourseDto.class);
+	}
 
 }

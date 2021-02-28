@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -164,6 +165,42 @@ class CourseControllerTest {
 		assertThat(actualResponseBody)
 				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("16", "Incorrect parameter")));
 	}
+	
+	@DisplayName("Search for sorted courses with valid input")
+	@Test
+	void getSortedCourses_whenValidInput_thenReturnsCourseList() throws Exception {
+
+		//CourseNameDto courseNameDto = new CourseNameDto("Test");
+		Course c = new Course();
+		c.setName("Test");
+		c.setPar(72);
+		c.setHoleNbr(18);
+		c.setId(1l);
+
+		List<Course> retVal = new ArrayList<>();
+		retVal.add(c);
+		
+		CourseDto courseDto = new CourseDto();
+		courseDto.setName("Test");
+		courseDto.setPar(72);
+		courseDto.setHoleNbr(18);
+		courseDto.setId(1l);
+
+		List<Course> expectedResponseBody = retVal;
+
+		when(courseService.getSortedCourses(0)).thenReturn(retVal);
+		when(modelMapper.map(c, CourseDto.class)).thenReturn(courseDto);
+
+		MvcResult mvcResult = mockMvc.perform(get("/rest/SortedCourses/0")).andExpect(status().isOk()).andReturn();
+		
+		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+
+		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+
+		assertThat(actualResponseBody)
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
+	}
+	
 
 	@AfterAll
 	public static void done() {
