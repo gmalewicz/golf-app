@@ -226,6 +226,17 @@ class CourseServiceTest {
 		
 	}
 	
+	@DisplayName("Get courses alphabetically")
+	@Transactional
+	@Test
+	void searchForCoursesAlphabeticallyTest() {
+		
+		List<Course> retVal =  courseService.getSortedCourses(0);
+		
+		assertEquals(1, retVal.size());
+	}
+	
+	
 	@AfterAll
 	public static void done() {
 

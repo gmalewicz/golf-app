@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +21,16 @@ import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.HoleRepository;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@ConfigurationProperties(prefix = "course")
 @Service("courseService")
 public class CourseService {
 	
-	public static final int MIN_COURE_NAME_LENGTH_FOR_SEARCH = 3;
+	@Getter @Setter private Integer pageSize;
+	
+	@Getter @Setter private Integer minSearchLength;
 
 	@Autowired
 	private CourseRepository courseRepository;
@@ -39,7 +47,7 @@ public class CourseService {
 	@Transactional(readOnly=true)
 	public List<Course> searchForCourses(String courseName) {
 		
-		if (courseName.length() < MIN_COURE_NAME_LENGTH_FOR_SEARCH) {
+		if (courseName.length() < minSearchLength) {
 			throw new TooShortStringForSearchException();
 		}
 		
@@ -132,6 +140,12 @@ public class CourseService {
 		
 		return courseTeeRepository.findById(id);
 
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Course> getSortedCourses(Integer pageNo) {
+
+		return courseRepository.findByOrderByNameAsc(PageRequest.of(pageNo, pageSize));
 	}
 
 }
