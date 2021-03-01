@@ -97,6 +97,7 @@ class AccessControllerTest {
 		playerDto.setPassword("welcome");
 		playerDto.setCaptcha("ABCDE");
 		playerDto.setWhs(10f);
+		playerDto.setSex(Player.PLAYER_SEX_MALE);
 
 		HttpStatus status = this.accessController.addPlayer(playerDto);
 

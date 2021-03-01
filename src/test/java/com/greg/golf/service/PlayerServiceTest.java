@@ -53,6 +53,7 @@ class PlayerServiceTest {
 		adminPlayer.setPassword(player.getPassword());
 		adminPlayer.setRole(Player.ROLE_PLAYER_ADMIN);
 		adminPlayer.setWhs(10f);
+		adminPlayer.setSex(Player.PLAYER_SEX_MALE);
 		admin = playerRepository.save(adminPlayer);
 
 		log.info("Set up completed");

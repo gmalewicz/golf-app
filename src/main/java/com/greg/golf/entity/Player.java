@@ -28,20 +28,24 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "player")
-//@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Player {
 
 	@Transient
 	public static final int ROLE_PLAYER_ADMIN = 0;
 	@Transient
 	public static final int ROLE_PLAYER_REGULAR = 1;
+	
+	@Transient
+	public static final boolean PLAYER_SEX_MALE = false;
+	@Transient
+	public static final boolean PLAYER_SEX_FEMALE = true;
+	
 
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// @JsonView(Views.RoundWithoutPlayer.class)
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "nick")
@@ -50,10 +54,13 @@ public class Player {
 	@NotNull
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
 	@Column(name = "password")
 	private String password;
-
+	
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	private Boolean sex;
+	
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Min(value = -5)
@@ -70,7 +77,6 @@ public class Player {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@ManyToMany(cascade = { CascadeType.ALL })
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "player_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "round_id") })
@@ -78,37 +84,31 @@ public class Player {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<ScoreCard> scoreCard;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<Game> game;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<TournamentResult> tournamentResult;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<Tournament> tournament;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<OnlineRound> onlineRound;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<FavouriteCourse> favouriteCourse;
 
