@@ -11,4 +11,11 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="GMALEWICZ (generated)" id="1614618840530-2">
+        <addColumn tableName="course_tee">
+            <column name="sex" type="boolean" defaultValue="false">
+            	<constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

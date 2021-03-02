@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -51,9 +52,9 @@ class PlayerServiceTest {
 		Player adminPlayer = new Player();
 		adminPlayer.setNick("admin");
 		adminPlayer.setPassword(player.getPassword());
-		adminPlayer.setRole(Player.ROLE_PLAYER_ADMIN);
+		adminPlayer.setRole(Common.ROLE_PLAYER_ADMIN);
 		adminPlayer.setWhs(10f);
-		adminPlayer.setSex(Player.PLAYER_SEX_MALE);
+		adminPlayer.setSex(Common.PLAYER_SEX_MALE);
 		admin = playerRepository.save(adminPlayer);
 
 		log.info("Set up completed");
@@ -76,7 +77,7 @@ class PlayerServiceTest {
 	void changePasswordUnauthorizedTest(@Autowired PlayerRepository playerRepository) {
 
 		player.setPassword("test");
-		admin.setRole(Player.ROLE_PLAYER_REGULAR);
+		admin.setRole(Common.ROLE_PLAYER_REGULAR);
 		admin = playerRepository.save(admin);
 		Long adminId = admin.getId();
 

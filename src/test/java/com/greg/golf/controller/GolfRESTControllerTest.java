@@ -182,6 +182,7 @@ class GolfRESTControllerTest {
 		CourseTeeDto courseTeeDto = new CourseTeeDto();
 		courseTeeDto.setCr(71f);
 		courseTeeDto.setSr(78);
+		courseTeeDto.setSex(false);
 		courseTeeDto.setTeeType(1);
 		courseTeeDto.setTee("Ladies red 1-18");
 		courseTeeDtoLst.add(courseTeeDto);

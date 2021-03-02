@@ -32,5 +32,9 @@ public class CourseTeeDto {
 	@NotNull
 	@Schema(description = "Tee type: 0 - 18 holes, 1 - first 9, 2 - second 9", example = "0", accessMode = READ_WRITE, minimum = "1", maximum = "2")
 	private Integer teeType;
+	
+	@NotNull
+	@Schema(description = "Player sex: false - male, true - female", example = "false", accessMode = READ_WRITE)
+	private Boolean sex;
 
 }

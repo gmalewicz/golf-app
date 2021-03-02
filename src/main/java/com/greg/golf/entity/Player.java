@@ -30,17 +30,6 @@ import javax.validation.constraints.NotNull;
 @Table(name = "player")
 public class Player {
 
-	@Transient
-	public static final int ROLE_PLAYER_ADMIN = 0;
-	@Transient
-	public static final int ROLE_PLAYER_REGULAR = 1;
-	
-	@Transient
-	public static final boolean PLAYER_SEX_MALE = false;
-	@Transient
-	public static final boolean PLAYER_SEX_FEMALE = true;
-	
-
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -23,6 +23,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -97,7 +98,7 @@ class AccessControllerTest {
 		playerDto.setPassword("welcome");
 		playerDto.setCaptcha("ABCDE");
 		playerDto.setWhs(10f);
-		playerDto.setSex(Player.PLAYER_SEX_MALE);
+		playerDto.setSex(Common.PLAYER_SEX_MALE);
 
 		HttpStatus status = this.accessController.addPlayer(playerDto);
 

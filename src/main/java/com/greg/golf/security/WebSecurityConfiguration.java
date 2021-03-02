@@ -90,7 +90,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 		 
 		 httpSecurity
 		 	.csrf()
-		 		.ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**")
+		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**")
 		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		 		 
 	}
