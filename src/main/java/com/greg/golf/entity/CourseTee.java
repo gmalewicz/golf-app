@@ -25,10 +25,6 @@ import lombok.ToString;
 @Table(name = "course_tee")
 public class CourseTee {
 	
-	public static final int TEE_TYPE_18 = 0;
-	public static final int TEE_TYPE_FIRST_9 = 1;
-	public static final int TEE_TYPE_SECOND_9 = 2;
-	
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,6 +52,10 @@ public class CourseTee {
     @Max(value = 2, message = "0 - 18 holes, 1 - first 9, 2 - second 9")
 	@Column(name = "tee_type")
 	private Integer teeType;
+	
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	private Boolean sex;
 	
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude

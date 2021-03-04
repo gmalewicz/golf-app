@@ -23,6 +23,10 @@ public class PlayerDto {
 	private String nick;
 
 	@NotNull
+	@Schema(description = "Player sex: false - male, true - female", example = "false", accessMode = READ_WRITE)
+	private Boolean sex;
+	
+	@NotNull
 	@JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "Player password", example = "welcome", accessMode = READ_WRITE, maxLength=60)
 	private String password;

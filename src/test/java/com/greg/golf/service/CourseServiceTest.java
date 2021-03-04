@@ -25,6 +25,7 @@ import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.FavouriteCourse;
 import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.PlayerRepository;
@@ -104,10 +105,11 @@ class CourseServiceTest {
 		course.setHoles(holes);
 		
 		CourseTee courseTee = new CourseTee();
+		courseTee.setSex(false);
 		courseTee.setCr(30F);
 		courseTee.setSr(55);
 		courseTee.setTee("test");
-		courseTee.setTeeType(CourseTee.TEE_TYPE_18);
+		courseTee.setTeeType(Common.TEE_TYPE_18);
 		List<CourseTee> tees = new ArrayList<CourseTee>();
 		tees.add(courseTee);
 		course.setTees(tees);

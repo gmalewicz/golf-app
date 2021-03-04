@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.PlayerNickInUseException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
@@ -34,7 +35,7 @@ public class PlayerService implements UserDetailsService {
 	public Player save(Player player) {
 
 		try {
-			player.setRole(Player.ROLE_PLAYER_REGULAR);
+			player.setRole(Common.ROLE_PLAYER_REGULAR);
 			return playerRepository.save(player);
 		} catch (Exception e) {
 			if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
@@ -94,7 +95,7 @@ public class PlayerService implements UserDetailsService {
 	public Player resetPassword(Long id, Player player) {
 
 		Player admin = playerRepository.getOne(id);
-		if (admin.getRole() != Player.ROLE_PLAYER_ADMIN) {
+		if (admin.getRole() != Common.ROLE_PLAYER_ADMIN) {
 			throw new UnauthorizedException();
 		}
 
