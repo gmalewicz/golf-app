@@ -68,7 +68,8 @@ public class RoundService {
 
 		log.debug("start searching matchin round");
 		// search for a round on the same course, the same date and tee time
-		Optional<Round> matchingRound = roundRepository.findByCourseDateTeeTime(round.getCourse(),
+		log.debug(round.getRoundDate());
+		Optional<Round> matchingRound = roundRepository.findRoundByCourseAndRoundDate(round.getCourse(),
 				round.getRoundDate());
 
 		// check if number of players is ok

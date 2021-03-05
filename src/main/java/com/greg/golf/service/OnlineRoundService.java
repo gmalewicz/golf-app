@@ -155,6 +155,7 @@ public class OnlineRoundService {
 
 		gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onlineRound.getTeeTime().substring(0, 2)) + 2);
 		gc.set(Calendar.MINUTE, Integer.parseInt(onlineRound.getTeeTime().substring(3, 5)));
+		gc.set(Calendar.MILLISECOND, gc.get(Calendar.MILLISECOND));	
 
 		round.setRoundDate(gc.getTime());
 
@@ -200,7 +201,7 @@ public class OnlineRoundService {
 	public void finalizeForOwner(Long ownerId) {
 
 		// get the online rounds from db
-		List<OnlineRound> onlineRounds = onlineRoundRepository.findByOwner(ownerId);
+		List<OnlineRound> onlineRounds = onlineRoundRepository.findByOwnerAndFinalized(ownerId, false);
 
 		// for now it is assumed that children are retrieved
 

@@ -26,4 +26,7 @@ public interface OnlineRoundRepository extends JpaRepository<OnlineRound, Long> 
 	@EntityGraph(attributePaths = {"scoreCard", "player", "course", "courseTee"})
 	List<OnlineRound> findByOwner(Long owner);
 	
+	@EntityGraph(attributePaths = {"scoreCard", "player", "course", "courseTee"})
+	List<OnlineRound> findByOwnerAndFinalized(Long owner, Boolean finalized);
+	
 }
