@@ -1,6 +1,7 @@
 package com.greg.golf.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -24,6 +25,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.PlayerNickInUseException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -158,7 +160,7 @@ class AccessControllerTest {
 		assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
 	}
 	
-	@DisplayName("Reset password by unathorized user")
+	@DisplayName("Reset password by unauthorized user")
 	@Transactional
 	@Test
 	void resetPlayerPasswordByUnauthorizedUserTest(@Autowired PlayerRepository playerRepository) {
@@ -173,6 +175,36 @@ class AccessControllerTest {
 		playerDto.setId(1l);
 
 		assertThrows(UnauthorizedException.class, () -> this.accessController.resetPassword(1l, playerDto));
+	}
+	
+	@DisplayName("Add player on behalf test")
+	@Transactional
+	@Test
+	void addPlayeronBehalfTest() {
+
+		PlayerDto playerDto = new PlayerDto();
+		playerDto.setNick("test");
+		playerDto.setPassword("welcome");
+		playerDto.setWhs(10f);
+		playerDto.setSex(Common.PLAYER_SEX_MALE);
+
+		ResponseEntity<PlayerDto> response = this.accessController.addPlayerOnBehalf(playerDto);
+
+		assertNotNull("Player id should not be null", response.getBody().getId());
+	}
+	
+	@DisplayName("Add player on behalf test which already exists")
+	@Transactional
+	@Test
+	void addPlayerOnBehalfWhichAlredyExistsTest() {
+
+		PlayerDto playerDto = new PlayerDto();
+		playerDto.setNick("golfer");
+		playerDto.setPassword("welcome");
+		playerDto.setWhs(10f);
+		playerDto.setSex(Common.PLAYER_SEX_MALE);
+
+		assertThrows(PlayerNickInUseException.class, () -> this.accessController.addPlayerOnBehalf(playerDto));
 	}
 	
 	@AfterAll

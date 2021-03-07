@@ -138,6 +138,24 @@ public class AccessController {
 
 		return HttpStatus.OK;
 	}
+	
+	@Tag(name = "Access API")
+	@Operation(summary = "Add player on behalf of him. It will have temporary 'welcome' password.")
+	@PostMapping(value = "/rest/AddPlayerOnBehalf")
+	public ResponseEntity<PlayerDto> addPlayerOnBehalf(
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+
+		log.info("trying to add player on behalf: " + playerDto.getNick() + " with temporary password");
+		playerDto.setPassword("welcome");
+				
+		Player player = modelMapper.map(playerDto, Player.class);
+
+		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+
+		player = playerService.save(player);
+
+		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
+	}
 
 	private void authenticate(String username, String password) throws BadCredentialsException {
 
