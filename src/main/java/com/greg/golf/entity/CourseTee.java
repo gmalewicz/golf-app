@@ -36,7 +36,7 @@ public class CourseTee {
 	private String tee;
 	
 	@NotNull
-	@Min(value = 30, message = "Course rate cannot be lower than 30")
+	@Min(value = 25, message = "Course rate cannot be lower than 25")
     @Max(value = 89, message = "Course rate cannot be greater than 89")
 	@Column(name = "cr")
 	private Float cr;

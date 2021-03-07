@@ -22,7 +22,7 @@ public class CourseTeeDto {
 	private String tee;
 
 	@NotNull
-	@Schema(description = "Course rate", example = "71", accessMode = READ_WRITE, minimum = "30", maximum = "89")
+	@Schema(description = "Course rate", example = "71", accessMode = READ_WRITE, minimum = "25", maximum = "89")
 	private Float cr;
 
 	@NotNull
