@@ -30,10 +30,10 @@ jobs:
       with:
         java-version: 1.13
         
-    - name: Create log directory
-      run: |
-        sudo mkdir /home/grzegorz_malewicz
-        sudo mkdir /home/grzegorz_malewicz/logs
+#    - name: Create log directory
+#      run: |
+#        sudo mkdir /home/grzegorz_malewicz
+#        sudo mkdir /home/grzegorz_malewicz/logs
         
     - name: Cache local Maven repository
       uses: actions/cache@v2
