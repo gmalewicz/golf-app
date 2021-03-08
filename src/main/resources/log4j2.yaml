@@ -5,21 +5,21 @@ Configuration:
         pattern: '%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n'
       name: Console
       target: SYSTEM_OUT
-    File:
-      PatternLayout:
-        pattern: '%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n'
-      name: File
-      fileName: /home/grzegorz_malewicz/logs/golf.log
+ #   File:
+ #     PatternLayout:
+ #       pattern: '%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n'
+ #     name: File
+ #     fileName: /home/grzegorz_malewicz/logs/golf.log
   Loggers:
     logger:
       - name: com.greg.golf
-        level: info
+        level: debug
         additivity: false
         AppenderRef:
           - ref: Console
-          - ref: File
+ #         - ref: File
     Root:
       AppenderRef:
       - ref: Console
-      - ref: File
+ #     - ref: File
       level: info
