@@ -75,12 +75,15 @@ public class OnlineRound {
 	// @JsonProperty(value = "matchPlay")
 	@Column(name = "match_play")
 	private Boolean matchPlay;
+	
+	@Column(name = "mp_format")
+	private Float mpFormat;
 
 	@EqualsAndHashCode.Exclude
 	// @Schema(description = "Player nick name", example = "golfer")
 	@Column(name = "nick2")
 	private String nick2;
-
+		
 	@NotNull
 	@ToString.Exclude
 	// @JsonProperty(value = "tee")
