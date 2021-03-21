@@ -150,6 +150,7 @@ public class OnlineRoundService {
 		players.add(onlineRound.getPlayer());
 		round.setPlayer(players);
 		round.setMatchPlay(onlineRound.getMatchPlay());
+		round.setMpFormat(onlineRound.getMpFormat());
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(onlineRound.getDate());
 

@@ -32,6 +32,11 @@ public class RoundDto {
 	private Boolean matchPlay;
 
 	@JsonView(Views.RoundWithoutPlayer.class)
+	@Schema(description = "Match play allowance format", example = "0.5", accessMode = READ_ONLY, allowableValues = {
+			"0.5", "0.75", "0.9", "1"})
+	private Float mpFormat;
+		
+	@JsonView(Views.RoundWithoutPlayer.class)
 	@Schema(description = "Course for a round", accessMode = READ_WRITE)
 	private CourseDto course;
 

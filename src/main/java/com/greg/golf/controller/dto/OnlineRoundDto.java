@@ -46,6 +46,10 @@ public class OnlineRoundDto {
 	@Schema(description = "Match play identifier", example = "true", accessMode = READ_WRITE, allowableValues = {
 			"true", "false" })
 	private Boolean matchPlay;
+	
+	@Schema(description = "Match play allowance format", example = "0.5", accessMode = READ_WRITE, allowableValues = {
+			"0.5", "0.75", "0.9", "1"})
+	private Float mpFormat;
 
 	@Schema(description = "Course tee", accessMode = READ_WRITE)
 	@JsonProperty(value = "tee")

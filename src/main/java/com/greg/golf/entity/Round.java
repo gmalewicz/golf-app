@@ -41,6 +41,9 @@ public class Round {
 	//@JsonProperty(value = "matchPlay")
 	@Column(name = "match_play")
 	private Boolean matchPlay;
+	
+	@Column(name = "mp_format")
+	private Float mpFormat;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

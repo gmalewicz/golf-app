@@ -187,4 +187,5 @@
     <include file="liquibase-183.xml" relativeToChangelogFile="true"/>
     <include file="liquibase-184.xml" relativeToChangelogFile="true"/>
     <include file="liquibase-190.xml" relativeToChangelogFile="true"/>
+    <include file="liquibase-191.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
