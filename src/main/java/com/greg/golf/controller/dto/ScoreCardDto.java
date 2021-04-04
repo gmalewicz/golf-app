@@ -22,7 +22,7 @@ public class ScoreCardDto {
 	private Integer hole;
 
 	@NotNull
-	@Schema(description = "Number of strokes (including putts)", example = "6", accessMode = READ_WRITE, minimum = "1", maximum = "15")
+	@Schema(description = "Number of strokes (including putts)", example = "6", accessMode = READ_WRITE, minimum = "1", maximum = "16")
 	private Integer stroke;
 
 	@NotNull

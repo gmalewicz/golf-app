@@ -48,7 +48,7 @@ public class OnlineScoreCard {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Min(value = 0, message = "Stroke number cannot be lower than 0")
-	@Max(value = 15, message = "Stroke number cannot be higher than 15")
+	@Max(value = 16, message = "Stroke number cannot be higher than 16")
 	@Column(name = "stroke")
 	private Integer stroke;
 
