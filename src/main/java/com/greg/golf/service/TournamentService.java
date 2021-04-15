@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,34 +28,23 @@ import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.repository.TournamentRoundRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Service("tournamentService")
+@RequiredArgsConstructor
 public class TournamentService {
 
 	private static final int TOURNAMENT_HOLES = 18;
 
-	@Autowired
-	private TournamentResultRepository tournamentResultRepository;
-
-	@Autowired
-	private TournamentRepository tournamentRepository;
-
-	@Autowired
-	private RoundService roundService;
-
-	@Autowired
-	private CourseService courseService;
-
-	@Autowired
-	private PlayerRoundRepository playerRoundRepository;
-
-	@Autowired
-	private ScoreCardService scoreCardService;
-
-	@Autowired
-	private TournamentRoundRepository tournamentRoundRepository;
+	private final TournamentResultRepository tournamentResultRepository;
+	private final TournamentRepository tournamentRepository;
+	private final RoundService roundService;
+	private final CourseService courseService;
+	private final PlayerRoundRepository playerRoundRepository;
+	private final ScoreCardService scoreCardService;
+	private final TournamentRoundRepository tournamentRoundRepository;
 
 	@Transactional
 	public List<Tournament> findAllTournamnets() {

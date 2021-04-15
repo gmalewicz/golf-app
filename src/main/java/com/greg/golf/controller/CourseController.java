@@ -1,10 +1,8 @@
 package com.greg.golf.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,6 @@ import com.greg.golf.controller.dto.HoleDto;
 import com.greg.golf.entity.Course;
 import com.greg.golf.service.CourseService;
 
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,14 +26,15 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController
-@OpenAPIDefinition(tags = { @Tag(name = "Course API") })
-public class CourseController {
+@OpenAPIDefinition(tags = @Tag(name = "Course API"))
+public class CourseController extends BaseController {
 
-	@Autowired
-	private CourseService courseService;
+	private final CourseService courseService;
 
-	@Autowired
-	private ModelMapper modelMapper;
+	public CourseController(ModelMapper modelMapper, CourseService courseService) {
+		super(modelMapper);
+		this.courseService = courseService;
+	}
 
 	@Tag(name = "Course API")
 	@Operation(summary = "Get list of courses.")
@@ -154,10 +152,6 @@ public class CourseController {
 		return mapList(courseService.searchForCourses(courseNameDto.getName()), CourseDto.class);
 	}
 
-	private <S, T> List<T> mapList(List<S> source, Class<T> targetClass) {
-		return source.stream().map(element -> modelMapper.map(element, targetClass)).collect(Collectors.toList());
-	}
-	
 	@Tag(name = "Course API")
 	@Operation(summary = "Get courses alphabetically")
 	@GetMapping(value = "/rest/SortedCourses/{pageId}")

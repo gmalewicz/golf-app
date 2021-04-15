@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,15 +20,16 @@ import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@RequiredArgsConstructor
 @Log4j2
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
 public class PlayerService implements UserDetailsService {
 
-	@Autowired
-	private PlayerRepository playerRepository;
+	private final PlayerRepository playerRepository;
 
 	@Transactional
 	public Player save(Player player) {

@@ -1,72 +1,52 @@
 package com.greg.golf.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeAll;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.modelmapper.ModelMapper;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.CourseDto;
-import com.greg.golf.controller.dto.CourseNameDto;
+import com.greg.golf.controller.dto.CourseTeeDto;
+import com.greg.golf.controller.dto.HoleDto;
 import com.greg.golf.entity.Course;
-import com.greg.golf.error.ApiErrorResponse;
-import com.greg.golf.security.JwtAuthenticationEntryPoint;
-import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.entity.FavouriteCourse;
+import com.greg.golf.entity.Player;
+import com.greg.golf.repository.FavouriteCourseRepository;
+import com.greg.golf.util.GolfPostgresqlContainer;
 
-import com.greg.golf.service.CourseService;
-import com.greg.golf.service.PlayerService;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
-import static org.mockito.BDDMockito.*;
-
 @Log4j2
-@AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = CourseController.class)
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
 class CourseControllerTest {
-
+	
+	@ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+		
+	
+	private final CourseController courseController;
+		
 	@Autowired
-	private MockMvc mockMvc;
+	public CourseControllerTest(CourseController courseController) {
 
-	@MockBean
-	private CourseService courseService;
-
-	@MockBean
-	private PlayerService playerService;
-
-	@MockBean
-	private JwtRequestFilter jwtRequestFilter;
-
-	@MockBean
-	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-	@MockBean
-	private ModelMapper modelMapper;
-
-	@Autowired
-	ObjectMapper objectMapper;
+		this.courseController = courseController;
+	}
 
 	@BeforeAll
 	public static void setup() {
@@ -74,134 +54,117 @@ class CourseControllerTest {
 		log.info("Set up completed");
 	}
 
-	@DisplayName("Search for courses with valid input")
+
+	@DisplayName("Gets list of holes for course")
+	@Transactional
 	@Test
-	void searchForCourses_whenValidInput_thenReturns200() throws Exception {
+	void getListOfHolesTest() {
 
-		CourseNameDto courseNameDto = new CourseNameDto("Test");
+		List<HoleDto> holeLst = this.courseController.getHoles(1l);
 
-		mockMvc.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(courseNameDto))).andExpect(status().isOk());
-	}
-
-	@DisplayName("Search for courses with null input")
-	@Test
-	void searchForCourses_whenNullValue_thenReturns400() throws Exception {
-		CourseNameDto courseNameDto = new CourseNameDto(null);
-
-		mockMvc.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(courseNameDto))).andExpect(status().isBadRequest());
+		assertEquals(18, holeLst.size());
 
 	}
 
-	@DisplayName("Search for courses map to business model")
+	@DisplayName("Add course test")
+	@Transactional
 	@Test
-	void searchForCourses_whenValidInput_thenMapsToBusinessModel() throws Exception {
-
-		CourseNameDto courseNameDto = new CourseNameDto("Test");
-
-		mockMvc.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(courseNameDto))).andExpect(status().isOk());
-
-		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-		verify(courseService, times(1)).searchForCourses(stringCaptor.capture());
-		assertThat(stringCaptor.getValue()).isEqualTo("Test");
-	}
-
-	@DisplayName("Search for courses veryfying response")
-	@Test
-	void searchForCourses_whenValidInput_thenReturnsCourseList() throws Exception {
-
-		CourseNameDto courseNameDto = new CourseNameDto("Test");
-		Course c = new Course();
-		c.setName("Test");
-		c.setPar(72);
-		c.setHoleNbr(18);
-		c.setId(1l);
-
-		List<Course> retVal = new ArrayList<>();
-		retVal.add(c);
+	void addCourseTest() {
 
 		CourseDto courseDto = new CourseDto();
-		courseDto.setName("Test");
-		courseDto.setPar(72);
-		courseDto.setHoleNbr(18);
-		courseDto.setId(1l);
+		courseDto.setName("Test course");
+		courseDto.setHoleNbr(9);
+		courseDto.setPar(36);
 
-		List<Course> expectedResponseBody = retVal;
+		List<HoleDto> holeDtoLst = new ArrayList<>();
 
-		when(courseService.searchForCourses("Test")).thenReturn(retVal);
-		when(modelMapper.map(c, CourseDto.class)).thenReturn(courseDto);
+		for (int i = 0; i < 9; i++) {
+			HoleDto holeDto = new HoleDto();
+			holeDto.setNumber(i + 1);
+			holeDto.setPar(4);
+			holeDto.setSi(18);
+			holeDtoLst.add(holeDto);
+		}
 
-		MvcResult mvcResult = mockMvc
-				.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
-						.content(objectMapper.writeValueAsString(courseNameDto)))
-				.andExpect(status().isOk()).andReturn();
+		courseDto.setHoles(holeDtoLst);
 
-		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+		List<CourseTeeDto> courseTeeDtoLst = new ArrayList<>();
+		CourseTeeDto courseTeeDto = new CourseTeeDto();
+		courseTeeDto.setCr(71f);
+		courseTeeDto.setSr(78);
+		courseTeeDto.setSex(false);
+		courseTeeDto.setTeeType(1);
+		courseTeeDto.setTee("Ladies red 1-18");
+		courseTeeDtoLst.add(courseTeeDto);
 
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		courseDto.setTees(courseTeeDtoLst);
 
-		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
-	}
+		HttpStatus status = this.courseController.addCourse(courseDto);
 
-	@DisplayName("Delete course with valid input")
-	@Test
-	void deleteCourse_whenValidInput_thenReturns200() throws Exception {
-
-		mockMvc.perform(delete("/rest/Course/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Delete course with invalid id")
-	@Test
-	void deleteCourse_whenValidInput_thenReturns400_2() throws Exception {
-
-		doThrow(new IllegalArgumentException()).when(courseService).delete(1l);
-		MvcResult mvcResult = mockMvc.perform(delete("/rest/Course/1")).andExpect(status().isBadRequest()).andReturn();
-
-		String actualResponseBody = mvcResult.getResponse().getContentAsString();
-
-		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("16", "Incorrect parameter")));
+		assertEquals(HttpStatus.OK, status);
 	}
 	
-	@DisplayName("Search for sorted courses with valid input")
+	@DisplayName("Get tees test")
+	@Transactional
 	@Test
-	void getSortedCourses_whenValidInput_thenReturnsCourseList() throws Exception {
+	void getTeesTest() {
 
-		//CourseNameDto courseNameDto = new CourseNameDto("Test");
-		Course c = new Course();
-		c.setName("Test");
-		c.setPar(72);
-		c.setHoleNbr(18);
-		c.setId(1l);
+		List<CourseTeeDto> retTees = this.courseController.getTees(1l);
 
-		List<Course> retVal = new ArrayList<>();
-		retVal.add(c);
+		assertEquals(9, retTees.size());
+	}
+	
+	@DisplayName("Get favourite course test")
+	@Transactional
+	@Test
+	void getFavouriteCourseTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+
+		FavouriteCourse fc = new FavouriteCourse();
+		Player player = new Player();
+		player.setId(1L);
+		Course course = new Course();
+		course.setId(1L);
+		fc.setPlayer(player);
+		fc.setCourse(course);
+		
+		favouriteCourseRepository.save(fc);
+		
+		List<CourseDto> retCourses = this.courseController.getFavouriteCourses(1l);
+		
+		assertEquals(1, retCourses.size());
+	}
+	
+	@DisplayName("Get course to favourites")
+	@Transactional
+	@Test
+	void getCourseToFavouritesTest() {
 		
 		CourseDto courseDto = new CourseDto();
-		courseDto.setName("Test");
-		courseDto.setPar(72);
-		courseDto.setHoleNbr(18);
-		courseDto.setId(1l);
-
-		List<Course> expectedResponseBody = retVal;
-
-		when(courseService.getSortedCourses(0)).thenReturn(retVal);
-		when(modelMapper.map(c, CourseDto.class)).thenReturn(courseDto);
-
-		MvcResult mvcResult = mockMvc.perform(get("/rest/SortedCourses/0")).andExpect(status().isOk()).andReturn();
+		courseDto.setId(1l);;
+		courseDto.setName("Test course");
+		courseDto.setHoleNbr(9);
+		courseDto.setPar(36);
+		HttpStatus status = this.courseController.addCourseToFavourites(1l, courseDto);
 		
-		String actualResponseBody = mvcResult.getResponse().getContentAsString();
-
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
-
-		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
+		assertEquals(HttpStatus.OK, status);
 	}
 	
-
+	@DisplayName("Delete course from favourites")
+	@Transactional
+	@Test
+	void deleteCourseFromFavouritesTest() {
+		
+		CourseDto courseDto = new CourseDto();
+		courseDto.setId(1l);;
+		courseDto.setName("Test course");
+		courseDto.setHoleNbr(9);
+		courseDto.setPar(36);
+		this.courseController.addCourseToFavourites(1l, courseDto);
+		HttpStatus status = this.courseController.deleteCourseFromFavourites(1l, courseDto);
+		
+		assertEquals(HttpStatus.OK, status);
+	}
+		
 	@AfterAll
 	public static void done() {
 

@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.greg.golf.configurationproperties.RoundServiceConfig;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.PlayerRound;
 import com.greg.golf.entity.Round;
@@ -22,25 +22,29 @@ import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-@ConfigurationProperties(prefix = "round")
+
 @Log4j2
 @Service("roundService")
 public class RoundService {
 	
-	@Getter @Setter private Integer pageSize;
-
-	@Autowired
-	private RoundRepository roundRepository;
-
-	@Autowired
-	private PlayerRoundRepository playerRoundRepository;
+	
+	private final RoundServiceConfig roundServiceConfig;
+	private final RoundRepository roundRepository;
+	private final PlayerRoundRepository playerRoundRepository;
 
 	@Autowired
 	private TournamentService tournamentService;
+	
+	@Autowired
+	public RoundService(RoundServiceConfig roundServiceConfig, RoundRepository roundRepository,
+			PlayerRoundRepository playerRoundRepository) {
+	
+		this.roundServiceConfig = roundServiceConfig;
+		this.roundRepository = roundRepository;
+		this.playerRoundRepository = playerRoundRepository;
+	}
 
 	@Transactional
 	public List<Round> list() {
@@ -133,13 +137,13 @@ public class RoundService {
 	@Transactional(readOnly = true)
 	public List<Round> listByPlayerPageable(Player player, Integer pageNo) {
 
-		return roundRepository.findByPlayerOrderByRoundDateDesc(player, PageRequest.of(pageNo, this.getPageSize()));
+		return roundRepository.findByPlayerOrderByRoundDateDesc(player, PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
 	}
 	
 	@Transactional(readOnly = true)
 	public List<Round> getRecentRounds(Integer pageNo) {
 
-		return roundRepository.findByOrderByRoundDateDesc(PageRequest.of(pageNo, this.getPageSize()));
+		return roundRepository.findByOrderByRoundDateDesc(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
 	}
 	
 
@@ -225,9 +229,6 @@ public class RoundService {
 		return playerRoundRepository.getByRoundId(roundId);
 
 	}
-	
-	
-	
 
 	@Transactional(readOnly = true)
 	public List<PlayerRound> getByRoundId(Long roundId) {

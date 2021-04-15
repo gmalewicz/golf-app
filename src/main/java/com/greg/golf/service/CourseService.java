@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.greg.golf.configurationproperties.CourseServiceConfig;
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.FavouriteCourse;
@@ -21,33 +21,23 @@ import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.HoleRepository;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @ConfigurationProperties(prefix = "course")
 @Service("courseService")
 public class CourseService {
 	
-	@Getter @Setter private Integer pageSize;
-	
-	@Getter @Setter private Integer minSearchLength;
-
-	@Autowired
-	private CourseRepository courseRepository;
-	
-	@Autowired
-	private CourseTeeRepository courseTeeRepository;
-	
-	@Autowired
-	private FavouriteCourseRepository favouriteCourseRepository;
-
-	@Autowired
-	private HoleRepository holeRepository;
+	private final CourseServiceConfig courseServiceConfig;
+	private final CourseRepository courseRepository;
+	private final CourseTeeRepository courseTeeRepository;
+	private final FavouriteCourseRepository favouriteCourseRepository;
+	private final HoleRepository holeRepository;
 	
 	@Transactional(readOnly=true)
 	public List<Course> searchForCourses(String courseName) {
 		
-		if (courseName.length() < minSearchLength) {
+		if (courseName.length() < courseServiceConfig.getMinSearchLength()) {
 			throw new TooShortStringForSearchException();
 		}
 		
@@ -145,7 +135,7 @@ public class CourseService {
 	@Transactional(readOnly = true)
 	public List<Course> getSortedCourses(Integer pageNo) {
 
-		return courseRepository.findByOrderByNameAsc(PageRequest.of(pageNo, pageSize));
+		return courseRepository.findByOrderByNameAsc(PageRequest.of(pageNo, courseServiceConfig.getPageSize()));
 	}
 
 }

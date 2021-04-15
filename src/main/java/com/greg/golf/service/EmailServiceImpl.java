@@ -3,16 +3,17 @@ package com.greg.golf.service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-@Component
-public class EmailServiceImpl {
+import lombok.RequiredArgsConstructor;
 
-	@Autowired
-	public JavaMailSender javaMailSender;
+@RequiredArgsConstructor
+@Component
+public class EmailServiceImpl implements EmailService {
+
+	private final JavaMailSender javaMailSender;
 
 	public void sendEmail(String to, String title, String content) throws MessagingException {
 		MimeMessage mail = javaMailSender.createMimeMessage();

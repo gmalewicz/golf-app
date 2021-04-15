@@ -1,7 +1,6 @@
 package com.greg.golf.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,35 +19,37 @@ import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.greg.golf.configurationproperties.WebSecuritySettings;
 import com.greg.golf.service.PlayerService;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-@ConfigurationProperties(prefix = "cors")
 @Configuration
 @EnableCaching
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
-	@Getter @Setter private String allowedOrigins;
+	private final WebSecuritySettings webSecuritySettings;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private final PlayerService playerService;
+	private final JwtRequestFilter jwtRequestFilter;
 	
+	public WebSecurityConfiguration(WebSecuritySettings webSecuritySettings,
+			JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, PlayerService playerService,
+			JwtRequestFilter jwtRequestFilter) throws Exception {
+		super();
+		this.webSecuritySettings = webSecuritySettings;
+		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+		this.playerService = playerService;
+		this.jwtRequestFilter = jwtRequestFilter;
+	}
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-	@Autowired
-	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-	@Autowired
-	private PlayerService playerService;
-	
-	@Autowired
-	private JwtRequestFilter jwtRequestFilter;
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -97,12 +98,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
-		log.info("Attempt to set allowed origins: " + allowedOrigins);
+		log.info("Attempt to set allowed origins: " + webSecuritySettings.getAllowedOrigins());
 			CorsRegistration cr = registry.addMapping("/**");
-			cr.allowedOrigins("http://" + this.getAllowedOrigins(), 
-						  "https://" + this.getAllowedOrigins(),
-						  "http://www." + this.getAllowedOrigins(),
-						  "https://www." + this.getAllowedOrigins());
+			cr.allowedOrigins("http://" + webSecuritySettings.getAllowedOrigins(), 
+						  "https://" + webSecuritySettings.getAllowedOrigins(),
+						  "http://www." + webSecuritySettings.getAllowedOrigins(),
+						  "https://www." + webSecuritySettings.getAllowedOrigins());
 			cr.allowedMethods("GET", "POST", "PATCH", "DELETE");
     }
    

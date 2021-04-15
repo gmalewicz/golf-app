@@ -1,7 +1,6 @@
 package com.greg.golf.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,30 +25,21 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController
-@OpenAPIDefinition(tags = { @Tag(name = "Access API") })
+@RequiredArgsConstructor
+@OpenAPIDefinition(tags = @Tag(name = "Access API"))
 public class AccessController {
 
-	@Autowired
-	private PasswordEncoder bCryptPasswordEncoder;
-
-	@Autowired
-	private PlayerService playerService;
-
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
-
-	@Autowired
-	private ICaptchaService captchaService;
-
-	@Autowired
-	private ModelMapper modelMapper;
-
-	@Autowired
-	private AuthenticationManager authenticationManager;
+	private final PasswordEncoder bCryptPasswordEncoder;
+	private final PlayerService playerService;
+	private final JwtTokenUtil jwtTokenUtil;
+	private final ICaptchaService captchaService;
+	private final ModelMapper modelMapper;
+	private final AuthenticationManager authenticationManager;
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
