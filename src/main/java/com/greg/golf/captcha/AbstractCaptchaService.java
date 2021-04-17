@@ -24,7 +24,7 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
     protected final ReCaptchaAttemptService reCaptchaAttemptService;
     protected final RestOperations restTemplate;
 
-    public AbstractCaptchaService(HttpServletRequest request, CaptchaSettings captchaSettings,
+    protected AbstractCaptchaService(HttpServletRequest request, CaptchaSettings captchaSettings,
     		ReCaptchaAttemptService reCaptchaAttemptService, RestOperations restTemplate) {
 		super();
 		this.request = request;

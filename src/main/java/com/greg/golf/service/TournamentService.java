@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.repository.TournamentRoundRepository;
+import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -127,6 +129,13 @@ public class TournamentService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	@EventListener
+	public void handleRoundEvent(RoundEvent roundEvent) {
+		log.debug("Handling round event...");
+		updateTournamentResult(roundEvent.getRound()); 
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void updateTournamentResult(Round round) {
 
 		// first verify if round has 18 holes played for each player
@@ -143,7 +152,7 @@ public class TournamentService {
 				log.debug("Attempting to update tournamnet result");
 				// first check if the round has not been already added
 				if (playerRound.getTournamentId() == null) {
-					
+
 					tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
 					int grossStrokes = getGrossStrokes(player, round);
 					tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
@@ -153,8 +162,9 @@ public class TournamentService {
 					// save entity
 					tournamentResultRepository.save(tournamentResult);
 					addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
-							getScoreDifferential(playerRound, round, player), round.getCourse().getName(), tournamentResult);
-					
+							getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
+							tournamentResult);
+
 				}
 
 			}, () -> {
@@ -170,12 +180,13 @@ public class TournamentService {
 				List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
 				// save entity
 				tournamentResultRepository.save(tournamentResult);
-				
-				addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(), tournamentResult.getStrokesNetto(),
-						getScoreDifferential(playerRound, round, player), round.getCourse().getName(), tournamentResult);
+
+				addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
+						tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
+						round.getCourse().getName(), tournamentResult);
 
 			});
-			
+
 			// set tournament id in player_round
 			playerRound.setTournamentId(round.getTournament().getId());
 			playerRoundRepository.save(playerRound);
@@ -183,8 +194,8 @@ public class TournamentService {
 		});
 	}
 
-	public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet,
-			float scrDiff, String courseName, TournamentResult tournamentResult) {
+	public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet, float scrDiff,
+			String courseName, TournamentResult tournamentResult) {
 
 		TournamentRound tournamnetRound = new TournamentRound();
 		tournamnetRound.setCourseName(courseName);
@@ -194,26 +205,25 @@ public class TournamentService {
 		tournamnetRound.setStrokesBrutto(strokesGross);
 		tournamnetRound.setStrokesNetto(strokesNet);
 		tournamnetRound.setTournamentResult(tournamentResult);
-		
+
 		tournamnetRound = tournamentRoundRepository.save(tournamnetRound);
-		
+
 		return tournamnetRound;
 	}
-	
+
 	public List<TournamentRound> getTournamentRoundsForResult(Long resultId) {
-		
+
 		TournamentResult tr = new TournamentResult();
 		tr.setId(resultId);
-		
+
 		return tournamentRoundRepository.findByTournamentResultOrderByIdAsc(tr);
-		
+
 	}
-	
 
 	// calculate score differential
 	public float getScoreDifferential(PlayerRound playerRound, Round round, Player player) {
-		
-		return (113 / (float)playerRound.getSr()) * (getCorrectedStrokes(player, round) - playerRound.getCr());
+
+		return (113 / (float) playerRound.getSr()) * (getCorrectedStrokes(player, round) - playerRound.getCr());
 
 	}
 
@@ -271,16 +281,17 @@ public class TournamentService {
 	}
 
 	// returns STB netto at index 0 and STB gross at index 1
-	public List<Integer> updateSTB(TournamentResult tournamentResult, Round round, PlayerRound playerRound, Player player) {
+	public List<Integer> updateSTB(TournamentResult tournamentResult, Round round, PlayerRound playerRound,
+			Player player) {
 
-		//create List of ret values 
-		List<Integer> retStb= new ArrayList<>();
-		
+		// create List of ret values
+		List<Integer> retStb = new ArrayList<>();
+
 		// calculate course HCP
 		int courseHCP = getCourseHCP(playerRound, round, player);
 
 		// calculate hole HCP for player
-		int hcpAll = (int) Math.floor((double)courseHCP / 18);
+		int hcpAll = (int) Math.floor((double) courseHCP / 18);
 		int hcpIncMaxHole = courseHCP - (hcpAll * 18);
 		log.debug("hcpAll " + hcpAll);
 		log.debug("hcpIncMaxHole " + hcpIncMaxHole);
@@ -314,15 +325,12 @@ public class TournamentService {
 			}
 		});
 
-		
 		retStb.add(playerScoreCard.stream().mapToInt(ScoreCard::getStbNet).sum());
-		tournamentResult.setStbNet(
-				tournamentResult.getStbNet() + retStb.get(0));
+		tournamentResult.setStbNet(tournamentResult.getStbNet() + retStb.get(0));
 
 		retStb.add(playerScoreCard.stream().mapToInt(ScoreCard::getStbGross).sum());
-		tournamentResult.setStbGross(
-				tournamentResult.getStbGross() +  retStb.get(1));
-		
+		tournamentResult.setStbGross(tournamentResult.getStbGross() + retStb.get(1));
+
 		return retStb;
 	}
 

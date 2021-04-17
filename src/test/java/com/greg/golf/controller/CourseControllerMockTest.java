@@ -65,7 +65,6 @@ class CourseControllerMockTest {
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;
 	
-	
 	@Autowired
 	public CourseControllerMockTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;

@@ -47,6 +47,10 @@ public class RoundController extends BaseController {
 			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
 		Round round = modelMapper.map(roundDto, Round.class);
+		log.debug(round.getCourse().getTees());
+		log.debug(round.getCourse());
+		log.debug(roundDto.getCourse().getTees());
+		log.debug(roundDto.getCourse());
 		roundService.saveRound(round);
 
 		return HttpStatus.OK;

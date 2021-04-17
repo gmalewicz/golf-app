@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,31 +21,21 @@ import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
+import com.greg.golf.service.events.RoundEvent;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-
+@RequiredArgsConstructor
 @Log4j2
 @Service("roundService")
 public class RoundService {
 	
-	
 	private final RoundServiceConfig roundServiceConfig;
 	private final RoundRepository roundRepository;
 	private final PlayerRoundRepository playerRoundRepository;
-
-	@Autowired
-	private TournamentService tournamentService;
+	private final ApplicationEventPublisher applicationEventPublisher;
 	
-	@Autowired
-	public RoundService(RoundServiceConfig roundServiceConfig, RoundRepository roundRepository,
-			PlayerRoundRepository playerRoundRepository) {
-	
-		this.roundServiceConfig = roundServiceConfig;
-		this.roundRepository = roundRepository;
-		this.playerRoundRepository = playerRoundRepository;
-	}
-
 	@Transactional
 	public List<Round> list() {
 		return roundRepository.findAll();
@@ -108,7 +98,8 @@ public class RoundService {
 			// verify if tournament shall be updated (only if the round is already assigned to tournament)
 			if (existingRound.getTournament() != null) {
 				log.info("Tournament round sent for checking if tournament result update shall be done");
-				tournamentService.updateTournamentResult(existingRound);
+				RoundEvent roundEvent = new RoundEvent(this, existingRound);
+				applicationEventPublisher.publishEvent(roundEvent);
 			}
 
 		}, () -> {

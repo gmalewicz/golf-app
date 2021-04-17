@@ -27,11 +27,8 @@ public class GameService {
 	private static final Map<Long, String> gameIdNameMap = Map.of(1l, "Hole Stake Game", 2l, "Bingo, Bango, Bongo Game");
 			
 	private final GameRepository gameRepository;
-	
 	private final EmailServiceImpl emailServiceImpl;
-	
 	private final TemplateEngine templateEngine;
-	
 	
 	@Transactional
 	public Game save(Game game) {

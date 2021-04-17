@@ -27,7 +27,7 @@ public class JwtTokenUtil implements Serializable {
 
 	public static final long JWT_TOKEN_VALIDITY = (long)8 * 60 * 60;
 
-	private final JwtConfig jwtConfig;
+	private final transient JwtConfig jwtConfig;
 	
 	//retrieve user id from jwt token
 	public String getUserIdFromToken(String token) {
