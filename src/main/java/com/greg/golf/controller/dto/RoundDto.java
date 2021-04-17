@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.greg.golf.entity.helpers.Views;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +14,6 @@ import lombok.Setter;
 @Setter
 public class RoundDto extends BaseRoundDto {
 	
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@Schema(description = "Course for a round", accessMode = READ_WRITE)
 	private CourseDto course;
 

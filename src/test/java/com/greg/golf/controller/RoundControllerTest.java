@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import com.greg.golf.controller.dto.CourseDto;
 import com.greg.golf.controller.dto.CourseTeeDto;
 import com.greg.golf.controller.dto.LimitedRoundDto;
+import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.controller.dto.PlayerRoundDto;
 import com.greg.golf.controller.dto.RoundDto;
@@ -157,7 +158,7 @@ class RoundControllerTest {
 	@Test
 	void getRecentRoundsTest() {
 		
-		List<LimitedRoundDto> roundDtoLst =  this.roundController.getRecentRounds(0);
+		List<LimitedRoundWithPlayersDto> roundDtoLst =  this.roundController.getRecentRounds(0);
 		
 		assertEquals(1, roundDtoLst.size());
 	}
