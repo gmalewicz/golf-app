@@ -38,7 +38,6 @@ public class Round {
 	private Long id;
 	
 	@NotNull
-	//@JsonProperty(value = "matchPlay")
 	@Column(name = "match_play")
 	private Boolean matchPlay;
 	
@@ -47,15 +46,11 @@ public class Round {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@ManyToOne
-	//@JsonProperty(value = "course")
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Course course;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	//@JsonProperty(value = "player", access = JsonProperty.Access.WRITE_ONLY)
-	//@JsonProperty(value = "player")
-	//@JsonView(Views.RoundWithPlayer.class)
 	@ManyToMany(cascade = { CascadeType.DETACH }, fetch = FetchType.LAZY)
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "round_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "player_id") })
@@ -64,20 +59,14 @@ public class Round {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "round_date")
-	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd kk:mm")
 	private Date roundDate;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	//@SortNatural
-	//@OrderBy
-	//@JsonProperty(value = "scoreCard", access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
-	// @JoinColumn(name = "round_id")
 	private List<ScoreCard> scoreCard = new ArrayList<>();
 	
 	@EqualsAndHashCode.Exclude
-	//@JsonProperty(value = "tournament", access = JsonProperty.Access.WRITE_ONLY)
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Tournament tournament;

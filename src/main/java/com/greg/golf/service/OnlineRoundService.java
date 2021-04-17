@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,21 +22,17 @@ import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.repository.OnlineRoundRepository;
 import com.greg.golf.repository.OnlineScoreCardRepository;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@RequiredArgsConstructor
 @Log4j2
 @Service("onlineRoundService")
 public class OnlineRoundService {
 
-	@Autowired
-	private OnlineRoundRepository onlineRoundRepository;
-
-	@Autowired
-	private OnlineScoreCardRepository onlineScoreCardRepository;
-
-	@Autowired
-	private RoundService roundService;
+	private final OnlineRoundRepository onlineRoundRepository;
+	private final OnlineScoreCardRepository onlineScoreCardRepository;
+	private final RoundService roundService;
 
 	@Scheduled(cron = "0 0 0 * * * ")
 	@Transactional
@@ -156,7 +151,7 @@ public class OnlineRoundService {
 
 		gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onlineRound.getTeeTime().substring(0, 2)) + 2);
 		gc.set(Calendar.MINUTE, Integer.parseInt(onlineRound.getTeeTime().substring(3, 5)));
-		gc.set(Calendar.MILLISECOND, gc.get(Calendar.MILLISECOND));	
+		gc.set(Calendar.MILLISECOND, gc.get(Calendar.MILLISECOND));
 
 		round.setRoundDate(gc.getTime());
 

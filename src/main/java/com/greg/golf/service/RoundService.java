@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.greg.golf.configurationproperties.RoundServiceConfig;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.PlayerRound;
 import com.greg.golf.entity.Round;
@@ -21,27 +21,21 @@ import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
+import com.greg.golf.service.events.RoundEvent;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-@ConfigurationProperties(prefix = "round")
+@RequiredArgsConstructor
 @Log4j2
 @Service("roundService")
 public class RoundService {
 	
-	@Getter @Setter private Integer pageSize;
-
-	@Autowired
-	private RoundRepository roundRepository;
-
-	@Autowired
-	private PlayerRoundRepository playerRoundRepository;
-
-	@Autowired
-	private TournamentService tournamentService;
-
+	private final RoundServiceConfig roundServiceConfig;
+	private final RoundRepository roundRepository;
+	private final PlayerRoundRepository playerRoundRepository;
+	private final ApplicationEventPublisher applicationEventPublisher;
+	
 	@Transactional
 	public List<Round> list() {
 		return roundRepository.findAll();
@@ -104,7 +98,8 @@ public class RoundService {
 			// verify if tournament shall be updated (only if the round is already assigned to tournament)
 			if (existingRound.getTournament() != null) {
 				log.info("Tournament round sent for checking if tournament result update shall be done");
-				tournamentService.updateTournamentResult(existingRound);
+				RoundEvent roundEvent = new RoundEvent(this, existingRound);
+				applicationEventPublisher.publishEvent(roundEvent);
 			}
 
 		}, () -> {
@@ -133,13 +128,13 @@ public class RoundService {
 	@Transactional(readOnly = true)
 	public List<Round> listByPlayerPageable(Player player, Integer pageNo) {
 
-		return roundRepository.findByPlayerOrderByRoundDateDesc(player, PageRequest.of(pageNo, this.getPageSize()));
+		return roundRepository.findByPlayerOrderByRoundDateDesc(player, PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
 	}
 	
 	@Transactional(readOnly = true)
 	public List<Round> getRecentRounds(Integer pageNo) {
 
-		return roundRepository.findByOrderByRoundDateDesc(PageRequest.of(pageNo, this.getPageSize()));
+		return roundRepository.findByOrderByRoundDateDesc(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
 	}
 	
 
@@ -225,9 +220,6 @@ public class RoundService {
 		return playerRoundRepository.getByRoundId(roundId);
 
 	}
-	
-	
-	
 
 	@Transactional(readOnly = true)
 	public List<PlayerRound> getByRoundId(Long roundId) {

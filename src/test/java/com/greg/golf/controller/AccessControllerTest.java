@@ -15,13 +15,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
@@ -34,6 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -44,8 +43,14 @@ class AccessControllerTest {
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
+	private final AccessController accessController;
+	
+	
 	@Autowired
-	private AccessController accessController;
+	public AccessControllerTest(AccessController accessController) {
+		
+		this.accessController = accessController;
+	}
 
 	@BeforeAll
 	public static void setup() {

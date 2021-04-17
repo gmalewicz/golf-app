@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
@@ -17,26 +16,20 @@ import com.greg.golf.controller.dto.GameSendData;
 import com.greg.golf.entity.Game;
 import com.greg.golf.entity.Player;
 import com.greg.golf.repository.GameRepository;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@RequiredArgsConstructor
 @Log4j2
 @Service("gameService")
 public class GameService {
 	
 	private static final Map<Long, String> gameIdNameMap = Map.of(1l, "Hole Stake Game", 2l, "Bingo, Bango, Bongo Game");
 			
-	@Autowired
-	private GameRepository gameRepository;
+	private final GameRepository gameRepository;
+	private final EmailServiceImpl emailServiceImpl;
+	private final TemplateEngine templateEngine;
 	
-	@Autowired
-	private EmailServiceImpl emailServiceImpl;
-	
-	@Autowired
-	TemplateEngine templateEngine;
-	
-	GameService() {}
-
 	@Transactional
 	public Game save(Game game) {
 

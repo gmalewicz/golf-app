@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
@@ -12,28 +11,27 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import com.greg.golf.error.ReCaptchaInvalidException;
-
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public abstract class AbstractCaptchaService implements ICaptchaService{
-    
-    
-    @Autowired
-    protected HttpServletRequest request;
-
-    @Autowired
-    protected CaptchaSettings captchaSettings;
-
-    @Autowired
-    protected ReCaptchaAttemptService reCaptchaAttemptService;
-
-    @Autowired
-    protected RestOperations restTemplate;
-
-    protected static final Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
-    
+	
+	protected static final Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");    
     protected static final String RECAPTCHA_URL_TEMPLATE = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s";
+    
+    protected final HttpServletRequest request;
+    protected final CaptchaSettings captchaSettings;
+    protected final ReCaptchaAttemptService reCaptchaAttemptService;
+    protected final RestOperations restTemplate;
+
+    protected AbstractCaptchaService(HttpServletRequest request, CaptchaSettings captchaSettings,
+    		ReCaptchaAttemptService reCaptchaAttemptService, RestOperations restTemplate) {
+		super();
+		this.request = request;
+		this.captchaSettings = captchaSettings;
+		this.reCaptchaAttemptService = reCaptchaAttemptService;
+		this.restTemplate = restTemplate;
+	}
     
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
