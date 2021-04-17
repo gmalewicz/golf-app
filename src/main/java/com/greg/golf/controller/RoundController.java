@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.greg.golf.controller.dto.LimitedRoundDto;
+import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
 import com.greg.golf.controller.dto.PlayerRoundDto;
 import com.greg.golf.controller.dto.RoundDto;
 import com.greg.golf.controller.dto.ScoreCardDto;
@@ -74,12 +75,12 @@ public class RoundController extends BaseController {
 	@Tag(name = "Round API")
 	@Operation(summary = "Get recent rounds")
 	@GetMapping(value = "/rest/RecentRounds/{pageId}")
-	public List<LimitedRoundDto> getRecentRounds(
+	public List<LimitedRoundWithPlayersDto> getRecentRounds(
 			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") Integer pageId) {
 
 		log.info("Requested list of recent rounds for page id " + pageId);
 
-		return mapList(roundService.getRecentRounds(pageId), LimitedRoundDto.class);
+		return mapList(roundService.getRecentRounds(pageId), LimitedRoundWithPlayersDto.class);
 	}
 
 	@Tag(name = "Round API")
