@@ -3,7 +3,6 @@ package com.greg.golf.service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -90,7 +89,7 @@ public class TournamentService {
 		// preparation and checking
 		if (round.getPlayer() == null || round.getPlayer().isEmpty()) {
 
-			round.setPlayer(new HashSet<>());
+			round.setPlayer(new ArrayList<>());
 			List<PlayerRound> playerRounds = roundService.getByRoundId(round.getId());
 			playerRounds.forEach(pr -> {
 

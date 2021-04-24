@@ -134,7 +134,7 @@ public class RoundService {
 	@Transactional(readOnly = true)
 	public List<Round> getRecentRounds(Integer pageNo) {
 
-		return roundRepository.findByOrderByRoundDateDesc(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
+		return roundRepository.findByOrderByRoundDateDescPlayerAsc(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
 	}
 	
 
@@ -213,16 +213,16 @@ public class RoundService {
 
 	}
 	
-	
+	/*
 	@Transactional(readOnly = true)
 	public List<PlayerRound> getForPlayerRoundDetails(Long roundId) {
 
-		return playerRoundRepository.getByRoundId(roundId);
+		return playerRoundRepository.findByRoundIdOrderByPlayerId(roundId);
 
 	}
-
+*/
 	@Transactional(readOnly = true)
 	public List<PlayerRound> getByRoundId(Long roundId) {
-		return playerRoundRepository.getByRoundId(roundId);
+		return playerRoundRepository.findByRoundIdOrderByPlayerId(roundId);
 	}
 }
