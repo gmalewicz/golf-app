@@ -28,5 +28,5 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 List<Round> findByPlayerOrderByRoundDateDesc(Player player, Pageable pageable);
 	 
 	 @EntityGraph(attributePaths = { "course", "player"})
-	 List<Round> findByOrderByRoundDateDesc(Pageable pageable);
+	 List<Round> findByOrderByRoundDateDescPlayerAsc(Pageable pageable);
 }

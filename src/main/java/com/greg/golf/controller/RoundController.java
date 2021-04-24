@@ -168,6 +168,6 @@ public class RoundController extends BaseController {
 
 		log.info("Requested players round details for round id " + roundId);
 
-		return mapList(roundService.getForPlayerRoundDetails(roundId), PlayerRoundDto.class);
+		return mapList(roundService.getByRoundId(roundId), PlayerRoundDto.class);
 	}
 }

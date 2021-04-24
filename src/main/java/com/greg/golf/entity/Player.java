@@ -1,7 +1,6 @@
 package com.greg.golf.entity;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -69,7 +68,7 @@ public class Player {
 	@ManyToMany(cascade = { CascadeType.ALL })
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "player_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "round_id") })
-	private Set<Round> rounds;
+	private List<Round> rounds;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

@@ -29,9 +29,9 @@ public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> 
 	
 	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-	@Query("SELECT pr FROM PlayerRound pr WHERE pr.playerId = :playerId AND pr.roundId = :roundId")
+	@Query("SELECT pr FROM PlayerRound pr WHERE pr.playerId = :playerId AND pr.roundId = :roundId ORDER BY pr.playerId")
 	Optional<PlayerRound> getForPlayerAndRound(@Param("playerId") Long playerId, @Param("roundId") Long roundId);
 	
-	List<PlayerRound> getByRoundId(Long roundId);
+	List<PlayerRound> findByRoundIdOrderByPlayerId(Long roundId);
 
 }

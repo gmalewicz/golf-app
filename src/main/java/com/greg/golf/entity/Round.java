@@ -1,7 +1,6 @@
 package com.greg.golf.entity;
 
 import java.util.Date;
-import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -54,7 +53,7 @@ public class Round {
 	@ManyToMany(cascade = { CascadeType.DETACH }, fetch = FetchType.LAZY)
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "round_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "player_id") })
-	private Set<Player> player;
+	private List<Player> player;
 
 	@EqualsAndHashCode.Exclude
 	@NotNull

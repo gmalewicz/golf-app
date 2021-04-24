@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -141,7 +139,7 @@ public class OnlineRoundService {
 		course.setId(onlineRound.getCourse().getId());
 		round.setCourse(course);
 
-		Set<Player> players = new HashSet<>();
+		List<Player> players = new ArrayList<>();
 		players.add(onlineRound.getPlayer());
 		round.setPlayer(players);
 		round.setMatchPlay(onlineRound.getMatchPlay());

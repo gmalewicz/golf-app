@@ -4,9 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -72,7 +71,7 @@ class TournamentControllerTest {
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		Set<Player> playerSet = new HashSet<Player>();
+		List<Player> playerSet = new ArrayList<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
