@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Getter
 @Setter
-public class PlayerDto {
+public class PlayerDto implements Comparable<PlayerDto> {
 		
 	@Schema(description = "Player identifier", example = "25", accessMode = READ_WRITE)
 	private Long id;
@@ -42,5 +42,34 @@ public class PlayerDto {
 	@JsonProperty(value = "captcha", access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "Google captcha", example = "03AG...", accessMode = WRITE_ONLY)
 	private String captcha;
+	
+	@Override
+	public int compareTo(PlayerDto o) {
+				
+		return (int)(id - o.id);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		var retVal = false;
+		
+		if (!(obj instanceof PlayerDto)) {
+			return false;
+		}
+		
+		if (id == ((PlayerDto) obj).id) {
+			retVal = true;
+		}
+	
+		return retVal;
+		
+	}
+	
+	@Override
+	public int hashCode() {
+
+		return super.hashCode();
+	}
 	
 }

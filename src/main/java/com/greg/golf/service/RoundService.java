@@ -42,8 +42,7 @@ public class RoundService {
 
 	}
 
-	@Transactional
-	public Optional<Round> findById(Long id) {
+	public Optional<Round> getWithPlayers (Long id) {
 		return roundRepository.findById(id);
 	}
 
@@ -55,7 +54,7 @@ public class RoundService {
 	@Transactional 
 	public Round saveRound(Round round) {
 
-		Player player = round.getPlayer().stream().findFirst().orElseThrow();
+		var player = round.getPlayer().stream().findFirst().orElseThrow();
 
 		// set player association to ScoreCard
 		round.getScoreCard().stream().forEach(card -> card.setPlayer(player));
@@ -98,7 +97,7 @@ public class RoundService {
 			// verify if tournament shall be updated (only if the round is already assigned to tournament)
 			if (existingRound.getTournament() != null) {
 				log.info("Tournament round sent for checking if tournament result update shall be done");
-				RoundEvent roundEvent = new RoundEvent(this, existingRound);
+				var roundEvent = new RoundEvent(this, existingRound);
 				applicationEventPublisher.publishEvent(roundEvent);
 			}
 
@@ -148,7 +147,7 @@ public class RoundService {
 	public void deleteScorecard(Long playerId, Long roundId) {
 
 		// get the round first
-		Round round = roundRepository.findById(roundId).orElseThrow();
+		var round = roundRepository.findById(roundId).orElseThrow();
 		log.debug("Round found");
 
 		// check if player score card exists in that round
@@ -187,11 +186,11 @@ public class RoundService {
 	public void updateScoreCard(Round updRound) {
 
 		// get the round first
-		Round round = roundRepository.findById(updRound.getId()).orElseThrow();
+		var round = roundRepository.findById(updRound.getId()).orElseThrow();
 		log.debug("Round found");
 
 		// get first player from set
-		Player player = updRound.getPlayer().iterator().next();
+		var player = updRound.getPlayer().iterator().next();
 		// remove score card object that matching player from round
 		round.getScoreCard().removeAll((round.getScoreCard().stream()
 				.filter(sc -> sc.getPlayer().getId().equals(player.getId())).collect(Collectors.toList())));
@@ -213,16 +212,8 @@ public class RoundService {
 
 	}
 	
-	/*
-	@Transactional(readOnly = true)
-	public List<PlayerRound> getForPlayerRoundDetails(Long roundId) {
-
-		return playerRoundRepository.findByRoundIdOrderByPlayerId(roundId);
-
-	}
-*/
-	@Transactional(readOnly = true)
+	@Transactional
 	public List<PlayerRound> getByRoundId(Long roundId) {
-		return playerRoundRepository.findByRoundIdOrderByPlayerId(roundId);
+		return playerRoundRepository.findByRoundIdOrderByPlayerId(roundId).orElseThrow();
 	}
 }

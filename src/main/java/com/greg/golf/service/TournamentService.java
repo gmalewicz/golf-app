@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.PlayerRound;
@@ -44,7 +43,6 @@ public class TournamentService {
 	private final RoundService roundService;
 	private final CourseService courseService;
 	private final PlayerRoundRepository playerRoundRepository;
-	private final ScoreCardService scoreCardService;
 	private final TournamentRoundRepository tournamentRoundRepository;
 
 	@Transactional
@@ -84,43 +82,25 @@ public class TournamentService {
 	}
 
 	@Transactional
-	public Tournament addRound(Long tournamnetId, Round round, boolean updateResults) {
+	public Tournament addRound(Long tournamnetId, Long roundId, boolean updateResults) {
+		
+		// first find the round in database
+		var round = roundService.getWithPlayers(roundId).orElseThrow();
 
-		// preparation and checking
-		if (round.getPlayer() == null || round.getPlayer().isEmpty()) {
+		// get tournament object
+		var tournament = tournamentRepository.findById(tournamnetId).orElseThrow();
 
-			round.setPlayer(new ArrayList<>());
-			List<PlayerRound> playerRounds = roundService.getByRoundId(round.getId());
-			playerRounds.forEach(pr -> {
-
-				Player player = new Player();
-				player.setId(pr.getPlayerId());
-				player.setWhs(pr.getWhs());
-				round.getPlayer().add(player);
-				round.getCourse().setTees(new ArrayList<>());
-				CourseTee courseTee = new CourseTee();
-				courseTee.setId(pr.getTeeId());
-				round.getCourse().getTees().add(courseTee);
-				log.debug("Player added");
-			});
-		}
-
-		if (round.getScoreCard() == null || round.getScoreCard().isEmpty()) {
-
-			round.setScoreCard(scoreCardService.listByRound(round));
-		}
-
-		// first check if round is not already added to that tournament
-		Tournament tournament = tournamentRepository.findById(tournamnetId).orElseThrow();
-
+		// next check if round is not already added to that tournament
 		if (tournament.getRound().contains(round)) {
 			log.warn("Attempt to add twice the same round to tournament");
 			throw new RoundAlreadyAddedToTournamentException();
 		}
-
+	
 		// add round to tournament
 		tournament.addRound(round);
 		tournamentRepository.save(tournament);
+		
+		// update tournament result
 		if (updateResults) {
 			updateTournamentResult(round);
 		}
@@ -131,7 +111,7 @@ public class TournamentService {
 	@EventListener
 	public void handleRoundEvent(RoundEvent roundEvent) {
 		log.debug("Handling round event...");
-		updateTournamentResult(roundEvent.getRound()); 
+		updateTournamentResult(roundEvent.getRound());
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -143,7 +123,7 @@ public class TournamentService {
 		// iterate through round players and check if they already added
 		round.getPlayer().forEach(player -> {
 
-			PlayerRound playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
+			var playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 
 			Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
 					.findByPlayerAndTournament(player, round.getTournament());
@@ -169,7 +149,7 @@ public class TournamentService {
 			}, () -> {
 				log.debug("Attempting to add the new round to tournamnet result");
 				// if it is the first record to be added to result than create it
-				TournamentResult tournamentResult = buildEmptyTournamentResult(player);
+				var tournamentResult = buildEmptyTournamentResult(player);
 				// get gross and net strokes
 				tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
 				tournamentResult.setStrokesNetto(
@@ -196,7 +176,7 @@ public class TournamentService {
 	public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet, float scrDiff,
 			String courseName, TournamentResult tournamentResult) {
 
-		TournamentRound tournamnetRound = new TournamentRound();
+		var tournamnetRound = new TournamentRound();
 		tournamnetRound.setCourseName(courseName);
 		tournamnetRound.setScrDiff(scrDiff);
 		tournamnetRound.setStbGross(stbGross);
@@ -212,7 +192,7 @@ public class TournamentService {
 
 	public List<TournamentRound> getTournamentRoundsForResult(Long resultId) {
 
-		TournamentResult tr = new TournamentResult();
+		var tr = new TournamentResult();
 		tr.setId(resultId);
 
 		return tournamentRoundRepository.findByTournamentResultOrderByIdAsc(tr);
@@ -317,6 +297,7 @@ public class TournamentService {
 			if (scoreCard.getStbNet() < 0) {
 				scoreCard.setStbNet(0);
 			}
+			log.debug(scoreCard.getHole() + " " + scoreCard.getStbNet());
 			// update STB brutto for each hole
 			scoreCard.setStbGross(holes.get(scoreCard.getHole() - 1).getPar() - scoreCard.getStroke() + 2);
 			if (scoreCard.getStbGross() < 0) {
@@ -338,7 +319,7 @@ public class TournamentService {
 	@Transactional
 	public List<Round> getAllPossibleRoundsForTournament(Long tournamentId) {
 
-		Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+		var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
 		return roundService.findByDates(tournament.getStartDate(), tournament.getEndDate());
 
 	}
@@ -350,7 +331,7 @@ public class TournamentService {
 			playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 		}
 
-		CourseTee courseTee = courseService.getTeeByid(playerRound.getTeeId()).orElseThrow();
+		var courseTee = courseService.getTeeByid(playerRound.getTeeId()).orElseThrow();
 
 		// calculate course HCP
 		int courseHCP = Math
@@ -366,7 +347,7 @@ public class TournamentService {
 
 	private TournamentResult buildEmptyTournamentResult(Player player) {
 
-		TournamentResult tournamentResult = new TournamentResult();
+		var tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(1);
 		tournamentResult.setPlayer(player);
 		tournamentResult.setStbNet(0);

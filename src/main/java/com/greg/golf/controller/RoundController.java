@@ -47,7 +47,7 @@ public class RoundController extends BaseController {
 	public HttpStatus addRound(
 			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
-		Round round = modelMapper.map(roundDto, Round.class);
+		var round = modelMapper.map(roundDto, Round.class);
 		log.debug(round.getCourse().getTees());
 		log.debug(round.getCourse());
 		log.debug(roundDto.getCourse().getTees());
@@ -66,7 +66,7 @@ public class RoundController extends BaseController {
 
 		log.info("Requested list of round for Player id -  " + playerId + " and page id " + pageId);
 
-		Player player = new Player();
+		var player = new Player();
 		player.setId(playerId);
 
 		return mapList(roundService.listByPlayerPageable(player, pageId), LimitedRoundDto.class);
@@ -91,7 +91,7 @@ public class RoundController extends BaseController {
 
 		log.info("Requested list of scorecards for Round id -  " + id);
 
-		Round round = new Round();
+		var round = new Round();
 		round.setId(id);
 
 		return mapList(scoreCardService.listByRound(round), ScoreCardDto.class);

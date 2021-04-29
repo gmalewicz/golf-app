@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -71,7 +73,7 @@ class GameControllerTest {
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		List<Player> playerSet = new ArrayList<Player>();
+		SortedSet<Player> playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);

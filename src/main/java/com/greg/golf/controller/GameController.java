@@ -57,7 +57,7 @@ public class GameController extends BaseController {
 
 		log.info("Requested list of games for Player id -  " + id);
 
-		Player player = new Player();
+		var player = new Player();
 		player.setId(id);
 
 		return mapList(gameService.listByPlayer(player), GameDto.class);

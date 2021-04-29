@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "player")
-public class Player {
+public class Player implements Comparable<Player> {
 
 	@Id
 	@Column(name = "id")
@@ -44,11 +44,11 @@ public class Player {
 	@ToString.Exclude
 	@Column(name = "password")
 	private String password;
-	
+
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	private Boolean sex;
-	
+
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Min(value = -5)
@@ -111,5 +111,34 @@ public class Player {
 	public void removeCoreCard(ScoreCard scoreCardItem) {
 		this.scoreCard.remove(scoreCardItem);
 		scoreCardItem.setPlayer(null);
+	}
+
+	@Override
+	public int compareTo(Player o) {
+
+		return (int) (id - o.id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		var retVal = false;
+		
+		if (!(obj instanceof Player)) {
+			return false;
+		}
+		
+		if (id == ((Player) obj).id) {
+			retVal = true;
+		}
+	
+		return retVal;
+		
+	}
+
+	@Override
+	public int hashCode() {
+
+		return super.hashCode();
 	}
 }

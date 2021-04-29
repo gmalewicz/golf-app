@@ -30,21 +30,21 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(TooManyPlayersException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooManyPlayersException ex) {
-		ApiErrorResponse response = new ApiErrorResponse("1", "Round cannot have more than 4 players");
+		var response = new ApiErrorResponse("1", "Round cannot have more than 4 players");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(PlayerAlreadyHasThatRoundException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerAlreadyHasThatRoundException ex) {
-		ApiErrorResponse response = new ApiErrorResponse("2", "Cannot save same round for a player");
+		var response = new ApiErrorResponse("2", "Cannot save same round for a player");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(PlayerNickInUseException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerNickInUseException ex) {
-		ApiErrorResponse response = new ApiErrorResponse("3", "Player nick already used");
+		var response = new ApiErrorResponse("3", "Player nick already used");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -52,7 +52,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(ConstraintViolationException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("4", "Bad request: constraint violation");
+		var response = new ApiErrorResponse("4", "Bad request: constraint violation");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
@@ -60,7 +60,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(SendingMailFailureException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(SendingMailFailureException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("5", "Error sending email");
+		var response = new ApiErrorResponse("5", "Error sending email");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 	
@@ -68,7 +68,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(NoSuchElementException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(NoSuchElementException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("6", "Data not found");
+		var response = new ApiErrorResponse("6", "Data not found");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 	
@@ -76,7 +76,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(RoundAlreadyAddedToTournamentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(RoundAlreadyAddedToTournamentException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("7", "Round already added to tournament");
+		var response = new ApiErrorResponse("7", "Round already added to tournament");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 	
@@ -84,7 +84,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(TooFewHolesForTournamentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooFewHolesForTournamentException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("8", "18 holes must be played to be addded to tournament");
+		var response = new ApiErrorResponse("8", "18 holes must be played to be addded to tournament");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 	
@@ -92,7 +92,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(ReCaptchaInvalidException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(ReCaptchaInvalidException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("9", ex.getMessage());
+		var response = new ApiErrorResponse("9", ex.getMessage());
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -100,7 +100,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(ReCaptchaUnavailableException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(ReCaptchaUnavailableException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("10", ex.getMessage());
+		var response = new ApiErrorResponse("10", ex.getMessage());
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
@@ -108,7 +108,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(UnauthorizedException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(UnauthorizedException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("11", "Administration role required to perform that operation");
+		var response = new ApiErrorResponse("11", "Administration role required to perform that operation");
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
 	
@@ -116,7 +116,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(EntityNotFoundException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("12", "Data not found");
+		var response = new ApiErrorResponse("12", "Data not found");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -124,14 +124,14 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
 		
-		StringBuilder errors = new StringBuilder();
+		var errors = new StringBuilder();
 	    ex.getBindingResult().getAllErrors().forEach(error -> {
 	        String errorMessage = error.getDefaultMessage();
 	        errors.append(errorMessage);
 	        errors.append(" ");
 	    });
 		
-		ApiErrorResponse response = new ApiErrorResponse("13", "Data validation failed: " + errors);
+		var response = new ApiErrorResponse("13", "Data validation failed: " + errors);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -139,7 +139,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(BadCredentialsException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("14", "Incorrect user name or password");
+		var response = new ApiErrorResponse("14", "Incorrect user name or password");
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
 	
@@ -147,7 +147,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(TooShortStringForSearchException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooShortStringForSearchException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("15", "Too short string for search");
+		var response = new ApiErrorResponse("15", "Too short string for search");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -155,7 +155,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(IllegalArgumentException ex) {
 		
-		ApiErrorResponse response = new ApiErrorResponse("16", "Incorrect parameter");
+		var response = new ApiErrorResponse("16", "Incorrect parameter");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 }
