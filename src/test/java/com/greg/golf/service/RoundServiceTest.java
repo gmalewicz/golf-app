@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import java.util.List;
-
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -27,7 +27,6 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.entity.PlayerRound;
 import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
-import com.greg.golf.entity.Tournament;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.repository.TournamentResultRepository;
@@ -72,7 +71,7 @@ class RoundServiceTest {
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		List<Player> playerSet = new ArrayList<Player>();
+		SortedSet<Player> playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
@@ -135,18 +134,10 @@ class RoundServiceTest {
 	void getRoundInsideRangeNotApplicableTest() {
 
 		Calendar startDate = new GregorianCalendar();
-		startDate.set(2020, 5, 11, 0, 0, 0);
+		startDate.set(2020, 5, 13, 0, 0, 0);
 		Calendar endDate = new GregorianCalendar();
 		endDate.set(2020, 06, 14, 0, 0, 0);
 
-		Tournament tournament = new Tournament();
-		tournament.setEndDate(new Date(1));
-		tournament.setStartDate(new Date(1));
-		tournament.setName("Test Cup");
-		tournament.setPlayer(player);
-		tournament = tournamentRepository.save(tournament);
-		round.setTournament(tournament);
-		roundRepository.save(round);
 
 		log.debug("------------------------ round tournament: " + round.getTournament());
 

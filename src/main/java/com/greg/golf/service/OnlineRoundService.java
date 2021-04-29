@@ -5,7 +5,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class OnlineRoundService {
 	@Transactional
 	public OnlineRound save(OnlineRound onlineRound) {
 
-		GregorianCalendar gc = new GregorianCalendar();
+		var gc = new GregorianCalendar();
 		onlineRound.setDate(gc.getTime());
 
 		return onlineRoundRepository.save(onlineRound);
@@ -52,7 +53,7 @@ public class OnlineRoundService {
 	@Transactional
 	public List<OnlineRound> save(List<OnlineRound> onlineRounds) {
 
-		GregorianCalendar gc = new GregorianCalendar();
+		var gc = new GregorianCalendar();
 		onlineRounds.forEach(or -> or.setDate(gc.getTime()));
 
 		return onlineRoundRepository.saveAll(onlineRounds);
@@ -88,7 +89,7 @@ public class OnlineRoundService {
 	@Transactional(readOnly = true)
 	public List<OnlineScoreCard> getOnlineScoreCards(Long onlineRoundId) {
 
-		OnlineRound onlineRound = new OnlineRound();
+		var onlineRound = new OnlineRound();
 		onlineRound.setId(onlineRoundId);
 
 		return onlineScoreCardRepository.getByOnlineRound(onlineRound);
@@ -115,7 +116,7 @@ public class OnlineRoundService {
 		Round retRound = null;
 
 		// get the online round from db
-		OnlineRound onlineRound = onlineRoundRepository.findById(id).orElseThrow();
+		var onlineRound = onlineRoundRepository.findById(id).orElseThrow();
 
 		retRound = buildRound(onlineRound);
 
@@ -129,9 +130,9 @@ public class OnlineRoundService {
 	private Round buildRound(OnlineRound onlineRound) {
 
 		// create Round object and fill it in
-		Round round = new Round();
+		var round = new Round();
 
-		Course course = new Course();
+		var course = new Course();
 		List<CourseTee> tees = new ArrayList<>();
 		tees.add(onlineRound.getCourseTee());
 		course.setTees(tees);
@@ -139,12 +140,12 @@ public class OnlineRoundService {
 		course.setId(onlineRound.getCourse().getId());
 		round.setCourse(course);
 
-		List<Player> players = new ArrayList<>();
+		SortedSet<Player> players = new TreeSet<>();
 		players.add(onlineRound.getPlayer());
 		round.setPlayer(players);
 		round.setMatchPlay(onlineRound.getMatchPlay());
 		round.setMpFormat(onlineRound.getMpFormat());
-		GregorianCalendar gc = new GregorianCalendar();
+		var gc = new GregorianCalendar();
 		gc.setTime(onlineRound.getDate());
 
 		gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onlineRound.getTeeTime().substring(0, 2)) + 2);
@@ -155,10 +156,10 @@ public class OnlineRoundService {
 
 		// create map of score cards that has been passed
 
-		Map<Integer, ScoreCard> holes = new HashMap<>();
+		var holes = new HashMap<Integer, ScoreCard>();
 
 		for (OnlineScoreCard os : onlineRound.getScoreCard()) {
-			ScoreCard sc = new ScoreCard();
+			var sc = new ScoreCard();
 			sc.setHole(os.getHole());
 			sc.setPats(os.getPutt());
 			sc.setPenalty(os.getPenalty());
@@ -169,13 +170,13 @@ public class OnlineRoundService {
 
 		// create 18 score cards and fill not used using empty score cards
 
-		List<ScoreCard> scoreCards = new ArrayList<>();
-		for (int i = 0; i < 18; i++) {
+		var scoreCards = new ArrayList<ScoreCard>();
+		for (var i = 0; i < 18; i++) {
 
 			if (holes.containsKey(i + 1)) {
 				scoreCards.add(holes.get(i + 1));
 			} else {
-				ScoreCard sc = new ScoreCard();
+				var sc = new ScoreCard();
 				sc.setHole(i + 1);
 				sc.setPats(0);
 				sc.setPenalty(0);
@@ -212,7 +213,7 @@ public class OnlineRoundService {
 	@Transactional(readOnly = true)
 	public List<OnlineRound> getOnlineRoundsForCourse(Long courseId) {
 
-		Course course = new Course();
+		var course = new Course();
 		course.setId(courseId);
 		List<OnlineRound> onlineRounds = onlineRoundRepository.findByCourse(course);
 

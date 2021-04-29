@@ -53,7 +53,7 @@ public class CourseController extends BaseController {
 
 		log.info("Requested list of holes for Course id -  " + id);
 
-		Course searchCourse = new Course();
+		var searchCourse = new Course();
 		searchCourse.setId(id);
 
 		return mapList(courseService.getHoles(searchCourse), HoleDto.class);
@@ -79,7 +79,7 @@ public class CourseController extends BaseController {
 		log.info("trying to add course: " + courseDto);
 
 		// copy data from dto to the entity object
-		Course course = modelMapper.map(courseDto, Course.class);
+		var course = modelMapper.map(courseDto, Course.class);
 
 		courseService.save(course);
 

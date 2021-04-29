@@ -5,7 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -17,7 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.greg.golf.controller.dto.RoundDto;
+
+import com.greg.golf.controller.dto.LimitedRoundDto;
 import com.greg.golf.controller.dto.TournamentDto;
 import com.greg.golf.controller.dto.TournamentResultDto;
 import com.greg.golf.entity.Course;
@@ -71,7 +73,7 @@ class TournamentControllerTest {
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		List<Player> playerSet = new ArrayList<Player>();
+		SortedSet<Player> playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
@@ -154,7 +156,7 @@ class TournamentControllerTest {
 	void getRoundsForTournamentTest() {
 		
 	
-		List<RoundDto> rndDtoLst =  this.tournamentController.getTournamentRounds(tournament.getId());
+		List<LimitedRoundDto> rndDtoLst =  this.tournamentController.getTournamentRounds(tournament.getId());
 		
 		assertEquals(1, rndDtoLst.size());
 	}

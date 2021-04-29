@@ -47,7 +47,7 @@ public class CourseService {
 	@Transactional(readOnly=false)
 	public long deleteFromFavourites(Course course, Long playerId) {
 		
-		Player player = new Player();
+		var player = new Player();
 		player.setId(playerId);
 				
 		return favouriteCourseRepository.deleteByPlayerAndCourse(player, course);
@@ -56,9 +56,9 @@ public class CourseService {
 	@Transactional(readOnly=false)
 	public void addToFavourites(Course course, Long playerId) {
 		
-		Player player = new Player();
+		var player = new Player();
 		player.setId(playerId);
-		FavouriteCourse favouriteCourse = new FavouriteCourse(); 
+		var favouriteCourse = new FavouriteCourse(); 
 		favouriteCourse.setPlayer(player);
 		favouriteCourse.setCourse(course);
 		
@@ -74,7 +74,7 @@ public class CourseService {
 	@Transactional(readOnly=true)
 	public List<Course> listFavourites(Long playerId) {
 		
-		Player player = new Player();
+		var player = new Player();
 		player.setId(playerId);
 		
 		return listFavourites(player);
@@ -118,7 +118,7 @@ public class CourseService {
 	@Transactional(readOnly=true)
 	public List<CourseTee> getTees(Long id) {
 		
-		Course course = new Course();
+		var course = new Course();
 		course.setId(id);
 
 		return courseTeeRepository.findByCourse(course);

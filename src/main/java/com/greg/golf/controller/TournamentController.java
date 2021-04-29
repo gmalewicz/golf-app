@@ -9,14 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.greg.golf.entity.helpers.Views;
-
-import com.greg.golf.controller.dto.RoundDto;
+import com.greg.golf.controller.dto.LimitedRoundDto;
 import com.greg.golf.controller.dto.TournamentDto;
 import com.greg.golf.controller.dto.TournamentResultDto;
 
-import com.greg.golf.entity.Round;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.entity.TournamentRound;
 import com.greg.golf.service.TournamentService;
@@ -55,7 +51,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 		log.info("Requested all tournament results sorted by played round desc and score netto ascending");
 
-		Tournament tournament = new Tournament();
+		var tournament = new Tournament();
 		tournament.setId(tournamentId);
 
 		return mapList(tournamentService.findAllTournamnetsResults(tournament), TournamentResultDto.class);
@@ -64,12 +60,11 @@ public class TournamentController extends BaseController {
 
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Return all rounds that can be added to tournament")
-	@JsonView(Views.RoundWithoutPlayer.class)
 	@GetMapping(value = "/rest/TournamentRounds/{tournamentId}")
-	public List<RoundDto> getTournamentRounds(
+	public List<LimitedRoundDto> getTournamentRounds(
 			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 		log.info("Requested rounds for tournament");
-		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), RoundDto.class);
+		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), LimitedRoundDto.class);
 	}
 
 	@Tag(name = "Tournament API")
@@ -78,11 +73,10 @@ public class TournamentController extends BaseController {
 	// @ApiResponse(responseCode = "500", description="Failed to send an email")
 	public HttpStatus addRoundToTournament(
 			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
-			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
+			@Parameter(description = "Round object", required = true) @RequestBody LimitedRoundDto limitedRoundDto) {
 
-		log.info("trying to add round to tournament: " + roundDto);
-
-		tournamentService.addRound(tournamentId, modelMapper.map(roundDto, Round.class), true);
+		log.info("trying to add round to tournament: " + limitedRoundDto);
+		tournamentService.addRound(tournamentId, limitedRoundDto.getId(), true);
 		log.info("Round added");
 
 		return HttpStatus.OK;

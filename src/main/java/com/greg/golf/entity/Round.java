@@ -2,6 +2,7 @@ package com.greg.golf.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.ArrayList;
 
 import javax.persistence.CascadeType;
@@ -21,6 +22,8 @@ import javax.persistence.Table;
 
 
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.SortNatural;
 
 import lombok.Data;
 import lombok.ToString;
@@ -48,12 +51,13 @@ public class Round {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Course course;
 
+	@SortNatural
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(cascade = { CascadeType.DETACH }, fetch = FetchType.LAZY)
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "round_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "player_id") })
-	private List<Player> player;
+	private SortedSet<Player> player;
 
 	@EqualsAndHashCode.Exclude
 	@NotNull

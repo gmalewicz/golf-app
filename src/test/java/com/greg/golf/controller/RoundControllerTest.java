@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -72,7 +74,7 @@ class RoundControllerTest {
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		List<Player> playerSet = new ArrayList<Player>();
+		SortedSet<Player> playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
@@ -132,7 +134,7 @@ class RoundControllerTest {
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setId(1L);
 		playerDto.setWhs(32.1f);
-		List<PlayerDto> playerDtoLst = new ArrayList<>();
+		SortedSet<PlayerDto> playerDtoLst = new TreeSet<>();
 		playerDtoLst.add(playerDto);
 		roundDto.setPlayer(playerDtoLst);
 			

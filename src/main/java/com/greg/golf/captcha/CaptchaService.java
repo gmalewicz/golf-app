@@ -26,10 +26,10 @@ public class CaptchaService extends AbstractCaptchaService {
 	public void processResponse(final String response) {
 		securityCheck(response);
 
-		final URI verifyUri = URI
+		final var verifyUri = URI
 				.create(String.format(RECAPTCHA_URL_TEMPLATE, getReCaptchaSecret(), response, getClientIP()));
 		try {
-			final GoogleResponse googleResponse = restTemplate.getForObject(verifyUri, GoogleResponse.class);
+			final var googleResponse = restTemplate.getForObject(verifyUri, GoogleResponse.class);
 
 			if (googleResponse == null) {
 				throw new RestClientException("Google response not available");

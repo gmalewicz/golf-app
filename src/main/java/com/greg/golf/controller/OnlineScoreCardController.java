@@ -49,9 +49,9 @@ public class OnlineScoreCardController extends BaseController {
 
 		log.debug("Received s -  " + onlineScoreCardDto);
 
-		OnlineScoreCard onlineScoreCard = modelMapper.map(onlineScoreCardDto, OnlineScoreCard.class);
+		var onlineScoreCard = modelMapper.map(onlineScoreCardDto, OnlineScoreCard.class);
 
-		OnlineRound onlineRound = new OnlineRound();
+		var onlineRound = new OnlineRound();
 		onlineRound.setId(onlineScoreCard.getOrId());
 		onlineScoreCard.setOnlineRound(onlineRound);
 

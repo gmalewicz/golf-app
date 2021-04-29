@@ -48,7 +48,7 @@ public class GameService {
 		Optional<Game> game = gameRepository.findById(gameSendData.getGameId());
 		log.debug("Game data retrived");
 		
-		Context context = new Context(); 
+		var context = new Context(); 
 		context.setVariable("gameName", gameIdNameMap.get(game.orElseThrow().getGameId()));
 		context.setVariable("game", game.orElseThrow());
 		String body = templateEngine.process("GameDetailsMailTemplate.html", context);

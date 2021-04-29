@@ -50,7 +50,7 @@ public class AccessController {
 		log.debug(
 				"trying to authenticate player: " + playerDto.getNick() + " with password " + playerDto.getPassword());
 
-		Player player = modelMapper.map(playerDto, Player.class);
+		var player = modelMapper.map(playerDto, Player.class);
 
 		authenticate(player.getNick(), player.getPassword());
 
@@ -60,7 +60,7 @@ public class AccessController {
 
 		log.info(userDetails.getPlayer());
 
-		HttpHeaders responseHeaders = new HttpHeaders();
+		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
 		responseHeaders.set("Jwt", token);
 
@@ -76,7 +76,7 @@ public class AccessController {
 
 		log.info("trying to add player: " + playerDto.getNick() + " with password xxxxxx");
 
-		Player player = modelMapper.map(playerDto, Player.class);
+		var player = modelMapper.map(playerDto, Player.class);
 
 		captchaService.processResponse(player.getCaptcha());
 
@@ -95,7 +95,7 @@ public class AccessController {
 
 		log.info("trying to update player: " + playerDto.getNick());
 
-		Player player = modelMapper.map(playerDto, Player.class);
+		var player = modelMapper.map(playerDto, Player.class);
 
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
 			player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
@@ -116,7 +116,7 @@ public class AccessController {
 
 		log.info("trying to reset the password for player: " + playerDto.getNick());
 
-		Player player = modelMapper.map(playerDto, Player.class);
+		var player = modelMapper.map(playerDto, Player.class);
 
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
 
@@ -138,7 +138,7 @@ public class AccessController {
 		log.info("trying to add player on behalf: " + playerDto.getNick() + " with temporary password");
 		playerDto.setPassword("welcome");
 				
-		Player player = modelMapper.map(playerDto, Player.class);
+		var player = modelMapper.map(playerDto, Player.class);
 
 		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
 

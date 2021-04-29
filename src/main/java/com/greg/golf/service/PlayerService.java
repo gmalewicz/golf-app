@@ -76,7 +76,7 @@ public class PlayerService implements UserDetailsService {
 	@Transactional
 	public Player update(Player player) {
 
-		Player persistedPlayer = playerRepository.getOne(player.getId());
+		var persistedPlayer = playerRepository.getOne(player.getId());
 
 		if (player.getWhs() != null) {
 			persistedPlayer.setWhs(player.getWhs());
@@ -94,12 +94,12 @@ public class PlayerService implements UserDetailsService {
 	@Transactional
 	public Player resetPassword(Long id, Player player) {
 
-		Player admin = playerRepository.getOne(id);
+		var admin = playerRepository.getOne(id);
 		if (admin.getRole() != Common.ROLE_PLAYER_ADMIN) {
 			throw new UnauthorizedException();
 		}
 
-		Player persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
+		var persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
 
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
 			persistedPlayer.setPassword(player.getPassword());
