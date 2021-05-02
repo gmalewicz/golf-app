@@ -15,9 +15,11 @@ import org.junit.jupiter.api.BeforeAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import com.greg.golf.entity.Player;
@@ -27,14 +29,13 @@ import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
 import com.greg.golf.error.ScoreCardUpdateException;
-import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
+import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -42,7 +43,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
+// @ExtendWith(SpringExtension.class)
 class RoundServiceTest {
 
 	@ClassRule
@@ -53,6 +54,9 @@ class RoundServiceTest {
 
 	@Autowired
 	private RoundService roundService;
+
+	@MockBean
+	private TournamentService mockTournamentService;
 
 	@BeforeAll
 	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
@@ -339,16 +343,17 @@ class RoundServiceTest {
 		scoreCard.setPats(0);
 		scoreCard.setPenalty(0);
 		scoreCard.setPlayer(player);
-		// scoreCard.setRound(round);
 		scoreCard.setStroke(5);
 		newRound.setScoreCard(new ArrayList<ScoreCard>());
 		newRound.getScoreCard().add(scoreCard);
 
-		Assertions.assertThrows(TooFewHolesForTournamentException.class, () -> {
-			roundService.saveRound(newRound);
-		});
+		ArgumentCaptor<RoundEvent> valueCapture = ArgumentCaptor.forClass(RoundEvent.class);
+		Mockito.doNothing().when(mockTournamentService).handleRoundEvent(valueCapture.capture());
+
+		roundService.saveRound(newRound);
+		assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
 	}
-	
+
 	@DisplayName("Try to update scorecard assigned to tournamnet")
 	@Transactional
 	@Test
@@ -356,7 +361,7 @@ class RoundServiceTest {
 			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
 
 		var round = roundRepository.getOne(roundId);
-		
+
 		var tournament = new Tournament();
 		tournament.setEndDate(round.getRoundDate());
 		tournament.setStartDate(round.getRoundDate());
@@ -381,7 +386,7 @@ class RoundServiceTest {
 			roundService.updateScoreCard(newRound);
 		});
 	}
-	
+
 	@DisplayName("Try to update correct scorecard")
 	@Transactional
 	@Test
@@ -389,7 +394,7 @@ class RoundServiceTest {
 			@Autowired PlayerRepository playerRepository) {
 
 		var round = roundRepository.getOne(roundId);
-		
+
 		// create the new round
 		var newRound = new Round();
 		newRound.setId(round.getId());
@@ -410,16 +415,13 @@ class RoundServiceTest {
 		newRound.getScoreCard().add(scoreCard);
 		// update the scorecard
 		roundService.updateScoreCard(newRound);
-		
+
 		round = roundRepository.getOne(roundId);
 
 		assertEquals(1, round.getScoreCard().size());
 		assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
 	}
-	
-	
-	
-	
+
 	@DisplayName("Try to update scorecard with more than 1 player")
 	@Transactional
 	@Test
@@ -434,7 +436,7 @@ class RoundServiceTest {
 		player.setWhs(30.1f);
 		player.setRole(0);
 		playerRepository.save(player);
-		
+
 		var round = roundRepository.getOne(roundId);
 
 		// creae the new round
@@ -452,13 +454,13 @@ class RoundServiceTest {
 			roundService.updateScoreCard(newRound);
 		});
 	}
-	
+
 	@DisplayName("Try to update scorecard without player")
 	@Transactional
 	@Test
 	void scoreCardUpdateWithoutPlayerTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
-		
+
 		var round = roundRepository.getOne(roundId);
 
 		// creae the new round
@@ -472,7 +474,6 @@ class RoundServiceTest {
 			roundService.updateScoreCard(newRound);
 		});
 	}
-	
 
 	@DisplayName("Get Round inside range applicable for tournamnet")
 	@Transactional
