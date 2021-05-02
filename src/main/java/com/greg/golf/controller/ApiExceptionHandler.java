@@ -4,6 +4,8 @@ import java.util.NoSuchElementException;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -156,6 +158,14 @@ public class ApiExceptionHandler {
 	public ResponseEntity<ApiErrorResponse> handleApiException(IllegalArgumentException ex) {
 		
 		var response = new ApiErrorResponse("16", "Incorrect parameter");
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(InvalidDataAccessApiUsageException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(InvalidDataAccessApiUsageException ex) {
+		
+		var response = new ApiErrorResponse("17", "Incorrect parameter");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 }

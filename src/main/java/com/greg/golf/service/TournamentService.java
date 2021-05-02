@@ -364,6 +364,7 @@ public class TournamentService {
 			// calculate played holes
 			int playedHoles = (int) round.getScoreCard().stream()
 					.filter(scoreCard -> scoreCard.getPlayer().equals(player) && scoreCard.getStroke() > 0).count();
+			log.debug("Number of holes: " + playedHoles);
 			if (playedHoles != TOURNAMENT_HOLES) {
 				throw new TooFewHolesForTournamentException();
 			}
