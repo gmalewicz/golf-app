@@ -26,6 +26,7 @@ import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
+import com.greg.golf.error.ScoreCardUpdateException;
 import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRepository;
@@ -347,6 +348,131 @@ class RoundServiceTest {
 			roundService.saveRound(newRound);
 		});
 	}
+	
+	@DisplayName("Try to update scorecard assigned to tournamnet")
+	@Transactional
+	@Test
+	void scoreCardUpdateThatIsAssignedToTournamentTest(@Autowired RoundRepository roundRepository,
+			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
+
+		var round = roundRepository.getOne(roundId);
+		
+		var tournament = new Tournament();
+		tournament.setEndDate(round.getRoundDate());
+		tournament.setStartDate(round.getRoundDate());
+		tournament.setName("Test tournament");
+		tournament.setPlayer(round.getPlayer().first());
+		tournamentRepository.save(tournament);
+
+		round.setTournament(tournament);
+		round = roundRepository.save(round);
+
+		// create the new round
+		var newRound = new Round();
+		newRound.setId(round.getId());
+		newRound.setCourse(round.getCourse());
+		var playerSet = new TreeSet<Player>();
+		playerSet.add(round.getPlayer().first());
+		newRound.setPlayer(playerSet);
+		newRound.setMatchPlay(false);
+		newRound.setRoundDate(round.getRoundDate());
+
+		Assertions.assertThrows(ScoreCardUpdateException.class, () -> {
+			roundService.updateScoreCard(newRound);
+		});
+	}
+	
+	@DisplayName("Try to update correct scorecard")
+	@Transactional
+	@Test
+	void correctScoreCardUpdateTest(@Autowired RoundRepository roundRepository,
+			@Autowired PlayerRepository playerRepository) {
+
+		var round = roundRepository.getOne(roundId);
+		
+		// create the new round
+		var newRound = new Round();
+		newRound.setId(round.getId());
+		newRound.setCourse(round.getCourse());
+		var playerSet = new TreeSet<Player>();
+		playerSet.add(round.getPlayer().first());
+		newRound.setPlayer(playerSet);
+		newRound.setMatchPlay(false);
+		newRound.setRoundDate(round.getRoundDate());
+		newRound.setScoreCard(new ArrayList<ScoreCard>());
+		var scoreCard = new ScoreCard();
+		scoreCard.setHole(1);
+		scoreCard.setPats(0);
+		scoreCard.setPenalty(0);
+		scoreCard.setPlayer(round.getPlayer().first());
+		scoreCard.setRound(round);
+		scoreCard.setStroke(6);
+		newRound.getScoreCard().add(scoreCard);
+		// update the scorecard
+		roundService.updateScoreCard(newRound);
+		
+		round = roundRepository.getOne(roundId);
+
+		assertEquals(1, round.getScoreCard().size());
+		assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
+	}
+	
+	
+	
+	
+	@DisplayName("Try to update scorecard with more than 1 player")
+	@Transactional
+	@Test
+	void scoreCardUpdateWithMoreThanOnePlayerTest(@Autowired RoundRepository roundRepository,
+			@Autowired PlayerRepository playerRepository) {
+
+		// create the new player
+		var player = new Player();
+		player.setNick("player5");
+		player.setPassword("test");
+		player.setSex(true);
+		player.setWhs(30.1f);
+		player.setRole(0);
+		playerRepository.save(player);
+		
+		var round = roundRepository.getOne(roundId);
+
+		// creae the new round
+		var newRound = new Round();
+		newRound.setId(round.getId());
+		newRound.setCourse(round.getCourse());
+		var playerSet = new TreeSet<Player>();
+		playerSet.add(player);
+		playerSet.add(round.getPlayer().first());
+		newRound.setPlayer(playerSet);
+		newRound.setMatchPlay(false);
+		newRound.setRoundDate(round.getRoundDate());
+
+		Assertions.assertThrows(ScoreCardUpdateException.class, () -> {
+			roundService.updateScoreCard(newRound);
+		});
+	}
+	
+	@DisplayName("Try to update scorecard without player")
+	@Transactional
+	@Test
+	void scoreCardUpdateWithoutPlayerTest(@Autowired RoundRepository roundRepository,
+			@Autowired PlayerRepository playerRepository) {
+		
+		var round = roundRepository.getOne(roundId);
+
+		// creae the new round
+		var newRound = new Round();
+		newRound.setId(round.getId());
+		newRound.setCourse(round.getCourse());
+		newRound.setMatchPlay(false);
+		newRound.setRoundDate(round.getRoundDate());
+
+		Assertions.assertThrows(ScoreCardUpdateException.class, () -> {
+			roundService.updateScoreCard(newRound);
+		});
+	}
+	
 
 	@DisplayName("Get Round inside range applicable for tournamnet")
 	@Transactional

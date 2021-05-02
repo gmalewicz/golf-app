@@ -20,6 +20,7 @@ import com.greg.golf.error.PlayerNickInUseException;
 import com.greg.golf.error.ReCaptchaInvalidException;
 import com.greg.golf.error.ReCaptchaUnavailableException;
 import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
+import com.greg.golf.error.ScoreCardUpdateException;
 import com.greg.golf.error.SendingMailFailureException;
 import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.error.TooManyPlayersException;
@@ -167,5 +168,13 @@ public class ApiExceptionHandler {
 		
 		var response = new ApiErrorResponse("17", "Incorrect parameter");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ScoreCardUpdateException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(ScoreCardUpdateException ex) {
+		
+		var response = new ApiErrorResponse("18", "Unable to update scorecard");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 }
