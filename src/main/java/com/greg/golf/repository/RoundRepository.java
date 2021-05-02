@@ -19,9 +19,7 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 List<Round> findByPlayer(Player player);
 	
 	 Optional<Round> findRoundByCourseAndRoundDate(Course course, Date roundDate);
-	  
-	 List<Round> findByPlayerOrderByRoundDateDesc(Player player);
-	 
+	   
 	 List<Round> findByTournamentIsNullAndRoundDateBetween(Date startDate, Date endDate);
 
 	 @EntityGraph(attributePaths = { "course"})

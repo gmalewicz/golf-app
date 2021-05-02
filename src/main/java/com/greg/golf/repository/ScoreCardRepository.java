@@ -15,7 +15,7 @@ import com.greg.golf.entity.ScoreCard;
 public interface ScoreCardRepository extends JpaRepository<ScoreCard, Integer> {
 	
 	//results needs to be sorted by id
-	@Query("SELECT sc FROM ScoreCard sc where sc.round = :round ORDER BY sc.id") 
+	@Query("SELECT sc FROM ScoreCard sc where sc.round = :round ORDER BY sc.player, sc.id") 
 	List<ScoreCard> findByRound(@Param("round") Round round);
 	
 	List<ScoreCard> findByRoundAndPlayer(Round round, Player player);

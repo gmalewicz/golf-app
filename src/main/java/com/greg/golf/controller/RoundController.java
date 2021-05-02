@@ -3,7 +3,6 @@ package com.greg.golf.controller;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -95,24 +94,6 @@ public class RoundController extends BaseController {
 		round.setId(id);
 
 		return mapList(scoreCardService.listByRound(round), ScoreCardDto.class);
-	}
-
-	@Tag(name = "Round API")
-	@Operation(summary = "Deletes round with given id.")
-	@DeleteMapping("/rest/Round/{id}")
-	public ResponseEntity<Long> deleteRound(
-			@Parameter(description = "Round id", example = "1", required = true) @PathVariable Long id) {
-
-		log.info("trying to delete round: " + id);
-
-		try {
-			roundService.delete(id);
-		} catch (Exception e) {
-			return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<>(id, HttpStatus.OK);
-
 	}
 
 	@Tag(name = "Round API")

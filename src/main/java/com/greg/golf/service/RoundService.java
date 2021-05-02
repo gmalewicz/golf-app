@@ -36,12 +36,6 @@ public class RoundService {
 	private final PlayerRoundRepository playerRoundRepository;
 	private final ApplicationEventPublisher applicationEventPublisher;
 	
-	@Transactional
-	public List<Round> list() {
-		return roundRepository.findAll();
-
-	}
-
 	public Optional<Round> getWithPlayers (Long id) {
 		return roundRepository.findById(id);
 	}
@@ -116,13 +110,6 @@ public class RoundService {
 
 		return round;
 	}
-
-	@Transactional(readOnly = true)
-	public List<Round> listByPlayer(Player player) {
-
-		return roundRepository.findByPlayerOrderByRoundDateDesc(player);
-	}
-	
 	
 	@Transactional(readOnly = true)
 	public List<Round> listByPlayerPageable(Player player, Integer pageNo) {
@@ -136,13 +123,6 @@ public class RoundService {
 		return roundRepository.findByOrderByRoundDateDescPlayerAsc(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
 	}
 	
-
-	@Transactional
-	public void delete(Long id) {
-
-		roundRepository.deleteById(id);
-	}
-
 	@Transactional
 	public void deleteScorecard(Long playerId, Long roundId) {
 
@@ -162,7 +142,7 @@ public class RoundService {
 		int playerCnt = round.getPlayer().size();
 		log.debug("Player cnt  is " + playerCnt);
 		if (playerCnt == 1) {
-			delete(roundId);
+			roundRepository.deleteById(roundId);
 			log.debug("Round deleted");
 			return;
 		}
