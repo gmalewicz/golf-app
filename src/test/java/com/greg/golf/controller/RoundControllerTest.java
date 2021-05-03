@@ -1,203 +1,219 @@
 package com.greg.golf.controller;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
-
 import org.junit.jupiter.api.BeforeAll;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import com.greg.golf.controller.dto.CourseDto;
-import com.greg.golf.controller.dto.CourseTeeDto;
-import com.greg.golf.controller.dto.LimitedRoundDto;
-import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
-import com.greg.golf.controller.dto.PlayerDto;
-import com.greg.golf.controller.dto.PlayerRoundDto;
-import com.greg.golf.controller.dto.RoundDto;
-import com.greg.golf.controller.dto.ScoreCardDto;
-import com.greg.golf.entity.Course;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.PlayerRound;
 import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
-import com.greg.golf.repository.PlayerRoundRepository;
-import com.greg.golf.repository.RoundRepository;
-import com.greg.golf.service.CourseService;
+import com.greg.golf.error.ApiErrorResponse;
+import com.greg.golf.security.JwtAuthenticationEntryPoint;
+import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.PlayerService;
-import com.greg.golf.util.GolfPostgresqlContainer;
-
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
+import com.greg.golf.service.RoundService;
+import com.greg.golf.service.ScoreCardService;
 
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(controllers = RoundController.class)
 class RoundControllerTest {
-	
-	@ClassRule
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
-	private static Player player;
-	private static Round round;
+	@MockBean
+	private RoundService roundService;
 
-	private final RoundController roundController;
-	
+	@MockBean
+	private ScoreCardService scoreCardService;
+
+	@MockBean
+	private PlayerService playerService;
+
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
+
+	@MockBean
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+	@MockBean
+	private ModelMapper modelMapper;
+
+	private final MockMvc mockMvc;
+	private final ObjectMapper objectMapper;
+
 	@Autowired
-	public RoundControllerTest(RoundController roundController) {
-		this.roundController = roundController;
+	public RoundControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+		this.mockMvc = mockMvc;
+		this.objectMapper = objectMapper;
 	}
-	
+
 	@BeforeAll
-	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
-			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository) {
+	public static void setup() {
 
-		player = playerService.getPlayer(1L).orElseThrow();
-
-		round = new Round();
-
-		Course course = courseService.getCourse(1L).orElseThrow();
-		round.setCourse(course);
-		SortedSet<Player> playerSet = new TreeSet<Player>();
-		playerSet.add(player);
-		round.setPlayer(playerSet);
-		round.setMatchPlay(false);
-		round.setRoundDate(new Date(1));
-		round.setScoreCard(new ArrayList<ScoreCard>());
-		ScoreCard scoreCard = new ScoreCard();
-		scoreCard.setHole(1);
-		scoreCard.setPats(0);
-		scoreCard.setPenalty(0);
-		scoreCard.setPlayer(player);
-		scoreCard.setRound(round);
-		scoreCard.setStroke(5);
-		round.getScoreCard().add(scoreCard);
-		scoreCard = new ScoreCard();
-		scoreCard.setHole(2);
-		scoreCard.setPats(0);
-		scoreCard.setPenalty(0);
-		scoreCard.setPlayer(player);
-		scoreCard.setRound(round);
-		scoreCard.setStroke(4);
-		round.getScoreCard().add(scoreCard);
-		round = roundRepository.save(round);
-		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 1, 1F, 2L, 1, player.getId(), round.getId());
-
-	
 		log.info("Set up completed");
 	}
 
+	@DisplayName("Add round with correct result")
+	@Test
+	void addRoundWhenValidInputThenReturns200() throws Exception {
 
+		var valueCapture = ArgumentCaptor.forClass(Round.class);
 
-	
-	@DisplayName("Add round")
-	@Transactional
+		when(roundService.saveRound(valueCapture.capture())).thenReturn(null);
+
+		String str = "{\"matchPlay\":false,\"roundDate\":\"2020/06/12 06:59\",\"course\":{\"id\":1,\"tees\":[{\"id\":1}]},\"player\":[{\"id\":1,\"whs\":32.1}],\"scoreCard\":[{\"hole\":1,\"stroke\":5,\"pats\":0,\"penalty\":0}]}";
+
+		mockMvc.perform(post("/rest/Round").contentType("application/json").characterEncoding("utf-8").content(str))
+				.andExpect(status().isOk()).andReturn();
+
+	}
+
+	@DisplayName("Gets rounds for player")
 	@Test
-	void addRoundTest() {
-		
-		RoundDto roundDto= new RoundDto();
-		roundDto.setMatchPlay(false);
-		Calendar calendar = new GregorianCalendar();
-		calendar.set(2020, 5, 12);
-		roundDto.setRoundDate(calendar.getTime());
-		roundDto.setScoreCard(new ArrayList<ScoreCardDto>());
-		ScoreCardDto scoreCard = new ScoreCardDto();
-		scoreCard.setHole(1);
-		scoreCard.setPats(0);
-		scoreCard.setPenalty(0);
-		scoreCard.setStroke(5);
-		roundDto.getScoreCard().add(scoreCard);
-		CourseDto courseDto = new CourseDto();
-		courseDto.setId(1l);
-		List<CourseTeeDto> courseTeeDtoLst = new ArrayList<>();
-		CourseTeeDto courseTeeDto = new CourseTeeDto();
-		courseTeeDto.setId(1l);
-		courseTeeDtoLst.add(courseTeeDto);
-		courseDto.setTees(courseTeeDtoLst);
-		roundDto.setCourse(courseDto);
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setId(1L);
-		playerDto.setWhs(32.1f);
-		SortedSet<PlayerDto> playerDtoLst = new TreeSet<>();
-		playerDtoLst.add(playerDto);
-		roundDto.setPlayer(playerDtoLst);
-			
-		HttpStatus status = this.roundController.addRound(roundDto);
-		
-		assertEquals(HttpStatus.OK, status);
+	void getsRoundsForPlayerThenReturns200() throws Exception {
+
+		var round = new Round();
+		round.setId(1l);
+		var lst = new ArrayList<Round>();
+		lst.add(round);
+
+		var playerCapture = ArgumentCaptor.forClass(Player.class);
+		var pageCapture = ArgumentCaptor.forClass(Integer.class);
+
+		when(roundService.listByPlayerPageable(playerCapture.capture(), pageCapture.capture())).thenReturn(lst);
+
+		mockMvc.perform(get("/rest/Rounds/1/1")).andExpect(status().isOk());
+
+	}
+
+	@DisplayName("Gets recent rounds")
+	@Test
+	void getsRecentRoundsThenReturns200() throws Exception {
+
+		var round = new Round();
+		round.setId(1l);
+		var lst = new ArrayList<Round>();
+		lst.add(round);
+
+		var pageCapture = ArgumentCaptor.forClass(Integer.class);
+
+		when(roundService.getRecentRounds(pageCapture.capture())).thenReturn(lst);
+
+		mockMvc.perform(get("/rest/RecentRounds/1")).andExpect(status().isOk());
+
+	}
+
+	@DisplayName("Gets score cards for round")
+	@Test
+	void getsScoreCardsForRoundThenReturns200() throws Exception {
+
+		var scoreCard = new ScoreCard();
+		scoreCard.setId(1l);
+		var lst = new ArrayList<ScoreCard>();
+		lst.add(scoreCard);
+
+		var roundCapture = ArgumentCaptor.forClass(Round.class);
+
+		when(scoreCardService.listByRound(roundCapture.capture())).thenReturn(lst);
+
+		mockMvc.perform(get("/rest/ScoreCard/1")).andExpect(status().isOk());
+
+	}
+
+	@DisplayName("Delete score card with success")
+	@Test
+	void deleteScorecardThenReturns200() throws Exception {
+
+		doNothing().when(roundService).deleteScorecard(anyLong(), anyLong());
+
+		mockMvc.perform(delete("/rest/ScoreCard/1/1")).andExpect(status().isOk());
 	}
 	
-	@DisplayName("Get round for player test")
-	@Transactional
+	@DisplayName("Update scorecard with success")
 	@Test
-	void getRoundForPlayerTest() {
-		
-		List<LimitedRoundDto> roundDtoLst =  this.roundController.getRound(1l, 0);
-		
-		assertEquals(1, roundDtoLst.size());
+	void updateRoundThenReturns200() throws Exception {
+
+		var roundCapture = ArgumentCaptor.forClass(Round.class);
+	
+		doNothing().when(roundService).updateScoreCard(roundCapture.capture());
+
+		String str = "{\"matchPlay\":false,\"roundDate\":\"2020/06/12 06:59\",\"course\":{\"id\":1,\"tees\":[{\"id\":1}]},\"player\":[{\"id\":1,\"whs\":32.1}],\"scoreCard\":[{\"hole\":1,\"stroke\":5,\"pats\":0,\"penalty\":0}]}";
+
+		mockMvc.perform(patch("/rest/ScoreCard").contentType("application/json").characterEncoding("utf-8").content(str))
+				.andExpect(status().isOk()).andReturn();
 	}
 	
-	@DisplayName("Get recent rounds")
-	@Transactional
+	@DisplayName("Get data for handicap calculation for a player")
 	@Test
-	void getRecentRoundsTest() {
+	void getHandicapDataForPlayerThenReturns200() throws Exception {
+
+		var playerRound = new PlayerRound();
+		playerRound.setId(1l);
 		
-		List<LimitedRoundWithPlayersDto> roundDtoLst =  this.roundController.getRecentRounds(0);
-		
-		assertEquals(1, roundDtoLst.size());
+		when(roundService.getForPlayerRoundDetails(anyLong(), anyLong())).thenReturn(playerRound);
+
+		mockMvc.perform(get("/rest/RoundPlayerDetails/1/1")).andExpect(status().isOk());
 	}
 	
-	@DisplayName("Get scorcards")
-	@Transactional
+	@DisplayName("Get data for handicap calculation for all players")
 	@Test
-	void getScoreCardsTest() {
+	void getHandicapDataForAllPlayersThenReturns200() throws Exception {
+
+		var playerRound = new PlayerRound();
+		playerRound.setId(1l);
+		var lst = new ArrayList<PlayerRound>();
+		lst.add(playerRound);
 		
-		List<ScoreCardDto> scoreCardDtoLst =  this.roundController.getScoreCards(round.getId());
-		
-		assertEquals(2, scoreCardDtoLst.size());
+		when(roundService.getByRoundId(anyLong())).thenReturn(lst);
+
+		mockMvc.perform(get("/rest/RoundPlayersDetails/1")).andExpect(status().isOk());
 	}
 	
-	@DisplayName("Get round player details")
-	@Transactional
+
+	// the test is artificial as it is not possible to pass null as an round id
+	// argument
+	@DisplayName("Delete score card with null")
 	@Test
-	void getRoundPlayerDetailsTest() {
-		
-		PlayerRoundDto playerRoundDto =  this.roundController.getRoundPlayerDetails(1l, round.getId());
-		
-		assertEquals(player.getWhs(), playerRoundDto.getWhs());
+	void deleteScorecard_whenInvalidInput_thenReturns400_2() throws Exception {
+
+		doThrow(new InvalidDataAccessApiUsageException(null)).when(roundService).deleteScorecard(1l, 1l);
+		MvcResult mvcResult = mockMvc.perform(delete("/rest/ScoreCard/1/1")).andExpect(status().isBadRequest())
+				.andReturn();
+
+		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+
+		assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
+				objectMapper.writeValueAsString(new ApiErrorResponse("17", "Incorrect parameter")));
 	}
-	
-	@DisplayName("Get player details for round")
-	@Transactional
-	@Test
-	void getPlayerDetailsForRoundTest() {
-		
-		List<PlayerRoundDto> playerRoundDtoLst =  this.roundController.getPlayersDetailsForRound(round.getId());
-		
-		assertEquals(player.getWhs(), playerRoundDtoLst.get(0).getWhs());
-	}
-	
-	
+
 	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository) {
-
-		roundRepository.deleteAll();
+	public static void done() {
 
 		log.info("Clean up completed");
 

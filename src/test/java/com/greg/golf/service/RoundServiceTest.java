@@ -1,9 +1,9 @@
 package com.greg.golf.service;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
@@ -12,7 +12,6 @@ import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,7 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
+import com.greg.golf.entity.Course;
+import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.PlayerRound;
 import com.greg.golf.entity.Round;
@@ -31,13 +34,11 @@ import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
 import com.greg.golf.error.ScoreCardUpdateException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRepository;
+import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
-
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -60,7 +61,7 @@ class RoundServiceTest {
 
 	@BeforeAll
 	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
-			@Autowired RoundRepository roundRepository) {
+			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
 
@@ -94,6 +95,7 @@ class RoundServiceTest {
 		round.getScoreCard().add(scoreCard);
 		round = roundRepository.save(round);
 		roundId = round.getId();
+		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 1, 1F, 2L, 1, player.getId(), round.getId());
 
 		log.info("Set up completed");
 	}
@@ -276,7 +278,7 @@ class RoundServiceTest {
 		player.setRole(0);
 		playerRepository.save(player);
 
-		// creae the new round
+		// create the new round
 		var newRound = new Round();
 		newRound.setCourse(round.getCourse());
 		var playerSet = new TreeSet<Player>();
@@ -291,7 +293,6 @@ class RoundServiceTest {
 		scoreCard.setPats(0);
 		scoreCard.setPenalty(0);
 		scoreCard.setPlayer(player);
-		// scoreCard.setRound(round);
 		scoreCard.setStroke(5);
 		newRound.setScoreCard(new ArrayList<ScoreCard>());
 		newRound.getScoreCard().add(scoreCard);
@@ -328,7 +329,7 @@ class RoundServiceTest {
 		player.setRole(0);
 		playerRepository.save(player);
 
-		// creae the new round
+		// create the new round
 		var newRound = new Round();
 		newRound.setCourse(round.getCourse());
 		var playerSet = new TreeSet<Player>();
@@ -347,7 +348,7 @@ class RoundServiceTest {
 		newRound.setScoreCard(new ArrayList<ScoreCard>());
 		newRound.getScoreCard().add(scoreCard);
 
-		ArgumentCaptor<RoundEvent> valueCapture = ArgumentCaptor.forClass(RoundEvent.class);
+		var valueCapture = ArgumentCaptor.forClass(RoundEvent.class);
 		Mockito.doNothing().when(mockTournamentService).handleRoundEvent(valueCapture.capture());
 
 		roundService.saveRound(newRound);
@@ -413,7 +414,7 @@ class RoundServiceTest {
 		scoreCard.setRound(round);
 		scoreCard.setStroke(6);
 		newRound.getScoreCard().add(scoreCard);
-		// update the scorecard
+		// update the score card
 		roundService.updateScoreCard(newRound);
 
 		round = roundRepository.getOne(roundId);
@@ -439,7 +440,7 @@ class RoundServiceTest {
 
 		var round = roundRepository.getOne(roundId);
 
-		// creae the new round
+		// create the new round
 		var newRound = new Round();
 		newRound.setId(round.getId());
 		newRound.setCourse(round.getCourse());
@@ -463,7 +464,7 @@ class RoundServiceTest {
 
 		var round = roundRepository.getOne(roundId);
 
-		// creae the new round
+		// create the new round
 		var newRound = new Round();
 		newRound.setId(round.getId());
 		newRound.setCourse(round.getCourse());
@@ -530,7 +531,66 @@ class RoundServiceTest {
 		assertEquals(1, rounds.size());
 
 	}
-
+	
+	@DisplayName("Add round")
+	@Transactional
+	@Test
+	void addRoundTest(@Autowired RoundRepository roundRepository) {
+		
+		var round= new Round();
+		round.setMatchPlay(false);
+		var calendar = new GregorianCalendar();
+		calendar.set(2020, 5, 12);
+		round.setRoundDate(calendar.getTime());
+		round.setScoreCard(new ArrayList<ScoreCard>());
+		var scoreCard = new ScoreCard();
+		scoreCard.setHole(1);
+		scoreCard.setPats(0);
+		scoreCard.setPenalty(0);
+		scoreCard.setStroke(5);
+		round.getScoreCard().add(scoreCard);
+		var course = new Course();
+		course.setId(1l);
+		var courseTeeLst = new ArrayList<CourseTee>();
+		var courseTee = new CourseTee();
+		courseTee.setId(1l);
+		courseTeeLst.add(courseTee);
+		course.setTees(courseTeeLst);
+		round.setCourse(course);
+		var player = new Player();
+		player.setId(1L);
+		player.setWhs(32.1f);
+		var playerLst = new TreeSet<Player>();
+		playerLst.add(player);
+		round.setPlayer(playerLst);
+			
+		roundService.saveRound(round);
+		
+		assertEquals(2, roundRepository.findAll().size());
+	}
+	
+	@DisplayName("Get recent rounds")
+	@Transactional
+	@Test
+	void getRecentRoundsTest() {
+		
+		var roundLst =  roundService.getRecentRounds(0);
+		
+		assertEquals(1, roundLst.size());
+	}
+	
+	@DisplayName("Get round player details")
+	@Transactional
+	@Test
+	void getRoundPlayerDetailsTest(@Autowired PlayerRepository playerRepository) {
+		
+		var player = playerRepository.findById(1L).orElseThrow();
+		
+		var playerRound =  roundService.getForPlayerRoundDetails(1L, roundId);
+		
+		assertEquals(player.getWhs(), playerRound.getWhs());
+	}
+	
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository) {
 

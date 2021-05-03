@@ -40,7 +40,7 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(PlayerAlreadyHasThatRoundException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerAlreadyHasThatRoundException ex) {
-		var response = new ApiErrorResponse("2", "Cannot save same round for a player");
+		var response = new ApiErrorResponse("2", "Cannot save the same round for a player");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 

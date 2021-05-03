@@ -46,12 +46,9 @@ public class RoundController extends BaseController {
 	public HttpStatus addRound(
 			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
-		var round = modelMapper.map(roundDto, Round.class);
-		log.debug(round.getCourse().getTees());
-		log.debug(round.getCourse());
-		log.debug(roundDto.getCourse().getTees());
-		log.debug(roundDto.getCourse());
-		roundService.saveRound(round);
+		log.info("Requested adding round for player id -  " + roundDto.getPlayer().first().getId());
+		
+		roundService.saveRound(modelMapper.map(roundDto, Round.class));
 
 		return HttpStatus.OK;
 	}
@@ -130,7 +127,7 @@ public class RoundController extends BaseController {
 	}
 
 	@Tag(name = "Round API")
-	@Operation(summary = "Return data required for course handicap calculation")
+	@Operation(summary = "Return data required for course handicap calculation for a player")
 	@GetMapping(value = "/rest/RoundPlayerDetails/{playerId}/{roundId}")
 	public PlayerRoundDto getRoundPlayerDetails(
 			@Parameter(description = "Player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
@@ -142,7 +139,7 @@ public class RoundController extends BaseController {
 	}
 
 	@Tag(name = "Round API")
-	@Operation(summary = "Return data required for course handicap calculation")
+	@Operation(summary = "Return data required for course handicap calculation for all players")
 	@GetMapping(value = "/rest/RoundPlayersDetails/{roundId}")
 	public List<PlayerRoundDto> getPlayersDetailsForRound(
 			@Parameter(description = "Round id", example = "1", required = true) @PathVariable("roundId") Long roundId) {
