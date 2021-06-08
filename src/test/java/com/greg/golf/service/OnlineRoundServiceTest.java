@@ -9,15 +9,15 @@ import java.util.List;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
-
 import org.junit.jupiter.api.BeforeAll;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
@@ -28,10 +28,6 @@ import com.greg.golf.repository.OnlineRoundRepository;
 import com.greg.golf.repository.OnlineScoreCardRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
-
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -98,25 +94,7 @@ class OnlineRoundServiceTest {
 		onlineRoundService.purge();
 		assertTrue(onlineRoundRepository.findAll().isEmpty());
 	}
-	
-	@DisplayName("Save online round")
-	@Transactional
-	@Test
-	void saveOnlineRoundTest() {
 		
-		OnlineRound onlineRound = new OnlineRound();;
-		onlineRound.setCourse(course);
-		onlineRound.setCourseTee(courseTee);
-		onlineRound.setPlayer(player);
-		onlineRound.setTeeTime("10:00");
-		onlineRound.setOwner(player.getId());
-		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
-		onlineRoundService.save(onlineRound);
-		
-		assertEquals(1, onlineRoundRepository.findAll().size());
-	}
-	
 	@DisplayName("Save online score card")
 	@Transactional
 	@Test
@@ -223,65 +201,7 @@ class OnlineRoundServiceTest {
 		
 		assertEquals(1, onlineRoundService.getOnlineScoreCards(onlineRound.getId()).size());
 	}
-	
-	@DisplayName("Delete online round")
-	@Transactional
-	@Test
-	void deleteOnlineRoundTest() {
-		
-		OnlineRound onlineRound = new OnlineRound();
-		onlineRound.setCourse(course);
-		onlineRound.setCourseTee(courseTee);
-		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
-		onlineRound.setTeeTime("10:00");
-		onlineRound.setOwner(player.getId());
-		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
-		onlineRoundRepository.save(onlineRound);
-		
-		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
-		onlineScoreCard.setPlayer(player);
-		onlineScoreCard.setHole(1);
-		onlineScoreCard.setOnlineRound(onlineRound);
-		onlineScoreCard.setStroke(1);
-		onlineScoreCard.setUpdate(false);
-		onlineScoreCardRepository.save(onlineScoreCard);
-		
-		onlineRoundService.delete(onlineRound.getId());
-		
-		assertEquals(0, onlineRoundRepository.findAll().size());
-	}
-	
-	@DisplayName("Finalize online round")
-	@Transactional
-	@Test
-	void finalizeRoundTest(@Autowired RoundRepository roundRepository) {
-		
-		OnlineRound onlineRound = new OnlineRound();
-		onlineRound.setCourse(course);
-		onlineRound.setCourseTee(courseTee);
-		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
-		onlineRound.setTeeTime("10:00");
-		onlineRound.setOwner(player.getId());
-		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
-		onlineRoundRepository.save(onlineRound);
-		
-		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
-		onlineScoreCard.setPlayer(player);
-		onlineScoreCard.setHole(1);
-		onlineScoreCard.setOnlineRound(onlineRound);
-		onlineScoreCard.setStroke(1);
-		onlineScoreCard.setUpdate(false);
-		onlineScoreCardRepository.save(onlineScoreCard);
-		
-		onlineRoundService.finalizeById(onlineRound.getId());
-		
-		assertEquals(1, roundRepository.findAll().size());
-	}
-	
+			
 	@DisplayName("Finalize online round for owner")
 	@Transactional
 	@Test
@@ -296,15 +216,22 @@ class OnlineRoundServiceTest {
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
 		onlineRound.setMatchPlay(false);
-		onlineRoundRepository.save(onlineRound);
 		
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
 		onlineScoreCard.setPlayer(player);
 		onlineScoreCard.setHole(1);
 		onlineScoreCard.setOnlineRound(onlineRound);
 		onlineScoreCard.setStroke(1);
+		onlineScoreCard.setPutt(0);
+		onlineScoreCard.setPenalty(0);
 		onlineScoreCard.setUpdate(false);
-		onlineScoreCardRepository.save(onlineScoreCard);
+		
+		onlineRound.setScoreCard(new ArrayList<OnlineScoreCard>());
+		onlineRound.getScoreCard().add(onlineScoreCard);
+		
+		
+		onlineRoundRepository.save(onlineRound);
+		// onlineScoreCardRepository.save(onlineScoreCard);
 				
 		onlineRoundService.finalizeForOwner(1L);
 		
@@ -327,7 +254,7 @@ class OnlineRoundServiceTest {
 		List<OnlineRound> rounds = new ArrayList<OnlineRound>();
 		rounds.add(onlineRound);
 		
-		onlineRoundService.save(onlineRound);
+		onlineRoundService.save(rounds);
 		
 		assertEquals(1, onlineRoundRepository.findAll().size());
 	}

@@ -10,15 +10,15 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
-public class JwtTokenUtil extends TokenUtil implements Serializable {
-		
-	public JwtTokenUtil(JwtConfig jwtConfig) {
+public class RefreshTokenUtil extends TokenUtil implements Serializable {
+	
+	public RefreshTokenUtil(JwtConfig jwtConfig) {
 		super(jwtConfig);
 	}
 
-	private static final long serialVersionUID = -2550185165626007488L;
+	private static final long serialVersionUID = -2550185165626007489L;
 
-	public static final long JWT_TOKEN_VALIDITY = (long) 60 * 60 * 8;
+	public static final long JWT_TOKEN_VALIDITY = (long) 60 * 60 * 24 * 30;
 
 	// while creating the token -
 	// 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID
@@ -30,6 +30,6 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret()).compact();
+				.signWith(SignatureAlgorithm.HS512, jwtConfig.getRefresh()).compact();
 	}
 }

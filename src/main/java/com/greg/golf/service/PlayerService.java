@@ -64,7 +64,7 @@ public class PlayerService implements UserDetailsService {
 		return golfUserDetails;
 
 	}
-
+	
 	@Cacheable
 	@Transactional(readOnly = true)
 	public Optional<Player> getPlayer(Long id) {
@@ -111,8 +111,14 @@ public class PlayerService implements UserDetailsService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Player> getPlayer(String nick) {
-		log.info("Get player for nick called");
-		return playerRepository.findPlayerByNick(nick);
+	public Player getPlayerForNick(String nick) {
+		
+		Optional<Player> player = playerRepository.findPlayerByNick(nick);
+		
+		if (player.isEmpty()) {
+			return null;
+		}
+		
+		return player.get();
 	}
 }

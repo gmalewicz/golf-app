@@ -28,41 +28,47 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-	
+
 	private UserDetails userDetails = null;
 
 	private final PlayerService playerService;
 	private final JwtTokenUtil jwtTokenUtil;
+	private final RefreshTokenUtil refreshTokenUtil;
+
+	private static final String REFRESH_PATH = "refresh";
+	private static final String REFRESH_TOKEN = "refreshToken";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		
+
 		String userId = null;
 		String jwtToken = null;
 		String requestTokenHeader = request.getHeader("Authorization");
-		
-		if (requestTokenHeader == null) { 
+		String refreshToken = request.getHeader("Refresh");
+
+		if (requestTokenHeader == null) {
 			jwtToken = request.getParameter("token");
 		}
 		log.debug("token: " + requestTokenHeader);
-		
-		
-		
+
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
 		if (jwtToken == null && requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 			jwtToken = requestTokenHeader.substring(7);
 		}
-		
+
 		if (jwtToken != null) {
-		
+
 			try {
 				userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
 			} catch (IllegalArgumentException e) {
 				log.error("Unable to get JWT Token");
 			} catch (ExpiredJwtException e) {
-				log.error("JWT Token has expired");
+				log.info("JWT Token has expired for player: " + e.getClaims().getSubject());
+				
+				jwtToken = processRefreshRequest(request, e, refreshToken);
+
 			}
 		}
 
@@ -76,8 +82,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			player.ifPresent(p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
 
 			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-				var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
+				var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+						userDetails.getAuthorities());
 				usernamePasswordAuthenticationToken
 						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				// After setting the Authentication in the context, we specify
@@ -89,5 +95,32 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		chain.doFilter(request, response);
 
+	}
+	
+	private String processRefreshRequest(HttpServletRequest request, ExpiredJwtException e, String refreshToken) {
+	
+		String jwtToken = null;
+		
+		// verify if it is refresh request
+		if (request.getRequestURI().contains(REFRESH_PATH)) {
+
+			log.info("Start generating rewewed token");
+
+			Optional<Player> player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject()));
+
+			player.ifPresent(
+					p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
+
+			// if positive generate the new JWT token and replace it in the request
+			if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
+
+				jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());
+				request.setAttribute(REFRESH_TOKEN, jwtToken);
+			} else {
+				log.info("Refersh token expired or not available");
+			}
+		}
+		
+		return jwtToken;
 	}
 }

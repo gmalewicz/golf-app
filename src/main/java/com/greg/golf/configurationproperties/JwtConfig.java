@@ -7,4 +7,5 @@ import lombok.Data;
 @ConfigurationProperties("jwt")
 public class JwtConfig {
 	private String secret;
+	private String refresh;
 }

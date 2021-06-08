@@ -24,6 +24,7 @@ spring:
     show_sql: true
 jwt:
   secret: golfBackendSecret
+  refresh: refreshSecret
 springdoc:
   swagger-ui:
     path: /api/swagger-ui.html

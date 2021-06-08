@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +20,7 @@ import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.repository.OnlineRoundRepository;
 import com.greg.golf.repository.OnlineScoreCardRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -41,16 +41,6 @@ public class OnlineRoundService {
 	}
 
 	@Transactional
-	public OnlineRound save(OnlineRound onlineRound) {
-
-		var gc = new GregorianCalendar();
-		onlineRound.setDate(gc.getTime());
-
-		return onlineRoundRepository.save(onlineRound);
-
-	}
-
-	@Transactional
 	public List<OnlineRound> save(List<OnlineRound> onlineRounds) {
 
 		var gc = new GregorianCalendar();
@@ -62,10 +52,14 @@ public class OnlineRoundService {
 
 	@Transactional
 	public OnlineScoreCard saveOnlineScoreCard(OnlineScoreCard onlineScoreCard) {
+		
+		var onlineRound = new OnlineRound();
+		onlineRound.setId(onlineScoreCard.getOrId());
+		onlineScoreCard.setOnlineRound(onlineRound);
 
 		if (onlineScoreCard.isUpdate()) {
 			log.debug("Update of the score card executed: " + onlineScoreCard);
-			OnlineScoreCard updatedScoreCard = onlineScoreCardRepository
+			var updatedScoreCard = onlineScoreCardRepository
 					.findByOnlineRoundAndHole(onlineScoreCard.getOnlineRound(), onlineScoreCard.getHole())
 					.orElseThrow();
 			updatedScoreCard.setStroke(onlineScoreCard.getStroke());
@@ -97,33 +91,9 @@ public class OnlineRoundService {
 	}
 
 	@Transactional
-	public void delete(Long id) {
-
-		onlineRoundRepository.deleteById(id);
-
-	}
-
-	@Transactional
 	public void deleteForOwner(Long ownerId) {
 
 		onlineRoundRepository.deleteByOwnerAndFinalized(ownerId, false);
-
-	}
-
-	@Transactional
-	public Round finalizeById(Long id) {
-
-		Round retRound = null;
-
-		// get the online round from db
-		var onlineRound = onlineRoundRepository.findById(id).orElseThrow();
-
-		retRound = buildRound(onlineRound);
-
-		// at the end delete the online entries
-		onlineRoundRepository.deleteById(id);
-
-		return retRound;
 
 	}
 
@@ -133,14 +103,14 @@ public class OnlineRoundService {
 		var round = new Round();
 
 		var course = new Course();
-		List<CourseTee> tees = new ArrayList<>();
+		var tees = new ArrayList<CourseTee>();
 		tees.add(onlineRound.getCourseTee());
 		course.setTees(tees);
 		course.setHoles(onlineRound.getCourse().getHoles());
 		course.setId(onlineRound.getCourse().getId());
 		round.setCourse(course);
 
-		SortedSet<Player> players = new TreeSet<>();
+		var players = new TreeSet<Player>();
 		players.add(onlineRound.getPlayer());
 		round.setPlayer(players);
 		round.setMatchPlay(onlineRound.getMatchPlay());
@@ -196,7 +166,7 @@ public class OnlineRoundService {
 	public void finalizeForOwner(Long ownerId) {
 
 		// get the online rounds from db
-		List<OnlineRound> onlineRounds = onlineRoundRepository.findByOwnerAndFinalized(ownerId, false);
+		var onlineRounds = onlineRoundRepository.findByOwnerAndFinalized(ownerId, false);
 
 		// for now it is assumed that children are retrieved
 
@@ -215,7 +185,7 @@ public class OnlineRoundService {
 
 		var course = new Course();
 		course.setId(courseId);
-		List<OnlineRound> onlineRounds = onlineRoundRepository.findByCourse(course);
+		var onlineRounds = onlineRoundRepository.findByCourse(course);
 
 		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 
@@ -225,7 +195,7 @@ public class OnlineRoundService {
 	@Transactional(readOnly = true)
 	public List<OnlineRound> getOnlineRoundsForOwner(Long ownerId) {
 
-		List<OnlineRound> onlineRounds = onlineRoundRepository.findByOwner(ownerId);
+		var onlineRounds = onlineRoundRepository.findByOwner(ownerId);
 
 		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 

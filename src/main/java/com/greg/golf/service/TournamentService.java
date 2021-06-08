@@ -56,18 +56,6 @@ public class TournamentService {
 	}
 
 	@Transactional
-	public Optional<TournamentResult> findByPlayerAndTournament(Player player, Tournament tournament) {
-		return tournamentResultRepository.findByPlayerAndTournament(player, tournament);
-	}
-
-	// test required
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	@Transactional
-	public Optional<TournamentResult> findByTournament(Tournament tournament) {
-		return tournamentResultRepository.findByTournament(tournament);
-	}
-
-	@Transactional
 	public Tournament addTournamnet(Tournament tournament) {
 
 		// just to make the time adjustment
@@ -144,6 +132,8 @@ public class TournamentService {
 							getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
 							tournamentResult);
 
+				} else {
+					log.warn("Attempt to update round which is already part of the tournamnet");
 				}
 
 			}, () -> {
@@ -277,10 +267,7 @@ public class TournamentService {
 
 		// fill all holes with hcpAll value or initialize it with 0 if hcpAll is 0
 		round.getScoreCard().forEach(scoreCard -> scoreCard.setHcp(hcpAll));
-		if (round.getCourse().getHoles() == null || round.getCourse().getHoles().isEmpty()) {
-			log.debug("getting holes");
-			round.getCourse().setHoles(courseService.getHoles(round.getCourse()));
-		}
+		
 		List<Hole> holes = round.getCourse().getHoles();
 		// get list of score card for player
 		List<ScoreCard> playerScoreCard = round.getScoreCard().stream()
@@ -314,8 +301,6 @@ public class TournamentService {
 		return retStb;
 	}
 
-	// test required
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@Transactional
 	public List<Round> getAllPossibleRoundsForTournament(Long tournamentId) {
 
