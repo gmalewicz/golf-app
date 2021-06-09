@@ -12,7 +12,6 @@ import com.greg.golf.configurationproperties.JwtConfig;
 import com.greg.golf.service.helpers.GolfUserDetails;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,11 +20,11 @@ import lombok.RequiredArgsConstructor;
 public abstract class TokenUtil {
 
 	protected final JwtConfig jwtConfig;
-	
+
 	protected TokenUtil() {
 		jwtConfig = null;
 	}
-		
+
 	// retrieve user id from jwt token
 	public String getUserIdFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);
@@ -42,9 +41,7 @@ public abstract class TokenUtil {
 	}
 
 	// for retrieving any information from token we will need the secret key
-	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(jwtConfig.getSecret()).parseClaimsJws(token).getBody();
-	}
+	protected abstract Claims getAllClaimsFromToken(String token);
 
 	// check if the token has expired
 	private Boolean isTokenExpired(String token) {

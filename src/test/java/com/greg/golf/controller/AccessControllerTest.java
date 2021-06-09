@@ -3,9 +3,14 @@ package com.greg.golf.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -20,18 +25,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+
+import com.greg.golf.configurationproperties.JwtConfig;
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.PlayerNickInUseException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
+import com.greg.golf.security.JwtTokenUtil;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
-
 
 import lombok.extern.log4j.Log4j2;
 
@@ -39,22 +46,24 @@ import lombok.extern.log4j.Log4j2;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class AccessControllerTest {
-	
+
 	@ClassRule
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
+			.getInstance();
 
 	private final AccessController accessController;
-	
-	
+	private static JwtTokenUtil jwtTokenUtil;
+
 	@Autowired
 	public AccessControllerTest(AccessController accessController) {
-		
+
 		this.accessController = accessController;
 	}
 
 	@BeforeAll
-	public static void setup() {
+	public static void setup(@Autowired JwtConfig jwtConfig) {
 
+		jwtTokenUtil = new JwtTokenUtil(jwtConfig);
 		log.info("Set up completed");
 	}
 
@@ -134,7 +143,7 @@ class AccessControllerTest {
 	void updatePlayerPasswordTest(@Autowired PlayerRepository playerRepository) {
 
 		String orgPlayerPwd = playerRepository.findById(1l).orElseThrow().getPassword();
-		
+
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setId(1l);
@@ -145,14 +154,14 @@ class AccessControllerTest {
 
 		assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
 	}
-	
+
 	@DisplayName("Reset password by privileged user")
 	@Transactional
 	@Test
 	void resetPlayerPasswordByPrivilagedUserTest(@Autowired PlayerRepository playerRepository) {
 
 		String orgPlayerPwd = playerRepository.findById(1l).orElseThrow().getPassword();
-		
+
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setNick("golfer");
@@ -164,7 +173,7 @@ class AccessControllerTest {
 
 		assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
 	}
-	
+
 	@DisplayName("Reset password by unauthorized user")
 	@Transactional
 	@Test
@@ -173,7 +182,7 @@ class AccessControllerTest {
 		Player orgPlayer = playerRepository.findById(1l).orElseThrow();
 		orgPlayer.setRole(1);
 		playerRepository.save(orgPlayer);
-		
+
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setNick("golfer");
@@ -181,7 +190,7 @@ class AccessControllerTest {
 
 		assertThrows(UnauthorizedException.class, () -> this.accessController.resetPassword(1l, playerDto));
 	}
-	
+
 	@DisplayName("Add player on behalf test")
 	@Transactional
 	@Test
@@ -197,7 +206,7 @@ class AccessControllerTest {
 
 		assertNotNull("Player id should not be null", response.getBody().getId());
 	}
-	
+
 	@DisplayName("Add player on behalf test which already exists")
 	@Transactional
 	@Test
@@ -211,7 +220,40 @@ class AccessControllerTest {
 
 		assertThrows(PlayerNickInUseException.class, () -> this.accessController.addPlayerOnBehalf(playerDto));
 	}
-	
+
+	@DisplayName("Should attempt refresh player token unsuccessfully")
+	@Transactional
+	@Test
+	void attemptToRefreshPlayerTokenTest() {
+
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		try {
+
+			accessController.refreshToken(request, 1l);
+		} catch (Exception e) {
+			fail("Should not have thrown any exception");
+		}
+
+	}
+
+	@DisplayName("Should attempt refresh player token successfully")
+	@Transactional
+	@Test
+	void attemptToRefreshPlayerTokenSuccessfullyTest() {
+
+		String jwtToken = jwtTokenUtil.generateToken("1");
+
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getAttribute("refreshToken")).thenReturn(jwtToken);
+		try {
+
+			accessController.refreshToken(request, 1l);
+		} catch (Exception e) {
+			fail("Should not have thrown any exception");
+		}
+
+	}
+
 	@AfterAll
 	public static void done() {
 

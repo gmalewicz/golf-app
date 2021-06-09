@@ -62,45 +62,50 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			try {
 				userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
-			} catch (IllegalArgumentException e) {
-				log.error("Unable to get JWT Token");
+
 			} catch (ExpiredJwtException e) {
 				log.info("JWT Token has expired for player: " + e.getClaims().getSubject());
-				
 				jwtToken = processRefreshRequest(request, e, refreshToken);
-
+				if (jwtToken != null) {
+					userId = e.getClaims().getSubject();
+				}
+			} catch (Exception e) {
+				log.error("Unable to get JWT Token");
 			}
 		}
 
 		// Once we get the token validate it.
 		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			logger.debug("Start processing the token for user: " + userId);
+			log.debug("Start processing the token for user: " + userId);
 			Optional<Player> player = this.playerService.getPlayer(Long.valueOf(userId));
 
 			// if token is valid configure Spring Security to manually set
 			// authentication
 			player.ifPresent(p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
 
-			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+			try {
+			
 				var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 						userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken
-						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				// After setting the Authentication in the context, we specify
 				// that the current user is authenticated. So it passes the
 				// Spring Security Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			} catch (Exception e) {
+				log.debug("Error aunthentication for user: " + userId);
 			}
+
 		}
 
 		chain.doFilter(request, response);
 
 	}
-	
+
 	private String processRefreshRequest(HttpServletRequest request, ExpiredJwtException e, String refreshToken) {
-	
+
 		String jwtToken = null;
-		
+
 		// verify if it is refresh request
 		if (request.getRequestURI().contains(REFRESH_PATH)) {
 
@@ -108,8 +113,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			Optional<Player> player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject()));
 
-			player.ifPresent(
-					p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
+			player.ifPresent(p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
 
 			// if positive generate the new JWT token and replace it in the request
 			if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
@@ -120,7 +124,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				log.info("Refersh token expired or not available");
 			}
 		}
-		
+
 		return jwtToken;
 	}
 }

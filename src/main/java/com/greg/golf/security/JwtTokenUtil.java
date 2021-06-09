@@ -6,12 +6,14 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.greg.golf.configurationproperties.JwtConfig;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil extends TokenUtil implements Serializable {
-		
+
 	public JwtTokenUtil(JwtConfig jwtConfig) {
 		super(jwtConfig);
 	}
@@ -31,5 +33,10 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret()).compact();
+	}
+
+	// for retrieving any information from token we will need the secret key
+	protected Claims getAllClaimsFromToken(String token) {
+		return Jwts.parser().setSigningKey(jwtConfig.getSecret()).parseClaimsJws(token).getBody();
 	}
 }

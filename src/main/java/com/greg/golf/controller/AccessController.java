@@ -165,16 +165,15 @@ public class AccessController {
 
 		log.debug("trying to refresh token for player id: " + id);
 
-		request.getAttribute(REFRESH_TOKEN);
-
 		var responseHeaders = new HttpHeaders();
-		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-
-		responseHeaders.set("Jwt", request.getAttribute(REFRESH_TOKEN).toString());
+		
+		if (request.getAttribute(REFRESH_TOKEN) != null) {
+		
+			responseHeaders.set("Access-Control-Expose-Headers", "Jwt");	
+			responseHeaders.set("Jwt", request.getAttribute(REFRESH_TOKEN).toString());
+		}
 
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
-
-
 	}
 
 	private void authenticate(String username, String password) throws BadCredentialsException {
