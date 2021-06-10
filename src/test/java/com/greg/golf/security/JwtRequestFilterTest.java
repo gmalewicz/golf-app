@@ -187,7 +187,7 @@ class JwtRequestFilterTest {
 		
 		String refreshToken = refreshTokenUtil.generateToken("1");
 		
-		when(request.getRequestURI()).thenReturn("refresh");
+		when(request.getRequestURI()).thenReturn("Refresh");
 
 		when(request.getHeader("Authorization")).thenReturn(
 				"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjIyNzQ3NDQ4LCJpYXQiOjE2MjI3MTg2NDh9.W5ZGbvT4pSr7lZBVuUBNhhuBSH0GC0LExwkvI29RU8rCOMPIjnOqWOO4wG56fzwy2McYnq7E0FkWdh-4sh0TVg");

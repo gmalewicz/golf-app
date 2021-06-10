@@ -20,7 +20,7 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 
 	private static final long serialVersionUID = -2550185165626007488L;
 
-	public static final long JWT_TOKEN_VALIDITY = (long) 60 * 60 * 8;
+	public static final long JWT_TOKEN_VALIDITY = (long) 60 * 60 * 4;
 
 	// while creating the token -
 	// 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID

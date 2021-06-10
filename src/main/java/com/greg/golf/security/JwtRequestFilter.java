@@ -35,7 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RefreshTokenUtil refreshTokenUtil;
 
-	private static final String REFRESH_PATH = "refresh";
+	private static final String REFRESH = "Refresh";
 	private static final String REFRESH_TOKEN = "refreshToken";
 
 	@Override
@@ -45,7 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String userId = null;
 		String jwtToken = null;
 		String requestTokenHeader = request.getHeader("Authorization");
-		String refreshToken = request.getHeader("Refresh");
+		String refreshToken = request.getHeader(REFRESH);
 
 		if (requestTokenHeader == null) {
 			jwtToken = request.getParameter("token");
@@ -107,9 +107,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String jwtToken = null;
 
 		// verify if it is refresh request
-		if (request.getRequestURI().contains(REFRESH_PATH)) {
+		if (request.getRequestURI().contains(REFRESH)) {
 
-			log.info("Start generating rewewed token");
+			log.info("Start generating renewed token");
 
 			Optional<Player> player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject()));
 

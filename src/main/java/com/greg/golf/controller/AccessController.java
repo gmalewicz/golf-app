@@ -166,11 +166,16 @@ public class AccessController {
 		log.debug("trying to refresh token for player id: " + id);
 
 		var responseHeaders = new HttpHeaders();
-		
+
 		if (request.getAttribute(REFRESH_TOKEN) != null) {
-		
-			responseHeaders.set("Access-Control-Expose-Headers", "Jwt");	
+
+			responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
 			responseHeaders.set("Jwt", request.getAttribute(REFRESH_TOKEN).toString());
+
+			// regenerate refresh token
+			final GolfUserDetails userDetails = playerService.loadUserById(id);
+			String token = refreshTokenUtil.generateToken(userDetails);
+			responseHeaders.set("Refresh", token);
 		}
 
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
