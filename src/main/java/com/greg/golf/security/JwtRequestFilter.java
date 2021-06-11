@@ -116,12 +116,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			player.ifPresent(p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
 
 			// if positive generate the new JWT token and replace it in the request
-			if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
+			try {
+				if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
 
-				jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());
-				request.setAttribute(REFRESH_TOKEN, jwtToken);
-			} else {
-				log.info("Refersh token expired or not available");
+					jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());
+					request.setAttribute(REFRESH_TOKEN, jwtToken);
+				}
+			} catch (Exception ex) {
+				log.info("Refersh token expired or not available: " + ex.getClass());
 			}
 		}
 
