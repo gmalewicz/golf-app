@@ -18,6 +18,7 @@ import com.greg.golf.entity.PlayerRound;
 import com.greg.golf.entity.Round;
 import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
+import com.greg.golf.error.ScoreCardUpdateException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
@@ -164,11 +165,18 @@ public class RoundService {
 
 	@Transactional
 	public void updateScoreCard(Round updRound) {
-
+		
+		
 		// get the round first
 		var round = roundRepository.findById(updRound.getId()).orElseThrow();
-		log.debug("Round found");
-
+		
+		// verify if round contains one and only one player
+		// also update the round which was assigned for tournament is not allowed
+		if (updRound.getPlayer() == null || updRound.getPlayer().size() != 1 || 
+				round.getTournament() != null) {
+			throw new ScoreCardUpdateException();
+		}
+		
 		// get first player from set
 		var player = updRound.getPlayer().iterator().next();
 		// remove score card object that matching player from round
