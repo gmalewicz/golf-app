@@ -42,7 +42,7 @@ public class OnlineRoundService {
 
 	@Transactional
 	public List<OnlineRound> save(List<OnlineRound> onlineRounds) {
-
+		
 		var gc = new GregorianCalendar();
 		onlineRounds.forEach(or -> or.setDate(gc.getTime()));
 

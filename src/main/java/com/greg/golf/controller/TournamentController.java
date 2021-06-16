@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.greg.golf.controller.dto.LimitedRoundDto;
+import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
 import com.greg.golf.controller.dto.TournamentDto;
 import com.greg.golf.controller.dto.TournamentResultDto;
 
@@ -61,10 +62,10 @@ public class TournamentController extends BaseController {
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Return all rounds that can be added to tournament")
 	@GetMapping(value = "/rest/TournamentRounds/{tournamentId}")
-	public List<LimitedRoundDto> getTournamentRounds(
+	public List<LimitedRoundWithPlayersDto> getTournamentRounds(
 			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 		log.info("Requested rounds for tournament");
-		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), LimitedRoundDto.class);
+		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), LimitedRoundWithPlayersDto.class);
 	}
 
 	@Tag(name = "Tournament API")

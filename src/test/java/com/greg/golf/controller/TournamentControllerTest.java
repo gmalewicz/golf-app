@@ -10,16 +10,17 @@ import java.util.TreeSet;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
-
 import org.junit.jupiter.api.BeforeAll;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
-import com.greg.golf.controller.dto.LimitedRoundDto;
+import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
 import com.greg.golf.controller.dto.TournamentDto;
 import com.greg.golf.controller.dto.TournamentResultDto;
 import com.greg.golf.entity.Course;
@@ -35,10 +36,6 @@ import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.service.CourseService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
-
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -156,7 +153,7 @@ class TournamentControllerTest {
 	void getRoundsForTournamentTest() {
 		
 	
-		List<LimitedRoundDto> rndDtoLst =  this.tournamentController.getTournamentRounds(tournament.getId());
+		List<LimitedRoundWithPlayersDto> rndDtoLst =  this.tournamentController.getTournamentRounds(tournament.getId());
 		
 		assertEquals(1, rndDtoLst.size());
 	}
