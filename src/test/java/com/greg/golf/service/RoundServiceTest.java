@@ -314,7 +314,7 @@ class RoundServiceTest {
 		tournament.setEndDate(round.getRoundDate());
 		tournament.setStartDate(round.getRoundDate());
 		tournament.setName("Test tournament");
-		tournament.setPlayer(round.getPlayer().first());
+		tournament.setPlayer(round.getPlayer().iterator().next());
 		tournamentRepository.save(tournament);
 
 		round.setTournament(tournament);
@@ -367,7 +367,7 @@ class RoundServiceTest {
 		tournament.setEndDate(round.getRoundDate());
 		tournament.setStartDate(round.getRoundDate());
 		tournament.setName("Test tournament");
-		tournament.setPlayer(round.getPlayer().first());
+		tournament.setPlayer(round.getPlayer().iterator().next());
 		tournamentRepository.save(tournament);
 
 		round.setTournament(tournament);
@@ -378,7 +378,7 @@ class RoundServiceTest {
 		newRound.setId(round.getId());
 		newRound.setCourse(round.getCourse());
 		var playerSet = new TreeSet<Player>();
-		playerSet.add(round.getPlayer().first());
+		playerSet.add(round.getPlayer().iterator().next());
 		newRound.setPlayer(playerSet);
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
@@ -401,7 +401,7 @@ class RoundServiceTest {
 		newRound.setId(round.getId());
 		newRound.setCourse(round.getCourse());
 		var playerSet = new TreeSet<Player>();
-		playerSet.add(round.getPlayer().first());
+		playerSet.add(round.getPlayer().iterator().next());
 		newRound.setPlayer(playerSet);
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
@@ -410,7 +410,7 @@ class RoundServiceTest {
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
 		scoreCard.setPenalty(0);
-		scoreCard.setPlayer(round.getPlayer().first());
+		scoreCard.setPlayer(round.getPlayer().iterator().next());
 		scoreCard.setRound(round);
 		scoreCard.setStroke(6);
 		newRound.getScoreCard().add(scoreCard);
@@ -446,7 +446,7 @@ class RoundServiceTest {
 		newRound.setCourse(round.getCourse());
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
-		playerSet.add(round.getPlayer().first());
+		playerSet.add(round.getPlayer().iterator().next());
 		newRound.setPlayer(playerSet);
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
