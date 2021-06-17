@@ -18,6 +18,7 @@ import com.greg.golf.controller.dto.OnlineScoreCardDto;
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.entity.OnlineScoreCard;
+import com.greg.golf.entity.Player;
 import com.greg.golf.service.OnlineRoundService;
 import com.greg.golf.service.PlayerService;
 
@@ -98,7 +99,12 @@ public class OnlineScoreCardController extends BaseController {
 	public PlayerDto getPlayer(
 			@Parameter(description = "nick", example = "player", required = true) @PathVariable("nick") String nick) {
 		
-		log.info("Requested player for nick");
+		log.info("Requested player for nick: " + nick);
+		Player player = playerService.getPlayerForNick(nick);
+		if (player == null) {
+			return null;
+		}
+		
 		return modelMapper.map(playerService.getPlayerForNick(nick), PlayerDto.class);
 	}
 
