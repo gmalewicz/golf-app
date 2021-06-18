@@ -41,7 +41,7 @@ public class CourseService {
 			throw new TooShortStringForSearchException();
 		}
 		
-		return courseRepository.findByNameContainingIgnoreCase(courseName);
+		return courseRepository.findByHistoricalAndNameContainingIgnoreCase(courseName, false);
 	}
 	
 	@Transactional(readOnly=false)
@@ -68,7 +68,7 @@ public class CourseService {
 	
 	@Transactional(readOnly=true)
 	public List<Course> list() {
-		return courseRepository.findByOrderByNameAsc();
+		return courseRepository.findByHistoricalOrderByNameAsc(false);
 	}
 	
 	@Transactional(readOnly=true)
@@ -104,6 +104,7 @@ public class CourseService {
 
 		course.getHoles().stream().forEach(h -> h.setCourse(course));
 		course.getTees().stream().forEach(h -> h.setCourse(course));
+		course.setHistorical(false);
 
 		return courseRepository.save(course);
 	}
@@ -135,7 +136,7 @@ public class CourseService {
 	@Transactional(readOnly = true)
 	public List<Course> getSortedCourses(Integer pageNo) {
 
-		return courseRepository.findByOrderByNameAsc(PageRequest.of(pageNo, courseServiceConfig.getPageSize()));
+		return courseRepository.findByHistoricalOrderByNameAsc(false, PageRequest.of(pageNo, courseServiceConfig.getPageSize()));
 	}
 
 }

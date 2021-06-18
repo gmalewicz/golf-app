@@ -34,6 +34,10 @@ public class Course {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	private Boolean historical;
+	
 	@NotNull
 	@Size(min = 3, max = 100, message = "Course name should be between 3 and 100 characters")
 	@Column(name = "name")

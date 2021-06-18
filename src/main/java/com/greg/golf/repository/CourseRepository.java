@@ -13,9 +13,9 @@ import com.greg.golf.entity.Course;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 	
-	 List<Course> findByOrderByNameAsc();
+	 List<Course> findByHistoricalOrderByNameAsc(Boolean historical);
 	 
-	 List<Course> findByNameContainingIgnoreCase(String courseName);
+	 List<Course> findByHistoricalAndNameContainingIgnoreCase(String courseName, Boolean historical);
 	 
-	 List<Course> findByOrderByNameAsc(Pageable pageable);
+	 List<Course> findByHistoricalOrderByNameAsc(Boolean historical, Pageable pageable);
 }

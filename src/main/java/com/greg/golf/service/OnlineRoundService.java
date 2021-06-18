@@ -195,7 +195,7 @@ public class OnlineRoundService {
 	@Transactional(readOnly = true)
 	public List<OnlineRound> getOnlineRoundsForOwner(Long ownerId) {
 
-		var onlineRounds = onlineRoundRepository.findByOwner(ownerId);
+		var onlineRounds = onlineRoundRepository.findByOwnerOrderByIdAsc(ownerId);
 
 		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 
