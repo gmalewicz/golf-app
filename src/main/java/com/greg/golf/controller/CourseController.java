@@ -163,4 +163,17 @@ public class CourseController extends BaseController {
 		return mapList(courseService.getSortedCourses(pageId), CourseDto.class);
 	}
 
+	@Tag(name = "Course API")
+	@Operation(summary = "Purge historical courses from favourites")
+	@PostMapping(value = "/rest/MoveToHistoryCourse/{courseId}")
+	public HttpStatus moveToHistoryCurse(
+			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("courseId") Long courseId) {
+
+		log.info("trying to move course to history");
+
+		courseService.moveToHistoryCurse(courseId);
+
+		return HttpStatus.OK;
+	}
+
 }

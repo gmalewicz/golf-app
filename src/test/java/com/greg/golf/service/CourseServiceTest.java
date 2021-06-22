@@ -238,7 +238,29 @@ class CourseServiceTest {
 		assertEquals(1, retVal.size());
 	}
 	
-	
+	@DisplayName("Should move course to history")
+	@Transactional
+	@Test
+	void moveCourseToHistoryTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+		
+		// first add the course to favorites
+		Course course = new Course();
+		course.setId(1L);
+		courseService.addToFavourites(course, 1L);
+		
+		//get the course
+		course = courseService.getCourse(1L).get();
+		
+		//move to history
+		courseService.moveToHistoryCurse(1L);
+		
+		//check if course has historical flag set
+		assertTrue("Historical flag shell be set", course.getHistorical());
+		
+		//check if favorites are empty
+		assertEquals(0, favouriteCourseRepository.findAll().size());	
+	}
+		
 	@AfterAll
 	public static void done() {
 

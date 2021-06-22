@@ -15,7 +15,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 	
 	 List<Course> findByHistoricalOrderByNameAsc(Boolean historical);
 	 
-	 List<Course> findByHistoricalAndNameContainingIgnoreCase(String courseName, Boolean historical);
+	 List<Course> findByHistoricalAndNameContainingIgnoreCase(Boolean historical, String courseName);
 	 
 	 List<Course> findByHistoricalOrderByNameAsc(Boolean historical, Pageable pageable);
 }
