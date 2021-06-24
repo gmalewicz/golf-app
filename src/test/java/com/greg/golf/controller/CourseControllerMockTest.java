@@ -1,6 +1,7 @@
 package com.greg.golf.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -202,6 +203,14 @@ class CourseControllerMockTest {
 
 		assertThat(actualResponseBody)
 				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
+	}
+	
+	@DisplayName("Move course to history")
+	@Test
+	void moveCourseToHistory_whenValidInput_thenReturns200() throws Exception {
+
+		doNothing().when(courseService).moveToHistoryCurse(1l);
+		mockMvc.perform(post("/rest/MoveToHistoryCourse/1")).andExpect(status().isOk());
 	}
 	
 

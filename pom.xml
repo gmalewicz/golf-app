@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>1.9.9</version>
+	<version>2.0.0</version>
 	<name>golf</name>
 	<description>DrunkGolfers and NiceGirls</description>
 

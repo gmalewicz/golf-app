@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.greg.golf.configurationproperties.JwtConfig;
 import com.greg.golf.controller.dto.PlayerDto;
@@ -161,13 +166,19 @@ class AccessControllerTest {
 	void resetPlayerPasswordByPrivilagedUserTest(@Autowired PlayerRepository playerRepository) {
 
 		String orgPlayerPwd = playerRepository.findById(1l).orElseThrow().getPassword();
+		
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+		
+		SecurityContextHolder.getContext().setAuthentication(
+			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setNick("golfer");
 		playerDto.setId(1l);
 
-		this.accessController.resetPassword(1l, playerDto);
+		this.accessController.resetPassword(playerDto);
 
 		Optional<Player> updPlayer = playerRepository.findById(1l);
 
@@ -178,17 +189,21 @@ class AccessControllerTest {
 	@Transactional
 	@Test
 	void resetPlayerPasswordByUnauthorizedUserTest(@Autowired PlayerRepository playerRepository) {
+		
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+		
+		SecurityContextHolder.getContext().setAuthentication(
+			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
-		Player orgPlayer = playerRepository.findById(1l).orElseThrow();
-		orgPlayer.setRole(1);
-		playerRepository.save(orgPlayer);
+		
 
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setNick("golfer");
 		playerDto.setId(1l);
 
-		assertThrows(UnauthorizedException.class, () -> this.accessController.resetPassword(1l, playerDto));
+		assertThrows(UnauthorizedException.class, () -> this.accessController.resetPassword(playerDto));
 	}
 
 	@DisplayName("Add player on behalf test")
