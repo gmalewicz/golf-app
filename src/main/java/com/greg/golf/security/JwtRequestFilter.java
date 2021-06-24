@@ -16,8 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.service.PlayerService;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -75,19 +77,39 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		}
 
 		// Once we get the token validate it.
+		validateToken(userId, request);
+
+		chain.doFilter(request, response);
+
+	}
+
+	private void validateToken(String userId, HttpServletRequest request) {
+
 		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			log.debug("Start processing the token for user: " + userId);
 			Optional<Player> player = this.playerService.getPlayer(Long.valueOf(userId));
 
 			// if token is valid configure Spring Security to manually set
 			// authentication
-			player.ifPresent(p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
+			player.ifPresent(p -> {
+
+				var authorities = new ArrayList<SimpleGrantedAuthority>();
+				if (p.getRole() == Common.ROLE_PLAYER_ADMIN) {
+					authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+				} else {
+					authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+				}
+
+				userDetails = new User(p.getId().toString(), p.getPassword(), authorities);
+
+			});
 
 			try {
-			
+
 				var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 						userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				usernamePasswordAuthenticationToken
+						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				// After setting the Authentication in the context, we specify
 				// that the current user is authenticated. So it passes the
 				// Spring Security Configurations successfully.
@@ -97,9 +119,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			}
 
 		}
-
-		chain.doFilter(request, response);
-
 	}
 
 	private String processRefreshRequest(HttpServletRequest request, ExpiredJwtException e, String refreshToken) {

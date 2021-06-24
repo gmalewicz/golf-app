@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -106,21 +107,26 @@ public class PlayerService implements UserDetailsService {
 	}
 
 	@Transactional
-	public Player resetPassword(Long id, Player player) {
+	public Player resetPassword(Player player) {
+		
+		Player persistedPlayer = null;
+		
+		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
+				.equals(Common.ADMIN)) {
+			
+			persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
 
-		var admin = playerRepository.getOne(id);
-		if (admin.getRole() != Common.ROLE_PLAYER_ADMIN) {
+			if (player.getPassword() != null && !player.getPassword().equals("")) {
+				persistedPlayer.setPassword(player.getPassword());
+			}
+
+			persistedPlayer = playerRepository.save(persistedPlayer);
+						
+		} else {
+			log.error("Attempt to reset password by unauthorized user");
 			throw new UnauthorizedException();
 		}
-
-		var persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
-
-		if (player.getPassword() != null && !player.getPassword().equals("")) {
-			persistedPlayer.setPassword(player.getPassword());
-		}
-
-		playerRepository.save(persistedPlayer);
-
+		
 		return persistedPlayer;
 	}
 

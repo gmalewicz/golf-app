@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,14 +16,18 @@ import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.FavouriteCourse;
 import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.TooShortStringForSearchException;
+import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.CourseRepository;
 import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.HoleRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "course")
 @Service("courseService")
@@ -140,13 +145,18 @@ public class CourseService {
 	@Transactional(readOnly = false)
 	public void moveToHistoryCurse(Long courseId) {
 
-		// set historical flag for course
-		var course = courseRepository.findById(courseId).orElseThrow();
-		course.setHistorical(true);
-		courseRepository.save(course);
-		
-		//remove course from favorites
-		favouriteCourseRepository.deleteByCourse(course);
-		
+		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
+				.equals(Common.ADMIN)) {
+			// set historical flag for course
+			var course = courseRepository.findById(courseId).orElseThrow();
+			course.setHistorical(true);
+			courseRepository.save(course);
+
+			// remove course from favorites
+			favouriteCourseRepository.deleteByCourse(course);
+		} else {
+			log.error("Attempt to move course to history by unauthorized user");
+			throw new UnauthorizedException();
+		}
 	}
 }

@@ -3,30 +3,30 @@ package com.greg.golf.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
-
-import javax.persistence.EntityNotFoundException;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
-
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -65,8 +65,14 @@ class PlayerServiceTest {
 	@Test
 	void changePasswordSuccessTest() {
 
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+		
+		SecurityContextHolder.getContext().setAuthentication(
+			        new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
+		
 		player.setPassword("test");
-		player = playerService.resetPassword(admin.getId(), player);
+		player = playerService.resetPassword(player);
 		assertEquals("test", player.getPassword());
 
 	}
@@ -77,39 +83,33 @@ class PlayerServiceTest {
 	void changePasswordUnauthorizedTest(@Autowired PlayerRepository playerRepository) {
 
 		player.setPassword("test");
-		admin.setRole(Common.ROLE_PLAYER_REGULAR);
-		admin = playerRepository.save(admin);
-		Long adminId = admin.getId();
-
-		assertThrows(UnauthorizedException.class, () -> playerService.resetPassword(adminId, player));
+		
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+		
+		SecurityContextHolder.getContext().setAuthentication(
+			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+		
+		assertThrows(UnauthorizedException.class, () -> playerService.resetPassword(player));
 
 	}
-
-	@DisplayName("Attempt to change password by user who does not exist")
-	@Transactional
-	@Test
-	void changePasswordAdminNoExistsTest(@Autowired PlayerRepository playerRepository) {
-
-		player.setPassword("test");
-		// admin.setRole(Player.ROLE_PLAYER_REGULAR);
-		// admin = playerRepository.save(admin);
-
-		assertThrows(EntityNotFoundException.class, () -> {
-			playerService.resetPassword(1500L, player);
-		});
-	}
-
+	
 	@DisplayName("Attempt to change password for unexisting user")
 	@Transactional
 	@Test
 	void changePasswordForunexistingUserTest(@Autowired PlayerRepository playerRepository) {
+		
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+		
+		SecurityContextHolder.getContext().setAuthentication(
+			        new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
 
 		Player unexistingPlayer = new Player();
 		unexistingPlayer.setNick("unknown");
-		// admin.setRole(Player.ROLE_PLAYER_REGULAR);
-		Long adminId = admin.getId();
 
-		assertThrows(NoSuchElementException.class, () -> playerService.resetPassword(adminId, unexistingPlayer));
+
+		assertThrows(NoSuchElementException.class, () -> playerService.resetPassword(unexistingPlayer));
 	}
 
 	@AfterAll

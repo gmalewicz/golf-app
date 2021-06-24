@@ -22,6 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.greg.golf.configurationproperties.JwtConfig;
+import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
@@ -231,6 +234,34 @@ class JwtRequestFilterTest {
 			fail("Should not have thrown any exception");
 		}
 		
+	}
+	
+	@DisplayName("Should process request with JWT token in parameter for non admin player")
+	@Transactional
+	@Test
+	void requestWithTokenInParameterForNonAdminTest(@Autowired PlayerRepository playerRepository) {
+
+		Player regularPlayer = new Player();
+		regularPlayer.setNick("RegularPlayer");
+		regularPlayer.setPassword("welcome");
+		regularPlayer.setRole(Common.ROLE_PLAYER_REGULAR);
+		regularPlayer.setWhs(10f);
+		regularPlayer.setSex(Common.PLAYER_SEX_MALE);
+		playerRepository.save(regularPlayer);
+		
+		String jwtToken = jwtTokenUtil.generateToken(String.valueOf(regularPlayer.getId()));
+
+		when(request.getHeader("Authorization")).thenReturn(null);
+		when(request.getParameter("token")).thenReturn(jwtToken);
+
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+
+		try {
+
+			jwtRequestFilter.doFilter(request, response, filterChain);
+		} catch (Exception e) {
+			fail("Should not have thrown any exception");
+		}
 	}
 
 	@AfterAll

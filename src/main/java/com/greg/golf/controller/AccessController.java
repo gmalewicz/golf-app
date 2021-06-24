@@ -119,9 +119,8 @@ public class AccessController {
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Administrative task: Reset password.")
-	@PatchMapping(value = "/rest/ResetPassword/{id}")
+	@PatchMapping(value = "/rest/ResetPassword")
 	public HttpStatus resetPassword(
-			@Parameter(required = true, description = "Id of the player who performs the update") @PathVariable("id") Long id,
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
 		log.info("trying to reset the password for player: " + playerDto.getNick());
@@ -134,7 +133,7 @@ public class AccessController {
 			player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
 		}
 
-		playerService.resetPassword(id, player);
+		playerService.resetPassword(player);
 
 		return HttpStatus.OK;
 	}
