@@ -83,10 +83,14 @@ jobs:
       if: always()
       run: doctl registry login --expiry-seconds 1200
       
-    - name: Delete existing repositories
+    - name: Delete golf-app existing repositories
       #if: startsWith(github.ref, 'refs/tags/')
       if: always()
       run: doctl registry repository delete-tag golf-app * --force
+
+    - name: Delete golf-web existing repositories
+      #if: startsWith(github.ref, 'refs/tags/')
+      if: always()
       run: doctl registry repository delete-tag golf-web * --force
 
     - name: Push image to DigitalOcean Container Registry
