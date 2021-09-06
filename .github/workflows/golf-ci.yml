@@ -86,7 +86,7 @@ jobs:
     - name: Push image to DigitalOcean Container Registry
       #if: startsWith(github.ref, 'refs/tags/')
       if: always()
-      run: docker push registry.digitalocean.com/golf/golf-web:$VERSION
+      run: docker push registry.digitalocean.com/golf/golf-app:$VERSION
 
     - name: Update deployment file
       #if: startsWith(github.ref, 'refs/tags/')
