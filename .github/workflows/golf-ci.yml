@@ -86,7 +86,7 @@ jobs:
     - name: Delete golf-app existing repositories
       #if: startsWith(github.ref, 'refs/tags/')
       if: always()
-      run: doctl registry repository delete-tag golf-app $(doctl registry repository list-tags golf-app --output json | jq ".[] | select ( .tag " -r | tr '\n' ' ') --force
+      run: doctl registry repository delete-tag golf-app $(doctl registry repository list-tags golf-app --output json | jq ".[] | .tag " -r | tr '\n' ' ') --force
       
       
 
