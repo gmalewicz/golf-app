@@ -92,6 +92,11 @@ jobs:
       if: always()
       run: TAG=$VERSION && sed -i 's|<IMAGE>|$IMAGE:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      #if: startsWith(github.ref, 'refs/tags/')
+      if: always()
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 golf
+
      # temporary as node is very small
     - name: Remove existing deployment
       #if: startsWith(github.ref, 'refs/tags/')
