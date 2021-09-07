@@ -87,20 +87,16 @@ jobs:
         docker push $IMAGE:$VERSION
         docker push $IMAGE:latest
       
-    - name: Build container image
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
-      run: docker build -t registry.digitalocean.com/golf/golf-app:$VERSION .
-    
     - name: Update deployment file
       #if: startsWith(github.ref, 'refs/tags/')
       if: always()
       run: TAG=$VERSION && sed -i 's|<IMAGE>|$IMAGE:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
-    - name: Save DigitalOcean kubeconfig with short-lived credentials
+     # temporary as node is very small
+    - name: Remove existing deployment
       #if: startsWith(github.ref, 'refs/tags/')
       if: always()
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 golf
+      run: kubectl delete deployment golf-app
 
     - name: Deploy to DigitalOcean Kubernetes
       #if: startsWith(github.ref, 'refs/tags/')
