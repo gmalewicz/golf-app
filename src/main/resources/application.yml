@@ -46,7 +46,9 @@ course:
 ---
 
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
   mail: 
     properties:
      mail:
@@ -61,7 +63,9 @@ spring:
 ---
 
 spring:
-  profiles: prod
+  config:
+    activate:
+      on-profile: prod
   datasource:
     url: jdbc:postgresql://10.156.0.3:5432/golf 
   jpa:

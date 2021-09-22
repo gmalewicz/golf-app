@@ -146,7 +146,7 @@ class RoundServiceTest {
 	void deleteScoreCardForRoundWithTwoPlayerTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		var player = new Player();
 		player.setNick("player2");
@@ -181,7 +181,7 @@ class RoundServiceTest {
 	void saveRoundWithMoreThan4PlayersTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		var player = new Player();
 		player.setNick("player2");
@@ -237,7 +237,7 @@ class RoundServiceTest {
 	void saveRoundForTheSamePlayerTwiceTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		// create the player
 		var player = new Player();
@@ -267,7 +267,7 @@ class RoundServiceTest {
 	void addScorecardToExistingRoundTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		// create the new player
 		var player = new Player();
@@ -308,7 +308,7 @@ class RoundServiceTest {
 	void addScorecardWithTournamentToExistingRoundTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		var tournament = new Tournament();
 		tournament.setEndDate(round.getRoundDate());
@@ -361,7 +361,7 @@ class RoundServiceTest {
 	void scoreCardUpdateThatIsAssignedToTournamentTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		var tournament = new Tournament();
 		tournament.setEndDate(round.getRoundDate());
@@ -394,7 +394,7 @@ class RoundServiceTest {
 	void correctScoreCardUpdateTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		// create the new round
 		var newRound = new Round();
@@ -417,7 +417,7 @@ class RoundServiceTest {
 		// update the score card
 		roundService.updateScoreCard(newRound);
 
-		round = roundRepository.getOne(roundId);
+		round = roundRepository.getById(roundId);
 
 		assertEquals(1, round.getScoreCard().size());
 		assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
@@ -438,7 +438,7 @@ class RoundServiceTest {
 		player.setRole(0);
 		playerRepository.save(player);
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		// create the new round
 		var newRound = new Round();
@@ -462,7 +462,7 @@ class RoundServiceTest {
 	void scoreCardUpdateWithoutPlayerTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getOne(roundId);
+		var round = roundRepository.getById(roundId);
 
 		// create the new round
 		var newRound = new Round();
