@@ -121,7 +121,12 @@ public class RoundService {
 	@Transactional(readOnly = true)
 	public List<Round> getRecentRounds(Integer pageNo) {
 
-		return roundRepository.findByOrderByRoundDateDescPlayerAsc(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
+		// v2.3 modified to use 2 queries to get rid of HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!  
+		// first get list of ids
+		List<Long> ids = roundRepository.getIdsForPage(PageRequest.of(pageNo, roundServiceConfig.getPageSize()));
+		// then return results only for selected page
+		return roundRepository.getForIds(ids);
+
 	}
 	
 	@Transactional

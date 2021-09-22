@@ -27,10 +27,6 @@ spring:
     show_sql: true
   liquibase:
     change-log: classpath:/db/dbChangeLog-dev.xml
-  cloud:
-    gcp:
-      sql:
-        enabled: false
 jwt:
   secret: golfBackendSecret
   refresh: refreshSecret

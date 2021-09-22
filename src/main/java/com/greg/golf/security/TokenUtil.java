@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.greg.golf.configurationproperties.JwtConfig;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.service.helpers.GolfUserDetails;
 
 import io.jsonwebtoken.Claims;
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public abstract class TokenUtil {
+	
+	protected static final String ROLES = "roles";
 
 	protected final JwtConfig jwtConfig;
 
@@ -51,7 +54,16 @@ public abstract class TokenUtil {
 
 	// generate token for user
 	public String generateToken(GolfUserDetails userDetails) {
+		
+		String authorities = "";
+		
+		if (userDetails.getPlayer().getRole() == Common.ROLE_PLAYER_ADMIN) {
+			authorities += Common.ADMIN + ",";
+		} 
+		authorities += Common.PLAYER;
+				
 		Map<String, Object> claims = new HashMap<>();
+		claims.put(ROLES, authorities);
 		return doGenerateToken(claims, userDetails.getPlayer().getId().toString());
 	}
 
