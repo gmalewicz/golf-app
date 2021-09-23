@@ -91,7 +91,8 @@ class CourseControllerMockTest {
 	@DisplayName("Search for courses with null input")
 	@Test
 	void searchForCourses_whenNullValue_thenReturns400() throws Exception {
-		CourseNameDto courseNameDto = new CourseNameDto(null);
+		
+		CourseNameDto courseNameDto = null;
 
 		mockMvc.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(courseNameDto))).andExpect(status().isBadRequest());
