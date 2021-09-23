@@ -34,7 +34,7 @@ google:
   recaptcha:
     key:
       site: 6Lf-66YZAAAAAJc3serwf1iRoJg6PgTPJazkfNWD
-      secret: ${sm://google_recaptcha_key_secret} 
+      secret: replace_it 
 cors:
   allowedOrigins: dgng.pl
 round:
