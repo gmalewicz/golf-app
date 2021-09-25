@@ -31,11 +31,11 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 @EntityGraph(attributePaths = { "course", "player"})
 	 List<Round> findByOrderByRoundDateDescPlayerAsc(Pageable pageable);
 	 
-	 @Query("SELECT r.id FROM Round r ORDER BY r.id") 
+	 @Query("SELECT r.id FROM Round r ORDER BY r.id DESC") 
 	 List<Long> getIdsForPage(Pageable pageable);
 	 
 	 @EntityGraph(attributePaths = { "course", "player"})
-	 @Query("SELECT r FROM Round r WHERE r.id in (:ids)") 
+	 @Query("SELECT r FROM Round r WHERE r.id in (:ids) ORDER BY r.id DESC") 
 	 List<Round> getForIds(@Param("ids") List<Long> ids);
 	 
 	 @EntityGraph(attributePaths = { "player"})
