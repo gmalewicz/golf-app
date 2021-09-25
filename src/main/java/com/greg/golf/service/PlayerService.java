@@ -91,7 +91,7 @@ public class PlayerService implements UserDetailsService {
 	@Transactional
 	public Player update(Player player) {
 
-		var persistedPlayer = playerRepository.getOne(player.getId());
+		var persistedPlayer = playerRepository.getById(player.getId());
 
 		if (player.getWhs() != null) {
 			persistedPlayer.setWhs(player.getWhs());

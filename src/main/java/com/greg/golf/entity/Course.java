@@ -64,16 +64,6 @@ public class Course {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
 	private List<CourseTee> tees = new ArrayList<>();
 
-	public void addHole(Hole hole) {
-		this.holes.add(hole);
-		hole.setCourse(this);
-	}
-
-	public void removeHole(Hole hole) {
-		this.holes.remove(hole);
-		hole.setCourse(null);
-	}
-
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
@@ -83,14 +73,4 @@ public class Course {
 	@ToString.Exclude
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval = true)
 	private List<FavouriteCourse> favouriteCourse;
-
-	public void addRound(Round round) {
-		this.rounds.add(round);
-		round.setCourse(this);
-	}
-
-	public void removeRound(Round round) {
-		this.rounds.remove(round);
-		round.setCourse(null);
-	}
 }

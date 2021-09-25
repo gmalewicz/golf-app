@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.greg.golf.entity.Course;
@@ -28,6 +30,13 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 
 	 @EntityGraph(attributePaths = { "course", "player"})
 	 List<Round> findByOrderByRoundDateDescPlayerAsc(Pageable pageable);
+	 
+	 @Query("SELECT r.id FROM Round r ORDER BY r.id") 
+	 List<Long> getIdsForPage(Pageable pageable);
+	 
+	 @EntityGraph(attributePaths = { "course", "player"})
+	 @Query("SELECT r FROM Round r WHERE r.id in (:ids)") 
+	 List<Round> getForIds(@Param("ids") List<Long> ids);
 	 
 	 @EntityGraph(attributePaths = { "player"})
 	 Optional<Round> findById(Long id);
