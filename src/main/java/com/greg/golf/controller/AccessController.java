@@ -168,11 +168,12 @@ public class AccessController {
 
 		if (request.getAttribute(REFRESH_TOKEN) != null) {
 
+			final GolfUserDetails userDetails = playerService.loadUserById(id);
+			
 			responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-			responseHeaders.set("Jwt", request.getAttribute(REFRESH_TOKEN).toString());
+			responseHeaders.set("Jwt", jwtTokenUtil.generateToken(userDetails));
 
 			// regenerate refresh token
-			final GolfUserDetails userDetails = playerService.loadUserById(id);
 			String token = refreshTokenUtil.generateToken(userDetails);
 			responseHeaders.set("Refresh", token);
 		}
