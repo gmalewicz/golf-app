@@ -2,7 +2,8 @@ spring:
   profiles:
     active: "dev"
   mail:
-    test-connection: false      host: smtp.gmail.com
+    test-connection: false  
+    host: smtp.gmail.com
     port: 587
     username: replace_it
     password: replace_it
@@ -59,7 +60,7 @@ spring:
     show_sql: true
   liquibase:
     change-log: classpath:/db/dbChangeLog-dev.xml
-  
+
 ---
 
 spring:
