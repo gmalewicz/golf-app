@@ -30,3 +30,6 @@ build/
 ### VS Code ###
 .vscode/
 /classpath
+/derby.log
+/src/main/resources/liquibase-diffChangeLog.xml
+/src/main/resources/liquibase-outputChangeLog.xml

@@ -17,6 +17,6 @@ WORKDIR /opt/golf
 
 COPY ${APP} golf.jar
 
-ENTRYPOINT ["java","-jar","golf.jar"]
+ENTRYPOINT ["java","-jar","golf.jar", "-Dliquibase.hub.mode=off", "-Dhibernate.types.print.banner=false"]
 
 EXPOSE 8080
