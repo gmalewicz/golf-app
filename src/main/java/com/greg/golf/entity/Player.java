@@ -100,18 +100,13 @@ public class Player implements Comparable<Player> {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
 	private List<FavouriteCourse> favouriteCourse;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
+	private List<Cycle> cycle;
+
 	@Transient
 	private String captcha;
-
-	public void addScoreCard(ScoreCard scoreCardItem) {
-		this.scoreCard.add(scoreCardItem);
-		scoreCardItem.setPlayer(this);
-	}
-
-	public void removeCoreCard(ScoreCard scoreCardItem) {
-		this.scoreCard.remove(scoreCardItem);
-		scoreCardItem.setPlayer(null);
-	}
 
 	@Override
 	public int compareTo(Player o) {

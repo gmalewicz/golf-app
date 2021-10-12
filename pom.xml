@@ -199,11 +199,11 @@
                         <artifactId>liquibase-hibernate5</artifactId>
                         <version>4.5.0</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-data-jpa</artifactId>
-                       	<version>2.5.4</version>
-                    </dependency>
+					<dependency>
+						<groupId>org.springframework.data</groupId>
+						<artifactId>spring-data-jpa</artifactId>
+						<version>2.5.5</version>
+					</dependency>
                     <dependency>
                         <groupId>javax.validation</groupId>
                         <artifactId>validation-api</artifactId>
