@@ -7,8 +7,11 @@ import com.greg.golf.repository.CycleTournamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -32,4 +35,15 @@ public class CycleService {
         return cycleTournamentRepository.save(cycleTournament);
     }
 
+    @Transactional(readOnly = true)
+    public List<Cycle> findAllCycles() {
+        return cycleRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<CycleTournament> findAllCycleTournaments(Long cycleId) {
+        var cycle = new Cycle();
+        cycle.setId(cycleId);
+        return cycleTournamentRepository.findByCycleOrderByStartDate(cycle);
+    }
 }

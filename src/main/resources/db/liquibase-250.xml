@@ -40,6 +40,9 @@
 			<column name="cycle_id" type="BIGINT">
 				<constraints nullable="false" />
 			</column>
+			<column name="start_date" type="timestamp">
+				<constraints nullable="false"/>
+			</column>
 		</createTable>
 	</changeSet>
 </databaseChangeLog>

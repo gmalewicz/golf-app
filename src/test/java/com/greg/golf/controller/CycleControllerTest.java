@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.CycleDto;
 import com.greg.golf.controller.dto.CycleTournamentDto;
 import com.greg.golf.entity.Cycle;
+import com.greg.golf.entity.CycleTournament;
+import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.CycleService;
@@ -20,8 +22,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,6 +92,30 @@ class CycleControllerTest {
 
 		mockMvc.perform(post("/rest/CycleTournament").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should return all cycles")
+	@Test
+	void getCyclesThenReturns200() throws Exception {
+
+		var outputLst = new ArrayList<Cycle>();
+
+		when(cycleService.findAllCycles()).thenReturn(outputLst);
+
+		mockMvc.perform(get("/rest/Cycle")).andExpect(status().isOk());
+
+	}
+
+	@DisplayName("Should return all cycle tournaments")
+	@Test
+	void getCycleTournamentsThenReturns200() throws Exception {
+
+		var outputLst = new ArrayList<CycleTournament>();
+
+		when(cycleService.findAllCycleTournaments(1L)).thenReturn(outputLst);
+
+		mockMvc.perform(get("/rest/CycleTournament/1")).andExpect(status().isOk());
+
 	}
 
 	@AfterAll

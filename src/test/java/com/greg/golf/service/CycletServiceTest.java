@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.entity.Player;
+import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.log4j.Log4j2;
 import org.junit.ClassRule;
@@ -17,6 +18,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Log4j2
@@ -29,6 +33,7 @@ class CycleServiceTest {
 			.getInstance();
 
 	private static Player player;
+	private static Cycle cycle;
 
 	@Autowired
 	private CycleService cycleService;
@@ -38,6 +43,12 @@ class CycleServiceTest {
 
 		player = playerService.getPlayer(1L).orElseThrow();
 
+		cycle = new Cycle();
+		cycle.setName("Test cycle");
+		cycle.setStatus(Cycle.STATUS_OPEN);
+		cycle.setPlayer(player);
+		cycle.setRule(Cycle.RULE_STANDARD);
+
 		log.info("Set up completed");
 	}
 
@@ -46,11 +57,6 @@ class CycleServiceTest {
 	@Test
 	void addCycleTest() {
 
-		var cycle = new Cycle();
-		cycle.setName("Test cycle");
-		cycle.setStatus(Cycle.STATUS_OPEN);
-		cycle.setPlayer(player);
-		cycle.setRule(Cycle.RULE_STANDARD);
 		cycle = cycleService.addCycle(cycle);
 
 		assertNotNull(cycle.getId());
@@ -61,11 +67,6 @@ class CycleServiceTest {
 	@Test
 	void addCycleTournamentTest() {
 
-		var cycle = new Cycle();
-		cycle.setName("Test cycle");
-		cycle.setStatus(Cycle.STATUS_OPEN);
-		cycle.setPlayer(player);
-		cycle.setRule(Cycle.RULE_STANDARD);
 		cycle = cycleService.addCycle(cycle);
 
 		var cycleTournament = new CycleTournament();
@@ -73,9 +74,56 @@ class CycleServiceTest {
 		cycleTournament.setBestOf(false);
 		cycleTournament.setRounds(1);
 		cycleTournament.setCycle(cycle);
+		cycleTournament.setStartDate(new Date(1));
 		cycleTournament = cycleService.addCycleTournament(cycleTournament);
 
 		assertNotNull(cycleTournament.getId());
+	}
+
+	@DisplayName("Get all cycles")
+	@Transactional
+	@Test
+	void getAllCyclesTest() {
+
+		cycleService.addCycle(cycle);
+		cycle.setName("Test cycle 2");
+		cycleService.addCycle(cycle);
+
+		assertEquals(2, cycleService.findAllCycles().size());
+		assertEquals("Test cycle", cycleService.findAllCycles().get(1).getName());
+		assertEquals("Test cycle 2", cycleService.findAllCycles().get(0).getName());
+
+	}
+
+	@DisplayName("Get all cycle tournaments")
+	@Transactional
+	@Test
+	void getAllCycleTournamentTest() {
+
+		cycle = cycleService.addCycle(cycle);
+
+		var cycleTournament2 = new CycleTournament();
+		cycleTournament2.setName("Test cycle tournament 2");
+		cycleTournament2.setBestOf(false);
+		cycleTournament2.setRounds(1);
+		cycleTournament2.setCycle(cycle);
+		cycleTournament2.setStartDate(new Date(2));
+		cycleService.addCycleTournament(cycleTournament2);
+
+		var cycleTournament1 = new CycleTournament();
+		cycleTournament1.setName("Test cycle tournament 1");
+		cycleTournament1.setBestOf(false);
+		cycleTournament1.setRounds(1);
+		cycleTournament1.setCycle(cycle);
+		cycleTournament1.setStartDate(new Date(1));
+		cycleService.addCycleTournament(cycleTournament1);
+
+		var cycleTournaments = cycleService.findAllCycleTournaments(cycle.getId());
+
+		assertEquals(2, cycleTournaments.size());
+		assertEquals((new Date(1)).getTime(), cycleTournaments.get(0).getStartDate().getTime());
+		assertEquals((new Date(2)).getTime(), cycleTournaments.get(1).getStartDate().getTime());
+
 	}
 
 	@AfterAll

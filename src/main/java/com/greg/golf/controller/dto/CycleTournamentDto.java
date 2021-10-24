@@ -1,10 +1,13 @@
 package com.greg.golf.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+
+import java.util.Date;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.*;
 
@@ -29,4 +32,9 @@ public class CycleTournamentDto {
 
 	@Schema(description = "Cycle object for that tournament", accessMode = WRITE_ONLY)
 	private CycleDto cycleDto;
+
+	@NotNull
+	@Schema(description = "Cycle tournament start date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+	private Date startDate;
 }

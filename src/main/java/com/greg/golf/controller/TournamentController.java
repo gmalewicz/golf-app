@@ -42,7 +42,7 @@ public class TournamentController extends BaseController {
 	public List<TournamentDto> getTournaments() {
 		log.info("Requested list of tournaments");
 
-		return mapList(tournamentService.findAllTournamnets(), TournamentDto.class);
+		return mapList(tournamentService.findAllTournaments(), TournamentDto.class);
 	}
 
 	@Tag(name = "Tournament API")
@@ -55,7 +55,7 @@ public class TournamentController extends BaseController {
 		var tournament = new Tournament();
 		tournament.setId(tournamentId);
 
-		return mapList(tournamentService.findAllTournamnetsResults(tournament), TournamentResultDto.class);
+		return mapList(tournamentService.findAllTournamentsResults(tournament), TournamentResultDto.class);
 
 	}
 
@@ -91,7 +91,7 @@ public class TournamentController extends BaseController {
 
 		log.info("trying to add tournament: " + tournamentDto);
 
-		tournamentService.addTournamnet(modelMapper.map(tournamentDto, Tournament.class));
+		tournamentService.addTournament(modelMapper.map(tournamentDto, Tournament.class));
 
 		return HttpStatus.OK;
 	}

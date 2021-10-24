@@ -123,7 +123,7 @@ public class Player implements Comparable<Player> {
 			return false;
 		}
 		
-		if (id == ((Player) obj).id) {
+		if (id.equals(((Player) obj).id)) {
 			retVal = true;
 		}
 	
