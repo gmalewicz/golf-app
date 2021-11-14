@@ -1,6 +1,7 @@
 package com.greg.golf.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,10 +32,15 @@ public class CycleTournamentDto {
 	private Boolean bestOf;
 
 	@Schema(description = "Cycle object for that tournament", accessMode = WRITE_ONLY)
-	private CycleDto cycleDto;
+	private CycleDto cycle;
 
 	@NotNull
 	@Schema(description = "Cycle tournament start date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date startDate;
+
+	@NotNull
+	@Schema(description = "Result set", accessMode = WRITE_ONLY)
+	@JsonProperty( value = "items", access = JsonProperty.Access.WRITE_ONLY)
+	private EagleResultDto[] tournamentResult;
 }

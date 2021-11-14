@@ -18,8 +18,11 @@
 			<column name="player_id" type="int">
 				<constraints nullable="false" />
 			</column>
-			<column name="rule" type="int">
+			<column name="best_rounds" type="int">
 				<constraints nullable="false" />
+			</column>
+			<column name="max_whs" type="numeric(3, 1)">
+				<constraints nullable="false"/>
 			</column>
 		</createTable>
 	</changeSet>
@@ -41,6 +44,28 @@
 				<constraints nullable="false" />
 			</column>
 			<column name="start_date" type="timestamp">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1635692983288-60">
+		<createTable tableName="cycle_result">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="cycle_resultPK"/>
+			</column>
+			<column name="player_name" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="results" type="INTEGER[]">
+				<constraints nullable="false"/>
+			</column>
+			<column name="total" type="INTEGER">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cycle_result" type="INTEGER">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cycle_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>

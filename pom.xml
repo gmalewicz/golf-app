@@ -115,6 +115,13 @@
 			<version>2.9.8</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.vladmihalcea/hibernate-types-55 -->
+		<dependency>
+			<groupId>com.vladmihalcea</groupId>
+			<artifactId>hibernate-types-55</artifactId>
+			<version>2.13.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>

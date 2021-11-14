@@ -47,7 +47,6 @@ class CycleServiceTest {
 		cycle.setName("Test cycle");
 		cycle.setStatus(Cycle.STATUS_OPEN);
 		cycle.setPlayer(player);
-		cycle.setRule(Cycle.RULE_STANDARD);
 
 		log.info("Set up completed");
 	}
@@ -75,7 +74,7 @@ class CycleServiceTest {
 		cycleTournament.setRounds(1);
 		cycleTournament.setCycle(cycle);
 		cycleTournament.setStartDate(new Date(1));
-		cycleTournament = cycleService.addCycleTournament(cycleTournament);
+		cycleTournament = cycleService.addCycleTournament(cycleTournament, null);
 
 		assertNotNull(cycleTournament.getId());
 	}
@@ -108,7 +107,7 @@ class CycleServiceTest {
 		cycleTournament2.setRounds(1);
 		cycleTournament2.setCycle(cycle);
 		cycleTournament2.setStartDate(new Date(2));
-		cycleService.addCycleTournament(cycleTournament2);
+		cycleService.addCycleTournament(cycleTournament2, null);
 
 		var cycleTournament1 = new CycleTournament();
 		cycleTournament1.setName("Test cycle tournament 1");
@@ -116,7 +115,7 @@ class CycleServiceTest {
 		cycleTournament1.setRounds(1);
 		cycleTournament1.setCycle(cycle);
 		cycleTournament1.setStartDate(new Date(1));
-		cycleService.addCycleTournament(cycleTournament1);
+		cycleService.addCycleTournament(cycleTournament1, null);
 
 		var cycleTournaments = cycleService.findAllCycleTournaments(cycle.getId());
 

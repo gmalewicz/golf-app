@@ -1,8 +1,10 @@
 package com.greg.golf.controller;
 
 import com.greg.golf.controller.dto.CycleDto;
+import com.greg.golf.controller.dto.CycleResultDto;
 import com.greg.golf.controller.dto.CycleTournamentDto;
 import com.greg.golf.entity.Cycle;
+import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.service.CycleService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +35,7 @@ public class CycleController extends BaseController {
 	public HttpStatus addCycle(
 			@Parameter(description = "Cycle object", required = true) @RequestBody CycleDto cycleDto) {
 
-		log.info("trying to add cycle: " + cycleDto);
+		log.info("trying to add cycle: " + cycleDto.getName());
 
 		cycleService.addCycle(modelMapper.map(cycleDto, Cycle.class));
 
@@ -46,9 +48,9 @@ public class CycleController extends BaseController {
 	public HttpStatus addCycleTournament(
 			@Parameter(description = "CycleTournament object", required = true) @RequestBody CycleTournamentDto cycleTournamentDto) {
 
-		log.info("trying to add cycle tournament: " + cycleTournamentDto);
+		log.info("trying to add cycle tournament: " + cycleTournamentDto.getName());
 
-		cycleService.addCycle(modelMapper.map(cycleTournamentDto, Cycle.class));
+		cycleService.addCycleTournament(modelMapper.map(cycleTournamentDto, CycleTournament.class), cycleTournamentDto.getTournamentResult());
 
 		return HttpStatus.OK;
 	}
@@ -69,5 +71,14 @@ public class CycleController extends BaseController {
 			@Parameter(description = "Cycle id", example = "1", required = true) @PathVariable("cycleId") Long cycleId) {
 		log.info("Requested list of cycle tournaments for cycle: " + cycleId);
 		return mapList(cycleService.findAllCycleTournaments(cycleId), CycleTournamentDto.class);
+	}
+
+	@Tag(name = "Cycle API")
+	@Operation(summary = "Return cycle results")
+	@GetMapping(value = "/rest/CycleResult/{cycleId}")
+	public List<CycleResultDto> getCycleResults(
+			@Parameter(description = "Cycle id", example = "1", required = true) @PathVariable("cycleId") Long cycleId) {
+		log.info("Requested cycle results for cycle: " + cycleId);
+		return mapList(cycleService.findCycleResults(cycleId), CycleResultDto.class);
 	}
 }

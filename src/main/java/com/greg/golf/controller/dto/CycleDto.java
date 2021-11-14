@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
@@ -24,10 +25,15 @@ public class CycleDto {
 	@Schema(description = "Cycle status: false - open, true - close", example = "false", accessMode = READ_WRITE)
 	private Boolean status;
 
-	@NotNull
-	@Schema(description = "Cycle rule: 0 - based on STB net, 1 - Volvo 2021", example = "0", accessMode = READ_WRITE)
-	private Integer rule;
-
 	@Schema(description = "Cycle owner", accessMode = READ_WRITE)
 	private PlayerDto player;
+
+	@NotNull
+	@Schema(description = "Number of best rounds from cycle to be included in the result, 0 - all rounds",
+			example = "0", minimum = "0", maximum = "20", accessMode = READ_WRITE)
+	private Integer bestRounds;
+
+	@NotNull
+	@Schema(description = "Maximum handicap", example = "38.5", accessMode = READ_WRITE, minimum="-5", maximum="54")
+	private Float maxWhs;
 }

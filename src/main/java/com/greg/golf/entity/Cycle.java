@@ -16,10 +16,6 @@ public class Cycle {
 	public static final boolean STATUS_OPEN = false;
 	public static final boolean STATUS_CLOSE = true;
 
-	public static final Integer RULE_VOLVO_2021 = 1;
-	// based on STB net without any modifications
-	public static final Integer RULE_STANDARD = 0;
-
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +31,13 @@ public class Cycle {
 
 	@EqualsAndHashCode.Exclude
 	@NotNull
-	private Integer rule;
+	@Column(name = "best_rounds")
+	private Integer bestRounds;
+
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	@Column(name = "max_whs")
+	private Float maxWhs;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
