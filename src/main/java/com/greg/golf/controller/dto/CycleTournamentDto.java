@@ -35,11 +35,6 @@ public class CycleTournamentDto {
 	private CycleDto cycle;
 
 	@NotNull
-	@Schema(description = "Cycle tournament start date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
-	private Date startDate;
-
-	@NotNull
 	@Schema(description = "Result set", accessMode = WRITE_ONLY)
 	@JsonProperty( value = "items", access = JsonProperty.Access.WRITE_ONLY)
 	private EagleResultDto[] tournamentResult;

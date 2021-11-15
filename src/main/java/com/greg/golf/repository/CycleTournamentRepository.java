@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface CycleTournamentRepository extends JpaRepository<CycleTournament, Long> {
 
-    List<CycleTournament> findByCycleOrderByStartDate(Cycle cycle);
+    List<CycleTournament> findByCycleOrderById(Cycle cycle);
 }

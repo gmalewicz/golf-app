@@ -43,9 +43,6 @@
 			<column name="cycle_id" type="BIGINT">
 				<constraints nullable="false" />
 			</column>
-			<column name="start_date" type="timestamp">
-				<constraints nullable="false"/>
-			</column>
 		</createTable>
 	</changeSet>
 	<changeSet author="GMALEWICZ (generated)" id="1635692983288-60">

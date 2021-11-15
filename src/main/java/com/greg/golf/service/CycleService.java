@@ -19,13 +19,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Log4j2
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "cycle")
 @Service("cycleService")
 public class CycleService {
+
+    private static final int ROUNDS_PER_TOURNAMENT = 4;
 
     private final CycleRepository cycleRepository;
 
@@ -69,9 +70,6 @@ public class CycleService {
         // first verify if there are already results
         var cycleResults = cycleResultRepository.findByCycle(cycleTournament.getCycle());
 
-
-
-
         // if not process initial insert, if yes process update
         if (cycleResults.size() == 0) {
             cycleResults = prepareTournament(cycleTournament, eagleResultDto);
@@ -81,20 +79,19 @@ public class CycleService {
             cycleResults = addTournamentToCycleResult( cycleResults,  newTournament);
 
         }
-        cycleResultRepository.saveAll(cycleResults);
+
+        // update total and cycle result
+        cycleResultRepository.saveAll(updCycleResultAndTotal(cycleTournament, cycleResults));
     }
 
     private List<CycleResult> addTournamentToCycleResult(List<CycleResult> cycleResults, List<CycleResult> tournamentResults) {
 
         // initialize result size
-        int resultSizeBeforeUpdate = cycleResults.get(0).getResults().length;
-
+        var cycleResultSize = cycleResults.get(0).getResults().length;
 
         //create map from cycle result where key is player id
         var cycleResultMap = cycleResults.stream()
                 .collect(Collectors.toMap(CycleResult::getPlayerName, cycleResult -> cycleResult));
-
-        var cycleResultSize = cycleResults.get(0).getResults().length;
 
         // update cycle results
         tournamentResults.forEach(tournamentResult -> {
@@ -103,9 +100,6 @@ public class CycleService {
             if (cycleResultMap.containsKey(tournamentResult.getPlayerName())) {
 
                 var cycleResult = cycleResultMap.get(tournamentResult.getPlayerName());
-
-                cycleResult.setTotal(cycleResult.getTotal() + tournamentResult.getTotal());
-                cycleResult.setCycleResult(cycleResult.getCycleResult() + tournamentResult.getCycleResult());
 
                 cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
                         Arrays.stream(tournamentResult.getResults())).toArray());
@@ -123,37 +117,33 @@ public class CycleService {
         // update players who did not play that tournament
         cycleResultMap.values()
             .forEach(cycleResult -> {
-                if (cycleResult.getResults().length == resultSizeBeforeUpdate) {
+                if (cycleResult.getResults().length == cycleResultSize) {
                     cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
-                            Arrays.stream(new int[resultSizeBeforeUpdate])).toArray());
+                            Arrays.stream(new int[ROUNDS_PER_TOURNAMENT])).toArray());
                 }
             });
 
-        // sort and return
-        return cycleResultMap
-                .values()
-                .stream()
-                .sorted(Comparator.comparingInt(CycleResult::getCycleResult))
-                .collect(Collectors.toList());
+        return cycleResultMap.values().stream().collect(Collectors.toList());
     }
 
 
     private List<CycleResult> prepareTournament(CycleTournament cycleTournament, EagleResultDto[] eagleResultDto) {
         List<CycleResult> cycleTournamentResults =  Arrays.stream(eagleResultDto)
-                .filter(e -> e.getPosition() != null)
                 .map(e -> {
                     var cycleResult = new CycleResult();
                     cycleResult.setCycle(cycleTournament.getCycle());
                     cycleResult.setPlayerName(e.getLastName() + " " + e.getFirstName());
                     cycleResult.setResults(e.getR());
                     cycleResult.setWhs(e.getWhs());
-                    cycleResult.setPosition(e.getPosition());
+
                     return cycleResult;})
                 .collect(Collectors.toList());
 
         log.debug("initial cycle results created");
 
-        return updCycleResultAndTotal(cycleTournament, cycleTournamentResults);
+        return cycleTournamentResults;
+
+        //return updCycleResultAndTotal(cycleTournament, cycleTournamentResults);
     }
 
     private List<CycleResult> updCycleResultAndTotal(CycleTournament cycleTournament, List<CycleResult> cycleResults ) {
@@ -178,7 +168,10 @@ public class CycleService {
                                 .limit(cycleTournament.getCycle().getBestRounds())
                                 .reduce(0, Integer::sum)
                 );
-                cycleResult.setTotal(cycleResult.getCycleResult());
+                cycleResult.setTotal(
+                        Arrays.stream(cycleResult.getResults())
+                                .reduce(0, Integer::sum)
+                );
             });
         }
         return cycleResults;
@@ -194,14 +187,14 @@ public class CycleService {
     public List<CycleTournament> findAllCycleTournaments(Long cycleId) {
         var cycle = new Cycle();
         cycle.setId(cycleId);
-        return cycleTournamentRepository.findByCycleOrderByStartDate(cycle);
+        return cycleTournamentRepository.findByCycleOrderById(cycle);
     }
 
     @Transactional(readOnly = true)
     public List<CycleResult> findCycleResults(Long cycleId) {
         var cycle = new Cycle();
         cycle.setId(cycleId);
-        return cycleResultRepository.findByCycleOrderByTotalDesc(cycle);
+        return cycleResultRepository.findByCycleOrderByCycleResultDesc(cycle);
     }
 
 }

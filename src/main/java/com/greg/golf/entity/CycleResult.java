@@ -58,6 +58,4 @@ public class CycleResult {
 	@Transient
 	private Float whs;
 
-	@Transient
-	private Integer position;
 }

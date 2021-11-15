@@ -73,7 +73,6 @@ class CycleServiceTest {
 		cycleTournament.setBestOf(false);
 		cycleTournament.setRounds(1);
 		cycleTournament.setCycle(cycle);
-		cycleTournament.setStartDate(new Date(1));
 		cycleTournament = cycleService.addCycleTournament(cycleTournament, null);
 
 		assertNotNull(cycleTournament.getId());
@@ -106,7 +105,6 @@ class CycleServiceTest {
 		cycleTournament2.setBestOf(false);
 		cycleTournament2.setRounds(1);
 		cycleTournament2.setCycle(cycle);
-		cycleTournament2.setStartDate(new Date(2));
 		cycleService.addCycleTournament(cycleTournament2, null);
 
 		var cycleTournament1 = new CycleTournament();
@@ -114,14 +112,11 @@ class CycleServiceTest {
 		cycleTournament1.setBestOf(false);
 		cycleTournament1.setRounds(1);
 		cycleTournament1.setCycle(cycle);
-		cycleTournament1.setStartDate(new Date(1));
 		cycleService.addCycleTournament(cycleTournament1, null);
 
 		var cycleTournaments = cycleService.findAllCycleTournaments(cycle.getId());
 
 		assertEquals(2, cycleTournaments.size());
-		assertEquals((new Date(1)).getTime(), cycleTournaments.get(0).getStartDate().getTime());
-		assertEquals((new Date(2)).getTime(), cycleTournaments.get(1).getStartDate().getTime());
 
 	}
 

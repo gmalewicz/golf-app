@@ -41,9 +41,4 @@ public class CycleTournament {
 	@NotNull
 	@Column(name = "best_off")
 	private Boolean bestOf;
-
-	@NotNull
-	@EqualsAndHashCode.Exclude
-	@Column(name = "start_date")
-	private Date startDate;
 }
