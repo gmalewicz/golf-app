@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -43,8 +44,6 @@ public class CycleService {
     @Transactional
     public CycleTournament addCycleTournament(CycleTournament cycleTournament, EagleResultDto[] eagleResultDto) {
 
-        log.debug("eagleResultDto size: " + eagleResultDto[0].getR());
-
         // filter to exclude players with too high handicap
         eagleResultDto = Arrays.stream(eagleResultDto)
                 .filter(e -> e.getWhs() <= cycleTournament.getCycle().getMaxWhs())
@@ -53,9 +52,9 @@ public class CycleService {
         // update to get the best round if required
         // the best round from the tournament will be saved at index 0 from four possible tournaments
         // the rest of tournaments will be removed
-        if (cycleTournament.getBestOf()) {
+        if (Boolean.TRUE.equals(cycleTournament.getBestOf())) {
             for (var e : eagleResultDto) {
-                int max = Arrays.stream(e.getR()).max().getAsInt();
+                int max = Arrays.stream(e.getR()).max().orElse(0);
                 e.setR(new int[] {max, 0, 0, 0});
             }
         }
@@ -71,7 +70,7 @@ public class CycleService {
         var cycleResults = cycleResultRepository.findByCycle(cycleTournament.getCycle());
 
         // if not process initial insert, if yes process update
-        if (cycleResults.size() == 0) {
+        if (cycleResults.isEmpty()) {
             cycleResults = prepareTournament(cycleTournament, eagleResultDto);
 
         } else {
@@ -123,7 +122,7 @@ public class CycleService {
                 }
             });
 
-        return cycleResultMap.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(cycleResultMap.values());
     }
 
 
@@ -142,8 +141,6 @@ public class CycleService {
         log.debug("initial cycle results created");
 
         return cycleTournamentResults;
-
-        //return updCycleResultAndTotal(cycleTournament, cycleTournamentResults);
     }
 
     private List<CycleResult> updCycleResultAndTotal(CycleTournament cycleTournament, List<CycleResult> cycleResults ) {
@@ -151,17 +148,17 @@ public class CycleService {
         // if all rounds should be included cycle results equals total
         if (cycleTournament.getCycle().getBestRounds() == 0) {
             cycleResults.forEach( cycleResult ->  {
-                cycleResult.setCycleResult(
+                cycleResult.setCycleScore(
                         Arrays.stream(cycleResult.getResults())
                                 .reduce(0, Integer::sum)
                 );
-                cycleResult.setTotal(cycleResult.getCycleResult());
+                cycleResult.setTotal(cycleResult.getCycleScore());
             });
         // otherwise, get best rounds from cycle results according to specified rule
         } else {
             cycleResults.forEach( cycleResult -> {
 
-                cycleResult.setCycleResult(
+                cycleResult.setCycleScore(
                         Arrays.stream(cycleResult.getResults())
                                 .boxed()
                                 .sorted(Comparator.reverseOrder())
@@ -194,7 +191,7 @@ public class CycleService {
     public List<CycleResult> findCycleResults(Long cycleId) {
         var cycle = new Cycle();
         cycle.setId(cycleId);
-        return cycleResultRepository.findByCycleOrderByCycleResultDesc(cycle);
+        return cycleResultRepository.findByCycleOrderByCycleScoreDesc(cycle);
     }
 
 }

@@ -23,8 +23,9 @@ public class CycleResultDto {
 	private Integer total;
 
 	@NotNull
+	@JsonProperty( value = "cycleResult", access = JsonProperty.Access.READ_ONLY)
 	@Schema(description = "Player cycle result", example = "1", accessMode = READ_ONLY)
-	private Integer cycleResult;
+	private Integer cycleScore;
 
 	@NotNull
 	@Schema(description = "Round results", accessMode = READ_ONLY)

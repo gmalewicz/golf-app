@@ -12,6 +12,6 @@ public interface CycleResultRepository extends JpaRepository<CycleResult, Long> 
 
     List<CycleResult> findByCycle(Cycle cycle);
 
-    List<CycleResult> findByCycleOrderByCycleResultDesc(Cycle cycle);
+    List<CycleResult> findByCycleOrderByCycleScoreDesc(Cycle cycle);
 
 }

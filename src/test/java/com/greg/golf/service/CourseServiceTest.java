@@ -1,10 +1,5 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +37,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import lombok.extern.log4j.Log4j2;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @Log4j2
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -55,17 +52,6 @@ class CourseServiceTest {
 	
 	@BeforeAll
 	public static void setup(@Autowired PlayerRepository playerRepository) {
-/*
-		FavouriteCourse fc = new FavouriteCourse();
-		Player player = new Player();
-		player.setId(1L);
-		Course course = new Course();
-		course.setId(1L);
-		fc.setPlayer(player);
-		fc.setCourse(course);
-		
-		favouriteCourseRepository.save(fc);
-		*/
 		log.info("Set up completed");
 	}
 
@@ -105,7 +91,7 @@ class CourseServiceTest {
 		hole.setNumber(1);
 		hole.setPar(3);
 		hole.setSi(1);
-		List<Hole> holes = new ArrayList<Hole>();
+		var holes = new ArrayList<Hole>();
 		holes.add(hole);
 		course.setHoles(holes);
 		
@@ -115,7 +101,7 @@ class CourseServiceTest {
 		courseTee.setSr(55);
 		courseTee.setTee("test");
 		courseTee.setTeeType(Common.TEE_TYPE_18);
-		List<CourseTee> tees = new ArrayList<CourseTee>();
+		var tees = new ArrayList<CourseTee>();
 		tees.add(courseTee);
 		course.setTees(tees);
 		
@@ -132,7 +118,7 @@ class CourseServiceTest {
 		courseService.delete(1L);
 		Optional<Course> course = courseService.getCourse(1L);
 		
-		assertEquals(false, course.isPresent());
+		assertFalse(course.isPresent());
 	}
 	
 	@DisplayName("Get tees")
@@ -160,7 +146,7 @@ class CourseServiceTest {
 	void getTeesByIdTest() {
 
 		Optional<CourseTee> tee = courseService.getTeeByid(1L);
-		assertEquals(true, tee.isPresent());
+		assertTrue(tee.isPresent());
 	}
 	
 	@DisplayName("Get favourite courses for player")
@@ -208,8 +194,6 @@ class CourseServiceTest {
 		course.setId(1L);
 		courseService.addToFavourites(course, 1L);
 		long retVal = courseService.deleteFromFavourites(course, 1L);
-		
-	// 	List<Course> fc = courseService.listFavourites(1L);
 
 		assertEquals(1, retVal);
 	}
@@ -260,13 +244,14 @@ class CourseServiceTest {
 		courseService.addToFavourites(course, 1L);
 		
 		//get the course
-		course = courseService.getCourse(1L).get();
+		course = courseService.getCourse(1L).orElse(null);
 		
 		//move to history
 		courseService.moveToHistoryCurse(1L);
 		
 		//check if course has historical flag set
-		assertTrue("Historical flag shell be set", course.getHistorical());
+		assertNotNull(course, "Course must be set");
+		assertTrue(course.getHistorical(), "Historical flag shell be set");
 		
 		//check if favorites are empty
 		assertEquals(0, favouriteCourseRepository.findAll().size());	
@@ -287,10 +272,7 @@ class CourseServiceTest {
 		Course course = new Course();
 		course.setId(1L);
 		courseService.addToFavourites(course, 1L);
-		
-		//get the course
-		course = courseService.getCourse(1L).get();
-		
+
 		// try to execute move operation - it shall throw exception
 		assertThrows(UnauthorizedException.class, () -> courseService.moveToHistoryCurse(1L));
 
@@ -299,8 +281,6 @@ class CourseServiceTest {
 	@AfterAll
 	public static void done() {
 
-		// favouriteCourseRepository.deleteAll();
-		
 		log.info("Clean up completed");
 
 	}

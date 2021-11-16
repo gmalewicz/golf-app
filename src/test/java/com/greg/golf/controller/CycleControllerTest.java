@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.CycleDto;
 import com.greg.golf.controller.dto.CycleTournamentDto;
 import com.greg.golf.entity.Cycle;
+import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
-import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.CycleService;
@@ -115,6 +115,18 @@ class CycleControllerTest {
 		when(cycleService.findAllCycleTournaments(1L)).thenReturn(outputLst);
 
 		mockMvc.perform(get("/rest/CycleTournament/1")).andExpect(status().isOk());
+
+	}
+
+	@DisplayName("Should return cycle results")
+	@Test
+	void getCycleResultsThenReturns200() throws Exception {
+
+		var outputLst = new ArrayList<CycleResult>();
+
+		when(cycleService.findCycleResults(1L)).thenReturn(outputLst);
+
+		mockMvc.perform(get("/rest/CycleResult/1")).andExpect(status().isOk());
 
 	}
 
