@@ -33,7 +33,6 @@ class CycleServiceTest {
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
             .getInstance();
 
-    private static Player player;
     private static Cycle cycle;
     private static EagleResultDto eagleResultDto;
 
@@ -43,7 +42,7 @@ class CycleServiceTest {
     @BeforeAll
     public static void setup(@Autowired PlayerService playerService) {
 
-        player = playerService.getPlayer(1L).orElseThrow();
+        Player player = playerService.getPlayer(1L).orElseThrow();
 
         cycle = new Cycle();
         cycle.setName("Test cycle");
