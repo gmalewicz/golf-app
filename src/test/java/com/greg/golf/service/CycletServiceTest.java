@@ -1,0 +1,161 @@
+package com.greg.golf.service;
+
+import com.greg.golf.controller.dto.EagleResultDto;
+import com.greg.golf.entity.Cycle;
+import com.greg.golf.entity.CycleTournament;
+import com.greg.golf.entity.Player;
+import com.greg.golf.util.GolfPostgresqlContainer;
+import lombok.extern.log4j.Log4j2;
+import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@Log4j2
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
+class CycleServiceTest {
+
+    @ClassRule
+    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
+            .getInstance();
+
+    private static Cycle cycle;
+    private static EagleResultDto eagleResultDto;
+
+    @Autowired
+    private CycleService cycleService;
+
+    @BeforeAll
+    public static void setup(@Autowired PlayerService playerService) {
+
+        Player player = playerService.getPlayer(1L).orElseThrow();
+
+        cycle = new Cycle();
+        cycle.setName("Test cycle");
+        cycle.setStatus(Cycle.STATUS_OPEN);
+        cycle.setPlayer(player);
+        cycle.setBestRounds(1);
+        cycle.setMaxWhs(12.0F);
+
+        eagleResultDto = new EagleResultDto();
+        eagleResultDto.setR(new int[]{40, 0, 0, 0});
+        eagleResultDto.setWhs(36.0F);
+        eagleResultDto.setLastName("Bond");
+        eagleResultDto.setFirstName("James");
+
+
+        log.info("Set up completed");
+    }
+
+    @DisplayName("Should add the new cycle")
+    @Transactional
+    @Test
+    void addCycleTest() {
+
+        cycle = cycleService.addCycle(cycle);
+
+        assertNotNull(cycle.getId());
+    }
+
+    @DisplayName("Should add the cycle tournament")
+    @Transactional
+    @ParameterizedTest
+    @CsvSource({
+            "false, 1, 36.0, 1",
+            "false, 1, 11.0, 1",
+            "false, 1, 11.0, 0",
+            "true, 1, 11.0, 0",
+            "false, 1, 11.0, 1",
+    })
+    void addCycleTournamentTest(boolean bestOf, int rounds, float whs, int bestRounds) {
+
+
+        cycle.setBestRounds(bestRounds);
+        cycle = cycleService.addCycle(cycle);
+
+        var cycleTournament = new CycleTournament();
+        cycleTournament.setName("Test cycle tournament");
+        cycleTournament.setBestOf(bestOf);
+        cycleTournament.setRounds(rounds);
+        cycleTournament.setCycle(cycle);
+
+        eagleResultDto.setWhs(whs);
+
+        cycleTournament = cycleService.addCycleTournament(cycleTournament, new EagleResultDto[]{eagleResultDto});
+
+        assertNotNull(cycleTournament.getId());
+    }
+
+    @DisplayName("Get all cycles")
+    @Transactional
+    @Test
+    void getAllCyclesTest() {
+
+        cycleService.addCycle(cycle);
+        cycle.setName("Test cycle 2");
+        cycleService.addCycle(cycle);
+
+        assertEquals(2, cycleService.findAllCycles().size());
+        assertEquals("Test cycle", cycleService.findAllCycles().get(1).getName());
+        assertEquals("Test cycle 2", cycleService.findAllCycles().get(0).getName());
+
+    }
+
+    @DisplayName("Get all cycle tournaments")
+    @Transactional
+    @Test
+    void getAllCycleTournamentTest() {
+
+        cycle = cycleService.addCycle(cycle);
+
+        var cycleTournament2 = new CycleTournament();
+        cycleTournament2.setName("Test cycle tournament 2");
+        cycleTournament2.setBestOf(false);
+        cycleTournament2.setRounds(1);
+        cycleTournament2.setCycle(cycle);
+        cycleService.addCycleTournament(cycleTournament2, new EagleResultDto[]{eagleResultDto});
+
+        var cycleTournament1 = new CycleTournament();
+        cycleTournament1.setName("Test cycle tournament 1");
+        cycleTournament1.setBestOf(false);
+        cycleTournament1.setRounds(1);
+        cycleTournament1.setCycle(cycle);
+        cycleService.addCycleTournament(cycleTournament1, new EagleResultDto[]{eagleResultDto});
+
+        var cycleTournaments = cycleService.findAllCycleTournaments(cycle.getId());
+
+        assertEquals(2, cycleTournaments.size());
+
+    }
+
+    @DisplayName("Get all cycles")
+    @Transactional
+    @Test
+    void getAllCycleResultsTest() {
+
+        assertEquals(0, cycleService.findCycleResults(1L).size());
+    }
+
+
+    @AfterAll
+    public static void done() {
+
+        log.info("Clean up completed");
+
+    }
+
+}

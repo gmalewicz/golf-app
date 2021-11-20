@@ -52,7 +52,7 @@ public class RoundService {
 		var player = round.getPlayer().stream().findFirst().orElseThrow();
 
 		// set player association to ScoreCard
-		round.getScoreCard().stream().forEach(card -> card.setPlayer(player));
+		round.getScoreCard().forEach(card -> card.setPlayer(player));
 
 		log.debug("start searching matchin round");
 		// search for a round on the same course, the same date and tee time
@@ -77,7 +77,7 @@ public class RoundService {
 		matchingRound.ifPresentOrElse(existingRound -> {
 			log.debug("Trying to update matching round");
 			existingRound.getPlayer().add(player);
-			round.getScoreCard().stream().forEach(card -> card.setRound(existingRound));
+			round.getScoreCard().forEach(card -> card.setRound(existingRound));
 			existingRound.getScoreCard().addAll(round.getScoreCard());
 			roundRepository.save(existingRound);
 			round.setId(existingRound.getId());
@@ -98,7 +98,7 @@ public class RoundService {
 
 		}, () -> {
 			log.debug("trying to add not matching round");
-			round.getScoreCard().stream().forEach(card -> card.setRound(round));
+			round.getScoreCard().forEach(card -> card.setRound(round));
 			roundRepository.save(round);
 			playerRoundRepository.updatePlayerRoundInfo(player.getWhs(),
 													round.getCourse().getTees().get(0).getSr(),
@@ -137,7 +137,7 @@ public class RoundService {
 		log.debug("Round found");
 
 		// check if player score card exists in that round
-		if (round.getPlayer().stream().filter(p -> p.getId().equals(playerId)).count() == 0) {
+		if (round.getPlayer().stream().noneMatch(p -> p.getId().equals(playerId))) {
 			log.warn("Player " + playerId + " not found in round " + roundId);
 			throw new NoSuchElementException();
 		}
@@ -188,7 +188,7 @@ public class RoundService {
 		round.getScoreCard().removeAll((round.getScoreCard().stream()
 				.filter(sc -> sc.getPlayer().getId().equals(player.getId())).collect(Collectors.toList())));
 
-		updRound.getScoreCard().stream().forEach(sc -> {
+		updRound.getScoreCard().forEach(sc -> {
 			sc.setRound(updRound);
 			sc.setPlayer(player);
 		});

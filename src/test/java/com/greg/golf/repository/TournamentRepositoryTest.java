@@ -1,8 +1,7 @@
 package com.greg.golf.repository;
 
-import static org.junit.Assert.assertNotNull;
-
-import static org.junit.Assert.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
 import com.greg.golf.entity.Tournament;
-import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
@@ -54,7 +52,7 @@ class TournamentRepositoryTest {
 		tournament.setName("Test tournament");
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
-		List<Round> roundList = new ArrayList<Round>();
+		var roundList = new ArrayList<Round>();
 		// roundList.add(round);
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
@@ -71,7 +69,7 @@ class TournamentRepositoryTest {
 		tournament.setName("Test tournament");
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
-		List<Round> roundList = new ArrayList<Round>();
+		var roundList = new ArrayList<Round>();
 		// roundList.add(round);
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
@@ -88,20 +86,11 @@ class TournamentRepositoryTest {
 		tournament.setName("Test tournament"); 
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
-		List<Round> roundList = new ArrayList<Round>();
-		// roundList.add(round);
+		var roundList = new ArrayList<Round>();
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament = tournamentRepository.save(tournament);
 		tournamentRepository.deleteById(tournament.getId());
 		assertTrue("Tournament should be null", tournamentRepository.findById(tournament.getId()).isEmpty());
 	}
-/*
-	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository) {
-		roundRepository.deleteAll();
-		log.info("Clean up completed");
-
-	}
-*/
 }

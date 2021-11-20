@@ -73,7 +73,7 @@ class TournamentServiceTest {
 		round.setPlayer(playerSet);
 		round.setRoundDate(new Date(1));
 		round.setMatchPlay(false);
-		round.setScoreCard(new ArrayList<ScoreCard>());
+		round.setScoreCard(new ArrayList<>());
 
 		for (var i = 0; i < 18; i++) {
 			var scoreCard = new ScoreCard();
@@ -88,7 +88,7 @@ class TournamentServiceTest {
 		}
 		round = roundRepository.save(round);
 
-		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2l, 0, player.getId(), round.getId());
+		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
 
 		tournament = new Tournament();
 		tournament.setEndDate(new Date(1));
@@ -134,7 +134,7 @@ class TournamentServiceTest {
 		tournament.setStartDate(new Date(1));
 		tournament.setName("Test Cup2");
 		tournament.setPlayer(player);
-		tournament = tournamentService.addTournamnet(tournament);
+		tournament = tournamentService.addTournament(tournament);
 
 		assertNotNull(tournament.getId());
 	}
@@ -196,7 +196,7 @@ class TournamentServiceTest {
 	@Test
 	void getAllTournamentsTest() {
 
-		assertEquals(1, tournamentService.findAllTournamnets().size());
+		assertEquals(1, tournamentService.findAllTournaments().size());
 
 	}
 

@@ -47,17 +47,17 @@ public class TournamentService {
 	private final TournamentRoundRepository tournamentRoundRepository;
 
 	@Transactional
-	public List<Tournament> findAllTournamnets() {
+	public List<Tournament> findAllTournaments() {
 		return tournamentRepository.findAll(Sort.by(Sort.Direction.DESC, "endDate"));
 	}
 
 	@Transactional
-	public List<TournamentResult> findAllTournamnetsResults(Tournament tournamnet) {
-		return tournamentResultRepository.findByTournamentOrderByPlayedRoundsDescStbNetDesc(tournamnet);
+	public List<TournamentResult> findAllTournamentsResults(Tournament tournament) {
+		return tournamentResultRepository.findByTournamentOrderByPlayedRoundsDescStbNetDesc(tournament);
 	}
 
 	@Transactional
-	public Tournament addTournamnet(Tournament tournament) {
+	public Tournament addTournament(Tournament tournament) {
 
 		// just to make the time adjustment
 		Calendar calendar = new GregorianCalendar();
@@ -71,13 +71,13 @@ public class TournamentService {
 	}
 
 	@Transactional
-	public Tournament addRound(Long tournamnetId, Long roundId, boolean updateResults) {
+	public Tournament addRound(Long tournamentId, Long roundId, boolean updateResults) {
 		
 		// first find the round in database
 		var round = roundService.getWithPlayers(roundId).orElseThrow();
 
 		// get tournament object
-		var tournament = tournamentRepository.findById(tournamnetId).orElseThrow();
+		var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
 
 		// next check if round is not already added to that tournament
 		if (tournament.getRound().contains(round)) {
@@ -117,7 +117,7 @@ public class TournamentService {
 			Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
 					.findByPlayerAndTournament(player, round.getTournament());
 			tournamentResultOpt.ifPresentOrElse(tournamentResult -> {
-				log.debug("Attempting to update tournamnet result");
+				log.debug("Attempting to update tournament result");
 				// first check if the round has not been already added
 				if (playerRound.getTournamentId() == null) {
 
@@ -134,11 +134,11 @@ public class TournamentService {
 							tournamentResult);
 
 				} else {
-					log.warn("Attempt to update round which is already part of the tournamnet");
+					log.warn("Attempt to update round which is already part of the tournament");
 				}
 
 			}, () -> {
-				log.debug("Attempting to add the new round to tournamnet result");
+				log.debug("Attempting to add the new round to tournament result");
 				// if it is the first record to be added to result than create it
 				var tournamentResult = buildEmptyTournamentResult(player);
 				// get gross and net strokes
@@ -167,18 +167,18 @@ public class TournamentService {
 	public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet, float scrDiff,
 			String courseName, TournamentResult tournamentResult) {
 
-		var tournamnetRound = new TournamentRound();
-		tournamnetRound.setCourseName(courseName);
-		tournamnetRound.setScrDiff(scrDiff);
-		tournamnetRound.setStbGross(stbGross);
-		tournamnetRound.setStbNet(stbNet);
-		tournamnetRound.setStrokesBrutto(strokesGross);
-		tournamnetRound.setStrokesNetto(strokesNet);
-		tournamnetRound.setTournamentResult(tournamentResult);
+		var tournamentRound = new TournamentRound();
+		tournamentRound.setCourseName(courseName);
+		tournamentRound.setScrDiff(scrDiff);
+		tournamentRound.setStbGross(stbGross);
+		tournamentRound.setStbNet(stbNet);
+		tournamentRound.setStrokesBrutto(strokesGross);
+		tournamentRound.setStrokesNetto(strokesNet);
+		tournamentRound.setTournamentResult(tournamentResult);
 
-		tournamnetRound = tournamentRoundRepository.save(tournamnetRound);
+		tournamentRound = tournamentRoundRepository.save(tournamentRound);
 
-		return tournamnetRound;
+		return tournamentRound;
 	}
 
 	public List<TournamentRound> getTournamentRoundsForResult(Long resultId) {
@@ -270,7 +270,7 @@ public class TournamentService {
 		round.getScoreCard().forEach(scoreCard -> scoreCard.setHcp(hcpAll));
 		
 		List<Hole> holes = round.getCourse().getHoles();
-		// get list of score card for player
+		// get list of scorecard for player
 		List<ScoreCard> playerScoreCard = round.getScoreCard().stream()
 				.filter(scoreCard -> scoreCard.getPlayer().equals(player)).collect(Collectors.toList());
 		playerScoreCard.forEach(scoreCard -> {
@@ -286,7 +286,7 @@ public class TournamentService {
 				scoreCard.setStbNet(0);
 			}
 			log.debug(scoreCard.getHole() + " " + scoreCard.getStbNet());
-			// update STB brutto for each hole
+			// update STB gross for each hole
 			scoreCard.setStbGross(holes.get(scoreCard.getHole() - 1).getPar() - scoreCard.getStroke() + 2);
 			if (scoreCard.getStbGross() < 0) {
 				scoreCard.setStbGross(0);
