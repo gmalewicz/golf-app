@@ -130,4 +130,10 @@ public class Player implements Comparable<Player> {
 		return retVal;
 		
 	}
+
+	@Override
+	public int hashCode() {
+
+		return super.hashCode();
+	}
 }

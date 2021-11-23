@@ -58,6 +58,11 @@ public class PlayerDto implements Comparable<PlayerDto> {
 		}
 	
 		return retVal;
-		
+	}
+
+	@Override
+	public int hashCode() {
+
+		return super.hashCode();
 	}
 }
