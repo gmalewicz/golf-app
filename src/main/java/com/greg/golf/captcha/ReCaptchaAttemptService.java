@@ -11,11 +11,11 @@ import com.google.common.cache.LoadingCache;
 @Service("reCaptchaAttemptService")
 public class ReCaptchaAttemptService {
     private static final int MAX_ATTEMPT = 4;
-    private LoadingCache<String, Integer> attemptsCache;
+    private final LoadingCache<String, Integer> attemptsCache;
 
     public ReCaptchaAttemptService() {
         super();
-        attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(4, TimeUnit.HOURS).build(new CacheLoader<String, Integer>() {
+        attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(4, TimeUnit.HOURS).build(new CacheLoader<>() {
             @Override
             public Integer load(final String key) {
                 return 0;

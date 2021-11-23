@@ -6,6 +6,6 @@ import com.greg.golf.entity.Player;
 
 public interface GolfUserDetails extends UserDetails {
 	
-	public Player getPlayer();
+	Player getPlayer();
 
 }

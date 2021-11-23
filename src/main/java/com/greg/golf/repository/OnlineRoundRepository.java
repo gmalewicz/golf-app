@@ -2,6 +2,7 @@ package com.greg.golf.repository;
 
 import java.util.List;
 
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -18,7 +19,8 @@ public interface OnlineRoundRepository extends JpaRepository<OnlineRound, Long> 
 	
 	
 	@EntityGraph(attributePaths = {"course", "courseTee", "player"})
-	List<OnlineRound> findAll();
+    @NonNull
+    List<OnlineRound> findAll();
 
 
 	void deleteByOwnerAndFinalized(Long ownerId, Boolean finzalized);

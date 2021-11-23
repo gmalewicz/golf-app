@@ -29,6 +29,7 @@ public class CycleController extends BaseController {
 		this.cycleService = cycleService;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Adds cycle")
 	@PostMapping(value = "/rest/Cycle")
@@ -42,6 +43,7 @@ public class CycleController extends BaseController {
 		return HttpStatus.OK;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Adds cycle tournament")
 	@PostMapping(value = "/rest/CycleTournament")

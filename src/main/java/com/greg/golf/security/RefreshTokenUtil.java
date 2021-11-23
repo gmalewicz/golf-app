@@ -37,6 +37,7 @@ public class RefreshTokenUtil extends TokenUtil implements Serializable {
 
 	// for retrieving any information from token we will need the secret key
 	protected Claims getAllClaimsFromToken(String token) {
+
 		return Jwts.parser().setSigningKey(jwtConfig.getRefresh()).parseClaimsJws(token).getBody();
 	}
 }

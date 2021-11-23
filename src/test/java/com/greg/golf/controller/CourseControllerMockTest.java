@@ -1,10 +1,6 @@
 package com.greg.golf.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -91,11 +87,9 @@ class CourseControllerMockTest {
 	@DisplayName("Search for courses with null input")
 	@Test
 	void searchForCourses_whenNullValue_thenReturns400() throws Exception {
-		
-		CourseNameDto courseNameDto = null;
 
 		mockMvc.perform(post("/rest/SearchForCourse").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(courseNameDto))).andExpect(status().isBadRequest());
+				.content(objectMapper.writeValueAsString(null))).andExpect(status().isBadRequest());
 
 	}
 
@@ -122,7 +116,7 @@ class CourseControllerMockTest {
 		c.setName("Test");
 		c.setPar(72);
 		c.setHoleNbr(18);
-		c.setId(1l);
+		c.setId(1L);
 
 		List<Course> retVal = new ArrayList<>();
 		retVal.add(c);
@@ -131,9 +125,7 @@ class CourseControllerMockTest {
 		courseDto.setName("Test");
 		courseDto.setPar(72);
 		courseDto.setHoleNbr(18);
-		courseDto.setId(1l);
-
-		List<Course> expectedResponseBody = retVal;
+		courseDto.setId(1L);
 
 		when(courseService.searchForCourses("Test")).thenReturn(retVal);
 		when(modelMapper.map(c, CourseDto.class)).thenReturn(courseDto);
@@ -148,7 +140,7 @@ class CourseControllerMockTest {
 		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
 	}
 
 	@DisplayName("Delete course with valid input")
@@ -162,7 +154,7 @@ class CourseControllerMockTest {
 	@Test
 	void deleteCourse_whenValidInput_thenReturns400_2() throws Exception {
 
-		doThrow(new IllegalArgumentException()).when(courseService).delete(1l);
+		doThrow(new IllegalArgumentException()).when(courseService).delete(1L);
 		MvcResult mvcResult = mockMvc.perform(delete("/rest/Course/1")).andExpect(status().isBadRequest()).andReturn();
 
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
@@ -175,12 +167,11 @@ class CourseControllerMockTest {
 	@Test
 	void getSortedCourses_whenValidInput_thenReturnsCourseList() throws Exception {
 
-		//CourseNameDto courseNameDto = new CourseNameDto("Test");
 		Course c = new Course();
 		c.setName("Test");
 		c.setPar(72);
 		c.setHoleNbr(18);
-		c.setId(1l);
+		c.setId(1L);
 
 		List<Course> retVal = new ArrayList<>();
 		retVal.add(c);
@@ -189,9 +180,7 @@ class CourseControllerMockTest {
 		courseDto.setName("Test");
 		courseDto.setPar(72);
 		courseDto.setHoleNbr(18);
-		courseDto.setId(1l);
-
-		List<Course> expectedResponseBody = retVal;
+		courseDto.setId(1L);
 
 		when(courseService.getSortedCourses(0)).thenReturn(retVal);
 		when(modelMapper.map(c, CourseDto.class)).thenReturn(courseDto);
@@ -203,14 +192,14 @@ class CourseControllerMockTest {
 		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponseBody));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
 	}
 	
 	@DisplayName("Move course to history")
 	@Test
 	void moveCourseToHistory_whenValidInput_thenReturns200() throws Exception {
 
-		doNothing().when(courseService).moveToHistoryCurse(1l);
+		doNothing().when(courseService).moveToHistoryCurse(1L);
 		mockMvc.perform(post("/rest/MoveToHistoryCourse/1")).andExpect(status().isOk());
 	}
 	

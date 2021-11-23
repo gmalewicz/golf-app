@@ -96,14 +96,14 @@ public class TournamentService {
 		return tournament;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	@Transactional(propagation = Propagation.REQUIRED)
 	@EventListener
 	public void handleRoundEvent(RoundEvent roundEvent) {
 		log.debug("Handling round event...");
 		updateTournamentResult(roundEvent.getRound());
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void updateTournamentResult(Round round) {
 
 		// first verify if round has 18 holes played for each player
@@ -342,8 +342,8 @@ public class TournamentService {
 		return tournamentResult;
 	}
 
-	// verifies if all score cards have all 18 holes filled
-	private boolean verifyRoundCorecteness(Round round) {
+	// verifies if all scorecards have all 18 holes filled
+	private void verifyRoundCorecteness(Round round) {
 
 		round.getPlayer().forEach(player -> {
 
@@ -355,6 +355,5 @@ public class TournamentService {
 				throw new TooFewHolesForTournamentException();
 			}
 		});
-		return true;
 	}
 }

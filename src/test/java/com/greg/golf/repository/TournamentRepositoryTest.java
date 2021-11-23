@@ -5,7 +5,6 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;

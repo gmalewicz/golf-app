@@ -1,20 +1,11 @@
 package com.greg.golf.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.Optional;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.BeforeAll;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +74,7 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setTournament(tournament);
 
 		tournamentResult = tournamentResultRepository.save(tournamentResult);
-		assertNotNull("Id should not be null", tournamentResult.getId());
+		Assertions.assertNotNull(tournamentResult.getId(), "Id should not be null");
 	}
 
 	
@@ -105,8 +96,8 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setTournament(tournament);
 
 		tournamentResult = tournamentResultRepository.save(tournamentResult);
-		assertNotNull("Tournament result should not be null",
-				tournamentResultRepository.findById(tournamentResult.getId()));
+		Assertions.assertNotNull(
+				tournamentResultRepository.findById(tournamentResult.getId()), "Tournament result should not be null");
 	}
 	
 	@DisplayName("Find all amd sort by played rounds and strokes netto")
@@ -126,8 +117,8 @@ class TournamentResultRepositoryTest {
 
 		tournamentResult.setTournament(tournament);
 
-		tournamentResult = tournamentResultRepository.save(tournamentResult);
-		assertEquals(1,
+		tournamentResultRepository.save(tournamentResult);
+		Assertions.assertEquals(1,
 				tournamentResultRepository.findByTournamentOrderByPlayedRoundsDescStbNetDesc(tournament).size());
 	}
 
@@ -151,8 +142,8 @@ class TournamentResultRepositoryTest {
 		tournamentResult = tournamentResultRepository.save(tournamentResult);
 
 		tournamentResultRepository.deleteById(tournamentResult.getId());
-		assertTrue("Tournament result should be null",
-				tournamentResultRepository.findById(tournamentResult.getId()).isEmpty());
+		Assertions.assertTrue(
+				tournamentResultRepository.findById(tournamentResult.getId()).isEmpty(), "Tournament result should be null");
 	}
 	
 	@DisplayName("Find by player and tournament")
@@ -171,7 +162,7 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setTournament(tournament);
 
 		Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository.findByPlayerAndTournament(player, tournament);
-		assertTrue("Tournament result should not be null", tournamentResultOpt.isEmpty());
+		Assertions.assertTrue(tournamentResultOpt.isEmpty(), "Tournament result should not be null");
 	}
 
 	@AfterAll

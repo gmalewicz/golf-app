@@ -136,7 +136,7 @@ public class RoundService {
 		var round = roundRepository.findById(roundId).orElseThrow();
 		log.debug("Round found");
 
-		// check if player score card exists in that round
+		// check if player scorecard exists in that round
 		if (round.getPlayer().stream().noneMatch(p -> p.getId().equals(playerId))) {
 			log.warn("Player " + playerId + " not found in round " + roundId);
 			throw new NoSuchElementException();
@@ -158,7 +158,7 @@ public class RoundService {
 				.collect(Collectors.toSet());
 		round.getPlayer().removeAll(playerToRemove);
 		log.debug("Player deleted");
-		// select score card to remove
+		// select scorecard to remove
 		Set<ScoreCard> cardsToRemove = round.getScoreCard().stream()
 				.filter(sc -> sc.getPlayer().getId().equals(playerId)).collect(Collectors.toSet());
 		round.getScoreCard().removeAll(cardsToRemove);
@@ -184,7 +184,7 @@ public class RoundService {
 		
 		// get first player from set
 		var player = updRound.getPlayer().iterator().next();
-		// remove score card object that matching player from round
+		// remove scorecard object that matching player from round
 		round.getScoreCard().removeAll((round.getScoreCard().stream()
 				.filter(sc -> sc.getPlayer().getId().equals(player.getId())).collect(Collectors.toList())));
 

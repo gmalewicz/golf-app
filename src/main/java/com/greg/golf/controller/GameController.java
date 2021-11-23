@@ -37,6 +37,7 @@ public class GameController extends BaseController {
 		this.gameService = gameService;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Game API")
 	@Operation(summary = "Add Game")
 	@PostMapping(value = "/rest/Game")
@@ -63,6 +64,7 @@ public class GameController extends BaseController {
 		return mapList(gameService.listByPlayer(player), GameDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Game API")
 	@Operation(summary = "Sends game details for email address")
 	@PostMapping(value = "/rest/SendGame")

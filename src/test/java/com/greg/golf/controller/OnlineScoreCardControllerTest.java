@@ -1,6 +1,5 @@
 package com.greg.golf.controller;
 
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,10 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -78,7 +74,7 @@ class OnlineScoreCardControllerTest {
 
 		var input = new OnlineRoundDto();
 		input.setTeeTime("10:00");
-		input.setOwner(1l);
+		input.setOwner(1L);
 		input.setFinalized(false);
 		input.setMatchPlay(false);
 
@@ -167,7 +163,7 @@ class OnlineScoreCardControllerTest {
 	@Test
 	void getOnlineRoundForOwnerThenReturns200() throws Exception {
 				
-		when(onlineRoundService.getOnlineRoundsForOwner(anyLong())).thenReturn(new ArrayList<OnlineRound>());
+		when(onlineRoundService.getOnlineRoundsForOwner(anyLong())).thenReturn(new ArrayList<>());
 
 		mockMvc.perform(get("/rest/OnlineRoundOwner/1")).andExpect(status().isOk());
 
@@ -175,7 +171,7 @@ class OnlineScoreCardControllerTest {
 	
 	@DisplayName("Should save online scorecard")
 	@Test
-	void saveOnlineScorecard(@Autowired OnlineScoreCardController onlineScoreCardController) throws Exception {
+	void saveOnlineScorecard(@Autowired OnlineScoreCardController onlineScoreCardController) {
 		
 		var onlineScorecardDto = new OnlineScoreCardDto();
 		onlineScorecardDto.setPenalty(0);
@@ -188,14 +184,14 @@ class OnlineScoreCardControllerTest {
 		onlineScorecard.setPutt(1);
 		onlineScorecard.setStroke(3);
 		onlineScorecard.setOrId(1);
-		onlineScorecard.setId(1l);
+		onlineScorecard.setId(1L);
 		
 		//when(modelMapper.map(Mockito.mock(OnlineScoreCardDto.class), OnlineScoreCard.class)).thenReturn(onlineScorecard);
 		when(modelMapper.map(any(),  any())).thenReturn(null);
 		when(onlineRoundService.saveOnlineScoreCard(any())).thenReturn(new OnlineScoreCard());
 		
 		
-		assertNull(onlineScoreCardController.send(onlineScorecardDto));
+		Assertions.assertNull(onlineScoreCardController.send(onlineScorecardDto));
 
 	}
 	

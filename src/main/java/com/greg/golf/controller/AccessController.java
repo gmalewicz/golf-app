@@ -78,13 +78,14 @@ public class AccessController {
 				HttpStatus.OK);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Access API")
 	@Operation(summary = "Add player.")
 	@PostMapping(value = "/rest/AddPlayer")
 	public HttpStatus addPlayer(
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
-		log.info("trying to add player: " + playerDto.getNick() + " with password xxxxxx");
+		log.info("trying to add player: " + playerDto.getNick());
 
 		var player = modelMapper.map(playerDto, Player.class);
 
@@ -97,6 +98,8 @@ public class AccessController {
 		return HttpStatus.OK;
 	}
 
+
+	@SuppressWarnings("UnusedReturnValue")
 	@Tag(name = "Access API")
 	@Operation(summary = "Update player. Only WHS and/or password can be updated.")
 	@PatchMapping(value = "/rest/PatchPlayer")
@@ -117,6 +120,7 @@ public class AccessController {
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
 	}
 
+	@SuppressWarnings({"UnusedReturnValue", "SameReturnValue"})
 	@Tag(name = "Access API")
 	@Operation(summary = "Administrative task: Reset password.")
 	@PatchMapping(value = "/rest/ResetPassword")
@@ -156,6 +160,7 @@ public class AccessController {
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	@Tag(name = "Access API")
 	@Operation(summary = "Refresh player token.")
 	@GetMapping(value = "/rest/Refresh/{id}")

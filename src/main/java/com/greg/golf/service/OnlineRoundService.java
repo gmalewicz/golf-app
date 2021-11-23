@@ -97,7 +97,7 @@ public class OnlineRoundService {
 
 	}
 
-	private Round buildRound(OnlineRound onlineRound) {
+	private void buildRound(OnlineRound onlineRound) {
 
 		// create Round object and fill it in
 		var round = new Round();
@@ -124,7 +124,7 @@ public class OnlineRoundService {
 
 		round.setRoundDate(gc.getTime());
 
-		// create map of score cards that has been passed
+		// create map of scorecards that has been passed
 
 		var holes = new HashMap<Integer, ScoreCard>();
 
@@ -138,7 +138,7 @@ public class OnlineRoundService {
 			holes.put(os.getHole(), sc);
 		}
 
-		// create 18 score cards and fill not used using empty score cards
+		// create 18 scorecards and fill using empty scorecards
 
 		var scoreCards = new ArrayList<ScoreCard>();
 		for (var i = 0; i < 18; i++) {
@@ -159,7 +159,7 @@ public class OnlineRoundService {
 
 		round.setScoreCard(scoreCards);
 
-		return roundService.saveRound(round);
+		roundService.saveRound(round);
 	}
 
 	@Transactional
@@ -168,7 +168,7 @@ public class OnlineRoundService {
 		// get the online rounds from db
 		var onlineRounds = onlineRoundRepository.findByOwnerAndFinalized(ownerId, false);
 
-		// for now it is assumed that children are retrieved
+		// for now, it is assumed that children are retrieved
 
 		onlineRounds.forEach(onlineRound -> {
 
@@ -187,7 +187,7 @@ public class OnlineRoundService {
 		course.setId(courseId);
 		var onlineRounds = onlineRoundRepository.findByCourse(course);
 
-		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
+		onlineRounds.forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 
 		return onlineRounds;
 	}
@@ -197,7 +197,7 @@ public class OnlineRoundService {
 
 		var onlineRounds = onlineRoundRepository.findByOwner(ownerId);
 
-		onlineRounds.stream().forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
+		onlineRounds.forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 
 		return onlineRounds;
 	}

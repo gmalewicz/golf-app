@@ -49,7 +49,7 @@ public class CourseService {
 		return courseRepository.findByHistoricalAndNameContainingIgnoreCase(false, courseName);
 	}
 
-	@Transactional(readOnly = false)
+	@Transactional()
 	public long deleteFromFavourites(Course course, Long playerId) {
 
 		var player = new Player();
@@ -58,7 +58,7 @@ public class CourseService {
 		return favouriteCourseRepository.deleteByPlayerAndCourse(player, course);
 	}
 
-	@Transactional(readOnly = false)
+	@Transactional()
 	public void addToFavourites(Course course, Long playerId) {
 
 		var player = new Player();
@@ -104,8 +104,8 @@ public class CourseService {
 	@Transactional
 	public Course save(Course course) {
 
-		course.getHoles().stream().forEach(h -> h.setCourse(course));
-		course.getTees().stream().forEach(h -> h.setCourse(course));
+		course.getHoles().forEach(h -> h.setCourse(course));
+		course.getTees().forEach(h -> h.setCourse(course));
 		course.setHistorical(false);
 
 		return courseRepository.save(course);
@@ -142,7 +142,7 @@ public class CourseService {
 				PageRequest.of(pageNo, courseServiceConfig.getPageSize()));
 	}
 
-	@Transactional(readOnly = false)
+	@Transactional()
 	public void moveToHistoryCurse(Long courseId) {
 
 		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()

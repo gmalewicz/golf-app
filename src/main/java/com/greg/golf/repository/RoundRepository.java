@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,5 +40,6 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 List<Round> getForIds(@Param("ids") List<Long> ids);
 	 
 	 @EntityGraph(attributePaths = { "player"})
-	 Optional<Round> findById(Long id);
+     @NonNull
+     Optional<Round> findById(@NonNull Long id);
 }

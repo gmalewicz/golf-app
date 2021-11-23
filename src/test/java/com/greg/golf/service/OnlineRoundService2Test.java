@@ -1,17 +1,11 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Date;
 import java.util.List;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.BeforeAll;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,19 +36,15 @@ class OnlineRoundService2Test {
 
 	@Autowired
 	private OnlineRoundService onlineRoundService;
-		
-	private static Course course;
-	private static CourseTee courseTee;
-	private static Player player;
-	
-	@BeforeAll
+
+    @BeforeAll
 	public static void setup(@Autowired OnlineRoundRepository onlineRoundRepository, @Autowired  OnlineScoreCardRepository onlineScoreCardRepository) {
-		
-		course = new Course();
+
+        Course course = new Course();
 		course.setId(1L);
-		courseTee = new CourseTee();
+        CourseTee courseTee = new CourseTee();
 		courseTee.setId(1L);
-		player = new Player();
+        Player player = new Player();
 		player.setId(1L);
 		
 		OnlineRound onlineRound = new OnlineRound();
@@ -88,9 +78,9 @@ class OnlineRoundService2Test {
 		
 		List<OnlineRound> rounds = onlineRoundService.getOnlineRoundsForCourse(1L);
 		
-		assertEquals(1, rounds.size());
+		Assertions.assertEquals(1, rounds.size());
 		
-		assertEquals(1, rounds.get(0).getScoreCardAPI().size());
+		Assertions.assertEquals(1, rounds.get(0).getScoreCardAPI().size());
 	}
 	
 	@DisplayName("Get online rounds for owner")
@@ -102,9 +92,9 @@ class OnlineRoundService2Test {
 		
 		List<OnlineRound> rounds = onlineRoundService.getOnlineRoundsForOwner(1L);
 		
-		assertEquals(1, rounds.size());
+		Assertions.assertEquals(1, rounds.size());
 		
-		assertEquals(1, rounds.get(0).getScoreCardAPI().size());
+		Assertions.assertEquals(1, rounds.get(0).getScoreCardAPI().size());
 	}
 	
 	@DisplayName("Delete online rounds for owner")
@@ -117,7 +107,7 @@ class OnlineRoundService2Test {
 		
 		List<OnlineRound> rounds = onlineRoundService.getOnlineRounds();
 		
-		assertEquals(0, rounds.size());
+		Assertions.assertEquals(0, rounds.size());
 		
 	}
 	
