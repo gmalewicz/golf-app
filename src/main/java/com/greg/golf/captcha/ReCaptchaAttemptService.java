@@ -2,7 +2,6 @@ package com.greg.golf.captcha;
 
 import java.util.concurrent.TimeUnit;
 
-import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.google.common.cache.CacheBuilder;
@@ -18,7 +17,7 @@ public class ReCaptchaAttemptService {
         super();
         attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(4, TimeUnit.HOURS).build(new CacheLoader<>() {
             @Override
-            public Integer load(final @NonNull String key) {
+            public Integer load(final String key) {
                 return 0;
             }
         });
