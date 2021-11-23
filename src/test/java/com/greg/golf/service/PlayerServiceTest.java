@@ -1,16 +1,12 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,7 +69,7 @@ class PlayerServiceTest {
 		
 		player.setPassword("test");
 		player = playerService.resetPassword(player);
-		assertEquals("test", player.getPassword());
+		Assertions.assertEquals("test", player.getPassword());
 
 	}
 

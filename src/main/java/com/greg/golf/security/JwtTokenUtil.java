@@ -30,6 +30,7 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 	// compaction of the JWT to a URL-safe string
 	protected String doGenerateToken(Map<String, Object> claims, String subject) {
 
+		assert jwtConfig != null;
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret()).compact();
@@ -37,6 +38,7 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 
 	// for retrieving any information from token we will need the secret key
 	protected Claims getAllClaimsFromToken(String token) {
+		assert jwtConfig != null;
 		return Jwts.parser().setSigningKey(jwtConfig.getSecret()).parseClaimsJws(token).getBody();
 	}
 }

@@ -107,6 +107,7 @@ public class OnlineScoreCardController extends BaseController {
 		return modelMapper.map(playerService.getPlayerForNick(nick), PlayerDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Delete online round with given owner id.")
 	@DeleteMapping("/rest/OnlineRoundForOwner/{ownerId}")
@@ -119,6 +120,7 @@ public class OnlineScoreCardController extends BaseController {
 
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Online scoreard API")
 	@Operation(summary = "Finalize online rounds for owner")
 	@PostMapping(value = "/rest/FinalizeOnlineOwnerRounds")

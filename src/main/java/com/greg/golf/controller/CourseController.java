@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 
+@SuppressWarnings("unused")
 @Log4j2
 @RestController
 @OpenAPIDefinition(tags = @Tag(name = "Course API"))
@@ -70,6 +71,7 @@ public class CourseController extends BaseController {
 		return mapList(courseService.getTees(id), CourseTeeDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Course API")
 	@Operation(summary = "Add the new course.")
 	@PostMapping(value = "/rest/Course")
@@ -86,7 +88,8 @@ public class CourseController extends BaseController {
 		return HttpStatus.OK;
 	}
 
-	@Tag(name = "Course API")
+	@SuppressWarnings("SameReturnValue")
+    @Tag(name = "Course API")
 	@Operation(summary = "Delete course with given id.")
 	@DeleteMapping("/rest/Course/{id}")
 	public HttpStatus deleteCourse(
@@ -113,6 +116,7 @@ public class CourseController extends BaseController {
 		return mapList(courseService.listFavourites(playerId), CourseDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Course API")
 	@Operation(summary = "Add course to favourites")
 	@PostMapping(value = "/rest/FavouriteCourses/{playerId}")
@@ -127,6 +131,7 @@ public class CourseController extends BaseController {
 		return HttpStatus.OK;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Course API")
 	@Operation(summary = "Delete course from favourites")
 	@PostMapping(value = "/rest/DeleteFavouriteCourse/{playerId}")
@@ -163,6 +168,7 @@ public class CourseController extends BaseController {
 		return mapList(courseService.getSortedCourses(pageId), CourseDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Course API")
 	@Operation(summary = "Purge historical courses from favourites")
 	@PostMapping(value = "/rest/MoveToHistoryCourse/{courseId}")

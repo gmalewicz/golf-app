@@ -1,7 +1,5 @@
 package com.greg.golf.controller;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,10 +7,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,7 +44,6 @@ class TournamentControllerTest {
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	private static Player player;
-	private static Round round;
 	private static Tournament tournament;
 
 	private final TournamentController tournamentController;
@@ -66,16 +60,16 @@ class TournamentControllerTest {
 
 		player = playerService.getPlayer(1L).orElseThrow();
 
-		round = new Round();
+		Round round = new Round();
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		SortedSet<Player> playerSet = new TreeSet<Player>();
+		SortedSet<Player> playerSet = new TreeSet<>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
 		round.setRoundDate(new Date(1));
-		round.setScoreCard(new ArrayList<ScoreCard>());
+		round.setScoreCard(new ArrayList<>());
 		ScoreCard scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
@@ -111,7 +105,7 @@ class TournamentControllerTest {
 	void getTrournamentsTest() {
 
 		List<TournamentDto> tournaments = this.tournamentController.getTournaments();
-		assertEquals(1, tournaments.size());
+		Assertions.assertEquals(1, tournaments.size());
 
 	}
 
@@ -122,7 +116,7 @@ class TournamentControllerTest {
 
 		tournamentRepository.deleteAll();
 		List<TournamentDto> tournaments = this.tournamentController.getTournaments();
-		assertEquals(0, tournaments.size());
+		Assertions.assertEquals(0, tournaments.size());
 
 	}
 	
@@ -144,7 +138,7 @@ class TournamentControllerTest {
 		
 		List<TournamentResultDto> trDtoLst =  this.tournamentController.getTournamentResult(tournament.getId());
 		
-		assertEquals(1, trDtoLst.get(0).getStbNet().intValue());
+		Assertions.assertEquals(1, trDtoLst.get(0).getStbNet().intValue());
 	}
 	
 	@DisplayName("Get rounds for tournament")
@@ -155,7 +149,7 @@ class TournamentControllerTest {
 	
 		List<LimitedRoundWithPlayersDto> rndDtoLst =  this.tournamentController.getTournamentRounds(tournament.getId());
 		
-		assertEquals(1, rndDtoLst.size());
+		Assertions.assertEquals(1, rndDtoLst.size());
 	}
 	
 	@AfterAll

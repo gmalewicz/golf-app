@@ -9,7 +9,7 @@ import lombok.Getter;
 public class RoundEvent extends ApplicationEvent {
 
 	private static final long serialVersionUID = 1L;
-	private transient Round round;
+	private final transient Round round;
 	
 	public RoundEvent(Object source, Round round) {
         super(source);

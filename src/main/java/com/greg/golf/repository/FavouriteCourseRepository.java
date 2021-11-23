@@ -18,5 +18,5 @@ public interface FavouriteCourseRepository extends JpaRepository<FavouriteCourse
 
 	long deleteByPlayerAndCourse(Player player, Course course);
 	
-	long deleteByCourse(Course course);
+	void deleteByCourse(Course course);
 }

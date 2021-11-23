@@ -7,10 +7,8 @@ import org.springframework.security.core.userdetails.User;
 
 import com.greg.golf.entity.Player;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class GolfUser extends User implements GolfUserDetails {
 
@@ -27,5 +25,5 @@ public class GolfUser extends User implements GolfUserDetails {
 		return player;
 	}
 
-	private transient Player player;
+	private final transient Player player;
 }

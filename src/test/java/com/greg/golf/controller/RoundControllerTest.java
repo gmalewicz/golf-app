@@ -99,7 +99,7 @@ class RoundControllerTest {
 	void getsRoundsForPlayerThenReturns200() throws Exception {
 
 		var round = new Round();
-		round.setId(1l);
+		round.setId(1L);
 		var lst = new ArrayList<Round>();
 		lst.add(round);
 
@@ -117,7 +117,7 @@ class RoundControllerTest {
 	void getsRecentRoundsThenReturns200() throws Exception {
 
 		var round = new Round();
-		round.setId(1l);
+		round.setId(1L);
 		var lst = new ArrayList<Round>();
 		lst.add(round);
 
@@ -134,7 +134,7 @@ class RoundControllerTest {
 	void getsScoreCardsForRoundThenReturns200() throws Exception {
 
 		var scoreCard = new ScoreCard();
-		scoreCard.setId(1l);
+		scoreCard.setId(1L);
 		var lst = new ArrayList<ScoreCard>();
 		lst.add(scoreCard);
 
@@ -174,7 +174,7 @@ class RoundControllerTest {
 	void getHandicapDataForPlayerThenReturns200() throws Exception {
 
 		var playerRound = new PlayerRound();
-		playerRound.setId(1l);
+		playerRound.setId(1L);
 		
 		when(roundService.getForPlayerRoundDetails(anyLong(), anyLong())).thenReturn(playerRound);
 
@@ -186,7 +186,7 @@ class RoundControllerTest {
 	void getHandicapDataForAllPlayersThenReturns200() throws Exception {
 
 		var playerRound = new PlayerRound();
-		playerRound.setId(1l);
+		playerRound.setId(1L);
 		var lst = new ArrayList<PlayerRound>();
 		lst.add(playerRound);
 		
@@ -196,13 +196,13 @@ class RoundControllerTest {
 	}
 	
 
-	// the test is artificial as it is not possible to pass null as an round id
+	// the test is artificial as it is not possible to pass null as a round id
 	// argument
 	@DisplayName("Delete score card with null")
 	@Test
 	void deleteScorecard_whenInvalidInput_thenReturns400_2() throws Exception {
 
-		doThrow(new InvalidDataAccessApiUsageException(null)).when(roundService).deleteScorecard(1l, 1l);
+		doThrow(new InvalidDataAccessApiUsageException("")).when(roundService).deleteScorecard(1L, 1L);
 		MvcResult mvcResult = mockMvc.perform(delete("/rest/ScoreCard/1/1")).andExpect(status().isBadRequest())
 				.andReturn();
 

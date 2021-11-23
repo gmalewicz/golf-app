@@ -1,12 +1,6 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -74,9 +68,9 @@ class RoundServiceTest {
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
 		var calendar = new GregorianCalendar();
-		calendar.set(2020, 5, 12);
+		calendar.set(2020, Calendar.JUNE, 12);
 		round.setRoundDate(calendar.getTime());
-		round.setScoreCard(new ArrayList<ScoreCard>());
+		round.setScoreCard(new ArrayList<>());
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
@@ -105,9 +99,7 @@ class RoundServiceTest {
 	@Test
 	void deleteScoreCardForNonExistingRoundTest() {
 
-		Assertions.assertThrows(NoSuchElementException.class, () -> {
-			roundService.deleteScorecard(1L, 999L);
-		});
+		Assertions.assertThrows(NoSuchElementException.class, () -> roundService.deleteScorecard(1L, 999L));
 	}
 
 	@DisplayName("Delete score card for null argument")
@@ -115,9 +107,7 @@ class RoundServiceTest {
 	@Test
 	void deleteScoreCardForEmptyRoundTest() {
 
-		Assertions.assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-			roundService.deleteScorecard(1L, null);
-		});
+		Assertions.assertThrows(InvalidDataAccessApiUsageException.class, () -> roundService.deleteScorecard(1L, null));
 	}
 
 	@DisplayName("Delete score card for incorrect player")
@@ -125,9 +115,7 @@ class RoundServiceTest {
 	@Test
 	void deleteScoreCardWithIncorrectPlayerTest() {
 
-		Assertions.assertThrows(NoSuchElementException.class, () -> {
-			roundService.deleteScorecard(2L, roundId);
-		});
+		Assertions.assertThrows(NoSuchElementException.class, () -> roundService.deleteScorecard(2L, roundId));
 	}
 
 	@DisplayName("Delete score card for a round with only one player")
@@ -136,7 +124,7 @@ class RoundServiceTest {
 	void deleteScoreCardForRoundWithOnePlayerTest(@Autowired RoundRepository roundRepository) {
 
 		roundService.deleteScorecard(1L, roundId);
-		assertEquals(0, roundRepository.count());
+		Assertions.assertEquals(0, roundRepository.count());
 
 	}
 
@@ -156,7 +144,7 @@ class RoundServiceTest {
 		player.setRole(0);
 		playerRepository.save(player);
 		round.getPlayer().add(player);
-		player.setRounds(new ArrayList<Round>());
+		player.setRounds(new ArrayList<>());
 		player.getRounds().add(round);
 		roundRepository.save(round);
 
@@ -171,7 +159,7 @@ class RoundServiceTest {
 		roundRepository.save(round);
 
 		roundService.deleteScorecard(player.getId(), round.getId());
-		assertEquals(2, round.getScoreCard().size());
+		Assertions.assertEquals(2, round.getScoreCard().size());
 
 	}
 
@@ -224,11 +212,9 @@ class RoundServiceTest {
 		newRound.setPlayer(playerSet);
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
-		newRound.setScoreCard(new ArrayList<ScoreCard>());
+		newRound.setScoreCard(new ArrayList<>());
 
-		Assertions.assertThrows(TooManyPlayersException.class, () -> {
-			roundService.saveRound(newRound);
-		});
+		Assertions.assertThrows(TooManyPlayersException.class, () -> roundService.saveRound(newRound));
 	}
 
 	@DisplayName("Try to save the round for the same player twice")
@@ -254,11 +240,9 @@ class RoundServiceTest {
 		newRound.setPlayer(playerSet);
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
-		newRound.setScoreCard(new ArrayList<ScoreCard>());
+		newRound.setScoreCard(new ArrayList<>());
 
-		Assertions.assertThrows(PlayerAlreadyHasThatRoundException.class, () -> {
-			roundService.saveRound(newRound);
-		});
+		Assertions.assertThrows(PlayerAlreadyHasThatRoundException.class, () -> roundService.saveRound(newRound));
 	}
 
 	@DisplayName("Try to add scorecard to existing round")
@@ -287,19 +271,19 @@ class RoundServiceTest {
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
 
-		// create one score card and add it to the round
+		// create one scorecard and add it to the round
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
 		scoreCard.setPenalty(0);
 		scoreCard.setPlayer(player);
 		scoreCard.setStroke(5);
-		newRound.setScoreCard(new ArrayList<ScoreCard>());
+		newRound.setScoreCard(new ArrayList<>());
 		newRound.getScoreCard().add(scoreCard);
 
 		roundService.saveRound(newRound);
 
-		assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
+		Assertions.assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
 	}
 
 	@DisplayName("Try to add scorecard to existing round with tournament")
@@ -338,21 +322,21 @@ class RoundServiceTest {
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
 
-		// create one score card and add it to the round
+		// create one scorecard and add it to the round
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
 		scoreCard.setPenalty(0);
 		scoreCard.setPlayer(player);
 		scoreCard.setStroke(5);
-		newRound.setScoreCard(new ArrayList<ScoreCard>());
+		newRound.setScoreCard(new ArrayList<>());
 		newRound.getScoreCard().add(scoreCard);
 
 		var valueCapture = ArgumentCaptor.forClass(RoundEvent.class);
 		Mockito.doNothing().when(mockTournamentService).handleRoundEvent(valueCapture.capture());
 
 		roundService.saveRound(newRound);
-		assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
+		Assertions.assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
 	}
 
 	@DisplayName("Try to update scorecard assigned to tournamnet")
@@ -383,9 +367,7 @@ class RoundServiceTest {
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
 
-		Assertions.assertThrows(ScoreCardUpdateException.class, () -> {
-			roundService.updateScoreCard(newRound);
-		});
+		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
 	}
 
 	@DisplayName("Try to update correct scorecard")
@@ -405,7 +387,7 @@ class RoundServiceTest {
 		newRound.setPlayer(playerSet);
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
-		newRound.setScoreCard(new ArrayList<ScoreCard>());
+		newRound.setScoreCard(new ArrayList<>());
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
@@ -414,13 +396,13 @@ class RoundServiceTest {
 		scoreCard.setRound(round);
 		scoreCard.setStroke(6);
 		newRound.getScoreCard().add(scoreCard);
-		// update the score card
+		// update the scorecard
 		roundService.updateScoreCard(newRound);
 
 		round = roundRepository.getById(roundId);
 
-		assertEquals(1, round.getScoreCard().size());
-		assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
+		Assertions.assertEquals(1, round.getScoreCard().size());
+		Assertions.assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
 	}
 
 	@DisplayName("Try to update scorecard with more than 1 player")
@@ -451,9 +433,7 @@ class RoundServiceTest {
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
 
-		Assertions.assertThrows(ScoreCardUpdateException.class, () -> {
-			roundService.updateScoreCard(newRound);
-		});
+		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
 	}
 
 	@DisplayName("Try to update scorecard without player")
@@ -471,9 +451,7 @@ class RoundServiceTest {
 		newRound.setMatchPlay(false);
 		newRound.setRoundDate(round.getRoundDate());
 
-		Assertions.assertThrows(ScoreCardUpdateException.class, () -> {
-			roundService.updateScoreCard(newRound);
-		});
+		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
 	}
 
 	@DisplayName("Get Round inside range applicable for tournamnet")
@@ -483,7 +461,7 @@ class RoundServiceTest {
 
 		List<PlayerRound> pr = roundService.getByRoundId(roundId);
 
-		assertEquals(1, pr.size());
+		Assertions.assertEquals(1, pr.size());
 
 	}
 
@@ -493,13 +471,13 @@ class RoundServiceTest {
 	void getRoundInsideRangeApplicableTest() {
 
 		var startDate = new GregorianCalendar();
-		startDate.set(2020, 5, 11, 0, 0, 0);
+		startDate.set(2020, Calendar.JUNE, 11, 0, 0, 0);
 		var endDate = new GregorianCalendar();
-		endDate.set(2020, 06, 14, 0, 0, 0);
+		endDate.set(2020, Calendar.JULY, 14, 0, 0, 0);
 
 		var rounds = roundService.findByDates(startDate.getTime(), endDate.getTime());
 
-		assertEquals(1, rounds.size());
+		Assertions.assertEquals(1, rounds.size());
 
 	}
 
@@ -509,13 +487,13 @@ class RoundServiceTest {
 	void getRoundInsideRangeNotApplicableTest() {
 
 		var startDate = new GregorianCalendar();
-		startDate.set(2020, 5, 13, 0, 0, 0);
+		startDate.set(2020, Calendar.JUNE, 13, 0, 0, 0);
 		var endDate = new GregorianCalendar();
-		endDate.set(2020, 06, 14, 0, 0, 0);
+		endDate.set(2020, Calendar.JULY, 14, 0, 0, 0);
 
 		var rounds = roundService.findByDates(startDate.getTime(), endDate.getTime());
 
-		assertEquals(0, rounds.size());
+		Assertions.assertEquals(0, rounds.size());
 
 	}
 
@@ -528,7 +506,7 @@ class RoundServiceTest {
 
 		var rounds = roundService.listByPlayerPageable(player, 0);
 
-		assertEquals(1, rounds.size());
+		Assertions.assertEquals(1, rounds.size());
 
 	}
 	
@@ -540,9 +518,9 @@ class RoundServiceTest {
 		var round= new Round();
 		round.setMatchPlay(false);
 		var calendar = new GregorianCalendar();
-		calendar.set(2020, 5, 12);
+		calendar.set(2020, Calendar.JUNE, 12);
 		round.setRoundDate(calendar.getTime());
-		round.setScoreCard(new ArrayList<ScoreCard>());
+		round.setScoreCard(new ArrayList<>());
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
@@ -550,10 +528,10 @@ class RoundServiceTest {
 		scoreCard.setStroke(5);
 		round.getScoreCard().add(scoreCard);
 		var course = new Course();
-		course.setId(1l);
+		course.setId(1L);
 		var courseTeeLst = new ArrayList<CourseTee>();
 		var courseTee = new CourseTee();
-		courseTee.setId(1l);
+		courseTee.setId(1L);
 		courseTeeLst.add(courseTee);
 		course.setTees(courseTeeLst);
 		round.setCourse(course);
@@ -566,7 +544,7 @@ class RoundServiceTest {
 			
 		roundService.saveRound(round);
 		
-		assertEquals(2, roundRepository.findAll().size());
+		Assertions.assertEquals(2, roundRepository.findAll().size());
 	}
 	
 	@DisplayName("Get recent rounds")
@@ -576,7 +554,7 @@ class RoundServiceTest {
 		
 		var roundLst =  roundService.getRecentRounds(0);
 		
-		assertEquals(1, roundLst.size());
+		Assertions.assertEquals(1, roundLst.size());
 	}
 	
 	@DisplayName("Get round player details")
@@ -588,7 +566,7 @@ class RoundServiceTest {
 		
 		var playerRound =  roundService.getForPlayerRoundDetails(1L, roundId);
 		
-		assertEquals(player.getWhs(), playerRound.getWhs());
+		Assertions.assertEquals(player.getWhs(), playerRound.getWhs());
 	}
 	
 	@AfterAll

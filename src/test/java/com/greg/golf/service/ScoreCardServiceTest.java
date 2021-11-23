@@ -1,16 +1,12 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TreeSet;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,9 +49,9 @@ class ScoreCardServiceTest {
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
 		var calendar = new GregorianCalendar();
-		calendar.set(2020, 5, 12);
+		calendar.set(2020, Calendar.JUNE, 12);
 		round.setRoundDate(calendar.getTime());
-		round.setScoreCard(new ArrayList<ScoreCard>());
+		round.setScoreCard(new ArrayList<>());
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
@@ -88,7 +84,7 @@ class ScoreCardServiceTest {
 		
 		var scoreCardLst =  scoreCardService.listByRound(round);
 		
-		assertEquals(2, scoreCardLst.size());
+		Assertions.assertEquals(2, scoreCardLst.size());
 	}
 	
 	@AfterAll

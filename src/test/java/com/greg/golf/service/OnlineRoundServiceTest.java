@@ -1,17 +1,11 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,7 +64,7 @@ class OnlineRoundServiceTest {
 	void purgeEmptyTest() {
 		
 		onlineRoundService.purge();
-		assertTrue(onlineRoundRepository.findAll().isEmpty());
+		Assertions.assertTrue(onlineRoundRepository.findAll().isEmpty());
 		
 	}
 	
@@ -90,9 +84,9 @@ class OnlineRoundServiceTest {
 		onlineRound.setMatchPlay(false);
 		onlineRoundRepository.save(onlineRound);
 		
-		assertEquals(1, onlineRoundRepository.findAll().size());
+		Assertions.assertEquals(1, onlineRoundRepository.findAll().size());
 		onlineRoundService.purge();
-		assertTrue(onlineRoundRepository.findAll().isEmpty());
+		Assertions.assertTrue(onlineRoundRepository.findAll().isEmpty());
 	}
 		
 	@DisplayName("Save online score card")
@@ -120,7 +114,7 @@ class OnlineRoundServiceTest {
 		
 		onlineRoundService.saveOnlineScoreCard(onlineScoreCard);
 		
-		assertEquals(1, onlineScoreCardRepository.findAll().size());
+		Assertions.assertEquals(1, onlineScoreCardRepository.findAll().size());
 	}
 	
 	@DisplayName("Update online score card")
@@ -147,13 +141,13 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setUpdate(false);
 		onlineScoreCardRepository.save(onlineScoreCard);
 		
-		assertEquals(1, onlineScoreCardRepository.findAll().size());
+		Assertions.assertEquals(1, onlineScoreCardRepository.findAll().size());
 		
 		onlineScoreCard.setUpdate(true);
 		onlineScoreCard.setStroke(2);
 		onlineRoundService.saveOnlineScoreCard(onlineScoreCard);
 		
-		assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
 	}
 	
 	@DisplayName("Get online rounds")
@@ -172,7 +166,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setMatchPlay(false);
 		onlineRoundRepository.save(onlineRound);
 		
-		assertEquals(1, onlineRoundService.getOnlineRounds().size());
+		Assertions.assertEquals(1, onlineRoundService.getOnlineRounds().size());
 	}
 	
 	@DisplayName("Get online score cards")
@@ -199,7 +193,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setUpdate(false);
 		onlineScoreCardRepository.save(onlineScoreCard);
 		
-		assertEquals(1, onlineRoundService.getOnlineScoreCards(onlineRound.getId()).size());
+		Assertions.assertEquals(1, onlineRoundService.getOnlineScoreCards(onlineRound.getId()).size());
 	}
 			
 	@DisplayName("Finalize online round for owner")
@@ -226,7 +220,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setPenalty(0);
 		onlineScoreCard.setUpdate(false);
 		
-		onlineRound.setScoreCard(new ArrayList<OnlineScoreCard>());
+		onlineRound.setScoreCard(new ArrayList<>());
 		onlineRound.getScoreCard().add(onlineScoreCard);
 		
 		
@@ -235,7 +229,7 @@ class OnlineRoundServiceTest {
 				
 		onlineRoundService.finalizeForOwner(1L);
 		
-		assertEquals(1, roundRepository.findAll().size());
+		Assertions.assertEquals(1, roundRepository.findAll().size());
 	}
 	
 	@DisplayName("Save online rounds")
@@ -243,7 +237,7 @@ class OnlineRoundServiceTest {
 	@Test
 	void saveOnlineRoundsTest() {
 		
-		OnlineRound onlineRound = new OnlineRound();;
+		OnlineRound onlineRound = new OnlineRound();
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
@@ -251,12 +245,12 @@ class OnlineRoundServiceTest {
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
 		onlineRound.setMatchPlay(false);
-		List<OnlineRound> rounds = new ArrayList<OnlineRound>();
+		List<OnlineRound> rounds = new ArrayList<>();
 		rounds.add(onlineRound);
 		
 		onlineRoundService.save(rounds);
 		
-		assertEquals(1, onlineRoundRepository.findAll().size());
+		Assertions.assertEquals(1, onlineRoundRepository.findAll().size());
 	}
 	
 	@AfterAll

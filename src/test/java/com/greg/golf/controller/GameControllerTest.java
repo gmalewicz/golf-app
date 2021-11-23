@@ -1,7 +1,5 @@
 package com.greg.golf.controller;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,12 +7,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.BeforeAll;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +48,7 @@ class GameControllerTest {
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	private static Player player;
-	private static Round round;
-	
+
 	private final GameController gameController;
 
 	@Autowired
@@ -69,16 +62,16 @@ class GameControllerTest {
 
 		player = playerService.getPlayer(1L).orElseThrow();
 
-		round = new Round();
+		Round round = new Round();
 
 		Course course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
-		SortedSet<Player> playerSet = new TreeSet<Player>();
+		SortedSet<Player> playerSet = new TreeSet<>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setMatchPlay(false);
 		round.setRoundDate(new Date(1));
-		round.setScoreCard(new ArrayList<ScoreCard>());
+		round.setScoreCard(new ArrayList<>());
 		ScoreCard scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
 		scoreCard.setPats(0);
@@ -110,14 +103,14 @@ class GameControllerTest {
 		GameDto gameDto = new GameDto();
 		gameDto.setPlayer(modelMapper.map(player, PlayerDto.class));
 		gameDto.setGameDate(new Date());
-		gameDto.setGameId(1l);
+		gameDto.setGameId(1L);
 		gameDto.setStake(0.5f);
 		
 		GameDataDto gameDataDto = new GameDataDto();
 		String[] nicks = {"golfer", "test"};
 		gameDataDto.setPlayerNicks(nicks);
 		Integer[] score = {1, 2};
-		gameDataDto.setScore(score);;
+		gameDataDto.setScore(score);
 		Short[][] gameResult = {{1, 2}};
 		gameDataDto.setGameResult(gameResult);
 		
@@ -125,7 +118,7 @@ class GameControllerTest {
 		
 		HttpStatus status =  this.gameController.addGame(gameDto);
 		
-		assertEquals(HttpStatus.OK, status);
+		Assertions.assertEquals(HttpStatus.OK, status);
 	}
 	
 	@DisplayName("Add game")
@@ -136,14 +129,14 @@ class GameControllerTest {
 		Game game = new Game();
 		game.setPlayer(player);
 		game.setGameDate(new Date());
-		game.setGameId(1l);
+		game.setGameId(1L);
 		game.setStake(0.5f);
 		
 		GameData gameData = new GameData();
 		String[] nicks = {"golfer", "test"};
 		gameData.setPlayerNicks(nicks);
 		Integer[] score = {1, 2};
-		gameData.setScore(score);;
+		gameData.setScore(score);
 		Short[][] gameResult = {{1, 2}};
 		gameData.setGameResult(gameResult);
 		
@@ -151,9 +144,9 @@ class GameControllerTest {
 		
 		gameService.save(game);
 		
-		List<GameDto> gameDtoLst =  this.gameController.getGames(1l);
+		List<GameDto> gameDtoLst =  this.gameController.getGames(1L);
 		
-		assertEquals(1l, gameDtoLst.get(0).getGameId().longValue());
+		Assertions.assertEquals(1L, gameDtoLst.get(0).getGameId().longValue());
 	}
 	
 

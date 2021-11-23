@@ -68,6 +68,7 @@ public class TournamentController extends BaseController {
 		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), LimitedRoundWithPlayersDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Adds round to tournament")
 	@PostMapping(value = "/rest/TournamentRound/{tournamentId}")
@@ -83,6 +84,7 @@ public class TournamentController extends BaseController {
 		return HttpStatus.OK;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Adds tournament")
 	@PostMapping(value = "/rest/Tournament")

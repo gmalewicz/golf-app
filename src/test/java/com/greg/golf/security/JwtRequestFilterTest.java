@@ -1,6 +1,5 @@
 package com.greg.golf.security;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,12 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +81,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 
@@ -105,7 +100,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 
@@ -125,7 +120,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 
@@ -142,7 +137,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 
@@ -159,7 +154,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 
@@ -179,7 +174,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 	
@@ -204,7 +199,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 	
@@ -224,14 +219,14 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 		
 		try {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 		
 	}
@@ -260,7 +255,7 @@ class JwtRequestFilterTest {
 
 			jwtRequestFilter.doFilter(request, response, filterChain);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 	}
 

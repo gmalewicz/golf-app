@@ -40,6 +40,7 @@ public class RoundController extends BaseController {
 		this.scoreCardService = scoreCardService;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Round API")
 	@Operation(summary = "Add the new round for a player.")
 	@PostMapping(value = "/rest/Round")
@@ -93,6 +94,7 @@ public class RoundController extends BaseController {
 		return mapList(scoreCardService.listByRound(round), ScoreCardDto.class);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Round API")
 	@Operation(summary = "Deletes score card for given player id and round id")
 	@DeleteMapping("/rest/ScoreCard/{playerId}/{roundId}")
@@ -110,6 +112,7 @@ public class RoundController extends BaseController {
 
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Round API")
 	@Operation(summary = "Updates score card for given round.")
 	@PatchMapping("/rest/ScoreCard")

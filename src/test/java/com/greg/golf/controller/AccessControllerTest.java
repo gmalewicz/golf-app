@@ -1,25 +1,18 @@
 package com.greg.golf.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.BeforeAll;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,7 +75,7 @@ class AccessControllerTest {
 		playerDto.setPassword("welcome");
 
 		ResponseEntity<PlayerDto> response = this.accessController.authenticatePlayer(playerDto);
-		assertEquals(1L, response.getBody().getId().longValue());
+		Assertions.assertEquals(1L, Objects.requireNonNull(response.getBody()).getId().longValue());
 	}
 
 	@DisplayName("Process invalid password authentication")
@@ -123,7 +116,7 @@ class AccessControllerTest {
 
 		HttpStatus status = this.accessController.addPlayer(playerDto);
 
-		assertEquals(HttpStatus.OK, status);
+		Assertions.assertEquals(HttpStatus.OK, status);
 	}
 
 	@DisplayName("Update player whs")
@@ -133,13 +126,13 @@ class AccessControllerTest {
 
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setWhs(10f);
-		playerDto.setId(1l);
+		playerDto.setId(1L);
 
 		this.accessController.updatePlayer(playerDto);
 
-		Optional<Player> player = playerRepository.findById(1l);
+		Optional<Player> player = playerRepository.findById(1L);
 
-		assertEquals(10f, player.orElseThrow().getWhs().floatValue(), 0);
+		Assertions.assertEquals(10f, player.orElseThrow().getWhs(), 0);
 	}
 
 	@DisplayName("Update player password")
@@ -147,17 +140,17 @@ class AccessControllerTest {
 	@Test
 	void updatePlayerPasswordTest(@Autowired PlayerRepository playerRepository) {
 
-		String orgPlayerPwd = playerRepository.findById(1l).orElseThrow().getPassword();
+		String orgPlayerPwd = playerRepository.findById(1L).orElseThrow().getPassword();
 
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
-		playerDto.setId(1l);
+		playerDto.setId(1L);
 
 		this.accessController.updatePlayer(playerDto);
 
-		Optional<Player> updPlayer = playerRepository.findById(1l);
+		Optional<Player> updPlayer = playerRepository.findById(1L);
 
-		assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
+		Assertions.assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
 	}
 
 	@DisplayName("Reset password by privileged user")
@@ -165,7 +158,7 @@ class AccessControllerTest {
 	@Test
 	void resetPlayerPasswordByPrivilagedUserTest(@Autowired PlayerRepository playerRepository) {
 
-		String orgPlayerPwd = playerRepository.findById(1l).orElseThrow().getPassword();
+		String orgPlayerPwd = playerRepository.findById(1L).orElseThrow().getPassword();
 		
 		var authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
@@ -176,13 +169,13 @@ class AccessControllerTest {
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setNick("golfer");
-		playerDto.setId(1l);
+		playerDto.setId(1L);
 
 		this.accessController.resetPassword(playerDto);
 
-		Optional<Player> updPlayer = playerRepository.findById(1l);
+		Optional<Player> updPlayer = playerRepository.findById(1L);
 
-		assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
+		Assertions.assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
 	}
 
 	@DisplayName("Reset password by unauthorized user")
@@ -201,7 +194,7 @@ class AccessControllerTest {
 		PlayerDto playerDto = new PlayerDto();
 		playerDto.setPassword("newPassword");
 		playerDto.setNick("golfer");
-		playerDto.setId(1l);
+		playerDto.setId(1L);
 
 		assertThrows(UnauthorizedException.class, () -> this.accessController.resetPassword(playerDto));
 	}
@@ -219,7 +212,7 @@ class AccessControllerTest {
 
 		ResponseEntity<PlayerDto> response = this.accessController.addPlayerOnBehalf(playerDto);
 
-		assertNotNull("Player id should not be null", response.getBody().getId());
+		Assertions.assertNotNull(Objects.requireNonNull(response.getBody()).getId(), "Player id should not be null");
 	}
 
 	@DisplayName("Add player on behalf test which already exists")
@@ -244,9 +237,9 @@ class AccessControllerTest {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		try {
 
-			accessController.refreshToken(request, 1l);
+			accessController.refreshToken(request, 1L);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 
 	}
@@ -262,9 +255,9 @@ class AccessControllerTest {
 		when(request.getAttribute("refreshToken")).thenReturn(jwtToken);
 		try {
 
-			accessController.refreshToken(request, 1l);
+			accessController.refreshToken(request, 1L);
 		} catch (Exception e) {
-			fail("Should not have thrown any exception");
+			Assertions.fail("Should not have thrown any exception");
 		}
 
 	}

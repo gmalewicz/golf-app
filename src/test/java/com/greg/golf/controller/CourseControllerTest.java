@@ -1,16 +1,10 @@
 package com.greg.golf.controller;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.BeforeAll;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,9 +54,9 @@ class CourseControllerTest {
 	@Test
 	void getListOfHolesTest() {
 
-		List<HoleDto> holeLst = this.courseController.getHoles(1l);
+		List<HoleDto> holeLst = this.courseController.getHoles(1L);
 
-		assertEquals(18, holeLst.size());
+		Assertions.assertEquals(18, holeLst.size());
 
 	}
 
@@ -101,7 +95,7 @@ class CourseControllerTest {
 
 		HttpStatus status = this.courseController.addCourse(courseDto);
 
-		assertEquals(HttpStatus.OK, status);
+		Assertions.assertEquals(HttpStatus.OK, status);
 	}
 	
 	@DisplayName("Get tees test")
@@ -109,9 +103,9 @@ class CourseControllerTest {
 	@Test
 	void getTeesTest() {
 
-		List<CourseTeeDto> retTees = this.courseController.getTees(1l);
+		List<CourseTeeDto> retTees = this.courseController.getTees(1L);
 
-		assertEquals(9, retTees.size());
+		Assertions.assertEquals(9, retTees.size());
 	}
 	
 	@DisplayName("Get favourite course test")
@@ -129,9 +123,9 @@ class CourseControllerTest {
 		
 		favouriteCourseRepository.save(fc);
 		
-		List<CourseDto> retCourses = this.courseController.getFavouriteCourses(1l);
+		List<CourseDto> retCourses = this.courseController.getFavouriteCourses(1L);
 		
-		assertEquals(1, retCourses.size());
+		Assertions.assertEquals(1, retCourses.size());
 	}
 	
 	@DisplayName("Get course to favourites")
@@ -140,13 +134,13 @@ class CourseControllerTest {
 	void getCourseToFavouritesTest() {
 		
 		CourseDto courseDto = new CourseDto();
-		courseDto.setId(1l);;
+		courseDto.setId(1L);
 		courseDto.setName("Test course");
 		courseDto.setHoleNbr(9);
 		courseDto.setPar(36);
-		HttpStatus status = this.courseController.addCourseToFavourites(1l, courseDto);
+		HttpStatus status = this.courseController.addCourseToFavourites(1L, courseDto);
 		
-		assertEquals(HttpStatus.OK, status);
+		Assertions.assertEquals(HttpStatus.OK, status);
 	}
 	
 	@DisplayName("Delete course from favourites")
@@ -155,14 +149,14 @@ class CourseControllerTest {
 	void deleteCourseFromFavouritesTest() {
 		
 		CourseDto courseDto = new CourseDto();
-		courseDto.setId(1l);;
+		courseDto.setId(1L);
 		courseDto.setName("Test course");
 		courseDto.setHoleNbr(9);
 		courseDto.setPar(36);
-		this.courseController.addCourseToFavourites(1l, courseDto);
-		HttpStatus status = this.courseController.deleteCourseFromFavourites(1l, courseDto);
+		this.courseController.addCourseToFavourites(1L, courseDto);
+		HttpStatus status = this.courseController.deleteCourseFromFavourites(1L, courseDto);
 		
-		assertEquals(HttpStatus.OK, status);
+		Assertions.assertEquals(HttpStatus.OK, status);
 	}
 		
 	@AfterAll

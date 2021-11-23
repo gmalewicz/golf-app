@@ -24,16 +24,16 @@ import lombok.extern.log4j.Log4j2;
 @Service("gameService")
 public class GameService {
 	
-	private static final Map<Long, String> gameIdNameMap = Map.of(1l, "Hole Stake Game", 2l, "Bingo, Bango, Bongo Game");
+	private static final Map<Long, String> gameIdNameMap = Map.of(1L, "Hole Stake Game", 2L, "Bingo, Bango, Bongo Game");
 			
 	private final GameRepository gameRepository;
 	private final EmailServiceImpl emailServiceImpl;
 	private final TemplateEngine templateEngine;
 	
 	@Transactional
-	public Game save(Game game) {
+	public void save(Game game) {
 
-		return gameRepository.save(game);
+		gameRepository.save(game);
 	}
 
 	@Transactional(readOnly = true)

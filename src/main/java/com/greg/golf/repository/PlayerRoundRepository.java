@@ -16,10 +16,10 @@ import com.greg.golf.entity.PlayerRound;
 @Repository
 public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> {
 
-	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	@Transactional(propagation = Propagation.REQUIRED)
 	@Modifying
 	@Query("UPDATE PlayerRound pr SET pr.whs = :whs, pr.teeId = :teeId, pr.sr = :sr, pr.cr = :cr, pr.teeType = :teeType where pr.playerId = :playerId AND pr.roundId = :roundId")
-	int updatePlayerRoundInfo(@Param("whs") Float whs, 
+	void updatePlayerRoundInfo(@Param("whs") Float whs,
 							  @Param("sr") Integer sr,
 							  @Param("cr") Float cr,
 							  @Param("teeId") Long teeId,  

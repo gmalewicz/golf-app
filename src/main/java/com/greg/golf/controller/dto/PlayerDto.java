@@ -53,18 +53,11 @@ public class PlayerDto implements Comparable<PlayerDto> {
 			return false;
 		}
 		
-		if (id == ((PlayerDto) obj).id) {
+		if (id.equals(((PlayerDto) obj).id)) {
 			retVal = true;
 		}
 	
 		return retVal;
 		
 	}
-	
-	@Override
-	public int hashCode() {
-
-		return super.hashCode();
-	}
-	
 }

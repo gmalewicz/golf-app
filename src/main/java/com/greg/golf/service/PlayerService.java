@@ -109,7 +109,7 @@ public class PlayerService implements UserDetailsService {
 	@Transactional
 	public Player resetPassword(Player player) {
 		
-		Player persistedPlayer = null;
+		Player persistedPlayer;
 		
 		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
 				.equals(Common.ADMIN)) {

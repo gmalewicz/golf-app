@@ -1,7 +1,5 @@
 package com.greg.golf.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -9,10 +7,7 @@ import java.util.Date;
 import java.util.TreeSet;
 
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,9 +46,11 @@ class TournamentServiceTest {
 	private static Round round;
 	private static Tournament tournament;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private TournamentService tournamentService;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	TournamentResultRepository tournamentResultRepository;
 
@@ -120,8 +117,8 @@ class TournamentServiceTest {
 
 		log.info("STB netto: " + tournamentResult.getStbNet());
 		log.info("STB gross: " + tournamentResult.getStbGross());
-		assertEquals(62, tournamentResult.getStbNet().intValue());
-		assertEquals(17, tournamentResult.getStbGross().intValue());
+		Assertions.assertEquals(62, tournamentResult.getStbNet().intValue());
+		Assertions.assertEquals(17, tournamentResult.getStbGross().intValue());
 	}
 
 	@DisplayName("Should add the new tournamnet")
@@ -136,7 +133,7 @@ class TournamentServiceTest {
 		tournament.setPlayer(player);
 		tournament = tournamentService.addTournament(tournament);
 
-		assertNotNull(tournament.getId());
+		Assertions.assertNotNull(tournament.getId());
 	}
 
 	@DisplayName("Calculate corrected strokes")
@@ -150,7 +147,7 @@ class TournamentServiceTest {
 		var correctedScore = tournamentService.getCorrectedStrokes(player, round);
 
 		log.info("corrected Strokes: " + correctedScore);
-		assertEquals(93, correctedScore);
+		Assertions.assertEquals(93, correctedScore);
 	}
 
 	@DisplayName("Calculate score differential")
@@ -168,7 +165,7 @@ class TournamentServiceTest {
 		var scoreDifferential = tournamentService.getScoreDifferential(playerRound, round, player);
 
 		log.info("score differential: " + scoreDifferential);
-		assertEquals(93, (int) scoreDifferential);
+		Assertions.assertEquals(93, (int) scoreDifferential);
 	}
 
 	@DisplayName("Should save tournament round")
@@ -188,7 +185,7 @@ class TournamentServiceTest {
 
 		TournamentRound tournamentRound = tournamentService.addTournamentRound(1, 1, 1, 1, 1, "test", tournamentResult);
 
-		assertNotNull(tournamentRound.getId());
+		Assertions.assertNotNull(tournamentRound.getId());
 	}
 
 	@DisplayName("Get all tournaments")
@@ -196,7 +193,7 @@ class TournamentServiceTest {
 	@Test
 	void getAllTournamentsTest() {
 
-		assertEquals(1, tournamentService.findAllTournaments().size());
+		Assertions.assertEquals(1, tournamentService.findAllTournaments().size());
 
 	}
 
@@ -207,7 +204,7 @@ class TournamentServiceTest {
 
 		var grossStrokes = tournamentService.getGrossStrokes(player, round);
 
-		assertEquals(90, grossStrokes);
+		Assertions.assertEquals(90, grossStrokes);
 
 	}
 
@@ -218,7 +215,7 @@ class TournamentServiceTest {
 
 		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null);
 
-		assertEquals(54, netStrokes);
+		Assertions.assertEquals(54, netStrokes);
 
 	}
 
@@ -229,7 +226,7 @@ class TournamentServiceTest {
 
 		var netStrokes = tournamentService.getNetStrokes(player, round, 22, null);
 
-		assertEquals(0, netStrokes);
+		Assertions.assertEquals(0, netStrokes);
 
 	}
 
@@ -239,7 +236,7 @@ class TournamentServiceTest {
 	void addRoundTest() {
 
 		var t = tournamentService.addRound(tournament.getId(), round.getId(), false);
-		assertEquals(t.getRound().get(0).getId(), round.getId());
+		Assertions.assertEquals(t.getRound().get(0).getId(), round.getId());
 
 	}
 
@@ -265,7 +262,7 @@ class TournamentServiceTest {
 		redRound.setTournament(tournament);
 		tournamentService.updateTournamentResult(redRound);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
-		assertEquals(90, tr.getStrokesBrutto().intValue());
+		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
 	}
 
@@ -287,7 +284,7 @@ class TournamentServiceTest {
 		tournamentResultRepository.save(tournamentResult);
 		tournamentService.updateTournamentResult(redRound);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
-		assertEquals(190, tr.getStrokesBrutto().intValue());
+		Assertions.assertEquals(190, tr.getStrokesBrutto().intValue());
 
 	}
 
@@ -311,10 +308,10 @@ class TournamentServiceTest {
 		var roundEvent = new RoundEvent(this, redRound);
 		tournamentService.handleRoundEvent(roundEvent);
 
-		assertEquals(15, redRound.getScoreCard().get(0).getStroke().intValue());
+		Assertions.assertEquals(15, redRound.getScoreCard().get(0).getStroke().intValue());
 
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
-		assertEquals(90, tr.getStrokesBrutto().intValue());
+		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
 	}
 
@@ -324,10 +321,10 @@ class TournamentServiceTest {
 	void addTheNewRoundandUpdateTournamentResultTest(@Autowired RoundRepository roundRepository) {
 
 		var t = tournamentService.addRound(tournament.getId(), round.getId(), true);
-		assertEquals(t.getRound().get(0).getId(), round.getId());
+		Assertions.assertEquals(t.getRound().get(0).getId(), round.getId());
 
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
-		assertEquals(90, tr.getStrokesBrutto().intValue());
+		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
 	}
 
@@ -344,7 +341,7 @@ class TournamentServiceTest {
 
 		tournamentService.getTournamentRoundsForResult(roundResults.getId());
 
-		assertEquals(1, tournamentService.getTournamentRoundsForResult(roundResults.getId()).size());
+		Assertions.assertEquals(1, tournamentService.getTournamentRoundsForResult(roundResults.getId()).size());
 
 	}
 
