@@ -1,6 +1,7 @@
 package com.greg.golf.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import com.greg.golf.controller.dto.RoundWhsDto;
+import com.greg.golf.entity.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -28,10 +31,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.entity.Player;
-import com.greg.golf.entity.PlayerRound;
-import com.greg.golf.entity.Round;
-import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
@@ -46,21 +45,27 @@ import lombok.extern.log4j.Log4j2;
 @WebMvcTest(controllers = RoundController.class)
 class RoundControllerTest {
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private RoundService roundService;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private ScoreCardService scoreCardService;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private PlayerService playerService;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private JwtRequestFilter jwtRequestFilter;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private ModelMapper modelMapper;
 
@@ -210,6 +215,21 @@ class RoundControllerTest {
 
 		assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
 				objectMapper.writeValueAsString(new ApiErrorResponse("17", "Incorrect parameter")));
+	}
+
+	@DisplayName("Should update player hcp for round with correct result")
+	@Test
+	void updPlrHcpForRoundWhenValidInputThenReturns200() throws Exception {
+
+		var input = new RoundWhsDto();
+		input.setRoundId(1L);
+		input.setPlayerId(1L);
+		input.setWhs(20.1F);
+
+		doNothing().when(roundService).updateRoundWhs(any(), any(), any());
+
+		mockMvc.perform(patch("/rest/UpdatePlayerRound").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
 	@AfterAll

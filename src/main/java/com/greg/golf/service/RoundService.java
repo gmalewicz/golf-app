@@ -54,7 +54,7 @@ public class RoundService {
 		// set player association to ScoreCard
 		round.getScoreCard().forEach(card -> card.setPlayer(player));
 
-		log.debug("start searching matchin round");
+		log.debug("start searching matching round");
 		// search for a round on the same course, the same date and tee time
 		log.debug(round.getRoundDate());
 		Optional<Round> matchingRound = roundRepository.findRoundByCourseAndRoundDate(round.getCourse(),
@@ -62,7 +62,7 @@ public class RoundService {
 
 		// check if number of players is ok
 		if (matchingRound.isPresent() && matchingRound.get().getPlayer().size() > 3) {
-			log.warn("Number of players for round exeeded");
+			log.warn("Number of players for round exceeded");
 			throw new TooManyPlayersException();
 		}
 
@@ -209,4 +209,10 @@ public class RoundService {
 	public List<PlayerRound> getByRoundId(Long roundId) {
 		return playerRoundRepository.findByRoundIdOrderByPlayerId(roundId).orElseThrow();
 	}
+
+	@Transactional
+	public void updateRoundWhs(Long playerId, Long roundId, Float whs) {
+		playerRoundRepository.updatePlayerRoundWhs(whs, playerId, roundId);
+	}
+
 }

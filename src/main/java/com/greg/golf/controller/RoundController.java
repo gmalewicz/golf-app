@@ -1,6 +1,8 @@
 package com.greg.golf.controller;
 
 import java.util.List;
+
+import com.greg.golf.controller.dto.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,11 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.greg.golf.controller.dto.LimitedRoundDto;
-import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
-import com.greg.golf.controller.dto.PlayerRoundDto;
-import com.greg.golf.controller.dto.RoundDto;
-import com.greg.golf.controller.dto.ScoreCardDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
 import com.greg.golf.service.RoundService;
@@ -150,5 +147,20 @@ public class RoundController extends BaseController {
 		log.info("Requested players round details for round id " + roundId);
 
 		return mapList(roundService.getByRoundId(roundId), PlayerRoundDto.class);
+	}
+
+	@SuppressWarnings("SameReturnValue")
+	@Tag(name = "Round API")
+	@Operation(summary = "Updates whs for player for given round.")
+	@PatchMapping("rest/UpdatePlayerRound")
+	public HttpStatus updatePlayerRoundWHS(
+			@Parameter(description = "Round WHS object", required = true) @RequestBody RoundWhsDto roundWhsDto) {
+
+		roundService.updateRoundWhs(roundWhsDto.getPlayerId(), roundWhsDto.getRoundId(), roundWhsDto.getWhs());
+
+		log.info("Round: " + roundWhsDto.getRoundId() + " for player " + roundWhsDto.getPlayerId() +
+				" updated with whs " + roundWhsDto.getWhs());
+
+		return HttpStatus.OK;
 	}
 }

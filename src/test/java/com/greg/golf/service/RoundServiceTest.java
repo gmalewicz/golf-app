@@ -47,9 +47,11 @@ class RoundServiceTest {
 
 	private static Long roundId;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private RoundService roundService;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private TournamentService mockTournamentService;
 
@@ -94,7 +96,7 @@ class RoundServiceTest {
 		log.info("Set up completed");
 	}
 
-	@DisplayName("Delete score card for nonexisting round")
+	@DisplayName("Delete score card for nonexistent round")
 	@Transactional
 	@Test
 	void deleteScoreCardForNonExistingRoundTest() {
@@ -339,7 +341,7 @@ class RoundServiceTest {
 		Assertions.assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
 	}
 
-	@DisplayName("Try to update scorecard assigned to tournamnet")
+	@DisplayName("Try to update scorecard assigned to tournament")
 	@Transactional
 	@Test
 	void scoreCardUpdateThatIsAssignedToTournamentTest(@Autowired RoundRepository roundRepository,
@@ -454,7 +456,7 @@ class RoundServiceTest {
 		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
 	}
 
-	@DisplayName("Get Round inside range applicable for tournamnet")
+	@DisplayName("Get Round inside range applicable for tournament")
 	@Transactional
 	@Test
 	void getForPlayerRoundDetailsTest() {
@@ -465,7 +467,7 @@ class RoundServiceTest {
 
 	}
 
-	@DisplayName("Get Round inside range applicable for tournamnet")
+	@DisplayName("Get Round inside range applicable for tournament")
 	@Transactional
 	@Test
 	void getRoundInsideRangeApplicableTest() {
@@ -481,7 +483,7 @@ class RoundServiceTest {
 
 	}
 
-	@DisplayName("Round applicable for tournamnet not found")
+	@DisplayName("Round applicable for tournament not found")
 	@Transactional
 	@Test
 	void getRoundInsideRangeNotApplicableTest() {
@@ -568,7 +570,18 @@ class RoundServiceTest {
 		
 		Assertions.assertEquals(player.getWhs(), playerRound.getWhs());
 	}
-	
+
+	@DisplayName("Update player hcp for round")
+	@Transactional
+	@Test
+	void updatePlayerRoundWhsTest(@Autowired PlayerRepository playerRepository) {
+
+		roundService.updateRoundWhs(1L, roundId, 11.3F);
+		var playerRound =  roundService.getForPlayerRoundDetails(1L, roundId);
+
+		Assertions.assertEquals(11.3F, playerRound.getWhs());
+	}
+
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository) {
 
