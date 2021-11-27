@@ -35,4 +35,11 @@ public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
 	Optional<List<PlayerRound>> findByRoundIdOrderByPlayerId(Long roundId);
 
+	@Transactional(propagation = Propagation.REQUIRED)
+	@Modifying
+	@Query("UPDATE PlayerRound pr SET pr.whs = :whs where pr.playerId = :playerId AND pr.roundId = :roundId")
+	void updatePlayerRoundWhs(@Param("whs") Float whs,
+							  @Param("playerId") Long playerId,
+							  @Param("roundId") Long roundId);
+
 }
