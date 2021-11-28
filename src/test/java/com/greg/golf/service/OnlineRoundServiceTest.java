@@ -111,6 +111,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setOnlineRound(onlineRound);
 		onlineScoreCard.setStroke(1);
 		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
 		
 		onlineRoundService.saveOnlineScoreCard(onlineScoreCard);
 		
@@ -139,6 +140,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setOnlineRound(onlineRound);
 		onlineScoreCard.setStroke(1);
 		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
 		onlineScoreCardRepository.save(onlineScoreCard);
 		
 		Assertions.assertEquals(1, onlineScoreCardRepository.findAll().size());
@@ -191,6 +193,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setOnlineRound(onlineRound);
 		onlineScoreCard.setStroke(1);
 		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
 		onlineScoreCardRepository.save(onlineScoreCard);
 		
 		Assertions.assertEquals(1, onlineRoundService.getOnlineScoreCards(onlineRound.getId()).size());
@@ -219,6 +222,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setPutt(0);
 		onlineScoreCard.setPenalty(0);
 		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
 		
 		onlineRound.setScoreCard(new ArrayList<>());
 		onlineRound.getScoreCard().add(onlineScoreCard);

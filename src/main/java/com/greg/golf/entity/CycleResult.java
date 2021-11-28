@@ -39,7 +39,7 @@ public class CycleResult {
 
     @Type(type = "int-array")
     @NotNull
-    @Column(name = "results")
+    @Column(name = "results", columnDefinition = "int[]")
     private int[] results;
 
     @NotNull

@@ -3,6 +3,7 @@ package com.greg.golf.controller.dto;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
@@ -41,5 +42,9 @@ public class OnlineScoreCardDto {
 	@Schema(description = "Update flag", example = "true", accessMode = READ_WRITE, allowableValues = { "true",
 			"false" })
 	private boolean update;
+
+	@Schema(description = "Time", example = "10:59", accessMode = READ_WRITE, minimum = "00:00", maximum = "23:59")
+	@Pattern(regexp = "/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/")
+	private String time;
 
 }
