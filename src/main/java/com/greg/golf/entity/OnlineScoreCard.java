@@ -15,6 +15,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Size;
 
 import lombok.Data;
 import lombok.ToString;
@@ -69,6 +70,11 @@ public class OnlineScoreCard {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;
+
+	@EqualsAndHashCode.Exclude
+	@Size(min = 5, max = 5, message=  "Hour must be exact 5 characters long. Seconds not included")
+	@Column(name = "time")
+	private String time;
 
 	@Transient
 	private long orId;

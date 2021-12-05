@@ -64,6 +64,7 @@ class OnlineRoundService2Test {
 		onlineScoreCard.setOnlineRound(onlineRound);
 		onlineScoreCard.setStroke(1);
 		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
 		onlineScoreCardRepository.save(onlineScoreCard);
 		
 		log.info("Set up completed");
