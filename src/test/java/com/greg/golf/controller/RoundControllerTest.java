@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import com.greg.golf.controller.dto.RoundWhsDto;
 import com.greg.golf.entity.*;
+import com.greg.golf.repository.projection.PlayerRoundCnt;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -230,6 +231,15 @@ class RoundControllerTest {
 
 		mockMvc.perform(patch("/rest/UpdatePlayerRound").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Get player round count statistic")
+	@Test
+	void getPlayerRoundStatisticThenReturns200() throws Exception {
+
+		when(playerService.getPlayerRoundCnt()).thenReturn(new ArrayList<>());
+
+		mockMvc.perform(get("/rest/PlayerRoundCnt")).andExpect(status().isOk());
 	}
 
 	@AfterAll

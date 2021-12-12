@@ -1,9 +1,12 @@
 package com.greg.golf.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.greg.golf.repository.projection.PlayerRoundCnt;
+import com.greg.golf.service.helpers.RoleVerification;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -140,5 +143,13 @@ public class PlayerService implements UserDetailsService {
 		}
 
 		return player.get();
+	}
+
+	@Transactional
+	public List<PlayerRoundCnt> getPlayerRoundCnt() {
+
+		RoleVerification.verifyRole(Common.ADMIN, "Attempt to get player statistic by unauthorized user");
+
+		return playerRepository.getPlayerRoundCnt();
 	}
 }

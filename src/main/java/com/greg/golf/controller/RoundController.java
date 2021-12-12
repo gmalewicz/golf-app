@@ -3,6 +3,7 @@ package com.greg.golf.controller;
 import java.util.List;
 
 import com.greg.golf.controller.dto.*;
+import com.greg.golf.service.PlayerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,12 +30,15 @@ import lombok.extern.log4j.Log4j2;
 public class RoundController extends BaseController {
 
 	private final RoundService roundService;
+	private final PlayerService playerService;
 	private final ScoreCardService scoreCardService;
 
-	public RoundController(ModelMapper modelMapper, RoundService roundService, ScoreCardService scoreCardService) {
+	public RoundController(ModelMapper modelMapper, RoundService roundService, ScoreCardService scoreCardService,
+						   PlayerService playerService) {
 		super(modelMapper);
 		this.roundService = roundService;
 		this.scoreCardService = scoreCardService;
+		this.playerService = playerService;
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -162,5 +166,14 @@ public class RoundController extends BaseController {
 				" updated with whs " + roundWhsDto.getWhs());
 
 		return HttpStatus.OK;
+	}
+
+	@SuppressWarnings("UnusedReturnValue")
+	@Tag(name = "Access API")
+	@Operation(summary = "Get player data")
+	@GetMapping(value = "/rest/PlayerRoundCnt")
+	public List<PlayerRoundCntDto> getPlayerList() {
+		log.info("Requested player round cnt");
+		return mapList(playerService.getPlayerRoundCnt(), PlayerRoundCntDto.class);
 	}
 }
