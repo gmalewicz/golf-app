@@ -156,7 +156,7 @@ class AccessControllerTest {
 	@DisplayName("Reset password by privileged user")
 	@Transactional
 	@Test
-	void resetPlayerPasswordByPrivilagedUserTest(@Autowired PlayerRepository playerRepository) {
+	void resetPlayerPasswordByPrivilegedUserTest(@Autowired PlayerRepository playerRepository) {
 
 		String orgPlayerPwd = playerRepository.findById(1L).orElseThrow().getPassword();
 		

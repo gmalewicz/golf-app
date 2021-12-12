@@ -25,10 +25,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 @Log4j2
 @AutoConfigureMockMvc(addFilters = false)
@@ -129,6 +131,16 @@ class CycleControllerTest {
 		mockMvc.perform(get("/rest/CycleResult/1")).andExpect(status().isOk());
 
 	}
+
+	@DisplayName("Should close cycle with correct result")
+	@Test
+	void closeCycleWithValidInputThenReturns200() throws Exception {
+
+		doNothing().when(cycleService).closeCycle(any());
+
+		mockMvc.perform(patch("/rest/CycleClose/1")).andExpect(status().isOk()).andReturn();
+	}
+
 
 	@AfterAll
 	public static void done() {
