@@ -4,13 +4,17 @@ import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
+import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
+import com.greg.golf.service.helpers.RoleVerification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,11 +42,15 @@ public class CycleService {
     @Transactional
     public Cycle addCycle(Cycle cycle) {
 
+        RoleVerification.verifyRole(Common.ADMIN, "Attempt to add cycle by unauthorized user");
+
         return cycleRepository.save(cycle);
     }
 
     @Transactional
     public CycleTournament addCycleTournament(CycleTournament cycleTournament, EagleResultDto[] eagleResultDto) {
+
+        RoleVerification.verifyRole(Common.ADMIN, "Attempt to add tournament to cycle by unauthorized user");
 
         // filter to exclude players with too high handicap
         eagleResultDto = Arrays.stream(eagleResultDto)
@@ -192,6 +200,18 @@ public class CycleService {
         var cycle = new Cycle();
         cycle.setId(cycleId);
         return cycleResultRepository.findByCycleOrderByCycleScoreDesc(cycle);
+    }
+
+    public void closeCycle(Long cycleId) {
+
+        RoleVerification.verifyRole(Common.ADMIN, "Attempt to close cycle by unauthorized user");
+
+        var cycle = cycleRepository.findById(cycleId).orElseThrow();
+
+        // set close flag
+        cycle.setStatus(Cycle.STATUS_CLOSE);
+        cycleRepository.save(cycle);
+
     }
 
 }

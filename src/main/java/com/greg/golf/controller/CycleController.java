@@ -83,4 +83,18 @@ public class CycleController extends BaseController {
 		log.info("Requested cycle results for cycle: " + cycleId);
 		return mapList(cycleService.findCycleResults(cycleId), CycleResultDto.class);
 	}
+
+	@SuppressWarnings({"UnusedReturnValue", "SameReturnValue"})
+	@Tag(name = "Cycle API")
+	@Operation(summary = "Close cycle. Further updates will not be possible.")
+	@PatchMapping(value = "/rest/CycleClose/{cycleId}")
+	public HttpStatus resetPassword(
+			@Parameter(description = "Cycle id to be closed", required = true) @PathVariable("cycleId") Long cycleId) {
+
+		log.info("trying to close cycle: " + cycleId);
+
+		cycleService.closeCycle(cycleId);
+
+		return HttpStatus.OK;
+	}
 }
