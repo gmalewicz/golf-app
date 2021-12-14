@@ -21,6 +21,6 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 	 Optional<Player> findPlayerByNick(@Param("nick") String nick);
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-	@Query("SELECT p.nick AS nick, p.sex AS sex, p.whs AS whs, p.role AS role, COUNT(*) AS roundCnt FROM Player p LEFT JOIN p.rounds GROUP BY p.nick, p.sex, p.whs, p.role")
+	@Query("SELECT p.nick AS nick, p.sex AS sex, p.whs AS whs, p.role AS role, COUNT(r) AS roundCnt FROM Player p left join p.rounds as r GROUP BY p.nick, p.sex, p.whs, p.role")
 	List<PlayerRoundCnt> getPlayerRoundCnt();
 }
