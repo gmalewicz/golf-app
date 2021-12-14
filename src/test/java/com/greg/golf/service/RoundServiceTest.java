@@ -2,6 +2,8 @@ package com.greg.golf.service;
 
 import java.util.*;
 
+import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.UnauthorizedException;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -14,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -35,6 +41,8 @@ import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import lombok.extern.log4j.Log4j2;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
 @SpringBootTest
@@ -580,6 +588,37 @@ class RoundServiceTest {
 		var playerRound =  roundService.getForPlayerRoundDetails(1L, roundId);
 
 		Assertions.assertEquals(11.3F, playerRound.getWhs());
+	}
+
+	@DisplayName("Get player round count")
+	@Transactional
+	@Test
+	void getPlayerRoundCntByAuthorizedUserTest(@Autowired PlayerService playerService) {
+
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+
+		var retList = playerService.getPlayerRoundCnt();
+
+		Assertions.assertEquals(1, retList.size());
+		Assertions.assertEquals(1, retList.get(0).getRoundCnt());
+	}
+
+	@DisplayName("Get player round count")
+	@Transactional
+	@Test
+	void getPlayerRoundCntByUnauthorizedUserTest(@Autowired PlayerService playerService) {
+
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+
+		assertThrows(UnauthorizedException.class, playerService::getPlayerRoundCnt);
 	}
 
 	@AfterAll
