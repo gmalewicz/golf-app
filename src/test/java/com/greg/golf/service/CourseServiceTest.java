@@ -144,14 +144,14 @@ class CourseServiceTest {
 	@Test
 	void getTeesByIdTest() {
 
-		Optional<CourseTee> tee = courseService.getTeeByid(1L);
+		Optional<CourseTee> tee = courseService.getTeeById(1L);
 		assertTrue(tee.isPresent());
 	}
 	
 	@DisplayName("Get favourite courses for player")
 	@Transactional
 	@Test
-	void getFavouruteCoursesTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+	void getFavouriteCoursesTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
 		
 		FavouriteCourse fc = new FavouriteCourse();
 		Player player = new Player();

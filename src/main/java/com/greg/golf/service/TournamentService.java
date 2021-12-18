@@ -317,7 +317,7 @@ public class TournamentService {
 			playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 		}
 
-		var courseTee = courseService.getTeeByid(playerRound.getTeeId()).orElseThrow();
+		var courseTee = courseService.getTeeById(playerRound.getTeeId()).orElseThrow();
 
 		// calculate course HCP
 		int courseHCP = Math
