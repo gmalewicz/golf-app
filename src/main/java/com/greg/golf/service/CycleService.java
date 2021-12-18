@@ -5,16 +5,14 @@ import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "cycle")
 @Service("cycleService")

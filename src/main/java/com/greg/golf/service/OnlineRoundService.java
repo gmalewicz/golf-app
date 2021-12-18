@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +23,9 @@ import com.greg.golf.repository.OnlineRoundRepository;
 import com.greg.golf.repository.OnlineScoreCardRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 @Service("onlineRoundService")
 public class OnlineRoundService {
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 
@@ -35,11 +36,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import lombok.extern.log4j.Log4j2;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class CourseServiceTest {
@@ -145,14 +144,14 @@ class CourseServiceTest {
 	@Test
 	void getTeesByIdTest() {
 
-		Optional<CourseTee> tee = courseService.getTeeByid(1L);
+		Optional<CourseTee> tee = courseService.getTeeById(1L);
 		assertTrue(tee.isPresent());
 	}
 	
 	@DisplayName("Get favourite courses for player")
 	@Transactional
 	@Test
-	void getFavouruteCoursesTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+	void getFavouriteCoursesTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
 		
 		FavouriteCourse fc = new FavouriteCourse();
 		Player player = new Player();

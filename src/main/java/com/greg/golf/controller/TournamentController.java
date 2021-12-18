@@ -1,6 +1,8 @@
 package com.greg.golf.controller;
 
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +24,8 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 @RestController
 @OpenAPIDefinition(tags = { @Tag(name = "Tournament API") })
 public class TournamentController extends BaseController {

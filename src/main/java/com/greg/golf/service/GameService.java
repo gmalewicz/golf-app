@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
@@ -17,10 +18,9 @@ import com.greg.golf.entity.Game;
 import com.greg.golf.entity.Player;
 import com.greg.golf.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 @Service("gameService")
 public class GameService {
 	

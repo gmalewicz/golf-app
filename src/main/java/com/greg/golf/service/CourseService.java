@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.greg.golf.service.helpers.RoleVerification;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,9 +27,8 @@ import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.HoleRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "course")
 @Service("courseService")
@@ -114,6 +115,8 @@ public class CourseService {
 	@Transactional
 	public void delete(Long id) {
 
+		RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete course by unauthorized user");
+
 		courseRepository.deleteById(id);
 
 	}
@@ -129,7 +132,7 @@ public class CourseService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<CourseTee> getTeeByid(Long id) {
+	public Optional<CourseTee> getTeeById(Long id) {
 
 		return courseTeeRepository.findById(id);
 

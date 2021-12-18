@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,8 @@ import com.greg.golf.repository.TournamentRoundRepository;
 import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 @Service("tournamentService")
 @RequiredArgsConstructor
 public class TournamentService {
@@ -317,7 +317,7 @@ public class TournamentService {
 			playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 		}
 
-		var courseTee = courseService.getTeeByid(playerRound.getTeeId()).orElseThrow();
+		var courseTee = courseService.getTeeById(playerRound.getTeeId()).orElseThrow();
 
 		// calculate course HCP
 		int courseHCP = Math

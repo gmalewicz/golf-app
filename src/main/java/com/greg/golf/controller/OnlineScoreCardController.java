@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -24,10 +25,9 @@ import com.greg.golf.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.log4j.Log4j2;
 
 @RestController
-@Log4j2
+@Slf4j
 public class OnlineScoreCardController extends BaseController {
 
 	private final OnlineRoundService onlineRoundService;

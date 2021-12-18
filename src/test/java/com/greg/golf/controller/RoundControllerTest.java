@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import com.greg.golf.controller.dto.RoundWhsDto;
 import com.greg.golf.entity.*;
-import com.greg.golf.repository.projection.PlayerRoundCnt;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -39,9 +39,7 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.RoundService;
 import com.greg.golf.service.ScoreCardService;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
+@Slf4j
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = RoundController.class)
 class RoundControllerTest {

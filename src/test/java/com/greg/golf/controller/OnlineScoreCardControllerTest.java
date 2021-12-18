@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,7 @@ import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.OnlineRoundService;
 import com.greg.golf.service.PlayerService;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
+@Slf4j
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = OnlineScoreCardController.class)
 class OnlineScoreCardControllerTest {

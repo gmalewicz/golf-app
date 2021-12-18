@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TreeSet;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,7 @@ import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
+@Slf4j
 @SpringBootTest
 class ScoreCardServiceTest {
 
