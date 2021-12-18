@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -35,11 +36,9 @@ import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.CourseService;
 import com.greg.golf.service.PlayerService;
 
-import lombok.extern.log4j.Log4j2;
-
 import static org.mockito.BDDMockito.*;
 
-@Log4j2
+@Slf4j
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = CourseController.class)
 class CourseControllerMockTest {

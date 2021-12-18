@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,9 +24,7 @@ import com.greg.golf.repository.OnlineScoreCardRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
+@Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class OnlineRoundServiceTest {

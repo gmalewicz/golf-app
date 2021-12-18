@@ -1,10 +1,10 @@
 package com.greg.golf.service.helpers;
 
 import com.greg.golf.error.UnauthorizedException;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-@Log4j2
+@Slf4j
 public class RoleVerification {
 
     private RoleVerification() {

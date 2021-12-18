@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
@@ -11,9 +12,8 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import com.greg.golf.error.ReCaptchaInvalidException;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 public abstract class AbstractCaptchaService implements ICaptchaService{
 	
 	protected static final Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");    

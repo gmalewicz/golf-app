@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.greg.golf.repository.projection.PlayerRoundCnt;
 import com.greg.golf.service.helpers.RoleVerification;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,10 +26,9 @@ import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
 public class PlayerService implements UserDetailsService {

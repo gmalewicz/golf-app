@@ -1,4 +1,9 @@
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  main:
+    allow-circular-references: true
   mail:
     test-connection: false  
     host: smtp.gmail.com

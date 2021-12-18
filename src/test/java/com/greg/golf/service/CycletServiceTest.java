@@ -7,7 +7,7 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.util.GolfPostgresqlContainer;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class CycleServiceTest {

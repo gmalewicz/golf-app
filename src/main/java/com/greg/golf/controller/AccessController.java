@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,15 +31,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @OpenAPIDefinition(tags = @Tag(name = "Access API"))
 public class AccessController {
 
 	private static final String REFRESH_TOKEN = "refreshToken";
+
 
 	private final PasswordEncoder bCryptPasswordEncoder;
 	private final PlayerService playerService;
@@ -56,7 +57,7 @@ public class AccessController {
 
 		String token;
 
-		log.debug(
+		log.info(
 				"trying to authenticate player: " + playerDto.getNick() + " with password " + playerDto.getPassword());
 
 		var player = modelMapper.map(playerDto, Player.class);
@@ -64,8 +65,6 @@ public class AccessController {
 		authenticate(player.getNick(), player.getPassword());
 
 		final GolfUserDetails userDetails = playerService.loadUserByUsername(player.getNick());
-
-		log.info(userDetails.getPlayer());
 
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");

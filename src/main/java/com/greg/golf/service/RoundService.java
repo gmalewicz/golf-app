@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,9 @@ import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 @Service("roundService")
 public class RoundService {
 	
@@ -56,7 +56,7 @@ public class RoundService {
 
 		log.debug("start searching matching round");
 		// search for a round on the same course, the same date and tee time
-		log.debug(round.getRoundDate());
+		log.debug(round.getRoundDate().toString());
 		Optional<Round> matchingRound = roundRepository.findRoundByCourseAndRoundDate(round.getCourse(),
 				round.getRoundDate());
 

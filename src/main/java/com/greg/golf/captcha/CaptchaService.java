@@ -4,6 +4,7 @@ import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -11,9 +12,8 @@ import org.springframework.web.client.RestOperations;
 
 import com.greg.golf.error.ReCaptchaInvalidException;
 import com.greg.golf.error.ReCaptchaUnavailableException;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 @Service("captchaService")
 public class CaptchaService extends AbstractCaptchaService {
 
@@ -42,7 +42,7 @@ public class CaptchaService extends AbstractCaptchaService {
 				}
 				throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
 			}
-			log.debug("Google's response: {} ", googleResponse.toString());
+			log.debug("Google's response: {} ", googleResponse);
 		} catch (RestClientException rce) {
 			throw new ReCaptchaUnavailableException("Registration unavailable at this time.  Please try again later.",
 					rce);

@@ -1,5 +1,6 @@
 package com.greg.golf.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -24,9 +25,8 @@ import com.greg.golf.service.PlayerService;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Slf4j
 @ConfigurationProperties(prefix = "cors")
 @Configuration
 @EnableCaching
@@ -35,7 +35,8 @@ import lombok.extern.log4j.Log4j2;
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
-	
+
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

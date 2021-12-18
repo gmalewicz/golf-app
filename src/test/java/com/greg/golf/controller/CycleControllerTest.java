@@ -10,7 +10,7 @@ import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.CycleService;
 import com.greg.golf.service.PlayerService;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
-@Log4j2
+@Slf4j
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = CycleController.class)
 class CycleControllerTest {
