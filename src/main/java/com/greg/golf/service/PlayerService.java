@@ -35,6 +35,19 @@ public class PlayerService implements UserDetailsService {
 
 	private final PlayerRepository playerRepository;
 
+
+	@CacheEvict
+	@Transactional
+	public void delete(Long id) {
+
+		RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete player by unauthorized user");
+
+		var player = new Player();
+		player.setId(id);
+
+		playerRepository.delete(player);
+	}
+
 	@Transactional
 	public Player save(Player player) {
 
@@ -86,11 +99,11 @@ public class PlayerService implements UserDetailsService {
 	@Cacheable
 	@Transactional(readOnly = true)
 	public Optional<Player> getPlayer(Long id) {
-		log.info("Get player called");
+		log.debug("Get player called");
 		return playerRepository.findById(id);
 	}
 
-	@CacheEvict(key = "#player.id")
+	@CacheEvict
 	@Transactional
 	public Player update(Player player) {
 

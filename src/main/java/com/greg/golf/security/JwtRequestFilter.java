@@ -2,7 +2,6 @@ package com.greg.golf.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -32,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	private UserDetails userDetails = null;
+	// private UserDetails userDetails = null;
 
 	private final PlayerService playerService;
 	private final JwtTokenUtil jwtTokenUtil;
@@ -87,25 +86,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private void validateToken(String userId, HttpServletRequest request) {
 
 		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
 			log.debug("Start processing the token for user: " + userId);
-			Optional<Player> player = this.playerService.getPlayer(Long.valueOf(userId));
 
-			// if token is valid configure Spring Security to manually set
-			// authentication
-			player.ifPresent(p -> {
+			try {
 
+				Player player = this.playerService.getPlayer(Long.valueOf(userId)).orElseThrow();
+
+				// if token is valid configure Spring Security to manually set
+				// authentication
 				var authorities = new ArrayList<SimpleGrantedAuthority>();
-				if (p.getRole() == Common.ROLE_PLAYER_ADMIN) {
+				if (player.getRole() == Common.ROLE_PLAYER_ADMIN) {
 					authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
 				} else {
 					authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
 				}
 
-				userDetails = new User(p.getId().toString(), p.getPassword(), authorities);
-
-			});
-
-			try {
+				UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), authorities);
 
 				var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 						userDetails.getAuthorities());
@@ -116,7 +113,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				// Spring Security Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			} catch (Exception e) {
-				log.debug("Error aunthentication for user: " + userId);
+				log.info("Error authentication for user: " + userId);
 			}
 
 		}
@@ -131,19 +128,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			log.info("Start generating renewed token");
 
-			Optional<Player> player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject()));
-
-			player.ifPresent(p -> userDetails = new User(p.getId().toString(), p.getPassword(), new ArrayList<>()));
-
-			// if positive generate the new JWT token and replace it in the request
 			try {
+
+				Player player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject())).orElseThrow();
+
+				UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<>());
+
+				// if positive generate the new JWT token and replace it in the request
+
 				if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
 
 					jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());
 					request.setAttribute(REFRESH_TOKEN, jwtToken);
 				}
 			} catch (Exception ex) {
-				log.info("Refersh token expired or not available: " + ex.getClass());
+				log.info("Refresh token expired or not available: " + ex.getClass());
 			}
 		}
 

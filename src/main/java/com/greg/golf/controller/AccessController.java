@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.greg.golf.controller.dto.PlayerIdDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
@@ -184,6 +185,20 @@ public class AccessController {
 
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
 	}
+
+	@Tag(name = "Access API")
+	@Operation(summary = "Delete player")
+	@PostMapping(value = "/rest/DeletePlayer")
+	public HttpStatus deletePlayer(
+			@Parameter(description = "Player id", required = true) @RequestBody PlayerIdDto playerIdDto) {
+
+		log.info("trying to delete player with id: " + playerIdDto.getId());
+
+		playerService.delete(playerIdDto.getId());
+
+		return HttpStatus.OK;
+	}
+
 
 	private void authenticate(String username, String password) throws BadCredentialsException {
 
