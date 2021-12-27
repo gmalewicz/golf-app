@@ -151,6 +151,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 		round.getPlayer().add(player);
 		player.setRounds(new ArrayList<>());
@@ -186,6 +187,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 		round.getPlayer().add(player);
 		player = new Player();
@@ -194,6 +196,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 		round.getPlayer().add(player);
 		player = new Player();
@@ -202,6 +205,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 		round.getPlayer().add(player);
 		roundRepository.save(round);
@@ -212,6 +216,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 
 		var newRound = new Round();
@@ -269,6 +274,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 
 		// create the new round
@@ -320,6 +326,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 
 		// create the new round
@@ -427,6 +434,7 @@ class RoundServiceTest {
 		player.setSex(true);
 		player.setWhs(30.1f);
 		player.setRole(0);
+		player.setModified(false);
 		playerRepository.save(player);
 
 		var round = roundRepository.getById(roundId);

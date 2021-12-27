@@ -241,6 +241,7 @@ class JwtRequestFilterTest {
 		regularPlayer.setRole(Common.ROLE_PLAYER_REGULAR);
 		regularPlayer.setWhs(10f);
 		regularPlayer.setSex(Common.PLAYER_SEX_MALE);
+		regularPlayer.setModified(false);
 		playerRepository.save(regularPlayer);
 		
 		String jwtToken = jwtTokenUtil.generateToken(String.valueOf(regularPlayer.getId()));
