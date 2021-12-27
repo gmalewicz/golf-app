@@ -23,7 +23,7 @@
 		<hibernate-types-52.version>2.14.0</hibernate-types-52.version>
 		<hibernate-types-55.version>2.14.0</hibernate-types-55.version>
 		<modelmapper.version>2.4.4</modelmapper.version>
-		<liquibase-maven-plugin.version>4.6.1</liquibase-maven-plugin.version>
+		<liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
 		<org.testcontainers.postgresql.version>1.16.2</org.testcontainers.postgresql.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -202,22 +202,22 @@
 					<dependency>
 					    <groupId>com.fasterxml.jackson.datatype</groupId>
 					    <artifactId>jackson-datatype-jdk8</artifactId>
-					    <version>2.13.0</version>
+					    <version>2.13.1</version>
 					</dependency>
 					<dependency>
                         <groupId>org.liquibase</groupId>
                         <artifactId>liquibase-core</artifactId>
-                        <version>4.3.5</version>
+                        <version>4.6.2</version>
                     </dependency>
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
                         <artifactId>liquibase-hibernate5</artifactId>
-                        <version>4.5.0</version>
+                        <version>4.6.2</version>
                     </dependency>
 					<dependency>
 						<groupId>org.springframework.data</groupId>
 						<artifactId>spring-data-jpa</artifactId>
-						<version>2.5.5</version>
+						<version>2.6.0</version>
 					</dependency>
                     <dependency>
                         <groupId>javax.validation</groupId>

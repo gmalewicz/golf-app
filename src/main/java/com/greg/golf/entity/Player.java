@@ -64,6 +64,10 @@ public class Player implements Comparable<Player> {
 	private Integer role;
 
 	@EqualsAndHashCode.Exclude
+	@NotNull
+	private Boolean modified;
+
+	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(cascade = { CascadeType.ALL })
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "player_id") }, inverseJoinColumns = {

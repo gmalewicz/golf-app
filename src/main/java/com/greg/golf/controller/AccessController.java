@@ -59,13 +59,13 @@ public class AccessController {
 		String token;
 
 		log.info(
-				"trying to authenticate player: " + playerDto.getNick() + " with password " + playerDto.getPassword());
+				"trying to authenticate player: " + playerDto.getNick() + " with password *****");
 
 		var player = modelMapper.map(playerDto, Player.class);
 
 		authenticate(player.getNick(), player.getPassword());
-
-		final GolfUserDetails userDetails = playerService.loadUserByUsername(player.getNick());
+		log.debug("After authentication");
+		final GolfUserDetails userDetails = playerService.loadUserAndUpdate(player.getNick());
 
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
@@ -204,5 +204,18 @@ public class AccessController {
 
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
+	}
+
+	@Tag(name = "Access API")
+	@Operation(summary = "Update player by administrator.")
+	@PatchMapping(value = "/rest/UpdatePlayerOnBehalf")
+	public HttpStatus updatePlayerOnBehalf(
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+
+		log.info("trying to update player: " + playerDto.getNick() + " by admin or other player");
+
+		playerService.updatePlayerOnBehalf(modelMapper.map(playerDto, Player.class));
+
+		return HttpStatus.OK;
 	}
 }

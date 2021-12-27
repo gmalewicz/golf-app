@@ -2,11 +2,11 @@ package com.greg.golf.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import com.greg.golf.repository.projection.PlayerRoundCnt;
 import com.greg.golf.service.helpers.RoleVerification;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -53,6 +53,7 @@ public class PlayerService implements UserDetailsService {
 
 		try {
 			player.setRole(Common.ROLE_PLAYER_REGULAR);
+			player.setModified(false);
 			return playerRepository.save(player);
 		} catch (Exception e) {
 			if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
@@ -63,49 +64,65 @@ public class PlayerService implements UserDetailsService {
 
 	}
 
+	@Transactional
+	public GolfUserDetails loadUserAndUpdate(String playerName) {
+
+		Player player = playerRepository.findPlayerByNick(playerName)
+				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
+
+		// clear modify flag if user has been changed
+		if (player.getModified()) {
+
+			player.setModified(false);
+			playerRepository.save(player);
+			log.debug("Cleared modified flag for user " + playerName);
+		}
+
+		log.info("Creating user details for " + playerName);
+
+		return new GolfUser(player.getNick(), player.getPassword(), new ArrayList<>(), player);
+	}
+
+	@CacheEvict(value = "player", key = "#player.id")
+	public void cacheEvict(@NonNull Player player) {
+		log.debug("Cache evict called");
+	}
+
+
 	@Override
 	@Transactional(readOnly = true)
 	public GolfUserDetails loadUserByUsername(String playerName) throws UsernameNotFoundException {
 
-		Optional<Player> player = playerRepository.findPlayerByNick(playerName);
-		GolfUserDetails golfUserDetails;
+		Player player = playerRepository.findPlayerByNick(playerName)
+				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
 
-		try {
-			golfUserDetails = new GolfUser(player.orElseThrow().getNick(), player.orElseThrow().getPassword(),
-					new ArrayList<>(), player.orElseThrow());
-			log.info("User details created");
-		} catch (NoSuchElementException e) {
-			throw new UsernameNotFoundException("User not found", e.getCause());
-		}
+		log.info("Creating user details for " + playerName);
 
-		return golfUserDetails;
+		return new GolfUser(player.getNick(), player.getPassword(),	new ArrayList<>(), player);
 
 	}
 
 	@Transactional(readOnly = true)
 	public GolfUserDetails loadUserById(Long id) {
 
-		Optional<Player> player = playerRepository.findById(id);
-		GolfUserDetails golfUserDetails;
+		Player player = playerRepository.findById(id)
+				.orElseThrow(() -> new UsernameNotFoundException("User " + id + " not found"));
 
-		golfUserDetails = new GolfUser(player.orElseThrow().getNick(), player.orElseThrow().getPassword(),
-				new ArrayList<>(), player.orElseThrow());
-		log.info("User details created");
+		log.info("Creating user details for " + id);
 
-		return golfUserDetails;
-
+		return new GolfUser(player.getNick(), player.getPassword(),	new ArrayList<>(), player);
 	}
 
-	@Cacheable
+	@Cacheable(value = "player", key = "#id")
 	@Transactional(readOnly = true)
 	public Optional<Player> getPlayer(Long id) {
 		log.debug("Get player called");
 		return playerRepository.findById(id);
 	}
 
-	@CacheEvict
+	@CacheEvict(value = "player", key = "#player.id")
 	@Transactional
-	public Player update(Player player) {
+	public Player update(@NonNull Player player) {
 
 		var persistedPlayer = playerRepository.getById(player.getId());
 
@@ -120,6 +137,37 @@ public class PlayerService implements UserDetailsService {
 		playerRepository.save(persistedPlayer);
 
 		return persistedPlayer;
+	}
+
+	@CacheEvict(value = "player", key = "#player.id")
+	@Transactional
+	public void updatePlayerOnBehalf(@NonNull Player player) {
+
+		var persistedPlayer = playerRepository.findById(player.getId()).orElseThrow();
+		boolean changed = false;
+
+		if (player.getWhs() != null && !player.getWhs().equals(persistedPlayer.getWhs()) ) {
+			persistedPlayer.setWhs(player.getWhs());
+			changed = true;
+		}
+
+		if (player.getNick() != null && !player.getNick().equals(persistedPlayer.getNick()) ) {
+			persistedPlayer.setNick(player.getNick());
+			changed = true;
+		}
+
+		if (player.getSex() != null && !player.getSex().equals(persistedPlayer.getSex()) ) {
+			persistedPlayer.setSex(player.getSex());
+			changed = true;
+		}
+
+		if (changed) {
+			persistedPlayer.setModified(true);
+			playerRepository.save(persistedPlayer);
+			log.debug("player changes saved for " + persistedPlayer.getNick());
+		} else {
+			log.warn("nothing to update for player " + persistedPlayer.getNick());
+		}
 	}
 
 	@Transactional
