@@ -5,11 +5,13 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TreeSet;
 
+import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -23,6 +25,10 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 @Slf4j
 @SpringBootTest
 class ScoreCardServiceTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 
 	@ClassRule
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer

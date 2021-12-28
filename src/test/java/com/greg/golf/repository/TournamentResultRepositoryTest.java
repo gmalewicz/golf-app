@@ -3,6 +3,7 @@ package com.greg.golf.repository;
 import java.util.Date;
 import java.util.Optional;
 
+import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -21,6 +22,7 @@ import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -29,6 +31,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class TournamentResultRepositoryTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 	
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();

@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.modelmapper.ModelMapper;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +46,13 @@ class OnlineScoreCardControllerTest {
 	private PlayerService playerService;
 
 	@MockBean
+	private UserService userService;
+
+	@MockBean
 	private JwtRequestFilter jwtRequestFilter;
+
+	@MockBean
+	private PasswordEncoder bCryptPasswordEncoder;
 
 	@MockBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

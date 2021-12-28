@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.greg.golf.configurationproperties.JwtConfig;
@@ -32,6 +33,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class JwtRequestFilterTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 
 	@ClassRule
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
@@ -74,7 +79,7 @@ class JwtRequestFilterTest {
 	@Test
 	void requestWithoutTokenTest() {
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -93,7 +98,7 @@ class JwtRequestFilterTest {
 
 		when(request.getHeader("Authorization")).thenReturn("Bearer " + jwtToken);
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -113,7 +118,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn(null);
 		when(request.getParameter("token")).thenReturn(jwtToken);
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -130,7 +135,7 @@ class JwtRequestFilterTest {
 
 		when(request.getHeader("Authorization")).thenReturn("invalid");
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -147,7 +152,7 @@ class JwtRequestFilterTest {
 
 		when(request.getHeader("Authorization")).thenReturn("Bearer 1234");
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -167,7 +172,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn(
 				"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjIyNzQ3NDQ4LCJpYXQiOjE2MjI3MTg2NDh9.W5ZGbvT4pSr7lZBVuUBNhhuBSH0GC0LExwkvI29RU8rCOMPIjnOqWOO4wG56fzwy2McYnq7E0FkWdh-4sh0TVg");
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -192,7 +197,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Refresh")).thenReturn(refreshToken);
 		
 		
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -212,7 +217,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn("Bearer " + jwtToken);
 		
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -249,7 +254,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn(null);
 		when(request.getParameter("token")).thenReturn(jwtToken);
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
 
 		try {
 

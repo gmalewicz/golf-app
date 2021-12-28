@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -31,9 +33,9 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	// private UserDetails userDetails = null;
+	@Autowired
+	private PlayerService playerService;
 
-	private final PlayerService playerService;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RefreshTokenUtil refreshTokenUtil;
 

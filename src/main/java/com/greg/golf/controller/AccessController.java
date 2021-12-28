@@ -8,10 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,11 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.greg.golf.captcha.ICaptchaService;
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
-import com.greg.golf.security.JwtTokenUtil;
-import com.greg.golf.security.RefreshTokenUtil;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.helpers.GolfUserDetails;
 
@@ -41,14 +35,8 @@ public class AccessController {
 
 	private static final String REFRESH_TOKEN = "refreshToken";
 
-
-	private final PasswordEncoder bCryptPasswordEncoder;
 	private final PlayerService playerService;
-	private final JwtTokenUtil jwtTokenUtil;
-	private final RefreshTokenUtil refreshTokenUtil;
-	private final ICaptchaService captchaService;
 	private final ModelMapper modelMapper;
-	private final AuthenticationManager authenticationManager;
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
@@ -56,29 +44,19 @@ public class AccessController {
 	public ResponseEntity<PlayerDto> authenticatePlayer(
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
-		String token;
+		log.info("trying to authenticate player: " + playerDto.getNick() + " with password *****");
 
-		log.info(
-				"trying to authenticate player: " + playerDto.getNick() + " with password *****");
-
-		var player = modelMapper.map(playerDto, Player.class);
-
-		authenticate(player.getNick(), player.getPassword());
-		log.debug("After authentication");
-		final GolfUserDetails userDetails = playerService.loadUserAndUpdate(player.getNick());
+		GolfUserDetails userDetails =playerService.authenticatePlayer(modelMapper.map(playerDto, Player.class));
 
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-		token = jwtTokenUtil.generateToken(userDetails);
-		responseHeaders.set("Jwt", token);
-		token = refreshTokenUtil.generateToken(userDetails);
-		responseHeaders.set("Refresh", token);
+		responseHeaders.set("Jwt", playerService.generateJwtToken(userDetails));
+		responseHeaders.set("Refresh", playerService.generateRefreshToken(userDetails));
 
 		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders,
 				HttpStatus.OK);
 	}
 
-	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Access API")
 	@Operation(summary = "Add player.")
 	@PostMapping(value = "/rest/AddPlayer")
@@ -87,19 +65,11 @@ public class AccessController {
 
 		log.info("trying to add player: " + playerDto.getNick());
 
-		var player = modelMapper.map(playerDto, Player.class);
-
-		captchaService.processResponse(player.getCaptcha());
-
-		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-
-		playerService.save(player);
+		playerService.addPlayer(modelMapper.map(playerDto, Player.class));
 
 		return HttpStatus.OK;
 	}
 
-
-	@SuppressWarnings("UnusedReturnValue")
 	@Tag(name = "Access API")
 	@Operation(summary = "Update player. Only WHS and/or password can be updated.")
 	@PatchMapping(value = "/rest/PatchPlayer")
@@ -108,19 +78,12 @@ public class AccessController {
 
 		log.info("trying to update player: " + playerDto.getNick());
 
-		var player = modelMapper.map(playerDto, Player.class);
-
-		if (player.getPassword() != null && !player.getPassword().equals("")) {
-			player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-			log.info("password changed");
-		}
-
-		player = playerService.update(player);
+		Player player = playerService.update(modelMapper.map(playerDto, Player.class));
 
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
 	}
 
-	@SuppressWarnings({"UnusedReturnValue", "SameReturnValue"})
+	@SuppressWarnings({"UnusedReturnValue"})
 	@Tag(name = "Access API")
 	@Operation(summary = "Administrative task: Reset password.")
 	@PatchMapping(value = "/rest/ResetPassword")
@@ -129,15 +92,7 @@ public class AccessController {
 
 		log.info("trying to reset the password for player: " + playerDto.getNick());
 
-		var player = modelMapper.map(playerDto, Player.class);
-
-		if (player.getPassword() != null && !player.getPassword().equals("")) {
-
-			log.info("password changed");
-			player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-		}
-
-		playerService.resetPassword(player);
+		playerService.resetPassword(modelMapper.map(playerDto, Player.class));
 
 		return HttpStatus.OK;
 	}
@@ -149,13 +104,8 @@ public class AccessController {
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
 		log.info("trying to add player on behalf: " + playerDto.getNick() + " with temporary password");
-		playerDto.setPassword("welcome");
 
-		var player = modelMapper.map(playerDto, Player.class);
-
-		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-
-		player = playerService.save(player);
+		Player player = playerService.addPlayerOnBehalf(modelMapper.map(playerDto, Player.class));
 
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
 	}
@@ -176,11 +126,9 @@ public class AccessController {
 			final GolfUserDetails userDetails = playerService.loadUserById(id);
 			
 			responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-			responseHeaders.set("Jwt", jwtTokenUtil.generateToken(userDetails));
-
+			responseHeaders.set("Jwt",  playerService.generateJwtToken(userDetails));
 			// regenerate refresh token
-			String token = refreshTokenUtil.generateToken(userDetails);
-			responseHeaders.set("Refresh", token);
+			responseHeaders.set("Refresh", playerService.generateRefreshToken(userDetails));
 		}
 
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
@@ -197,13 +145,6 @@ public class AccessController {
 		playerService.delete(playerIdDto.getId());
 
 		return HttpStatus.OK;
-	}
-
-
-	private void authenticate(String username, String password) throws BadCredentialsException {
-
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
 	}
 
 	@Tag(name = "Access API")

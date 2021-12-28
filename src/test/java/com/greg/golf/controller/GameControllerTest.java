@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 import com.greg.golf.controller.GameController;
@@ -42,6 +44,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class GameControllerTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 	
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
@@ -120,7 +126,7 @@ class GameControllerTest {
 		Assertions.assertEquals(HttpStatus.OK, status);
 	}
 	
-	@DisplayName("Add game")
+	@DisplayName("Get game")
 	@Transactional
 	@Test
 	void getGamesTest(@Autowired ModelMapper modelMapper, @Autowired GameService gameService) {

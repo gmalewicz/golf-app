@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -47,6 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 // @ExtendWith(SpringExtension.class)
 class RoundServiceTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 
 	@ClassRule
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer

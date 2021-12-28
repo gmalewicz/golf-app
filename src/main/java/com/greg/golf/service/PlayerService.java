@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.greg.golf.captcha.ICaptchaService;
 import com.greg.golf.repository.projection.PlayerRoundCnt;
+import com.greg.golf.security.JwtTokenUtil;
+import com.greg.golf.security.RefreshTokenUtil;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +36,48 @@ import lombok.RequiredArgsConstructor;
 @Slf4j
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
-public class PlayerService implements UserDetailsService {
+public class PlayerService {
+
+	private static final String TEMPORARY_PASSWORD = "welcome";
 
 	private final PlayerRepository playerRepository;
 
+	private final JwtTokenUtil jwtTokenUtil;
+	private final RefreshTokenUtil refreshTokenUtil;
+	private final ICaptchaService captchaService;
+	private final PasswordEncoder bCryptPasswordEncoder;
+	private final AuthenticationManager authenticationManager;
+
+	public GolfUserDetails authenticatePlayer(Player player) {
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), player.getPassword()));
+		log.debug("Authentication completed");
+		return loadUserAndUpdate(player.getNick());
+	}
+
+	public String generateJwtToken(GolfUserDetails userDetails) {
+		return jwtTokenUtil.generateToken(userDetails);
+	}
+
+	public String generateRefreshToken(GolfUserDetails userDetails) {
+		return refreshTokenUtil.generateToken(userDetails);
+	}
+
+	@Transactional
+	public void addPlayer(Player player) {
+		captchaService.processResponse(player.getCaptcha());
+
+		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+
+		save(player);
+	}
+
+	@Transactional
+	public Player addPlayerOnBehalf(Player player) {
+
+		player.setPassword(bCryptPasswordEncoder.encode(TEMPORARY_PASSWORD));
+
+		return save(player);
+	}
 
 	@CacheEvict
 	@Transactional
@@ -49,7 +92,7 @@ public class PlayerService implements UserDetailsService {
 	}
 
 	@Transactional
-	public Player save(Player player) {
+	private Player save(Player player) {
 
 		try {
 			player.setRole(Common.ROLE_PLAYER_REGULAR);
@@ -65,7 +108,7 @@ public class PlayerService implements UserDetailsService {
 	}
 
 	@Transactional
-	public GolfUserDetails loadUserAndUpdate(String playerName) {
+	private GolfUserDetails loadUserAndUpdate(String playerName) {
 
 		Player player = playerRepository.findPlayerByNick(playerName)
 				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
@@ -86,20 +129,6 @@ public class PlayerService implements UserDetailsService {
 	@CacheEvict(value = "player", key = "#player.id")
 	public void cacheEvict(@NonNull Player player) {
 		log.debug("Cache evict called");
-	}
-
-
-	@Override
-	@Transactional(readOnly = true)
-	public GolfUserDetails loadUserByUsername(String playerName) throws UsernameNotFoundException {
-
-		Player player = playerRepository.findPlayerByNick(playerName)
-				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
-
-		log.info("Creating user details for " + playerName);
-
-		return new GolfUser(player.getNick(), player.getPassword(),	new ArrayList<>(), player);
-
 	}
 
 	@Transactional(readOnly = true)
@@ -128,12 +157,13 @@ public class PlayerService implements UserDetailsService {
 
 		if (player.getWhs() != null) {
 			persistedPlayer.setWhs(player.getWhs());
+			log.info("Handicap changed by player");
 		}
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
-			persistedPlayer.setPassword(player.getPassword());
+			persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+			log.info("Password changed by player");
 		}
 
-		persistedPlayer.setRole(persistedPlayer.getRole());
 		playerRepository.save(persistedPlayer);
 
 		return persistedPlayer;
@@ -171,27 +201,21 @@ public class PlayerService implements UserDetailsService {
 	}
 
 	@Transactional
-	public Player resetPassword(Player player) {
-		
-		Player persistedPlayer;
-		
+	public void resetPassword(Player player) {
+
 		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
 				.equals(Common.ADMIN)) {
-			
-			persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
 
 			if (player.getPassword() != null && !player.getPassword().equals("")) {
-				persistedPlayer.setPassword(player.getPassword());
+				Player persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
+				persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+				playerRepository.save(persistedPlayer);
 			}
 
-			persistedPlayer = playerRepository.save(persistedPlayer);
-						
 		} else {
 			log.error("Attempt to reset password by unauthorized user");
 			throw new UnauthorizedException();
 		}
-		
-		return persistedPlayer;
 	}
 
 	@Transactional(readOnly = true)

@@ -3,6 +3,7 @@ package com.greg.golf.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 import com.greg.golf.controller.dto.CourseDto;
@@ -29,6 +31,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class CourseControllerTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 	
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
