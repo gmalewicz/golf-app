@@ -156,6 +156,16 @@ class AccessControllerTest {
 				.content(objectMapper.writeValueAsString(output))).andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should attempt to refresh token without header with correct result")
+	@Test
+	void processAttemptRefreshTokenWithoutHeaderThenReturns200() throws Exception {
+
+		Player player = new Player();
+		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
+
+		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
+	}
+
 	@DisplayName("Should refresh token with correct result")
 	@Test
 	void processRefreshTokenThenReturns200() throws Exception {
@@ -167,7 +177,7 @@ class AccessControllerTest {
 		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
 		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/Refresh/1").header("refreshToken", "exists")).andExpect(status().isOk());
 	}
 
 	@DisplayName("Should delete with correct result")

@@ -48,6 +48,7 @@ public class PlayerService {
 	private final PasswordEncoder bCryptPasswordEncoder;
 	private final AuthenticationManager authenticationManager;
 
+	@Transactional
 	public GolfUserDetails authenticatePlayer(Player player) {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), player.getPassword()));
 		log.debug("Authentication completed");
@@ -91,7 +92,6 @@ public class PlayerService {
 		playerRepository.delete(player);
 	}
 
-	@Transactional
 	private Player save(Player player) {
 
 		try {
@@ -107,14 +107,13 @@ public class PlayerService {
 
 	}
 
-	@Transactional
 	private GolfUserDetails loadUserAndUpdate(String playerName) {
 
 		Player player = playerRepository.findPlayerByNick(playerName)
 				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
 
 		// clear modify flag if user has been changed
-		if (player.getModified()) {
+		if (Boolean.TRUE.equals(player.getModified())) {
 
 			player.setModified(false);
 			playerRepository.save(player);

@@ -1,16 +1,14 @@
 package com.greg.golf.service;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-
-import com.greg.golf.controller.dto.PlayerDto;
+import com.greg.golf.entity.Player;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.PlayerNickInUseException;
+import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
+import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -18,8 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,11 +26,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import com.greg.golf.entity.Player;
-import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.UnauthorizedException;
-import com.greg.golf.repository.PlayerRepository;
-import com.greg.golf.util.GolfPostgresqlContainer;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
@@ -237,6 +232,77 @@ class PlayerServiceTest {
 		assertThrows(PlayerNickInUseException.class, () -> playerService.addPlayerOnBehalf(player));
 	}
 
+	@DisplayName("Generate tokens")
+	@Transactional
+	@Test
+	void generateTokensTest() {
+
+		Player player = new Player();
+		player.setRole(Common.ROLE_PLAYER_REGULAR);
+		player.setId(1L);
+
+		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
+
+		Assertions.assertDoesNotThrow(() -> playerService.generateJwtToken(userDetails));
+		Assertions.assertDoesNotThrow(() -> playerService.generateRefreshToken(userDetails));
+	}
+
+	@DisplayName("Delete player test")
+	@Transactional
+	@Test
+	void deletePlayerTest(@Autowired PlayerRepository playerRepository) {
+
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
+
+		playerService.delete(1L);
+
+		Assertions.assertEquals(1, playerRepository.findAll().size());
+	}
+
+	@DisplayName("Load user by Id test")
+	@Transactional
+	@Test
+	void loadUserByIdTest() {
+
+		GolfUserDetails userDetails = playerService.loadUserById(1L);
+
+		Assertions.assertEquals("golfer", userDetails.getUsername());
+	}
+
+	@DisplayName("Update player on behalf test")
+	@Transactional
+	@Test
+	void updatePlayerOnBehalfTest(@Autowired PlayerRepository playerRepository) {
+
+		Player player = new Player();
+		player.setId(1L);
+		player.setWhs(33.3F);
+		player.setNick("Test");
+		player.setSex(!Common.PLAYER_SEX_MALE);
+		playerService.updatePlayerOnBehalf(player);
+
+		Player persistedPlayer = playerRepository.getById(1L);
+
+		Assertions.assertEquals("Test", persistedPlayer.getNick());
+		Assertions.assertEquals(33.3F, persistedPlayer.getWhs());
+		Assertions.assertEquals(!Common.PLAYER_SEX_MALE, persistedPlayer.getSex());
+	}
+
+	@DisplayName("Get player for nick test")
+	@Transactional
+	@Test
+	void getPlayerForNickTest() {
+
+		Player persistedPlayer = playerService.getPlayerForNick("golfer");
+
+		Assertions.assertEquals(1L, persistedPlayer.getId());
+	}
+
+
 	@AfterAll
 	public static void done(@Autowired PlayerRepository playerRepository) {
 
@@ -244,5 +310,4 @@ class PlayerServiceTest {
 		log.info("Clean up completed");
 
 	}
-
 }

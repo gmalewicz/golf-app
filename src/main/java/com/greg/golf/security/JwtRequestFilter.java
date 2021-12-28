@@ -97,7 +97,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 				// do not authorize player who has been modified by admin
 				// modified flag will be removed after sign on
-				if (player.getModified()) {
+				if (Boolean.TRUE.equals(player.getModified())) {
 
 					// clear cache for the player that has been modified
 					this.playerService.cacheEvict(player);
