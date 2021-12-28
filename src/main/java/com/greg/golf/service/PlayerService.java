@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 import com.greg.golf.captcha.ICaptchaService;
+import com.greg.golf.configurationproperties.PlayerServiceConfig;
 import com.greg.golf.repository.projection.PlayerRoundCnt;
 import com.greg.golf.security.JwtTokenUtil;
 import com.greg.golf.security.RefreshTokenUtil;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,14 +36,14 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Slf4j
+@ConfigurationProperties(prefix = "player")
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
 public class PlayerService {
 
-	private static final String TEMPORARY_PASSWORD = "welcome";
-
 	private final PlayerRepository playerRepository;
 
+	private final PlayerServiceConfig playerServiceConfig;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RefreshTokenUtil refreshTokenUtil;
 	private final ICaptchaService captchaService;
@@ -75,7 +77,7 @@ public class PlayerService {
 	@Transactional
 	public Player addPlayerOnBehalf(Player player) {
 
-		player.setPassword(bCryptPasswordEncoder.encode(TEMPORARY_PASSWORD));
+		player.setPassword(bCryptPasswordEncoder.encode( playerServiceConfig.getTempPwd()));
 
 		return save(player);
 	}

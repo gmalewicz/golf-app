@@ -177,7 +177,7 @@ class AccessControllerTest {
 		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
 		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-		mockMvc.perform(get("/rest/Refresh/1").header("refreshToken", "exists")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/Refresh/1").requestAttr("refreshToken", "exists")).andExpect(status().isOk());
 	}
 
 	@DisplayName("Should delete with correct result")

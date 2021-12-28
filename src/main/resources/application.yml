@@ -47,7 +47,9 @@ round:
   pageSize: 5
 course:
   pageSize: 5
-  minSearchLength: 3  
+  minSearchLength: 3
+player:
+  tempPwd: welcome
     
 ---
 
