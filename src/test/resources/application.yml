@@ -52,3 +52,5 @@ round:
 course:
   pageSize: 5
   minSearchLength: 3
+player:
+  tempPwd: welcome

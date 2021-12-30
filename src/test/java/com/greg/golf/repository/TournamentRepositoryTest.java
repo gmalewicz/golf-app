@@ -6,6 +6,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.greg.golf.security.JwtRequestFilter;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import com.greg.golf.entity.Tournament;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -27,6 +29,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class TournamentRepositoryTest {
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
 
 	private static Player player;
 

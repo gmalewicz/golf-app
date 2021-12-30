@@ -1,5 +1,7 @@
 package com.greg.golf.security;
 
+import com.greg.golf.service.PlayerService;
+import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,15 +15,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import com.greg.golf.service.PlayerService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -36,17 +35,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 
 	@Getter @Setter private String allowedOrigins;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-	
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Autowired
-	private PlayerService playerService;
+	private UserService userService;
 	
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
@@ -55,7 +51,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		// configure AuthenticationManager so that it knows from where to load
 		// user for matching credentials
-		auth.userDetailsService(playerService).passwordEncoder(passwordEncoder());
+		auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
 	}
 
 	@Bean

@@ -10,6 +10,7 @@ import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.CycleService;
 import com.greg.golf.service.PlayerService;
+import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -51,6 +53,14 @@ class CycleControllerTest {
 
 	@MockBean
 	private ModelMapper modelMapper;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private PasswordEncoder bCryptPasswordEncoder;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private UserService userService;
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;

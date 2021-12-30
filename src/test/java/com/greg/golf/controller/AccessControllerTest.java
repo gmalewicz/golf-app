@@ -1,264 +1,211 @@
 package com.greg.golf.controller;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
-import org.junit.jupiter.api.*;
-
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import com.greg.golf.configurationproperties.JwtConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
-import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.PlayerNickInUseException;
-import com.greg.golf.error.UnauthorizedException;
-import com.greg.golf.repository.PlayerRepository;
-import com.greg.golf.security.JwtTokenUtil;
-import com.greg.golf.util.GolfPostgresqlContainer;
+import com.greg.golf.security.JwtAuthenticationEntryPoint;
+import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.service.PlayerService;
+import com.greg.golf.service.UserService;
+import com.greg.golf.service.helpers.GolfUser;
+import com.greg.golf.service.helpers.GolfUserDetails;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
 
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
+import java.util.ArrayList;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(controllers = AccessController.class)
 class AccessControllerTest {
 
-	@ClassRule
-	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
-			.getInstance();
+	@SuppressWarnings("unused")
+	@MockBean
+	private PlayerService playerService;
 
-	private final AccessController accessController;
-	private static JwtTokenUtil jwtTokenUtil;
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtRequestFilter jwtRequestFilter;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private ModelMapper modelMapper;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private PasswordEncoder bCryptPasswordEncoder;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private UserService userService;
+
+	private final MockMvc mockMvc;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public AccessControllerTest(AccessController accessController) {
-
-		this.accessController = accessController;
+	public AccessControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+		this.mockMvc = mockMvc;
+		this.objectMapper = objectMapper;
 	}
 
 	@BeforeAll
-	public static void setup(@Autowired JwtConfig jwtConfig) {
-
-		jwtTokenUtil = new JwtTokenUtil(jwtConfig);
+	public static void setup() {
 		log.info("Set up completed");
 	}
 
-	@DisplayName("Process valid authentication")
-	@Transactional
+	@DisplayName("Should authenticate with correct result")
 	@Test
-	void authenticateValidPlayerTest() {
+	void processAuthenticationWhenValidInputThenReturns200() throws Exception {
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setNick("golfer");
-		playerDto.setPassword("welcome");
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
 
-		ResponseEntity<PlayerDto> response = this.accessController.authenticatePlayer(playerDto);
-		Assertions.assertEquals(1L, Objects.requireNonNull(response.getBody()).getId().longValue());
+		Player player = new Player();
+		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
+
+		when(playerService.authenticatePlayer(any())).thenReturn(userDetails);
+		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
+		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
+
+		mockMvc.perform(post("/rest/Authenticate").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Process invalid password authentication")
-	@Transactional
+	@DisplayName("Should add player with correct result")
 	@Test
-	void authenticateInvalidPasswordTest() {
+	void processAddPlayerWhenValidInputThenReturns200() throws Exception {
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setNick("golfer");
-		playerDto.setPassword("invalid");
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
 
-		assertThrows(BadCredentialsException.class, () -> this.accessController.authenticatePlayer(playerDto));
+		doNothing().when(playerService).addPlayer(any());
+
+		mockMvc.perform(post("/rest/AddPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Process invalid username authentication")
-	@Transactional
+	@DisplayName("Should update player with correct result")
 	@Test
-	void authenticateInvalidUserNameTest() {
+	void processUpdatePlayerWhenValidInputThenReturns200() throws Exception {
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setNick("invalid");
-		playerDto.setPassword("welcome");
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
 
-		assertThrows(BadCredentialsException.class, () -> this.accessController.authenticatePlayer(playerDto));
+		var output = new Player();
+		output.setNick("Test");
+		output.setPassword("Password");
+
+		when(playerService.update(any())).thenReturn(output);
+
+		mockMvc.perform(patch("/rest/PatchPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Add player test")
-	@Transactional
+	@DisplayName("Should reset password by privileged user with correct result")
 	@Test
-	void addPlayerTest() {
+	void processPasswordByPrivilegedUserWhenValidInputThenReturns200() throws Exception {
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setNick("test");
-		playerDto.setPassword("welcome");
-		playerDto.setCaptcha("ABCDE");
-		playerDto.setWhs(10f);
-		playerDto.setSex(Common.PLAYER_SEX_MALE);
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
 
-		HttpStatus status = this.accessController.addPlayer(playerDto);
+		doNothing().when(playerService).resetPassword(any());
 
-		Assertions.assertEquals(HttpStatus.OK, status);
+		mockMvc.perform(patch("/rest/ResetPassword").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Update player whs")
-	@Transactional
+	@DisplayName("Should add player on behalf with correct result")
 	@Test
-	void updatePlayerWhsTest(@Autowired PlayerRepository playerRepository) {
+	void processAddPlayerOnBehalfWhenValidInputThenReturns200() throws Exception {
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setWhs(10f);
-		playerDto.setId(1L);
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
 
-		this.accessController.updatePlayer(playerDto);
+		var output = new Player();
+		output.setNick("Test");
+		output.setPassword("Password");
 
-		Optional<Player> player = playerRepository.findById(1L);
+		when(playerService.addPlayerOnBehalf(any())).thenReturn(output);
 
-		Assertions.assertEquals(10f, player.orElseThrow().getWhs(), 0);
+		mockMvc.perform(post("/rest/AddPlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(output))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Update player password")
-	@Transactional
+	@DisplayName("Should attempt to refresh token without header with correct result")
 	@Test
-	void updatePlayerPasswordTest(@Autowired PlayerRepository playerRepository) {
+	void processAttemptRefreshTokenWithoutHeaderThenReturns200() throws Exception {
 
-		String orgPlayerPwd = playerRepository.findById(1L).orElseThrow().getPassword();
+		Player player = new Player();
+		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setPassword("newPassword");
-		playerDto.setId(1L);
-
-		this.accessController.updatePlayer(playerDto);
-
-		Optional<Player> updPlayer = playerRepository.findById(1L);
-
-		Assertions.assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
+		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
 	}
 
-	@DisplayName("Reset password by privileged user")
-	@Transactional
+	@DisplayName("Should refresh token with correct result")
 	@Test
-	void resetPlayerPasswordByPrivilegedUserTest(@Autowired PlayerRepository playerRepository) {
+	void processRefreshTokenThenReturns200() throws Exception {
 
-		String orgPlayerPwd = playerRepository.findById(1L).orElseThrow().getPassword();
-		
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+		Player player = new Player();
+		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setPassword("newPassword");
-		playerDto.setNick("golfer");
-		playerDto.setId(1L);
+		when(playerService.loadUserById(any())).thenReturn(userDetails);
+		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
+		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-		this.accessController.resetPassword(playerDto);
-
-		Optional<Player> updPlayer = playerRepository.findById(1L);
-
-		Assertions.assertNotSame(orgPlayerPwd, updPlayer.orElseThrow().getPassword());
+		mockMvc.perform(get("/rest/Refresh/1").requestAttr("refreshToken", "exists")).andExpect(status().isOk());
 	}
 
-	@DisplayName("Reset password by unauthorized user")
-	@Transactional
+	@DisplayName("Should delete with correct result")
 	@Test
-	void resetPlayerPasswordByUnauthorizedUserTest(@Autowired PlayerRepository playerRepository) {
-		
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+	void processDeletePlayerWhenValidInputThenReturns200() throws Exception {
 
-		
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setId(1L);
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setPassword("newPassword");
-		playerDto.setNick("golfer");
-		playerDto.setId(1L);
+		doNothing().when(playerService).delete(any());
 
-		assertThrows(UnauthorizedException.class, () -> this.accessController.resetPassword(playerDto));
+		mockMvc.perform(post("/rest/DeletePlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Add player on behalf test")
-	@Transactional
+	@DisplayName("Should update player on behalf with correct result")
 	@Test
-	void addPlayeronBehalfTest() {
+	void processUpdatePlayerOnBehalfWhenValidInputThenReturns200() throws Exception {
 
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setNick("test");
-		playerDto.setPassword("welcome");
-		playerDto.setWhs(10f);
-		playerDto.setSex(Common.PLAYER_SEX_MALE);
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
 
-		ResponseEntity<PlayerDto> response = this.accessController.addPlayerOnBehalf(playerDto);
+		doNothing().when(playerService).updatePlayerOnBehalf(any());
 
-		Assertions.assertNotNull(Objects.requireNonNull(response.getBody()).getId(), "Player id should not be null");
-	}
-
-	@DisplayName("Add player on behalf test which already exists")
-	@Transactional
-	@Test
-	void addPlayerOnBehalfWhichAlredyExistsTest() {
-
-		PlayerDto playerDto = new PlayerDto();
-		playerDto.setNick("golfer");
-		playerDto.setPassword("welcome");
-		playerDto.setWhs(10f);
-		playerDto.setSex(Common.PLAYER_SEX_MALE);
-
-		assertThrows(PlayerNickInUseException.class, () -> this.accessController.addPlayerOnBehalf(playerDto));
-	}
-
-	@DisplayName("Should attempt refresh player token unsuccessfully")
-	@Transactional
-	@Test
-	void attemptToRefreshPlayerTokenTest() {
-
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		try {
-
-			accessController.refreshToken(request, 1L);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-
-	}
-
-	@DisplayName("Should attempt refresh player token successfully")
-	@Transactional
-	@Test
-	void attemptToRefreshPlayerTokenSuccessfullyTest() {
-
-		String jwtToken = jwtTokenUtil.generateToken("1");
-
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		when(request.getAttribute("refreshToken")).thenReturn(jwtToken);
-		try {
-
-			accessController.refreshToken(request, 1L);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-
+		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
 	@AfterAll

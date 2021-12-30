@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -57,6 +59,14 @@ class CourseControllerMockTest {
 
 	@MockBean
 	private ModelMapper modelMapper;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private PasswordEncoder bCryptPasswordEncoder;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private UserService userService;
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;

@@ -2,18 +2,25 @@ package com.greg.golf.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.greg.golf.captcha.ICaptchaService;
+import com.greg.golf.configurationproperties.PlayerServiceConfig;
 import com.greg.golf.repository.projection.PlayerRoundCnt;
+import com.greg.golf.security.JwtTokenUtil;
+import com.greg.golf.security.RefreshTokenUtil;
 import com.greg.golf.service.helpers.RoleVerification;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,17 +36,69 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Slf4j
+@ConfigurationProperties(prefix = "player")
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
-public class PlayerService implements UserDetailsService {
+public class PlayerService {
 
 	private final PlayerRepository playerRepository;
 
+	private final PlayerServiceConfig playerServiceConfig;
+	private final JwtTokenUtil jwtTokenUtil;
+	private final RefreshTokenUtil refreshTokenUtil;
+	private final ICaptchaService captchaService;
+	private final PasswordEncoder bCryptPasswordEncoder;
+	private final AuthenticationManager authenticationManager;
+
 	@Transactional
-	public Player save(Player player) {
+	public GolfUserDetails authenticatePlayer(Player player) {
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), player.getPassword()));
+		log.debug("Authentication completed");
+		return loadUserAndUpdate(player.getNick());
+	}
+
+	public String generateJwtToken(GolfUserDetails userDetails) {
+		return jwtTokenUtil.generateToken(userDetails);
+	}
+
+	public String generateRefreshToken(GolfUserDetails userDetails) {
+		return refreshTokenUtil.generateToken(userDetails);
+	}
+
+	@Transactional
+	public void addPlayer(Player player) {
+		captchaService.processResponse(player.getCaptcha());
+
+		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+
+		save(player);
+	}
+
+	@Transactional
+	public Player addPlayerOnBehalf(Player player) {
+
+		player.setPassword(bCryptPasswordEncoder.encode( playerServiceConfig.getTempPwd()));
+
+		return save(player);
+	}
+
+	@CacheEvict
+	@Transactional
+	public void delete(Long id) {
+
+		RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete player by unauthorized user");
+
+		var player = new Player();
+		player.setId(id);
+
+		playerRepository.delete(player);
+	}
+
+	private Player save(Player player) {
 
 		try {
 			player.setRole(Common.ROLE_PLAYER_REGULAR);
+			player.setModified(false);
 			return playerRepository.save(player);
 		} catch (Exception e) {
 			if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
@@ -50,87 +109,114 @@ public class PlayerService implements UserDetailsService {
 
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public GolfUserDetails loadUserByUsername(String playerName) throws UsernameNotFoundException {
+	private GolfUserDetails loadUserAndUpdate(String playerName) {
 
-		Optional<Player> player = playerRepository.findPlayerByNick(playerName);
-		GolfUserDetails golfUserDetails;
+		Player player = playerRepository.findPlayerByNick(playerName)
+				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
 
-		try {
-			golfUserDetails = new GolfUser(player.orElseThrow().getNick(), player.orElseThrow().getPassword(),
-					new ArrayList<>(), player.orElseThrow());
-			log.info("User details created");
-		} catch (NoSuchElementException e) {
-			throw new UsernameNotFoundException("User not found", e.getCause());
+		// clear modify flag if user has been changed
+		if (Boolean.TRUE.equals(player.getModified())) {
+
+			player.setModified(false);
+			playerRepository.save(player);
+			log.debug("Cleared modified flag for user " + playerName);
 		}
 
-		return golfUserDetails;
+		log.info("Creating user details for " + playerName);
 
+		return new GolfUser(player.getNick(), player.getPassword(), new ArrayList<>(), player);
+	}
+
+	@CacheEvict(value = "player", key = "#player.id")
+	public void cacheEvict(@NonNull Player player) {
+		log.debug("Cache evict called");
 	}
 
 	@Transactional(readOnly = true)
 	public GolfUserDetails loadUserById(Long id) {
 
-		Optional<Player> player = playerRepository.findById(id);
-		GolfUserDetails golfUserDetails;
+		Player player = playerRepository.findById(id)
+				.orElseThrow(() -> new UsernameNotFoundException("User " + id + " not found"));
 
-		golfUserDetails = new GolfUser(player.orElseThrow().getNick(), player.orElseThrow().getPassword(),
-				new ArrayList<>(), player.orElseThrow());
-		log.info("User details created");
+		log.info("Creating user details for " + id);
 
-		return golfUserDetails;
-
+		return new GolfUser(player.getNick(), player.getPassword(),	new ArrayList<>(), player);
 	}
 
-	@Cacheable
+	@Cacheable(value = "player", key = "#id")
 	@Transactional(readOnly = true)
 	public Optional<Player> getPlayer(Long id) {
-		log.info("Get player called");
+		log.debug("Get player called");
 		return playerRepository.findById(id);
 	}
 
-	@CacheEvict(key = "#player.id")
+	@CacheEvict(value = "player", key = "#player.id")
 	@Transactional
-	public Player update(Player player) {
+	public Player update(@NonNull Player player) {
 
 		var persistedPlayer = playerRepository.getById(player.getId());
 
 		if (player.getWhs() != null) {
 			persistedPlayer.setWhs(player.getWhs());
+			log.info("Handicap changed by player");
 		}
 		if (player.getPassword() != null && !player.getPassword().equals("")) {
-			persistedPlayer.setPassword(player.getPassword());
+			persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+			log.info("Password changed by player");
 		}
 
-		persistedPlayer.setRole(persistedPlayer.getRole());
 		playerRepository.save(persistedPlayer);
 
 		return persistedPlayer;
 	}
 
+	@CacheEvict(value = "player", key = "#player.id")
 	@Transactional
-	public Player resetPassword(Player player) {
-		
-		Player persistedPlayer;
-		
+	public void updatePlayerOnBehalf(@NonNull Player player) {
+
+		var persistedPlayer = playerRepository.findById(player.getId()).orElseThrow();
+		boolean changed = false;
+
+		if (player.getWhs() != null && !player.getWhs().equals(persistedPlayer.getWhs()) ) {
+			persistedPlayer.setWhs(player.getWhs());
+			changed = true;
+		}
+
+		if (player.getNick() != null && !player.getNick().equals(persistedPlayer.getNick()) ) {
+			persistedPlayer.setNick(player.getNick());
+			changed = true;
+		}
+
+		if (player.getSex() != null && !player.getSex().equals(persistedPlayer.getSex()) ) {
+			persistedPlayer.setSex(player.getSex());
+			changed = true;
+		}
+
+		if (changed) {
+			persistedPlayer.setModified(true);
+			playerRepository.save(persistedPlayer);
+			log.debug("player changes saved for " + persistedPlayer.getNick());
+		} else {
+			log.warn("nothing to update for player " + persistedPlayer.getNick());
+		}
+	}
+
+	@Transactional
+	public void resetPassword(Player player) {
+
 		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
 				.equals(Common.ADMIN)) {
-			
-			persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
 
 			if (player.getPassword() != null && !player.getPassword().equals("")) {
-				persistedPlayer.setPassword(player.getPassword());
+				Player persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
+				persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+				playerRepository.save(persistedPlayer);
 			}
 
-			persistedPlayer = playerRepository.save(persistedPlayer);
-						
 		} else {
 			log.error("Attempt to reset password by unauthorized user");
 			throw new UnauthorizedException();
 		}
-		
-		return persistedPlayer;
 	}
 
 	@Transactional(readOnly = true)

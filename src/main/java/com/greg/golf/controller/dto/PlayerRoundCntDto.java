@@ -7,10 +7,15 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 
 @Getter
 @Setter
 public class PlayerRoundCntDto {
+
+    @NotNull
+    @Schema(description = "Player identifier", example = "25", accessMode = READ_WRITE)
+    private Long id;
 
     @NotNull
     @Schema(description = "Player nick name", example = "golfer", accessMode = READ_ONLY, maxLength=20)

@@ -6,6 +6,7 @@ import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -18,6 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,6 +37,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class CycleServiceTest {
+
+    @SuppressWarnings("unused")
+    @MockBean
+    private JwtRequestFilter jwtRequestFilter;
 
     @ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer

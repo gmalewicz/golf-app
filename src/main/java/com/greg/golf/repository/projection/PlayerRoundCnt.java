@@ -2,6 +2,7 @@ package com.greg.golf.repository.projection;
 
 public interface PlayerRoundCnt {
 
+    Long getId();
     String getNick();
     Boolean getSex();
     Float getWhs();
