@@ -25,6 +25,7 @@
 		<modelmapper.version>2.4.4</modelmapper.version>
 		<liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
 		<org.testcontainers.postgresql.version>1.16.2</org.testcontainers.postgresql.version>
+		<!-- <org.springframework.social.spring-social-facebook.version>2.0.3.RELEASE</org.springframework.social.spring-social-facebook.version> -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -45,6 +46,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
 
 		<dependency>
@@ -132,7 +138,13 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-
+<!--
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-facebook</artifactId>
+			<version>${org.springframework.social.spring-social-facebook.version}</version>
+		</dependency>
+-->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>

@@ -1,4 +1,16 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: 5404652492885471
+            client-secret: 3aa01310aaae53ad71996b46ff7f9c45
+            scope:
+              - public_profile
+        provider:
+          facebook:
+            user-info-uri: https://graph.facebook.com/me?fields=name,first_name,last_name
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher

@@ -42,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 public class PlayerService {
 
 	private final PlayerRepository playerRepository;
-
 	private final PlayerServiceConfig playerServiceConfig;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RefreshTokenUtil refreshTokenUtil;
@@ -55,6 +54,30 @@ public class PlayerService {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), player.getPassword()));
 		log.debug("Authentication completed");
 		return loadUserAndUpdate(player.getNick());
+	}
+
+	@Transactional
+	public String processOAuthPostLogin(String firstName, String lastName) {
+
+		String nick = firstName + "." + lastName.substring(0,2);
+
+		// check if player already exists
+		Player player = getPlayerForNick(nick);
+
+		if (player == null) {
+			log.info("Social media player not found: " + nick + " - adding the new player for " + firstName + " " + lastName);
+
+			final var newPlayer = new Player();
+			newPlayer.setNick(nick);
+			newPlayer.setWhs(54.0F);
+			newPlayer.setSex(false);
+			newPlayer.setPassword((playerServiceConfig.getTempPwd()));
+			addPlayerOnBehalf(newPlayer);
+		} {
+			log.debug("Social media player already exists: " + nick);
+		}
+
+		return generateJwtToken(loadUserAndUpdate(nick));
 	}
 
 	public String generateJwtToken(GolfUserDetails userDetails) {
