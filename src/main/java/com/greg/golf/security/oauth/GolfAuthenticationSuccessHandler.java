@@ -1,6 +1,9 @@
 package com.greg.golf.security.oauth;
 
+import com.greg.golf.configurationproperties.CourseServiceConfig;
+import com.greg.golf.configurationproperties.Oauth2Config;
 import com.greg.golf.service.PlayerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -18,6 +21,9 @@ public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHa
     private PlayerService playerService;
 
     @Autowired
+    private Oauth2Config oauth2Config;
+
+    @Autowired
     public GolfAuthenticationSuccessHandler(@Lazy PlayerService playerService) {
         this.playerService = playerService;
     }
@@ -32,8 +38,8 @@ public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHa
         log.debug("Player first name: " + oauthUser.getFirstName());
         log.debug("Player last name: " + oauthUser.getLastName());
 
-        String token = playerService.processOAuthPostLogin(oauthUser.getFirstName(), oauthUser.getLastName());
+        String queryParams = playerService.processOAuthPostLogin(oauthUser.getFirstName(), oauthUser.getLastName());
 
-        response.sendRedirect("http://localhost:4200/login?token=" + token);
+        response.sendRedirect(oauth2Config.getRedirect() + queryParams);
     }
 }

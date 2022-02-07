@@ -283,7 +283,7 @@ class PlayerServiceTest {
 		player.setWhs(33.3F);
 		player.setNick("Test");
 		player.setSex(!Common.PLAYER_SEX_MALE);
-		playerService.updatePlayerOnBehalf(player);
+		playerService.updatePlayerOnBehalf(player, false);
 
 		Player persistedPlayer = playerRepository.getById(1L);
 

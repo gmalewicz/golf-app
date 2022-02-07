@@ -60,6 +60,8 @@ public class PlayerService {
 	public String processOAuthPostLogin(String firstName, String lastName) {
 
 		String nick = firstName + "." + lastName.substring(0,2);
+		StringBuilder queryParams = new StringBuilder("?token=");
+		String newPlayerQuery = "";
 
 		// check if player already exists
 		Player player = getPlayerForNick(nick);
@@ -73,11 +75,15 @@ public class PlayerService {
 			newPlayer.setSex(false);
 			newPlayer.setPassword((playerServiceConfig.getTempPwd()));
 			addPlayerOnBehalf(newPlayer);
-		} {
+			newPlayerQuery = "&new_player=true";
+		} else {
 			log.debug("Social media player already exists: " + nick);
 		}
 
-		return generateJwtToken(loadUserAndUpdate(nick));
+		queryParams.append(generateJwtToken(loadUserAndUpdate(nick)));
+		queryParams.append(newPlayerQuery);
+
+		return queryParams.toString();
 	}
 
 	public String generateJwtToken(GolfUserDetails userDetails) {
@@ -195,7 +201,7 @@ public class PlayerService {
 
 	@CacheEvict(value = "player", key = "#player.id")
 	@Transactional
-	public void updatePlayerOnBehalf(@NonNull Player player) {
+	public void updatePlayerOnBehalf(@NonNull Player player, boolean updateSocial) {
 
 		var persistedPlayer = playerRepository.findById(player.getId()).orElseThrow();
 		boolean changed = false;
@@ -215,7 +221,7 @@ public class PlayerService {
 			changed = true;
 		}
 
-		if (changed) {
+		if (changed && !updateSocial) {
 			persistedPlayer.setModified(true);
 			playerRepository.save(persistedPlayer);
 			log.debug("player changes saved for " + persistedPlayer.getNick());

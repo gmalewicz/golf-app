@@ -67,6 +67,7 @@ public class AccessController {
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("refresh", playerService.generateRefreshToken(userDetails));
 
+		assert userDetails != null;
 		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders, HttpStatus.OK);
 	}
 
@@ -168,8 +169,9 @@ public class AccessController {
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
 		log.info("trying to update player: " + playerDto.getNick() + " by admin or other player");
+		boolean updateSocial = playerDto.getUpdateSocial() != null && playerDto.getUpdateSocial();
 
-		playerService.updatePlayerOnBehalf(modelMapper.map(playerDto, Player.class));
+		playerService.updatePlayerOnBehalf(modelMapper.map(playerDto, Player.class), updateSocial);
 
 		return HttpStatus.OK;
 	}

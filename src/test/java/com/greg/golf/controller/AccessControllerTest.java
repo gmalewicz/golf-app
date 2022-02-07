@@ -202,7 +202,7 @@ class AccessControllerTest {
 		input.setNick("Test");
 		input.setPassword("Password");
 
-		doNothing().when(playerService).updatePlayerOnBehalf(any());
+		doNothing().when(playerService).updatePlayerOnBehalf(any(), any());
 
 		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
