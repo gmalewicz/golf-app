@@ -61,6 +61,7 @@ class PlayerServiceTest {
 		adminPlayer.setWhs(10f);
 		adminPlayer.setSex(Common.PLAYER_SEX_MALE);
 		adminPlayer.setModified(false);
+		adminPlayer.setType(Common.TYPE_PLAYER_LOCAL);
 		admin = playerRepository.save(adminPlayer);
 
 		log.info("Set up completed");

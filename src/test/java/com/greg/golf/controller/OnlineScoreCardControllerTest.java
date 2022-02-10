@@ -12,6 +12,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
+import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
+import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -59,6 +62,15 @@ class OnlineScoreCardControllerTest {
 
 	@MockBean
 	private ModelMapper modelMapper;
+
+	@MockBean
+	private GolfOAuth2UserService golfOAuth2UserService;
+
+	@MockBean
+	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
+
+	@MockBean
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;

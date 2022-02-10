@@ -55,6 +55,9 @@ public class WebSecurityConfiguration<CustomOAuth2UserService> extends WebSecuri
 	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
 
 	@Autowired
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
+
+	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		// configure AuthenticationManager so that it knows from where to load
 		// user for matching credentials
@@ -94,7 +97,7 @@ public class WebSecurityConfiguration<CustomOAuth2UserService> extends WebSecuri
 					.userService(oauth2UserService)
 				.and()
 				.successHandler(golfAuthenticationSuccessHandler)
-				.failureHandler(new GolfAuthenticationFailureHandler());
+				.failureHandler(golfAuthenticationFailureHandler);
 
 		httpSecurity
 			.cors();

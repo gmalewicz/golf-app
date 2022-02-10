@@ -8,4 +8,5 @@ public interface PlayerRoundCnt {
     Float getWhs();
     Integer getRole();
     Long getRoundCnt();
+    Integer getType();
 }

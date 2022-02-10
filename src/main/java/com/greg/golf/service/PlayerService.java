@@ -57,7 +57,7 @@ public class PlayerService {
 	}
 
 	@Transactional
-	public String processOAuthPostLogin(String firstName, String lastName) {
+	public String processOAuthPostLogin(String firstName, String lastName, int playerType) {
 
 		String nick = firstName + "." + lastName.substring(0,2);
 		StringBuilder queryParams = new StringBuilder("?token=");
@@ -71,13 +71,20 @@ public class PlayerService {
 
 			final var newPlayer = new Player();
 			newPlayer.setNick(nick);
+			// set default values for whs and sex - they should be updated in the second step on frontend
 			newPlayer.setWhs(54.0F);
 			newPlayer.setSex(false);
 			newPlayer.setPassword((playerServiceConfig.getTempPwd()));
+			newPlayer.setType(playerType);
 			addPlayerOnBehalf(newPlayer);
 			newPlayerQuery = "&new_player=true";
 		} else {
-			log.debug("Social media player already exists: " + nick);
+			log.debug("Player with such nick already exists: " + nick);
+			if (player.getType() != playerType) {
+				log.error("Attempt to log a player with different social media than registered");
+				log.error("Expected: " + player.getType() + " attempt with: " + playerType);
+				return null;
+			}
 		}
 
 		queryParams.append(generateJwtToken(loadUserAndUpdate(nick)));
@@ -99,6 +106,7 @@ public class PlayerService {
 		captchaService.processResponse(player.getCaptcha());
 
 		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+		player.setType(Common.TYPE_PLAYER_LOCAL);
 
 		save(player);
 	}
@@ -107,6 +115,11 @@ public class PlayerService {
 	public Player addPlayerOnBehalf(Player player) {
 
 		player.setPassword(bCryptPasswordEncoder.encode( playerServiceConfig.getTempPwd()));
+
+		// social player type should be set earlier
+		if (player.getType() == null) {
+			player.setType(Common.TYPE_PLAYER_LOCAL);
+		}
 
 		return save(player);
 	}

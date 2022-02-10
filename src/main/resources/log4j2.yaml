@@ -13,7 +13,7 @@ Configuration:
   Loggers:
     logger:
       - name: com.greg.golf
-        level: debug
+        level: info
         additivity: false
         AppenderRef:
           - ref: Console
