@@ -56,18 +56,14 @@ public class AccessController {
 	public ResponseEntity<PlayerDto> getSocialPlayer(HttpServletRequest request) {
 
 		String requestTokenHeader = request.getHeader("Authorization");
-		GolfUserDetails userDetails = null;
 
-		if (requestTokenHeader.startsWith("Bearer ")) {
-			String userId = jwtTokenUtil.getUserIdFromToken(requestTokenHeader.substring(7));
-			userDetails = playerService.loadUserById(Long.valueOf(userId));
-			log.info("get data for social player : " + userDetails.getPlayer().getNick());
-		}
+		String userId = jwtTokenUtil.getUserIdFromToken(requestTokenHeader.substring(7));
+		GolfUserDetails userDetails = playerService.loadUserById(Long.valueOf(userId));
+		log.info("get data for social player : " + userDetails.getPlayer().getNick());
 
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("refresh", playerService.generateRefreshToken(userDetails));
 
-		assert userDetails != null;
 		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders, HttpStatus.OK);
 	}
 

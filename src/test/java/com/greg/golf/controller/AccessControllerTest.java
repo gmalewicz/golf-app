@@ -229,6 +229,36 @@ class AccessControllerTest {
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should update player on behalf with social media flag set and correct result")
+	@Test
+	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetWhenValidInputThenReturns200() throws Exception {
+
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
+		input.setUpdateSocial(true);
+
+		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
+
+		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should request social media player data")
+	@Test
+	void requestSocialMediaPlayerDataWhenValidInputThenReturns200() throws Exception {
+
+		Player player = new Player();
+		player.setNick("test");
+		GolfUserDetails gu = new GolfUser("test", "test", new ArrayList<>(), player);
+
+		when(jwtTokenUtil.getUserIdFromToken(any())).thenReturn("1");
+		when(playerService.loadUserById(any())).thenReturn(gu);
+		when(playerService.generateRefreshToken(any())).thenReturn("1");
+
+		mockMvc.perform(get("/rest/GetSocialPlayer").header("Authorization","Bearer 1234")).andExpect(status().isOk());
+	}
+
 	@AfterAll
 	public static void done() {
 
