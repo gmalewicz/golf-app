@@ -32,7 +32,7 @@ import lombok.Setter;
 @EnableCaching
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfiguration<CustomOAuth2UserService> extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
 
@@ -78,7 +78,7 @@ public class WebSecurityConfiguration<CustomOAuth2UserService> extends WebSecuri
 			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         
 		httpSecurity
-			.csrf().disable()
+			//.csrf().disable()
 			.authorizeRequests()
 			.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**").permitAll()
 			//.antMatchers("/websocket/**").authenticated()
@@ -106,7 +106,6 @@ public class WebSecurityConfiguration<CustomOAuth2UserService> extends WebSecuri
 		 	.csrf()
 		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
 		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-		 		 
 	}
 	
 	@Override
