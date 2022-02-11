@@ -244,6 +244,21 @@ class AccessControllerTest {
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should update player on behalf with social media flag set false and correct result")
+	@Test
+	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetFalseWhenValidInputThenReturns200() throws Exception {
+
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
+		input.setUpdateSocial(false);
+
+		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
+
+		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
 	@DisplayName("Should request social media player data")
 	@Test
 	void requestSocialMediaPlayerDataWhenValidInputThenReturns200() throws Exception {
