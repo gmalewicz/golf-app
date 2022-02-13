@@ -303,6 +303,17 @@ class PlayerServiceTest {
 		Assertions.assertEquals(1L, persistedPlayer.getId());
 	}
 
+	@DisplayName("Process Oauth post login for unknown player test")
+	@Transactional
+	@Test
+	void getProcessOauthUnknownPlayerTest() {
+
+		playerService.processOAuthPostLogin("Test", "Player", Common.TYPE_PLAYER_FACEBOOK);
+		Player persistedPlayer = playerService.getPlayerForNick("Test.Pl");
+
+		Assertions.assertNotNull(persistedPlayer);
+	}
+
 
 	@AfterAll
 	public static void done(@Autowired PlayerRepository playerRepository) {
