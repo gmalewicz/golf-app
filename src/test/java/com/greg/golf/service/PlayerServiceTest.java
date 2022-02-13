@@ -356,6 +356,31 @@ class PlayerServiceTest {
 		Assertions.assertNull(retStr);
 	}
 
+	@DisplayName("Process valid authentication with modified flag set")
+	@Transactional
+	@Test
+	void authenticateValidPlayerWithModifiedFlagTest(@Autowired PlayerRepository playerRepository) {
+
+		Player adminPlayer = new Player();
+		adminPlayer.setNick("Test.Pl");
+		adminPlayer.setPassword(player.getPassword());
+		adminPlayer.setRole(Common.ROLE_PLAYER_ADMIN);
+		adminPlayer.setWhs(10f);
+		adminPlayer.setSex(Common.PLAYER_SEX_MALE);
+		adminPlayer.setModified(true);
+		adminPlayer.setType(Common.TYPE_PLAYER_LOCAL);
+		admin = playerRepository.save(adminPlayer);
+
+		Player player = new Player();
+		player.setNick("Test.Pl");
+		player.setPassword("welcome");
+
+		GolfUserDetails response = playerService.authenticatePlayer(player);
+		player = playerRepository.findById(admin.getId()).orElseThrow();
+
+		Assertions.assertFalse(player.getModified());
+
+	}
 
 	@AfterAll
 	public static void done(@Autowired PlayerRepository playerRepository) {
