@@ -42,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 public class PlayerService {
 
 	private final PlayerRepository playerRepository;
-
 	private final PlayerServiceConfig playerServiceConfig;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RefreshTokenUtil refreshTokenUtil;
@@ -55,6 +54,43 @@ public class PlayerService {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), player.getPassword()));
 		log.debug("Authentication completed");
 		return loadUserAndUpdate(player.getNick());
+	}
+
+	@Transactional
+	public String processOAuthPostLogin(String firstName, String lastName, int playerType) {
+
+		String nick = firstName + "." + lastName.substring(0,2);
+		StringBuilder queryParams = new StringBuilder("?token=");
+		String newPlayerQuery = "";
+
+		// check if player already exists
+		Player player = getPlayerForNick(nick);
+
+		if (player == null) {
+			log.info("Social media player not found: " + nick + " - adding the new player for " + firstName + " " + lastName);
+
+			final var newPlayer = new Player();
+			newPlayer.setNick(nick);
+			// set default values for whs and sex - they should be updated in the second step on frontend
+			newPlayer.setWhs(54.0F);
+			newPlayer.setSex(false);
+			newPlayer.setPassword((playerServiceConfig.getTempPwd()));
+			newPlayer.setType(playerType);
+			addPlayerOnBehalf(newPlayer);
+			newPlayerQuery = "&new_player=true";
+		} else {
+			log.debug("Player with such nick already exists: " + nick);
+			if (player.getType() != playerType) {
+				log.error("Attempt to log a player with different social media than registered");
+				log.error("Expected: " + player.getType() + " attempt with: " + playerType);
+				return null;
+			}
+		}
+
+		queryParams.append(generateJwtToken(loadUserAndUpdate(nick)));
+		queryParams.append(newPlayerQuery);
+
+		return queryParams.toString();
 	}
 
 	public String generateJwtToken(GolfUserDetails userDetails) {
@@ -70,6 +106,7 @@ public class PlayerService {
 		captchaService.processResponse(player.getCaptcha());
 
 		player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+		player.setType(Common.TYPE_PLAYER_LOCAL);
 
 		save(player);
 	}
@@ -78,6 +115,11 @@ public class PlayerService {
 	public Player addPlayerOnBehalf(Player player) {
 
 		player.setPassword(bCryptPasswordEncoder.encode( playerServiceConfig.getTempPwd()));
+
+		// social player type should be set earlier
+		if (player.getType() == null) {
+			player.setType(Common.TYPE_PLAYER_LOCAL);
+		}
 
 		return save(player);
 	}
@@ -172,7 +214,7 @@ public class PlayerService {
 
 	@CacheEvict(value = "player", key = "#player.id")
 	@Transactional
-	public void updatePlayerOnBehalf(@NonNull Player player) {
+	public void updatePlayerOnBehalf(@NonNull Player player, boolean updateSocial) {
 
 		var persistedPlayer = playerRepository.findById(player.getId()).orElseThrow();
 		boolean changed = false;
@@ -192,7 +234,7 @@ public class PlayerService {
 			changed = true;
 		}
 
-		if (changed) {
+		if (changed && !updateSocial) {
 			persistedPlayer.setModified(true);
 			playerRepository.save(persistedPlayer);
 			log.debug("player changes saved for " + persistedPlayer.getNick());

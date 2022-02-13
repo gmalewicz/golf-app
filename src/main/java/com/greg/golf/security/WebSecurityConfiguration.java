@@ -1,6 +1,8 @@
 package com.greg.golf.security;
 
-import com.greg.golf.service.PlayerService;
+import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
+import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
+import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,10 +44,19 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
-	
+
+	@Autowired
+	private GolfOAuth2UserService oauth2UserService;
+
+	@Autowired
+	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
+
+	@Autowired
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
+
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		// configure AuthenticationManager so that it knows from where to load
@@ -59,37 +69,43 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-	
+
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 
 		// Add a filter to validate the tokens with every request
 		httpSecurity
-			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  
+			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         
 		httpSecurity
-				//.csrf().disable()
-				.authorizeRequests()
-				.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**").permitAll()
-				//.antMatchers("/websocket/**").authenticated()
-				// all other requests need to be authenticated
-				.anyRequest().authenticated()
+			//.csrf().disable()
+			.authorizeRequests()
+			.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**").permitAll()
+			//.antMatchers("/websocket/**").authenticated()
+			// all other requests need to be authenticated
+			.anyRequest().authenticated()
+			.and()
+			// make sure we use stateless session; session won't be used to
+			// store user's state.
+			.exceptionHandling()
+			.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+			.and()
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			.and()
+			.oauth2Login()
+				.userInfoEndpoint()
+					.userService(oauth2UserService)
 				.and()
-				// make sure we use stateless session; session won't be used to
-				// store user's state.
-				.exceptionHandling()
-				.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-				.and()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
+				.successHandler(golfAuthenticationSuccessHandler)
+				.failureHandler(golfAuthenticationFailureHandler);
+
 		httpSecurity
 			.cors();
 		 
-		 httpSecurity
+		httpSecurity
 		 	.csrf()
-		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**")
+		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
 		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-		 		 
 	}
 	
 	@Override

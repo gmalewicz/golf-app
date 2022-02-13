@@ -1,4 +1,16 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: 5404652492885471
+            client-secret: replace_it
+            scope:
+              - public_profile
+        provider:
+          facebook:
+            user-info-uri: https://graph.facebook.com/me?fields=name,first_name,last_name
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -67,6 +79,8 @@ spring:
     show_sql: true
   liquibase:
     change-log: classpath:/db/dbChangeLog-dev.xml
+oauth2:
+  redirect: http://localhost:4200/login
 
 ---
 
@@ -80,6 +94,7 @@ spring:
     show_sql: false
   liquibase:
     change-log: classpath:/db/dbChangeLog-prod.xml
-    
+oauth2:
+  redirect: https://www.dgng.pl/login
 
         

@@ -8,6 +8,9 @@ import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
+import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
+import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.CycleService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
@@ -61,6 +64,18 @@ class CycleControllerTest {
 	@SuppressWarnings("unused")
 	@MockBean
 	private UserService userService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfOAuth2UserService golfOAuth2UserService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;

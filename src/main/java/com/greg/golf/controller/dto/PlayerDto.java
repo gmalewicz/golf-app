@@ -37,6 +37,9 @@ public class PlayerDto implements Comparable<PlayerDto> {
 	@JsonProperty(value = "captcha", access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "Google captcha", example = "03AG...", accessMode = WRITE_ONLY)
 	private String captcha;
+
+	@Schema(description = "Update in case of social player", example = "false", accessMode = WRITE_ONLY)
+	private Boolean updateSocial;
 	
 	@Override
 	public int compareTo(PlayerDto o) {

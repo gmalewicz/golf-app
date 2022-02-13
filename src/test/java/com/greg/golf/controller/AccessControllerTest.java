@@ -5,6 +5,10 @@ import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.security.JwtTokenUtil;
+import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
+import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
+import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
 import com.greg.golf.service.helpers.GolfUser;
@@ -25,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -58,6 +63,22 @@ class AccessControllerTest {
 	@SuppressWarnings("unused")
 	@MockBean
 	private UserService userService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfOAuth2UserService golfOAuth2UserService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtTokenUtil jwtTokenUtil;
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;
@@ -202,10 +223,55 @@ class AccessControllerTest {
 		input.setNick("Test");
 		input.setPassword("Password");
 
-		doNothing().when(playerService).updatePlayerOnBehalf(any());
+		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
 
 		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should update player on behalf with social media flag set and correct result")
+	@Test
+	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetWhenValidInputThenReturns200() throws Exception {
+
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
+		input.setUpdateSocial(true);
+
+		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
+
+		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should update player on behalf with social media flag set false and correct result")
+	@Test
+	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetFalseWhenValidInputThenReturns200() throws Exception {
+
+		var input = new PlayerDto();
+		input.setNick("Test");
+		input.setPassword("Password");
+		input.setUpdateSocial(false);
+
+		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
+
+		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should request social media player data")
+	@Test
+	void requestSocialMediaPlayerDataWhenValidInputThenReturns200() throws Exception {
+
+		Player player = new Player();
+		player.setNick("test");
+		GolfUserDetails gu = new GolfUser("test", "test", new ArrayList<>(), player);
+
+		when(jwtTokenUtil.getUserIdFromToken(any())).thenReturn("1");
+		when(playerService.loadUserById(any())).thenReturn(gu);
+		when(playerService.generateRefreshToken(any())).thenReturn("1");
+
+		mockMvc.perform(get("/rest/GetSocialPlayer").header("Authorization","Bearer 1234")).andExpect(status().isOk());
 	}
 
 	@AfterAll

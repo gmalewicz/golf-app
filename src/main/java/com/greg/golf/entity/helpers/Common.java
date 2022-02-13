@@ -15,4 +15,7 @@ public class Common {
 
 	public static final int TEE_TYPE_18 = 0;
 
+	public static final int TYPE_PLAYER_LOCAL = 0;
+	public static final int TYPE_PLAYER_FACEBOOK = 1;
+
 }

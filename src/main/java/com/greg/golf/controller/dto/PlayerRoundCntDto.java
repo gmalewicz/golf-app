@@ -36,4 +36,8 @@ public class PlayerRoundCntDto {
     @NotNull
     @Schema(description = "Player role", example = "1", accessMode = READ_ONLY, minimum="0", maximum="1")
     private Long roundCnt;
+
+    @NotNull
+    @Schema(description = "Player type", example = "0 - Local, 1 - Facebook", accessMode = READ_ONLY, minimum="0", maximum="1")
+    private Integer type;
 }

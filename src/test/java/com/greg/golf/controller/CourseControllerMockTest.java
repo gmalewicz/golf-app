@@ -9,6 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
+import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
+import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
@@ -67,6 +70,18 @@ class CourseControllerMockTest {
 	@SuppressWarnings("unused")
 	@MockBean
 	private UserService userService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfOAuth2UserService golfOAuth2UserService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;

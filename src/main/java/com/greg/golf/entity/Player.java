@@ -60,6 +60,13 @@ public class Player implements Comparable<Player> {
 	@NotNull
 	@Min(value = 0)
 	@Max(value = 1)
+	@Column(name = "type")
+	private Integer type;
+
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	@Min(value = 0)
+	@Max(value = 1)
 	@Column(name = "role")
 	private Integer role;
 

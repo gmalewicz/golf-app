@@ -1,31 +1,23 @@
 package com.greg.golf.controller;
 
 import javax.servlet.http.HttpServletRequest;
-
 import com.greg.golf.controller.dto.PlayerIdDto;
+import com.greg.golf.security.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.helpers.GolfUserDetails;
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -37,6 +29,7 @@ public class AccessController {
 
 	private final PlayerService playerService;
 	private final ModelMapper modelMapper;
+	private final JwtTokenUtil jwtTokenUtil;
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
@@ -56,6 +49,24 @@ public class AccessController {
 		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders,
 				HttpStatus.OK);
 	}
+
+	@Tag(name = "Access API")
+	@Operation(summary = "Get Social media player data.")
+	@GetMapping(value = "/rest/GetSocialPlayer")
+	public ResponseEntity<PlayerDto> getSocialPlayer(HttpServletRequest request) {
+
+		String requestTokenHeader = request.getHeader("Authorization");
+
+		String userId = jwtTokenUtil.getUserIdFromToken(requestTokenHeader.substring(7));
+		GolfUserDetails userDetails = playerService.loadUserById(Long.valueOf(userId));
+		log.info("get data for social player : " + userDetails.getPlayer().getNick());
+
+		var responseHeaders = new HttpHeaders();
+		responseHeaders.set("refresh", playerService.generateRefreshToken(userDetails));
+
+		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders, HttpStatus.OK);
+	}
+
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Add player.")
@@ -154,8 +165,9 @@ public class AccessController {
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
 
 		log.info("trying to update player: " + playerDto.getNick() + " by admin or other player");
+		boolean updateSocial = playerDto.getUpdateSocial() != null && playerDto.getUpdateSocial();
 
-		playerService.updatePlayerOnBehalf(modelMapper.map(playerDto, Player.class));
+		playerService.updatePlayerOnBehalf(modelMapper.map(playerDto, Player.class), updateSocial);
 
 		return HttpStatus.OK;
 	}
