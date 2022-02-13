@@ -4,7 +4,6 @@ spring:
       client:
         registration:
           facebook:
-            redirect-uri: https://dgng.pl/login/oauth2/code/facebook
             client-id: 5404652492885471
             client-secret: replace_it
             scope:
