@@ -4,7 +4,7 @@ spring:
       client:
         registration:
           facebook:
-            client-id: 5404652492885471
+            client-id: 334322345287310
             client-secret: replace_it
             scope:
               - public_profile
@@ -93,7 +93,7 @@ spring:
       client:
         registration:
           facebook:
-            redirect-uri: https://dgng.pl/oauth2/code/facebook
+            client-id: 5404652492885471
   datasource:
     url: jdbc:postgresql://10.156.0.3:5432/golf 
   jpa:
