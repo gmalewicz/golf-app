@@ -102,6 +102,6 @@ spring:
   liquibase:
     change-log: classpath:/db/dbChangeLog-prod.xml
 oauth2:
-  redirect: https://www.dgng.pl/login
+  redirect: https://dgng.pl/login
 
         
