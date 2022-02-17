@@ -57,6 +57,11 @@ spec:
             secretKeyRef:
               name: golf-app-secret
               key: allowed-origins
+        - name: spring.security.oauth2.client.registration.facebook.client-secret
+            valueFrom:
+              secretKeyRef:
+                name: golf-app-secret
+                key: facebook-secret
         - name: PG_SERVER
           valueFrom:
             configMapKeyRef:
