@@ -55,6 +55,10 @@ public class TournamentRound {
 	@NotNull
 	@Column(name = "scr_diff")
 	private Float scrDiff;
+
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	private Boolean strokes;
 	
 	@NotNull
 	//@JsonProperty( value = "courseName", access = JsonProperty.Access.READ_ONLY)

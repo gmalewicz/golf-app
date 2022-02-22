@@ -35,6 +35,11 @@ public class TournamentDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date endDate;
 
+	@NotNull
+	@Schema(description = "Number of best rounds from tournament to be included in the result, 0 - all rounds",
+			example = "0", minimum = "0", maximum = "10", accessMode = READ_WRITE)
+	private Integer bestRounds;
+
 	@Schema(description = "Tournamnet owner", accessMode = READ_WRITE)
 	private PlayerDto player;
 }

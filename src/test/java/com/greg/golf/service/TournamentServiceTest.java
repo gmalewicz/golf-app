@@ -188,7 +188,8 @@ class TournamentServiceTest {
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
 
-		TournamentRound tournamentRound = tournamentService.addTournamentRound(1, 1, 1, 1, 1, "test", tournamentResult);
+		TournamentRound tournamentRound =
+				tournamentService.addTournamentRound(1, 1, 1, 1, 1, "test", tournamentResult, false);
 
 		Assertions.assertNotNull(tournamentRound.getId());
 	}
@@ -265,7 +266,7 @@ class TournamentServiceTest {
 
 		var redRound = roundRepository.findById(round.getId()).orElseThrow();
 		redRound.setTournament(tournament);
-		tournamentService.updateTournamentResult(redRound);
+		tournamentService.updateTournamentResult(redRound, tournament);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
@@ -287,7 +288,7 @@ class TournamentServiceTest {
 		tournamentResult.setPlayer(player);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-		tournamentService.updateTournamentResult(redRound);
+		tournamentService.updateTournamentResult(redRound, tournament);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(190, tr.getStrokesBrutto().intValue());
 
@@ -303,7 +304,7 @@ class TournamentServiceTest {
 
 		// add round to tournament
 		redRound.setTournament(tournament);
-		tournamentService.updateTournamentResult(redRound);
+		tournamentService.updateTournamentResult(redRound, tournament);
 
 		// update the round which was already added to tournament
 		redRound.getScoreCard().get(0).setStroke(15);
@@ -340,7 +341,7 @@ class TournamentServiceTest {
 
 		var redRound = roundRepository.findById(round.getId()).orElseThrow();
 		redRound.setTournament(tournament);
-		tournamentService.updateTournamentResult(redRound);
+		tournamentService.updateTournamentResult(redRound, tournament);
 
 		var roundResults = tournamentResultRepository.findAll().get(0);
 

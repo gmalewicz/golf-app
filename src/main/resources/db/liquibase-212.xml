@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="1645280106706-70">
+		<addColumn tableName="tournament">
+			<column name="best_rounds" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1645469370089-72">
+		<addColumn tableName="tournament_result">
+			<column name="stroke_rounds" type="int" defaultValue="1000">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1645469370089-73">
+		<addColumn tableName="tournament_round">
+			<column name="strokes" type="boolean" defaultValue="true">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>
