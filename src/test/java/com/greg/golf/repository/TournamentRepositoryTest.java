@@ -51,7 +51,7 @@ class TournamentRepositoryTest {
 	@DisplayName("Add tournament")
 	@Transactional
 	@Test
-	void addToturnmentTest() {
+	void addTournamentTest() {
 
 		Tournament tournament = new Tournament();
 		tournament.setName("Test tournament");
@@ -61,6 +61,7 @@ class TournamentRepositoryTest {
 		// roundList.add(round);
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
+		tournament.setBestRounds(0);
 		tournament = tournamentRepository.save(tournament);
 		assertNotNull("Id should not be null", tournament.getId());
 	}
@@ -68,7 +69,7 @@ class TournamentRepositoryTest {
 	@DisplayName("Get tournament")
 	@Transactional
 	@Test
-	void getToturnmentById() {
+	void getTournamentById() {
 
 		Tournament tournament = new Tournament();
 		tournament.setName("Test tournament");
@@ -78,6 +79,7 @@ class TournamentRepositoryTest {
 		// roundList.add(round);
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
+		tournament.setBestRounds(0);
 		tournament = tournamentRepository.save(tournament);
 		assertNotNull("Tournament should not be null", tournamentRepository.findById(tournament.getId()));
 	}
@@ -85,7 +87,7 @@ class TournamentRepositoryTest {
 	@DisplayName("Delete tournament")
 	@Transactional
 	@Test
-	void deleteToturnmentById() {
+	void deleteTournamentById() {
 
 		Tournament tournament = new Tournament();
 		tournament.setName("Test tournament"); 
@@ -94,6 +96,7 @@ class TournamentRepositoryTest {
 		var roundList = new ArrayList<Round>();
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
+		tournament.setBestRounds(0);
 		tournament = tournamentRepository.save(tournament);
 		tournamentRepository.deleteById(tournament.getId());
 		assertTrue("Tournament should be null", tournamentRepository.findById(tournament.getId()).isEmpty());

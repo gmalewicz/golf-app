@@ -99,6 +99,7 @@ class TournamentControllerTest {
 		tournament.setStartDate(new Date(1));
 		tournament.setName("Test Cup");
 		tournament.setPlayer(player);
+		tournament.setBestRounds(0);
 		tournament = tournamentRepository.save(tournament);
 
 		log.info("Set up completed");
@@ -138,6 +139,7 @@ class TournamentControllerTest {
 		tr.setStbNet(1);
 		tr.setStrokesBrutto(1);
 		tr.setStrokesNetto(1);
+		tr.setStrokeRounds(1);
 		tr.setTournament(tournament);
 		tournamentResultRepository.save(tr);
 		

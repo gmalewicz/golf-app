@@ -2,7 +2,6 @@ package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -325,6 +325,7 @@ class RoundServiceTest {
 		tournament.setStartDate(round.getRoundDate());
 		tournament.setName("Test tournament");
 		tournament.setPlayer(round.getPlayer().iterator().next());
+		tournament.setBestRounds(0);
 		tournamentRepository.save(tournament);
 
 		round.setTournament(tournament);
@@ -380,6 +381,7 @@ class RoundServiceTest {
 		tournament.setStartDate(round.getRoundDate());
 		tournament.setName("Test tournament");
 		tournament.setPlayer(round.getPlayer().iterator().next());
+		tournament.setBestRounds(0);
 		tournamentRepository.save(tournament);
 
 		round.setTournament(tournament);

@@ -33,7 +33,8 @@ public class ScoreCard {
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	//@JsonProperty(value = "round_id", access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToOne(fetch = FetchType.LAZY)
+	//@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private Round round;
 
 	@NotNull

@@ -116,11 +116,11 @@ public class TournamentService {
         updateTournamentResult(roundEvent.getRound(), roundEvent.getRound().getTournament());
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public void updateTournamentResult(Round round, Tournament tournament) {
 
         // first verify if round has 18 holes played for each player
-        verifyRoundCorecteness(round);
+        verifyRoundCorrectness(round);
 
         // iterate through round players and check if they already added
         round.getPlayer().forEach(player -> {
@@ -196,7 +196,6 @@ public class TournamentService {
         });
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
     private void updateForBestRounds(Tournament tournament, TournamentResult tournamentResult) {
 
         // skip processing if all rounds shall be included
@@ -261,6 +260,8 @@ public class TournamentService {
         tournamentResultRepository.save(tournamentResult);
     }
 
+    @SuppressWarnings("java:S107")
+    @Transactional
     public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet, float scrDiff,
                                               String courseName, TournamentResult tournamentResult, boolean strokeApplicable) {
 
@@ -279,6 +280,7 @@ public class TournamentService {
         return tournamentRound;
     }
 
+    @Transactional
     public List<TournamentRound> getTournamentRoundsForResult(Long resultId) {
 
         var tr = new TournamentResult();
@@ -289,6 +291,7 @@ public class TournamentService {
     }
 
     // calculate score differential
+    @Transactional
     public float getScoreDifferential(PlayerRound playerRound, Round round, Player player) {
 
         return (113 / (float) playerRound.getSr()) * (getCorrectedStrokes(player, round) - playerRound.getCr());
@@ -296,19 +299,21 @@ public class TournamentService {
     }
 
     // calculate gross strokes
+    @Transactional
     public int getGrossStrokes(Player player, Round round) {
 
         log.debug("player: " + player);
         log.debug("round: " + round);
 
         // calculate gross result
-        int grossStrokes = round.getScoreCard().stream().filter(scoreCard -> scoreCard.getPlayer().equals(player))
+        int grossStrokes = round.getScoreCard().stream().filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()))
                 .mapToInt(ScoreCard::getStroke).sum();
         log.debug("Calculated gross strokes: " + grossStrokes);
         return grossStrokes;
     }
 
     // calculate gross strokes
+    @Transactional
     public boolean applicableForStroke(Round round) {
 
         log.debug("Start checking round for stroke statistic");
@@ -318,6 +323,7 @@ public class TournamentService {
     }
 
     // calculate corrected strokes
+    @Transactional
     public int getCorrectedStrokes(Player player, Round round) {
 
         log.debug("player: " + player);
@@ -326,7 +332,7 @@ public class TournamentService {
         List<Hole> holes = round.getCourse().getHoles();
 
         // calculate gross result
-        int grossStrokes = round.getScoreCard().stream().filter(scoreCard -> scoreCard.getPlayer().equals(player))
+        int grossStrokes = round.getScoreCard().stream().filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()))
                 .mapToInt(scoreCard -> {
 
                     if ((scoreCard.getHcp() + 2 + holes.get(scoreCard.getHole() - 1).getPar()) < scoreCard
@@ -343,6 +349,7 @@ public class TournamentService {
     }
 
     // calculate net strokes
+    @Transactional
     public int getNetStrokes(Player player, Round round, int grossStrokes, PlayerRound playerRound) {
 
         // calculate course HCP
@@ -357,7 +364,8 @@ public class TournamentService {
         return netStrokes;
     }
 
-    // returns STB netto at index 0 and STB gross at index 1
+    // returns STB net at index 0 and STB gross at index 1
+    @Transactional
     public List<Integer> updateSTB(TournamentResult tournamentResult, Round round, PlayerRound playerRound,
                                    Player player) {
 
@@ -379,7 +387,7 @@ public class TournamentService {
         List<Hole> holes = round.getCourse().getHoles();
         // get list of scorecard for player
         List<ScoreCard> playerScoreCard = round.getScoreCard().stream()
-                .filter(scoreCard -> scoreCard.getPlayer().equals(player)).collect(Collectors.toList());
+                .filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId())).collect(Collectors.toList());
         playerScoreCard.forEach(scoreCard -> {
             if (hcpIncMaxHole > 0 && holes.get(scoreCard.getHole() - 1).getSi() <= hcpIncMaxHole) {
                 // if some holes needs hcp update increase them
@@ -451,13 +459,13 @@ public class TournamentService {
     }
 
     // verifies if all scorecards have all 18 holes filled
-    private void verifyRoundCorecteness(Round round) {
+    private void verifyRoundCorrectness(Round round) {
 
         round.getPlayer().forEach(player -> {
 
             // calculate played holes
             int playedHoles = (int) round.getScoreCard().stream()
-                    .filter(scoreCard -> scoreCard.getPlayer().equals(player) && scoreCard.getStroke() > 0).count();
+                    .filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()) && scoreCard.getStroke() > 0).count();
             log.debug("Number of holes: " + playedHoles);
             if (playedHoles != TOURNAMENT_HOLES) {
                 throw new TooFewHolesForTournamentException();
