@@ -23,5 +23,11 @@ public interface TournamentResultRepository extends JpaRepository<TournamentResu
 	
 	@EntityGraph(attributePaths = { "player"})
 	List<TournamentResult> findByTournamentOrderByPlayedRoundsDescStbNetDesc(Tournament tournament);
+
+	@EntityGraph(attributePaths = { "player"})
+	List<TournamentResult> findByTournamentAndPlayedRoundsGreaterThanEqualOrderByStbNetDesc(Tournament tournament, Integer playedRounds);
+
+	@EntityGraph(attributePaths = { "player"})
+	List<TournamentResult> findByTournamentAndPlayedRoundsLessThanOrderByPlayedRoundsDescStbNetDesc(Tournament tournament, Integer playedRounds);
 	
 }

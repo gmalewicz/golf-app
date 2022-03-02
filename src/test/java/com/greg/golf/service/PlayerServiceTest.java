@@ -328,7 +328,7 @@ class PlayerServiceTest {
 		adminPlayer.setSex(Common.PLAYER_SEX_MALE);
 		adminPlayer.setModified(false);
 		adminPlayer.setType(Common.TYPE_PLAYER_FACEBOOK);
-		admin = playerRepository.save(adminPlayer);
+		playerRepository.save(adminPlayer);
 
 
 		String retStr = playerService.processOAuthPostLogin("Test", "Player", Common.TYPE_PLAYER_FACEBOOK);
@@ -349,7 +349,7 @@ class PlayerServiceTest {
 		adminPlayer.setSex(Common.PLAYER_SEX_MALE);
 		adminPlayer.setModified(false);
 		adminPlayer.setType(Common.TYPE_PLAYER_LOCAL);
-		admin = playerRepository.save(adminPlayer);
+		playerRepository.save(adminPlayer);
 
 		String retStr = playerService.processOAuthPostLogin("Test", "Player", Common.TYPE_PLAYER_FACEBOOK);
 
@@ -369,7 +369,7 @@ class PlayerServiceTest {
 		adminPlayer.setSex(Common.PLAYER_SEX_MALE);
 		adminPlayer.setModified(true);
 		adminPlayer.setType(Common.TYPE_PLAYER_LOCAL);
-		admin = playerRepository.save(adminPlayer);
+		playerRepository.save(adminPlayer);
 
 		Player player = new Player();
 		player.setNick("Test.Pl");

@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeSet;
 
+import com.greg.golf.entity.*;
+import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -18,19 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import com.greg.golf.entity.Player;
-import com.greg.golf.entity.PlayerRound;
-import com.greg.golf.entity.Round;
-import com.greg.golf.entity.ScoreCard;
-import com.greg.golf.entity.Tournament;
-import com.greg.golf.entity.TournamentResult;
-import com.greg.golf.entity.TournamentRound;
 import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
-import com.greg.golf.repository.HoleRepository;
-import com.greg.golf.repository.PlayerRoundRepository;
-import com.greg.golf.repository.RoundRepository;
-import com.greg.golf.repository.TournamentRepository;
-import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
@@ -47,10 +38,6 @@ class TournamentServiceTest {
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
 			.getInstance();
 
-	private static Player player;
-	private static Round round;
-	private static Tournament tournament;
-
 	@SuppressWarnings("unused")
 	@Autowired
 	private TournamentService tournamentService;
@@ -64,9 +51,10 @@ class TournamentServiceTest {
 			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository,
 			@Autowired TournamentRepository tournamentRepository) {
 
-		player = playerService.getPlayer(1L).orElseThrow();
+		var player = playerService.getPlayer(1L).orElseThrow();
+		player.setScoreCard(new ArrayList<>());
 
-		round = new Round();
+		var round = new Round();
 
 		var course = courseService.getCourse(1L).orElseThrow();
 		round.setCourse(course);
@@ -88,16 +76,41 @@ class TournamentServiceTest {
 			scoreCard.setHcp(2);
 			round.getScoreCard().add(scoreCard);
 		}
-		round = roundRepository.save(round);
+		roundRepository.save(round);
 
 		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
 
-		tournament = new Tournament();
+		// create the next round
+		var round2 = new Round();
+		round2.setCourse(course);
+		var playerSet2 = new TreeSet<Player>();
+		playerSet2.add(player);
+		round2.setPlayer(playerSet2);
+		round2.setRoundDate(new Date(3));
+		round2.setMatchPlay(false);
+		round2.setScoreCard(new ArrayList<>());
+		for (var i = 0; i < 18; i++) {
+			var scoreCard = new ScoreCard();
+			scoreCard.setHole(i + 1);
+			scoreCard.setPats(0);
+			scoreCard.setPenalty(0);
+			scoreCard.setPlayer(player);
+			scoreCard.setRound(round2);
+			scoreCard.setStroke(5);
+			scoreCard.setHcp(2);
+			round2.getScoreCard().add(scoreCard);
+		}
+		roundRepository.save(round2);
+
+		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round2.getId());
+
+		var tournament = new Tournament();
 		tournament.setEndDate(new Date(1));
 		tournament.setStartDate(new Date(1));
 		tournament.setName("Test Cup");
 		tournament.setPlayer(player);
-		tournament = tournamentRepository.save(tournament);
+		tournament.setBestRounds(Common.ALL_ROUNDS);
+		tournamentRepository.save(tournament);
 
 		log.info("Set up completed");
 	}
@@ -105,7 +118,9 @@ class TournamentServiceTest {
 	@DisplayName("Calculate net and gross STB")
 	@Transactional
 	@Test
-	void calculateNetAndGrossSTBTest(@Autowired RoundRepository roundRepository) {
+	void calculateNetAndGrossSTBTest(@Autowired RoundRepository roundRepository, @Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
 
 		var tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(0);
@@ -113,11 +128,12 @@ class TournamentServiceTest {
 		tournamentResult.setStrokesNetto(0);
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setPlayer(player);
-		tournamentResult.setTournament(tournament);
+		tournamentResult.setTournament(tournamentService.findAllTournaments().get(0));
 		tournamentResultRepository.save(tournamentResult);
 
-		var redRound = roundRepository.findById(round.getId()).orElseThrow();
+		var redRound = roundRepository.findAll().get(0);
 		tournamentService.updateSTB(tournamentResult, redRound, null, player);
 
 		log.info("STB netto: " + tournamentResult.getStbNet());
@@ -126,16 +142,19 @@ class TournamentServiceTest {
 		Assertions.assertEquals(17, tournamentResult.getStbGross().intValue());
 	}
 
-	@DisplayName("Should add the new tournamnet")
+	@DisplayName("Should add the new tournament")
 	@Transactional
 	@Test
-	void addTheNewTournamnetTest() {
+	void addTheNewTournamentTest(@Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
 
 		var tournament = new Tournament();
 		tournament.setEndDate(new Date(1));
 		tournament.setStartDate(new Date(1));
 		tournament.setName("Test Cup2");
 		tournament.setPlayer(player);
+		tournament.setBestRounds(1);
 		tournament = tournamentService.addTournament(tournament);
 
 		Assertions.assertNotNull(tournament.getId());
@@ -144,21 +163,33 @@ class TournamentServiceTest {
 	@DisplayName("Calculate corrected strokes")
 	@Transactional
 	@Test
-	void calculateCorrectedStrokesTest(@Autowired HoleRepository holeRepository) {
+	void calculateCorrectedStrokesTest(@Autowired HoleRepository holeRepository, @Autowired PlayerService playerService,
+									   @Autowired RoundRepository roundRepository,
+									   @Autowired CourseRepository courseRepository) {
 
-		round.getCourse().setHoles(holeRepository.findByCourse(round.getCourse()));
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var course = courseRepository.findById(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
+
+		//round.setCourse(course);
+
+		round.getCourse().setHoles(holeRepository.findByCourse(course));
 
 		round.getScoreCard().get(0).setStroke(20);
 		var correctedScore = tournamentService.getCorrectedStrokes(player, round);
 
 		log.info("corrected Strokes: " + correctedScore);
-		Assertions.assertEquals(93, correctedScore);
+		Assertions.assertEquals(91, correctedScore);
 	}
 
 	@DisplayName("Calculate score differential")
 	@Transactional
 	@Test
-	void calculateScoreDifferentialTest(@Autowired HoleRepository holeRepository) {
+	void calculateScoreDifferentialTest(@Autowired HoleRepository holeRepository, @Autowired PlayerService playerService,
+										@Autowired RoundRepository roundRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
 
 		round.getCourse().setHoles(holeRepository.findByCourse(round.getCourse()));
 		round.getScoreCard().get(0).setStroke(20);
@@ -170,13 +201,15 @@ class TournamentServiceTest {
 		var scoreDifferential = tournamentService.getScoreDifferential(playerRound, round, player);
 
 		log.info("score differential: " + scoreDifferential);
-		Assertions.assertEquals(93, (int) scoreDifferential);
+		Assertions.assertEquals(91, (int) scoreDifferential);
 	}
 
 	@DisplayName("Should save tournament round")
 	@Transactional
 	@Test
-	void saveTournamentRoundTest() {
+	void saveTournamentRoundTest(@Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
 
 		var tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(0);
@@ -184,28 +217,46 @@ class TournamentServiceTest {
 		tournamentResult.setStrokesNetto(0);
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setPlayer(player);
-		tournamentResult.setTournament(tournament);
+		tournamentResult.setTournament(tournamentService.findAllTournaments().get(0));
 		tournamentResultRepository.save(tournamentResult);
 
-		TournamentRound tournamentRound = tournamentService.addTournamentRound(1, 1, 1, 1, 1, "test", tournamentResult);
+		TournamentRound tournamentRound =
+				tournamentService.addTournamentRound(1, 1, 1, 1, 1, "test", tournamentResult, false);
 
 		Assertions.assertNotNull(tournamentRound.getId());
 	}
 
-	@DisplayName("Get all tournaments")
+	@DisplayName("Get all tournaments where all rounds are counted")
 	@Transactional
 	@Test
-	void getAllTournamentsTest() {
+	void getAllTournamentsTestAllRounds() {
 
 		Assertions.assertEquals(1, tournamentService.findAllTournaments().size());
 
 	}
 
+	@DisplayName("Get all tournaments where not all rounds are counted")
+	@Transactional
+	@Test
+	void getAllTournamentResultsTestNotAllRounds(@Autowired TournamentRepository tournamentRepository) {
+
+		var tournament = tournamentRepository.findAll().get(0);
+		tournament.setBestRounds(1);
+		tournamentRepository.save(tournament);
+
+		Assertions.assertEquals(0, tournamentService.findAllTournamentsResults(tournament.getId()).size());
+	}
+
+
 	@DisplayName("Calculate gross strokes")
 	@Transactional
 	@Test
-	void getGrossStrokesTest() {
+	void getGrossStrokesTest(@Autowired PlayerService playerService, @Autowired RoundRepository roundRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
 
 		var grossStrokes = tournamentService.getGrossStrokes(player, round);
 
@@ -216,7 +267,10 @@ class TournamentServiceTest {
 	@DisplayName("Calculate net strokes")
 	@Transactional
 	@Test
-	void getNetStrokesTest() {
+	void getNetStrokesTest(@Autowired PlayerService playerService, @Autowired RoundRepository roundRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
 
 		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null);
 
@@ -227,7 +281,10 @@ class TournamentServiceTest {
 	@DisplayName("Calculate net strokes where net strokes is lower than 0")
 	@Transactional
 	@Test
-	void getNetStrokesLowerThan0Test() {
+	void getNetStrokesLowerThan0Test(@Autowired PlayerService playerService, @Autowired RoundRepository roundRepository) {
+
+		var round = roundRepository.findAll().get(0);
+		var player = playerService.getPlayer(1L).orElseThrow();
 
 		var netStrokes = tournamentService.getNetStrokes(player, round, 22, null);
 
@@ -238,9 +295,11 @@ class TournamentServiceTest {
 	@DisplayName("Should add round to tournament")
 	@Transactional
 	@Test
-	void addRoundTest() {
+	void addRoundTest(@Autowired RoundRepository roundRepository) {
 
-		var t = tournamentService.addRound(tournament.getId(), round.getId(), false);
+		var round = roundRepository.findAll().get(0);
+
+		var t = tournamentService.addRound(tournamentService.findAllTournaments().get(0).getId(), round.getId(), false);
 		Assertions.assertEquals(t.getRound().get(0).getId(), round.getId());
 
 	}
@@ -248,7 +307,10 @@ class TournamentServiceTest {
 	@DisplayName("Should not allow add the same round to tournament twice")
 	@Transactional
 	@Test
-	void addTesSameRoundTwiceTest() {
+	void addTesSameRoundTwiceTest(@Autowired RoundRepository roundRepository) {
+
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
 
 		tournamentService.addRound(tournament.getId(), round.getId(), false);
 		Long tournamentId = tournament.getId();
@@ -258,26 +320,71 @@ class TournamentServiceTest {
 
 	}
 
-	@DisplayName("Adding the new round to the tournamnet result")
+	@DisplayName("Adding the new round to the tournament result")
 	@Transactional
 	@Test
-	void addNewRoundToTournamnetResultTest(@Autowired RoundRepository roundRepository) {
+	void addNewRoundToTournamentResultTest(@Autowired RoundRepository roundRepository) {
 
-		var redRound = roundRepository.findById(round.getId()).orElseThrow();
-		redRound.setTournament(tournament);
-		tournamentService.updateTournamentResult(redRound);
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		log.info(round.getPlayer().iterator().next().getNick());
+
+		round.setTournament(tournament);
+		roundRepository.save(round);
+
+		tournamentService.updateTournamentResult(round, tournament);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
 	}
 
-	@DisplayName("Should update the tournamnet result with the new round")
+	@DisplayName("Adding the new round to the tournament result where strokes are not applicable")
 	@Transactional
 	@Test
-	void updateTournamnetResultWithNewRoundTest(@Autowired RoundRepository roundRepository) {
+	void addNewRoundToTournamentResultTestStrokesNotApplicable(@Autowired RoundRepository roundRepository) {
 
-		var redRound = roundRepository.findById(round.getId()).orElseThrow();
-		redRound.setTournament(tournament);
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		round.setTournament(tournament);
+		round.getScoreCard().get(0).setStroke(Common.HOLE_GIVEN_UP);
+		roundRepository.save(round);
+		tournamentService.updateTournamentResult(round, tournament);
+		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
+		Assertions.assertEquals(0, tr.getStrokesBrutto().intValue());
+
+	}
+
+	@DisplayName("Adding the new round to the tournament result where strokes are not applicable and 1 round applicable")
+	@Transactional
+	@Test
+	void addNewRoundToTournamentResultTestStrokesNotApplicableOneRoundApplicable(@Autowired RoundRepository roundRepository) {
+
+		var round = roundRepository.findAll().get(0);
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+		tournament.setBestRounds(1);
+
+		round.setTournament(tournament);
+		round.getScoreCard().get(0).setStroke(Common.HOLE_GIVEN_UP);
+		roundRepository.save(round);
+		tournamentService.updateTournamentResult(round, tournament);
+		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
+		Assertions.assertEquals(0, tr.getStrokesBrutto().intValue());
+
+	}
+
+	@DisplayName("Should update the tournament result with the new round")
+	@Transactional
+	@Test
+	void updateTournamentResultWithNewRoundTest(@Autowired RoundRepository roundRepository, @Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		round.setTournament(tournament);
 		var tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(100);
 		tournamentResult.setStrokesBrutto(100);
@@ -285,62 +392,135 @@ class TournamentServiceTest {
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
 		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-		tournamentService.updateTournamentResult(redRound);
+		tournamentService.updateTournamentResult(round, tournament);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(190, tr.getStrokesBrutto().intValue());
-
 	}
 
-	@DisplayName("Should update the tournamnet result with updated round")
+	@DisplayName("Should update the tournament result with the new round where best round is 1")
 	@Transactional
 	@Test
-	void updateTournamnetResultWithUpdatedRoundTest(@Autowired RoundRepository roundRepository) {
+	void updateTournamentResultWithNewRoundWithBest1Round1Test(@Autowired TournamentRepository tournamentRepository,
+															   @Autowired RoundRepository roundRepository,
+															   @Autowired PlayerRoundRepository playerRoundRepository,
+															   @Autowired PlayerService playerService) {
 
-		// get round
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var rounds = roundRepository.findAll();
+
+
+		var round = rounds.get(0);
+
+		// set up 1 round as number of best rounds
+		var tournament = tournamentRepository.findAll().get(0);
+		tournament.setBestRounds(1);
+		tournament = tournamentRepository.save(tournament);
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(100);
+		tournamentResult.setStrokesBrutto(100);
+		tournamentResult.setStrokesNetto(100);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		//playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
+		tournamentService.addRound(tournament.getId(), round.getId(), true);
+
+		var round2 =  rounds.get(1);
+		tournamentService.addRound(tournament.getId(), round2.getId(), true);
+
+		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
+		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
+	}
+
+	@DisplayName("Should update the tournament result with the new round but hole that has been given up")
+	@Transactional
+	@Test
+	void updateTournamentResultWithNewRoundHoleGivenUpTest(@Autowired RoundRepository roundRepository, @Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
+
 		var redRound = roundRepository.findById(round.getId()).orElseThrow();
+		redRound.setTournament(tournament);
+		redRound.getScoreCard().get(0).setStroke(Common.HOLE_GIVEN_UP);
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(100);
+		tournamentResult.setStrokesBrutto(100);
+		tournamentResult.setStrokesNetto(100);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+		tournamentService.updateTournamentResult(redRound, tournament);
+		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
+		Assertions.assertEquals(100, tr.getStrokesBrutto().intValue());
+	}
+
+	@DisplayName("Should update the tournament result with updated round")
+	@Transactional
+	@Test
+	void updateTournamentResultWithUpdatedRoundTest(@Autowired RoundRepository roundRepository) {
+
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
 
 		// add round to tournament
-		redRound.setTournament(tournament);
-		tournamentService.updateTournamentResult(redRound);
+		round.setTournament(tournament);
+		tournamentService.updateTournamentResult(round, tournament);
 
 		// update the round which was already added to tournament
-		redRound.getScoreCard().get(0).setStroke(15);
-		roundRepository.save(redRound);
+		round.getScoreCard().get(0).setStroke(15);
+		roundRepository.save(round);
 
-		// try to update the tournamnet
-		var roundEvent = new RoundEvent(this, redRound);
+		// try to update the tournament
+		var roundEvent = new RoundEvent(this, round);
 		tournamentService.handleRoundEvent(roundEvent);
 
-		Assertions.assertEquals(15, redRound.getScoreCard().get(0).getStroke().intValue());
+		Assertions.assertEquals(15, round.getScoreCard().get(0).getStroke().intValue());
 
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
 	}
 
-	@DisplayName("Should add the the round to the tournamnet and update tournamnet result")
+
+	@DisplayName("Should add the the round to the tournament and update tournament result")
 	@Transactional
 	@Test
-	void addTheNewRoundandUpdateTournamentResultTest(@Autowired RoundRepository roundRepository) {
+	void addTheNewRoundAndUpdateTournamentResultTest(@Autowired RoundRepository roundRepository) {
 
-		var t = tournamentService.addRound(tournament.getId(), round.getId(), true);
-		Assertions.assertEquals(t.getRound().get(0).getId(), round.getId());
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		tournament = tournamentService.addRound(tournament.getId(), round.getId(), true);
+
+		Assertions.assertEquals(tournament.getRound().get(0).getId(), round.getId());
 
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
 	}
 
-	@DisplayName("Should return tournamnt round for tournament result")
+	@DisplayName("Should return tournament round for tournament result")
 	@Transactional
 	@Test
 	void getTournamentRoundForTournamentResultTest(@Autowired RoundRepository roundRepository) {
 
-		var redRound = roundRepository.findById(round.getId()).orElseThrow();
-		redRound.setTournament(tournament);
-		tournamentService.updateTournamentResult(redRound);
+		var round = roundRepository.findAll().get(0);
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		round.setTournament(tournament);
+		tournamentService.updateTournamentResult(round, tournament);
 
 		var roundResults = tournamentResultRepository.findAll().get(0);
 

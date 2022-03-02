@@ -55,6 +55,10 @@ public class TournamentResult {
 	private Integer playedRounds;
 
 	@NotNull
+	@Column(name = "stroke_rounds")
+	private Integer strokeRounds;
+
+	@NotNull
 	@Column(name = "stb_net")
 	private Integer stbNet;
 
@@ -67,4 +71,8 @@ public class TournamentResult {
 	// @JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tournamentResult", orphanRemoval = true)
 	private List<TournamentRound> tournamentRound;
+
+	public void increaseStrokeRounds() {
+		strokeRounds++;
+	}
 }

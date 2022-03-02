@@ -57,6 +57,7 @@ class TournamentResultRepositoryTest {
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
 		tournament.setPlayer(player);
+		tournament.setBestRounds(0);
 		tournament = tournamentRepository.save(tournament);
 		log.info("Set up completed");
 	}
@@ -72,9 +73,11 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setStrokesNetto(0);
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
 
 		Player player = playerRepository.findById(1L).orElseThrow();
 		tournamentResult.setPlayer(player);
+
 
 		tournamentResult.setTournament(tournament);
 
@@ -94,6 +97,7 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setStrokesNetto(0);
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
 
 		Player player = playerRepository.findById(1L).orElseThrow();
 		tournamentResult.setPlayer(player);
@@ -116,6 +120,7 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setStrokesNetto(0);
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
 
 		Player player = playerRepository.findById(1L).orElseThrow();
 		tournamentResult.setPlayer(player);
@@ -138,6 +143,7 @@ class TournamentResultRepositoryTest {
 		tournamentResult.setStrokesNetto(0);
 		tournamentResult.setStbGross(0);
 		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
 
 		Player player = playerRepository.findById(1L).orElseThrow();
 		tournamentResult.setPlayer(player);

@@ -18,4 +18,8 @@ public class Common {
 	public static final int TYPE_PLAYER_LOCAL = 0;
 	public static final int TYPE_PLAYER_FACEBOOK = 1;
 
+	public static final int ALL_ROUNDS = 0;
+
+	public static  final int HOLE_GIVEN_UP = 16;
+
 }

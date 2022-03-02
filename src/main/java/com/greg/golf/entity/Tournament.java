@@ -55,6 +55,11 @@ public class Tournament {
 	@Column(name = "end_date")
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date endDate;
+
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	@Column(name = "best_rounds")
+	private Integer bestRounds;
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

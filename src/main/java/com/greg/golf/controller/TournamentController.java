@@ -53,10 +53,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 		log.info("Requested all tournament results sorted by played round desc and score netto ascending");
 
-		var tournament = new Tournament();
-		tournament.setId(tournamentId);
-
-		return mapList(tournamentService.findAllTournamentsResults(tournament), TournamentResultDto.class);
+		return mapList(tournamentService.findAllTournamentsResults(tournamentId), TournamentResultDto.class);
 
 	}
 

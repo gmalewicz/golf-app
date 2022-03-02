@@ -38,4 +38,8 @@ public class TournamentResultDto {
 	@NotNull
 	@Schema(description = "Stableford gross", accessMode = READ_ONLY, minimum = "0")
 	private Integer stbGross;
+
+	@NotNull
+	@Schema(description = "Number of rounds applicable for stroke categories", accessMode = READ_ONLY, minimum = "0")
+	private Integer strokeRounds;
 }
