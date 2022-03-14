@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -21,13 +22,12 @@ import com.greg.golf.entity.TournamentResult;
 import com.greg.golf.entity.TournamentRound;
 import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
 import com.greg.golf.error.TooFewHolesForTournamentException;
-import com.greg.golf.repository.PlayerRoundRepository;
-import com.greg.golf.repository.TournamentRepository;
-import com.greg.golf.repository.TournamentResultRepository;
-import com.greg.golf.repository.TournamentRoundRepository;
 import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Slf4j
 @Service("tournamentService")
@@ -42,6 +42,9 @@ public class TournamentService {
     private final CourseService courseService;
     private final PlayerRoundRepository playerRoundRepository;
     private final TournamentRoundRepository tournamentRoundRepository;
+
+    @PersistenceContext
+    private final EntityManager entityManager;
 
     @Transactional
     public List<Tournament> findAllTournaments() {
@@ -84,7 +87,24 @@ public class TournamentService {
     }
 
     @Transactional
-    public Tournament addRound(Long tournamentId, Long roundId, boolean updateResults) {
+    public TournamentRound addRoundOnBehalf(Long tournamentId, Round round) {
+
+        round = roundService.saveRound(round);
+        entityManager.detach(round);
+
+        var tournamentLst = addRound(tournamentId, round.getId(), true);
+
+        //it must be one and only one result
+        if (tournamentLst == null || tournamentLst.size() != 1) {
+            //throw new TooManyPlayersException();
+            return null;
+        }
+
+        return tournamentLst.get(0);
+    }
+
+    @Transactional
+    public List<TournamentRound> addRound(Long tournamentId, Long roundId, boolean updateResults) {
 
         // first find the round in database
         var round = roundService.getWithPlayers(roundId).orElseThrow();
@@ -102,11 +122,13 @@ public class TournamentService {
         tournament.addRound(round);
         tournamentRepository.save(tournament);
 
+        tournament = tournamentRepository.findById(tournament.getId()).orElseThrow();
+
         // update tournament result
         if (updateResults) {
-            updateTournamentResult(round, tournament);
+            return updateTournamentResult(round, tournament);
         }
-        return tournament;
+        return null;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -117,7 +139,9 @@ public class TournamentService {
     }
 
     @Transactional
-    public void updateTournamentResult(Round round, Tournament tournament) {
+    public List<TournamentRound> updateTournamentResult(Round round, Tournament tournament) {
+
+        var tournamentRoundLst = new ArrayList<TournamentRound>();
 
         // first verify if round has 18 holes played for each player
         verifyRoundCorrectness(round);
@@ -149,9 +173,9 @@ public class TournamentService {
 
                     // save entity
                     tournamentResultRepository.save(tournamentResult);
-                    addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
+                    tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
                             getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
-                            tournamentResult, strokeApplicable);
+                            tournamentResult, strokeApplicable));
 
                     // here needs to be an update of TournamentResults in case if number of added rounds is greater
                     // than bestRounds assuming that bestRounds is not 0
@@ -183,17 +207,18 @@ public class TournamentService {
                 // save entity
                 tournamentResultRepository.save(tournamentResult);
 
-                addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
+                tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
                         tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
-                        round.getCourse().getName(), tournamentResult, strokeApplicable);
+                        round.getCourse().getName(), tournamentResult, strokeApplicable));
 
             });
 
             // set tournament id in player_round
             playerRound.setTournamentId(round.getTournament().getId());
             playerRoundRepository.save(playerRound);
-
         });
+
+        return tournamentRoundLst;
     }
 
     private void updateForBestRounds(Tournament tournament, TournamentResult tournamentResult) {
@@ -394,7 +419,7 @@ public class TournamentService {
                 scoreCard.setHcp(hcpAll + 1);
             }
 
-            // update STB netto for each hole
+            // update STB net for each hole
             scoreCard.setStbNet(
                     holes.get(scoreCard.getHole() - 1).getPar() - (scoreCard.getStroke() - scoreCard.getHcp()) + 2);
             if (scoreCard.getStbNet() < 0) {

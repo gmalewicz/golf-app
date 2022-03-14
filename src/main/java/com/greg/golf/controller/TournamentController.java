@@ -2,6 +2,8 @@ package com.greg.golf.controller;
 
 import java.util.List;
 
+import com.greg.golf.controller.dto.*;
+import com.greg.golf.entity.Round;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -10,11 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.greg.golf.controller.dto.LimitedRoundDto;
-import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
-import com.greg.golf.controller.dto.TournamentDto;
-import com.greg.golf.controller.dto.TournamentResultDto;
 
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.entity.TournamentRound;
@@ -50,8 +47,8 @@ public class TournamentController extends BaseController {
 	@Operation(summary = "Return all tournament results")
 	@GetMapping(value = "/rest/TournamentResult/{tournamentId}")
 	public List<TournamentResultDto> getTournamentResult(
-			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
-		log.info("Requested all tournament results sorted by played round desc and score netto ascending");
+			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
+		log.info("Requested all tournament results sorted by played round desc and score net ascending");
 
 		return mapList(tournamentService.findAllTournamentsResults(tournamentId), TournamentResultDto.class);
 
@@ -61,7 +58,7 @@ public class TournamentController extends BaseController {
 	@Operation(summary = "Return all rounds that can be added to tournament")
 	@GetMapping(value = "/rest/TournamentRounds/{tournamentId}")
 	public List<LimitedRoundWithPlayersDto> getTournamentRounds(
-			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
+			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 		log.info("Requested rounds for tournament");
 		return mapList(tournamentService.getAllPossibleRoundsForTournament(tournamentId), LimitedRoundWithPlayersDto.class);
 	}
@@ -72,7 +69,7 @@ public class TournamentController extends BaseController {
 	@PostMapping(value = "/rest/TournamentRound/{tournamentId}")
 	// @ApiResponse(responseCode = "500", description="Failed to send an email")
 	public HttpStatus addRoundToTournament(
-			@Parameter(description = "Tournamnet id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
+			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
 			@Parameter(description = "Round object", required = true) @RequestBody LimitedRoundDto limitedRoundDto) {
 
 		log.info("trying to add round to tournament: " + limitedRoundDto);
@@ -100,8 +97,23 @@ public class TournamentController extends BaseController {
 	@Operation(summary = "Return all rounds for a player belonging to the tournament")
 	@GetMapping(value = "/rest/TournamentResultRound/{resultId}")
 	public List<TournamentRound> getResultRounds(
-			@Parameter(description = "Tournamnet result id", example = "1", required = true) @PathVariable("resultId") Long resultId) {
+			@Parameter(description = "Tournament result id", example = "1", required = true) @PathVariable("resultId") Long resultId) {
 		log.info("Requested round details for tournament");
 		return tournamentService.getTournamentRoundsForResult(resultId);
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Adds round on behalf of the player to tournament")
+	@PostMapping(value = "/rest/TournamentRoundOnBehalf/{tournamentId}")
+	// @ApiResponse(responseCode = "500", description="Failed to send an email")
+	public TournamentRound addRoundOnBehalf(
+			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
+			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
+
+		log.info("trying to add round on behalf to tournament: " + tournamentId + " and round: " + roundDto);
+		var tournamentRound = tournamentService.addRoundOnBehalf(tournamentId, modelMapper.map(roundDto, Round.class));
+		log.debug("Round added");
+
+		return tournamentRound;
 	}
 }

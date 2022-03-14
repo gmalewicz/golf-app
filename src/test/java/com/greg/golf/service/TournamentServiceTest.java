@@ -136,7 +136,7 @@ class TournamentServiceTest {
 		var redRound = roundRepository.findAll().get(0);
 		tournamentService.updateSTB(tournamentResult, redRound, null, player);
 
-		log.info("STB netto: " + tournamentResult.getStbNet());
+		log.info("STB net: " + tournamentResult.getStbNet());
 		log.info("STB gross: " + tournamentResult.getStbGross());
 		Assertions.assertEquals(62, tournamentResult.getStbNet().intValue());
 		Assertions.assertEquals(17, tournamentResult.getStbGross().intValue());
@@ -299,7 +299,10 @@ class TournamentServiceTest {
 
 		var round = roundRepository.findAll().get(0);
 
-		var t = tournamentService.addRound(tournamentService.findAllTournaments().get(0).getId(), round.getId(), false);
+		tournamentService.addRound(tournamentService.findAllTournaments().get(0).getId(), round.getId(), false);
+
+		var t = tournamentService.findAllTournaments().get(0);
+
 		Assertions.assertEquals(t.getRound().get(0).getId(), round.getId());
 
 	}
@@ -405,7 +408,6 @@ class TournamentServiceTest {
 	@Test
 	void updateTournamentResultWithNewRoundWithBest1Round1Test(@Autowired TournamentRepository tournamentRepository,
 															   @Autowired RoundRepository roundRepository,
-															   @Autowired PlayerRoundRepository playerRoundRepository,
 															   @Autowired PlayerService playerService) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
@@ -502,7 +504,7 @@ class TournamentServiceTest {
 		var round = roundRepository.findAll().get(0);
 		var tournament = tournamentService.findAllTournaments().get(0);
 
-		tournament = tournamentService.addRound(tournament.getId(), round.getId(), true);
+		tournamentService.addRound(tournament.getId(), round.getId(), true);
 
 		Assertions.assertEquals(tournament.getRound().get(0).getId(), round.getId());
 
