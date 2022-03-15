@@ -1,171 +1,186 @@
 package com.greg.golf.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import com.greg.golf.security.JwtRequestFilter;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
-
-import com.greg.golf.controller.dto.LimitedRoundWithPlayersDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greg.golf.controller.dto.CycleTournamentDto;
+import com.greg.golf.controller.dto.LimitedRoundDto;
+import com.greg.golf.controller.dto.RoundDto;
 import com.greg.golf.controller.dto.TournamentDto;
-import com.greg.golf.controller.dto.TournamentResultDto;
-import com.greg.golf.entity.Course;
-import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
-import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.entity.TournamentResult;
-import com.greg.golf.repository.PlayerRoundRepository;
-import com.greg.golf.repository.RoundRepository;
-import com.greg.golf.repository.TournamentRepository;
-import com.greg.golf.repository.TournamentResultRepository;
-import com.greg.golf.service.CourseService;
-import com.greg.golf.service.PlayerService;
-import com.greg.golf.util.GolfPostgresqlContainer;
+import com.greg.golf.entity.TournamentRound;
+import com.greg.golf.security.JwtAuthenticationEntryPoint;
+import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
+import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
+import com.greg.golf.security.oauth.GolfOAuth2UserService;
+import com.greg.golf.service.TournamentService;
+import com.greg.golf.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.ArrayList;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @Slf4j
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(controllers = TournamentController.class)
 class TournamentControllerTest {
 
 	@SuppressWarnings("unused")
 	@MockBean
 	private JwtRequestFilter jwtRequestFilter;
-	
-	@ClassRule
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
-	private static Player player;
-	private static Tournament tournament;
+	@SuppressWarnings("unused")
+	@MockBean
+	private TournamentService tournamentService;
 
-	private final TournamentController tournamentController;
-	
+	@SuppressWarnings("unused")
+	@MockBean
+	private ModelMapper modelMapper;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private PasswordEncoder bCryptPasswordEncoder;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private UserService userService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfOAuth2UserService golfOAuth2UserService;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
+
+	@SuppressWarnings("unused")
+	@MockBean
+	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
+
+	private final MockMvc mockMvc;
+	private final ObjectMapper objectMapper;
+
 	@Autowired
-	public TournamentControllerTest(TournamentController tournamentController) {
-		this.tournamentController = tournamentController;
+	public TournamentControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+		this.mockMvc = mockMvc;
+		this.objectMapper = objectMapper;
 	}
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
-			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository,
-			@Autowired TournamentRepository tournamentRepository) {
-
-		player = playerService.getPlayer(1L).orElseThrow();
-
-		Round round = new Round();
-
-		Course course = courseService.getCourse(1L).orElseThrow();
-		round.setCourse(course);
-		SortedSet<Player> playerSet = new TreeSet<>();
-		playerSet.add(player);
-		round.setPlayer(playerSet);
-		round.setMatchPlay(false);
-		round.setRoundDate(new Date(1));
-		round.setScoreCard(new ArrayList<>());
-		ScoreCard scoreCard = new ScoreCard();
-		scoreCard.setHole(1);
-		scoreCard.setPats(0);
-		scoreCard.setPenalty(0);
-		scoreCard.setPlayer(player);
-		scoreCard.setRound(round);
-		scoreCard.setStroke(5);
-		round.getScoreCard().add(scoreCard);
-		scoreCard = new ScoreCard();
-		scoreCard.setHole(2);
-		scoreCard.setPats(0);
-		scoreCard.setPenalty(0);
-		scoreCard.setPlayer(player);
-		scoreCard.setRound(round);
-		scoreCard.setStroke(4);
-		round.getScoreCard().add(scoreCard);
-		round = roundRepository.save(round);
-		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 1, 1F, 2L, 1, player.getId(), round.getId());
-
-		tournament = new Tournament();
-		tournament.setEndDate(new Date(1));
-		tournament.setStartDate(new Date(1));
-		tournament.setName("Test Cup");
-		tournament.setPlayer(player);
-		tournament.setBestRounds(0);
-		tournament = tournamentRepository.save(tournament);
+	public static void setup() {
 
 		log.info("Set up completed");
 	}
 
-	@DisplayName("Gets all tournaments not empty")
-	@Transactional
+	@DisplayName("Should get all tournaments with correct result")
 	@Test
-	void getTrournamentsTest() {
+	void getTournamentsAndReturn200() throws Exception {
 
-		List<TournamentDto> tournaments = this.tournamentController.getTournaments();
-		Assertions.assertEquals(1, tournaments.size());
+		var outputLst = new ArrayList<Tournament>();
+
+		when(tournamentService.findAllTournaments()).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/Tournament")).andExpect(status().isOk());
 
 	}
 
-	@DisplayName("Gets all tournaments empty")
-	@Transactional
+	@DisplayName("Should get tournament results with correct result")
 	@Test
-	void getTrournamentsWithEmptyTest(@Autowired TournamentRepository tournamentRepository) {
+	void getTournamentResultsTest() throws Exception {
 
-		tournamentRepository.deleteAll();
-		List<TournamentDto> tournaments = this.tournamentController.getTournaments();
-		Assertions.assertEquals(0, tournaments.size());
+		var outputLst = new ArrayList<TournamentResult>();
 
+		when(tournamentService.findAllTournamentsResults(1L)).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/TournamentResult/1")).andExpect(status().isOk());
 	}
-	
-	@DisplayName("Get tournamnet results")
-	@Transactional
+
+	@DisplayName("Should get applicable rounds for tournament with correct result")
 	@Test
-	void getTournamnetResultsTest(@Autowired TournamentResultRepository tournamentResultRepository) {
-		
-		TournamentResult tr = new TournamentResult();
-		tr.setPlayedRounds(1);
-		tr.setPlayer(player);
-		tr.setStbGross(1);
-		tr.setStbNet(1);
-		tr.setStbNet(1);
-		tr.setStrokesBrutto(1);
-		tr.setStrokesNetto(1);
-		tr.setStrokeRounds(1);
-		tr.setTournament(tournament);
-		tournamentResultRepository.save(tr);
-		
-		List<TournamentResultDto> trDtoLst =  this.tournamentController.getTournamentResult(tournament.getId());
-		
-		Assertions.assertEquals(1, trDtoLst.get(0).getStbNet().intValue());
+	void getRoundsForTournamentTest() throws Exception {
+
+		var outputLst = new ArrayList<Round>();
+
+		when(tournamentService.getAllPossibleRoundsForTournament(1L)).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/TournamentRounds/1")).andExpect(status().isOk());
 	}
-	
-	@DisplayName("Get rounds for tournament")
-	@Transactional
+
+	@DisplayName("Should add round to tournament with correct result")
 	@Test
-	void getRoundsForTournamentTest() {
-		
-	
-		List<LimitedRoundWithPlayersDto> rndDtoLst =  this.tournamentController.getTournamentRounds(tournament.getId());
-		
-		Assertions.assertEquals(1, rndDtoLst.size());
+	void addRoundToTournamentWhenValidInputThenReturns200() throws Exception {
+
+		var input = new LimitedRoundDto();
+		input.setId(1L);
+
+		when(modelMapper.map(any(), any())).thenReturn(null);
+
+		mockMvc.perform(post("/rest/TournamentRound/1").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
-	
+
+	@DisplayName("Should add tournament with correct result")
+	@Test
+	void addTournamentWhenValidInputThenReturns200() throws Exception {
+
+		var input = new TournamentDto();
+		input.setId(1L);
+
+		when(modelMapper.map(any(), any())).thenReturn(null);
+
+		mockMvc.perform(post("/rest/Tournament").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should get rounds added for tournament with correct result")
+	@Test
+	void getAddedRoundsForTournamentTest() throws Exception {
+
+		var outputLst = new ArrayList<TournamentRound>();
+
+		when(tournamentService.getTournamentRoundsForResult(1L)).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/TournamentResultRound/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should add round for tournament on behalf with correct result")
+	@Test
+	void addRoundOnBehalfWhenValidInputThenReturns200() throws Exception {
+
+		var input = new RoundDto();
+		input.setId(1L);
+
+		var outputLst = new TournamentRound();
+
+		when(tournamentService.addRoundOnBehalf(any(), any())).thenReturn(outputLst);
+
+
+		when(modelMapper.map(any(), any())).thenReturn(null);
+
+		mockMvc.perform(post("/rest/TournamentRoundOnBehalf/1").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
 	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository,
-			@Autowired TournamentRepository tournamentRepository, @Autowired TournamentResultRepository tr) {
-
-		roundRepository.deleteAll();
-		tr.deleteAll();
-		tournamentRepository.deleteAll();
+	public static void done() {
 
 		log.info("Clean up completed");
 

@@ -67,7 +67,6 @@ public class TournamentController extends BaseController {
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Adds round to tournament")
 	@PostMapping(value = "/rest/TournamentRound/{tournamentId}")
-	// @ApiResponse(responseCode = "500", description="Failed to send an email")
 	public HttpStatus addRoundToTournament(
 			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
 			@Parameter(description = "Round object", required = true) @RequestBody LimitedRoundDto limitedRoundDto) {
@@ -81,7 +80,7 @@ public class TournamentController extends BaseController {
 
 	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Tournament API")
-	@Operation(summary = "Adds tournament")
+	@Operation(summary = "Add tournament")
 	@PostMapping(value = "/rest/Tournament")
 	public HttpStatus addTournament(
 			@Parameter(description = "Tournament object", required = true) @RequestBody TournamentDto tournamentDto) {

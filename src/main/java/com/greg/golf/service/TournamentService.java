@@ -96,7 +96,6 @@ public class TournamentService {
 
         //it must be one and only one result
         if (tournamentLst == null || tournamentLst.size() != 1) {
-            //throw new TooManyPlayersException();
             return null;
         }
 
@@ -128,7 +127,7 @@ public class TournamentService {
         if (updateResults) {
             return updateTournamentResult(round, tournament);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
