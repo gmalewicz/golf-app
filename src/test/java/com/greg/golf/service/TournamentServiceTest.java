@@ -1,9 +1,6 @@
 package com.greg.golf.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeSet;
@@ -16,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
