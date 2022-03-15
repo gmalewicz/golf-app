@@ -1,6 +1,8 @@
 package com.greg.golf.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -531,6 +534,51 @@ class TournamentServiceTest {
 		Assertions.assertEquals(1, tournamentService.getTournamentRoundsForResult(roundResults.getId()).size());
 
 	}
+
+	@DisplayName("Should return rounds applicable for tournament")
+	@Transactional
+	@Test
+	void getApplicableRoundsForTournamentTest() {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
+
+		Assertions.assertEquals(1, rndLst.size());
+
+	}
+
+	@DisplayName("Should add round on behalf for tournament")
+	@Transactional
+	@Test
+	void addRoundOnBehalfForTournamentTestAndReturnNullLst(@Autowired PlayerService playerService, @Autowired CourseService courseService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var course = courseService.getCourse(1L).orElseThrow();
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var round2 = new Round();
+		round2.setCourse(course);
+		var playerSet2 = new TreeSet<Player>();
+		playerSet2.add(player);
+		round2.setPlayer(playerSet2);
+		round2.setRoundDate(new Date(4));
+		round2.setMatchPlay(false);
+		round2.setScoreCard(new ArrayList<>());
+		for (var i = 0; i < 18; i++) {
+			var scoreCard = new ScoreCard();
+			scoreCard.setHole(i + 1);
+			scoreCard.setPats(0);
+			scoreCard.setPenalty(0);
+			scoreCard.setPlayer(player);
+			scoreCard.setRound(round2);
+			scoreCard.setStroke(5);
+			scoreCard.setHcp(2);
+			round2.getScoreCard().add(scoreCard);
+		}
+
+		Assertions.assertEquals(90, tournamentService.addRoundOnBehalf(1L,round2).getStrokesBrutto());
+	}
+
 
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,
