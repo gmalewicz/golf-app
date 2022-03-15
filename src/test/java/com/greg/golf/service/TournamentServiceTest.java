@@ -573,7 +573,7 @@ class TournamentServiceTest {
 			round2.getScoreCard().add(scoreCard);
 		}
 
-		Assertions.assertEquals(90, tournamentService.addRoundOnBehalf(1L,round2).getStrokesBrutto());
+		Assertions.assertEquals(90, tournamentService.addRoundOnBehalf(tournament.getId(), round2).getStrokesBrutto());
 	}
 
 
