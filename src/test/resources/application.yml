@@ -41,7 +41,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     open-in-view: true 
     generate-ddl: false 
-    show_sql: true
+    show_sql: false
   liquibase:
     change-log: classpath:/db/dbChangeLog-dev.xml
 jwt:
