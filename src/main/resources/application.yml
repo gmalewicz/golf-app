@@ -8,6 +8,9 @@ spring:
             client-secret: replace_it
             scope:
               - public_profile
+          google:
+            client-id: 608151938313-rtjvfjflrn86dtg1o0vdv70mpvnek27d.apps.googleusercontent.com
+            client-secret: replace_it
         provider:
           facebook:
             user-info-uri: https://graph.facebook.com/me?fields=name,first_name,last_name
