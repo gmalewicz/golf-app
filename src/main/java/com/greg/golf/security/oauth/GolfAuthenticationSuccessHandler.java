@@ -21,6 +21,7 @@ public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHa
     private PlayerService playerService;
 
     private static final String FACEBOOK = "facebook";
+    private static final String GOOGLE = "google";
 
     @Autowired
     private Oauth2Config oauth2Config;
@@ -38,6 +39,8 @@ public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         if (((OAuth2AuthenticationToken)authentication).getAuthorizedClientRegistrationId().equals(FACEBOOK)) {
             playerType = Common.TYPE_PLAYER_FACEBOOK;
+        } else if (((OAuth2AuthenticationToken)authentication).getAuthorizedClientRegistrationId().equals(GOOGLE)) {
+            playerType = Common.TYPE_PLAYER_GOOGLE;
         }
 
         GolfOAuth2User oauthUser = (GolfOAuth2User) authentication.getPrincipal();
@@ -52,7 +55,6 @@ public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHa
         if (queryParams == null) {
             response.sendRedirect(oauth2Config.getRedirect() + "?error=playerType");
         }
-
 
         response.sendRedirect(oauth2Config.getRedirect() + queryParams);
     }
