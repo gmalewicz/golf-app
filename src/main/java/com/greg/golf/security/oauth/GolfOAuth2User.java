@@ -30,10 +30,37 @@ public class GolfOAuth2User implements OAuth2User {
     }
 
     public String getFirstName() {
-        return oauth2User.getAttribute("first_name");
+
+        // Facebook
+        if (oauth2User.getAttribute("first_name") != null) {
+
+            return oauth2User.getAttribute("first_name");
+        }
+
+        // Google
+        if (oauth2User.getAttribute("given_name") != null) {
+
+            return oauth2User.getAttribute("given_name");
+        }
+
+        return null;
     }
 
     public String getLastName() {
-        return oauth2User.getAttribute("last_name");
+
+        // Facebook
+        if (oauth2User.getAttribute("last_name") != null) {
+
+            return oauth2User.getAttribute("last_name");
+        }
+
+        // Google
+        if (oauth2User.getAttribute("family_name") != null) {
+
+            return oauth2User.getAttribute("family_name");
+        }
+
+        return null;
+
     }
 }
