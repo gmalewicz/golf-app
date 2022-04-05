@@ -22,4 +22,4 @@ Configuration:
       AppenderRef:
       - ref: Console
  #     - ref: File
-      level: info
+      level: warn
