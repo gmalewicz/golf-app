@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.1</version>
+		<version>2.6.6</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>2.14</version>
+	<version>2.14.1</version>
 	<name>golf</name>
 	<description>DrunkGolfers and NiceGirls</description>
 
@@ -25,7 +25,6 @@
 		<modelmapper.version>2.4.4</modelmapper.version>
 		<liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
 		<org.testcontainers.postgresql.version>1.16.2</org.testcontainers.postgresql.version>
-		<!-- <org.springframework.social.spring-social-facebook.version>2.0.3.RELEASE</org.springframework.social.spring-social-facebook.version> -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

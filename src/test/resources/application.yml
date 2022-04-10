@@ -11,8 +11,9 @@ spring:
           google:
             client-id: 608151938313-rtjvfjflrn86dtg1o0vdv70mpvnek27d.apps.googleusercontent.com
             client-secret: replace_it
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
             scope:
-              - public_profile
+              - https://www.googleapis.com/auth/userinfo.profile
         provider:
           facebook:
             user-info-uri: https://graph.facebook.com/me?fields=name,first_name,last_name
