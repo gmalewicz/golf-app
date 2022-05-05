@@ -161,7 +161,7 @@ public class TournamentService {
                     int netStrokes = 0;
                     List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
                     // check if round is applicable for stroke statistic
-                    boolean strokeApplicable = applicableForStroke(round);
+                    boolean strokeApplicable = applicableForStroke(round, player);
                     if (strokeApplicable) {
                         tournamentResult.increaseStrokeRounds();
                         grossStrokes = getGrossStrokes(player, round);
@@ -192,7 +192,7 @@ public class TournamentService {
                 // update stb results
                 List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
                 // check if round is applicable for stroke statistic
-                boolean strokeApplicable = applicableForStroke(round);
+                boolean strokeApplicable = applicableForStroke(round, player);
                 if (strokeApplicable) {
                     tournamentResult.increaseStrokeRounds();
                     // get gross and net strokes
@@ -338,12 +338,15 @@ public class TournamentService {
 
     // calculate gross strokes
     @Transactional
-    public boolean applicableForStroke(Round round) {
+    public boolean applicableForStroke(Round round, Player player) {
 
         log.debug("Start checking round for stroke statistic");
 
         //search for 16 which means that hole has been given up
-        return round.getScoreCard().stream().noneMatch(scoreCard -> scoreCard.getStroke() >= Common.HOLE_GIVEN_UP);
+        return round.getScoreCard()
+                .stream()
+                .filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()))
+                .noneMatch(scoreCard -> scoreCard.getStroke() >= Common.HOLE_GIVEN_UP);
     }
 
     // calculate corrected strokes
