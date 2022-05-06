@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -52,10 +53,6 @@ public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         String queryParams = playerService.processOAuthPostLogin(oauthUser.getFirstName(), oauthUser.getLastName(), playerType);
 
-        if (queryParams == null) {
-            response.sendRedirect(oauth2Config.getRedirect() + "?error=playerType");
-        }
-
-        response.sendRedirect(oauth2Config.getRedirect() + queryParams);
+        response.sendRedirect(oauth2Config.getRedirect() + Objects.requireNonNullElse(queryParams, "?error=playerType"));
     }
 }
