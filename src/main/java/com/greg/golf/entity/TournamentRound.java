@@ -65,4 +65,7 @@ public class TournamentRound {
 	@Size(min = 3, max = 100, message = "Course name should be between 3 and 100 characters")
 	@Column(name = "course_name")
 	private String courseName;
+
+	@Column(name = "round_id")
+	private Integer roundId;
 }

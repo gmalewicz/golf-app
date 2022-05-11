@@ -20,4 +20,18 @@ public class RoleVerification {
             throw new UnauthorizedException();
         }
     }
+
+    public static void verifyPlayer(Long playerId, String errorTxt) throws UnauthorizedException {
+
+        log.info(playerId.toString());
+        log.info(SecurityContextHolder.getContext().getAuthentication().getName());
+        log.info(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()).toString());
+
+
+        if (!Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()).equals(playerId)) {
+
+            log.error(errorTxt);
+            throw new UnauthorizedException();
+        }
+    }
 }

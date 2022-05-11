@@ -108,6 +108,15 @@ class RoundControllerTest {
 		log.info("Set up completed");
 	}
 
+	@DisplayName("Gets round for id")
+	@Test
+	void getsRoundForIdThenReturns200() throws Exception {
+
+		when(roundService.getWithPlayers(1L)).thenReturn(java.util.Optional.of(new Round()));
+		mockMvc.perform(get("/rest/Round/1")).andExpect(status().isOk());
+	}
+
+
 	@DisplayName("Add round with correct result")
 	@Test
 	void addRoundWhenValidInputThenReturns200() throws Exception {
