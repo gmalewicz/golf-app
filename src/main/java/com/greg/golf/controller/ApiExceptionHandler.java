@@ -111,7 +111,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(UnauthorizedException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(UnauthorizedException ex) {
 		
-		var response = new ApiErrorResponse("11", "Administration role required to perform that operation");
+		var response = new ApiErrorResponse("11", "Authorization required to perform that operation");
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
 	

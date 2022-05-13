@@ -7,11 +7,7 @@ import com.greg.golf.entity.Round;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.entity.TournamentRound;
@@ -114,5 +110,17 @@ public class TournamentController extends BaseController {
 		log.debug("Round added");
 
 		return tournamentRound;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Deletes result from tournament")
+	@DeleteMapping(value = "/rest/TournamentResult/{tournamentResultId}")
+	public HttpStatus deleteResult(
+			@Parameter(description = "Tournament result id", example = "1", required = true) @PathVariable("tournamentResultId") Long tournamentResultId) {
+
+		log.info("Delete result from tournament: " + tournamentResultId);
+		tournamentService.deleteResult(tournamentResultId);
+
+		return HttpStatus.OK;
 	}
 }

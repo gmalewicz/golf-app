@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.greg.golf.entity.Tournament;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -42,4 +43,6 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 @EntityGraph(attributePaths = { "player"})
      @NonNull
      Optional<Round> findById(@NonNull Long id);
+
+	List<Round> findByTournament(Tournament tournament);
 }

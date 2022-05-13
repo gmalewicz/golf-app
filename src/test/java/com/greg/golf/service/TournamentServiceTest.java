@@ -17,6 +17,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -45,6 +50,8 @@ class TournamentServiceTest {
 	@SuppressWarnings("unused")
 	@Autowired
 	TournamentResultRepository tournamentResultRepository;
+
+	private static Long roundId;
 
 	@BeforeAll
 	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
@@ -76,7 +83,8 @@ class TournamentServiceTest {
 			scoreCard.setHcp(2);
 			round.getScoreCard().add(scoreCard);
 		}
-		roundRepository.save(round);
+		round = roundRepository.save(round);
+		roundId = round.getId();
 
 		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
 
@@ -115,6 +123,46 @@ class TournamentServiceTest {
 		log.info("Set up completed");
 	}
 
+	@DisplayName("Delete tournament result")
+	@Transactional
+	@Test
+	void deleteTournamentResultTest(@Autowired RoundRepository roundRepository, @Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(0);
+		tournamentResult.setStrokesBrutto(0);
+		tournamentResult.setStrokesNetto(0);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setPlayer(player);
+		var tournament = tournamentService.findAllTournaments().get(0);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		TournamentRound tournamentRound =
+				tournamentService.addTournamentRound(1, 1, 1, 1, 1,
+						"test", tournamentResult, false, roundId);
+
+		tournamentResult.setTournamentRound(new ArrayList<>());
+		tournamentResult.getTournamentRound().add(tournamentRound);
+		tournamentResultRepository.save(tournamentResult);
+
+		tournamentService.deleteResult(tournamentResult.getId());
+		Assertions.assertNull(roundRepository.findById(roundId).orElseThrow().getTournament());
+		Assertions.assertEquals(0, tournamentService.findAllTournaments().get(0).getTournamentResult().size());
+	}
+
+
 	@DisplayName("Calculate net and gross STB")
 	@Transactional
 	@Test
@@ -133,8 +181,8 @@ class TournamentServiceTest {
 		tournamentResult.setTournament(tournamentService.findAllTournaments().get(0));
 		tournamentResultRepository.save(tournamentResult);
 
-		var redRound = roundRepository.findAll().get(0);
-		tournamentService.updateSTB(tournamentResult, redRound, null, player);
+		var retRound = roundRepository.findAll().get(0);
+		tournamentService.updateSTB(tournamentResult, retRound, null, player);
 
 		log.info("STB net: " + tournamentResult.getStbNet());
 		log.info("STB gross: " + tournamentResult.getStbGross());
@@ -223,7 +271,8 @@ class TournamentServiceTest {
 		tournamentResultRepository.save(tournamentResult);
 
 		TournamentRound tournamentRound =
-				tournamentService.addTournamentRound(1, 1, 1, 1, 1, "test", tournamentResult, false);
+				tournamentService.addTournamentRound(1, 1, 1, 1, 1,
+											"test", tournamentResult, false, 1);
 
 		Assertions.assertNotNull(tournamentRound.getId());
 	}

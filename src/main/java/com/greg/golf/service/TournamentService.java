@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.*;
+import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -42,9 +43,36 @@ public class TournamentService {
     private final CourseService courseService;
     private final PlayerRoundRepository playerRoundRepository;
     private final TournamentRoundRepository tournamentRoundRepository;
+    private final RoundRepository roundRepository;
 
     @PersistenceContext
     private final EntityManager entityManager;
+
+    @Transactional
+    public void deleteResult(Long resultId) {
+
+        // first get the object
+        var tournamentResult = tournamentResultRepository.findById(resultId).orElseThrow();
+        // then verify if player is allowed to delete result
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournamentResult.getTournament().getPlayer().getId(), "Attempt to delete tournament result by unauthorized user");
+        // then clear tournament flag for rounds
+        tournamentResult.getTournamentRound().forEach(tournamentRnd -> {
+
+            if (tournamentRnd.getRoundId() != null) {
+
+                var round = roundRepository.findById(tournamentRnd.getRoundId().longValue()).orElseThrow();
+                round.setTournament(null);
+                roundRepository.save(round);
+            }
+
+        });
+        // then delete result
+        var rstLst = tournamentResult.getTournament().getTournamentResult().stream().filter(rst -> rst.getId().equals(resultId)).collect(Collectors.toList());
+        tournamentResult.getTournament().getTournamentResult().removeAll(rstLst);
+        tournamentRepository.save(tournamentResult.getTournament());
+
+    }
 
     @Transactional
     public List<Tournament> findAllTournaments() {
@@ -174,7 +202,7 @@ public class TournamentService {
                     tournamentResultRepository.save(tournamentResult);
                     tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
                             getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
-                            tournamentResult, strokeApplicable));
+                            tournamentResult, strokeApplicable, round.getId()));
 
                     // here needs to be an update of TournamentResults in case if number of added rounds is greater
                     // than bestRounds assuming that bestRounds is not 0
@@ -208,7 +236,7 @@ public class TournamentService {
 
                 tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
                         tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
-                        round.getCourse().getName(), tournamentResult, strokeApplicable));
+                        round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId()));
 
             });
 
@@ -287,7 +315,8 @@ public class TournamentService {
     @SuppressWarnings("java:S107")
     @Transactional
     public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet, float scrDiff,
-                                              String courseName, TournamentResult tournamentResult, boolean strokeApplicable) {
+                                              String courseName, TournamentResult tournamentResult, boolean strokeApplicable,
+                                              long roundId) {
 
         var tournamentRound = new TournamentRound();
         tournamentRound.setCourseName(courseName);
@@ -298,6 +327,7 @@ public class TournamentService {
         tournamentRound.setStrokesNetto(strokesNet);
         tournamentRound.setTournamentResult(tournamentResult);
         tournamentRound.setStrokes(strokeApplicable);
+        tournamentRound.setRoundId((int)roundId);
 
         tournamentRound = tournamentRoundRepository.save(tournamentRound);
 

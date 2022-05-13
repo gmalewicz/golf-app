@@ -56,6 +56,17 @@ public class RoundController extends BaseController {
 	}
 
 	@Tag(name = "Round API")
+	@Operation(summary = "Get the round for a given id.")
+	@GetMapping(value = "/rest/Round/{roundId}")
+	public LimitedRoundWithPlayersDto getRound(
+			@Parameter(description = "Round identifier", required = true)  @PathVariable("roundId") Long roundId) {
+
+		log.info("Get round for id -  " + roundId);
+
+		return modelMapper.map(roundService.getWithPlayers(roundId).orElseThrow(), LimitedRoundWithPlayersDto.class);
+	}
+
+	@Tag(name = "Round API")
 	@Operation(summary = "Get round for player id.")
 	@GetMapping(value = "/rest/Rounds/{playerId}/{pageId}")
 	public List<LimitedRoundDto> getRound(

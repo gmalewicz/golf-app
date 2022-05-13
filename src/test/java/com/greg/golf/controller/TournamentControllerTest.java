@@ -32,11 +32,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @Slf4j
 @AutoConfigureMockMvc(addFilters = false)
@@ -177,6 +179,14 @@ class TournamentControllerTest {
 
 		mockMvc.perform(post("/rest/TournamentRoundOnBehalf/1").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should delete result from tournament")
+	@Test
+	void deleteResultFromTournamentWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deleteResult(anyLong());
+		mockMvc.perform(delete("/rest/TournamentResult/1")).andExpect(status().isOk());
 	}
 
 	@AfterAll

@@ -69,7 +69,7 @@ public class TournamentResult {
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	// @JsonIgnore
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tournamentResult", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tournamentResult")
 	private List<TournamentRound> tournamentRound;
 
 	public void increaseStrokeRounds() {
