@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.6</version>
+		<version>2.6.7</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>2.15.0</version>
+	<version>2.15.1</version>
 	<name>golf</name>
 	<description>DrunkGolfers and NiceGirls</description>
 
@@ -24,7 +24,7 @@
 		<hibernate-types-52.version>2.14.0</hibernate-types-52.version>
 		<hibernate-types-55.version>2.14.0</hibernate-types-55.version>
 		<modelmapper.version>2.4.4</modelmapper.version>
-		<liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
+		<liquibase-maven-plugin.version>4.10.0</liquibase-maven-plugin.version>
 		<org.testcontainers.postgresql.version>1.16.2</org.testcontainers.postgresql.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -208,7 +208,7 @@
 					<dependency>
 					    <groupId>com.fasterxml.jackson.datatype</groupId>
 					    <artifactId>jackson-datatype-jdk8</artifactId>
-					    <version>2.13.1</version>
+					    <version>2.13.3</version>
 					</dependency>
 					<dependency>
                         <groupId>org.liquibase</groupId>
@@ -223,7 +223,7 @@
 					<dependency>
 						<groupId>org.springframework.data</groupId>
 						<artifactId>spring-data-jpa</artifactId>
-						<version>2.6.0</version>
+						<version>2.7.0</version>
 					</dependency>
                     <dependency>
                         <groupId>javax.validation</groupId>
@@ -293,7 +293,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>properties-maven-plugin</artifactId>
-						<version>1.0.0</version>
+						<version>1.1.0</version>
 						<executions>
 							<execution>
 								<phase>initialize</phase>
