@@ -12,12 +12,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
@@ -32,7 +33,7 @@ import lombok.Setter;
 @EnableCaching
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class WebSecurityConfiguration implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
 
@@ -40,22 +41,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private JwtRequestFilter jwtRequestFilter;
-
-	@Autowired
-	private GolfOAuth2UserService oauth2UserService;
-
-	@Autowired
-	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
-
-	@Autowired
-	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -65,13 +51,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 	}
 
 	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
 	}
 
-	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity httpSecurity,
+										   @Autowired JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+										   @Autowired JwtRequestFilter jwtRequestFilter,
+										   @Autowired GolfOAuth2UserService oauth2UserService,
+										   @Autowired GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler,
+										   @Autowired GolfAuthenticationFailureHandler golfAuthenticationFailureHandler) throws Exception {
 
 		// Add a filter to validate the tokens with every request
 		httpSecurity
@@ -106,6 +96,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 		 	.csrf()
 		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
 		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+
+		return httpSecurity.build();
 	}
 	
 	@Override
