@@ -196,7 +196,7 @@ public class PlayerService {
 	@Transactional
 	public Player update(@NonNull Player player) {
 
-		var persistedPlayer = playerRepository.getById(player.getId());
+		var persistedPlayer = playerRepository.findById(player.getId()).orElseThrow();
 
 		if (player.getWhs() != null) {
 			persistedPlayer.setWhs(player.getWhs());
