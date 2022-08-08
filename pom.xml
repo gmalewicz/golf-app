@@ -23,7 +23,7 @@
 		<hibernate-types-52.version>2.16.2</hibernate-types-52.version>
 		<hibernate-types-55.version>2.16.2</hibernate-types-55.version>
 		<modelmapper.version>3.1.0</modelmapper.version>
-		<liquibase-maven-plugin.version>4.10.0</liquibase-maven-plugin.version>
+		<liquibase-maven-plugin.version>4.15.0</liquibase-maven-plugin.version>
 		<org.testcontainers.postgresql.version>1.17.2</org.testcontainers.postgresql.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
