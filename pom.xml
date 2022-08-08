@@ -217,7 +217,7 @@
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
                         <artifactId>liquibase-hibernate5</artifactId>
-                        <version>4.10.0</version>
+                        <version>4.15.0</version>
 						<scope>runtime</scope>
                     </dependency>
 					<dependency>
