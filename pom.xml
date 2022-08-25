@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>2.15.1</version>
+	<version>2.17.0</version>
 	<name>golf</name>
 	<description>DrunkGolfers and NiceGirls</description>
 
@@ -23,7 +23,7 @@
 		<hibernate-types-52.version>2.18.0</hibernate-types-52.version>
 		<hibernate-types-55.version>2.18.0</hibernate-types-55.version>
 		<modelmapper.version>3.1.0</modelmapper.version>
-		<liquibase-maven-plugin.version>4.10.0</liquibase-maven-plugin.version>
+		<liquibase-maven-plugin.version>4.15.0</liquibase-maven-plugin.version>
 		<org.testcontainers.postgresql.version>1.17.3</org.testcontainers.postgresql.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -144,13 +144,13 @@
 			<version>${org.testcontainers.postgresql.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+<!--
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-maven-plugin</artifactId>
 			<version>${liquibase-maven-plugin.version}</version>
 		</dependency>
-
+-->
 		<dependency>
 			<groupId>com.vladmihalcea</groupId>
 			<artifactId>hibernate-types-52</artifactId>
@@ -199,6 +199,7 @@
 			<plugin>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>${liquibase-maven-plugin.version}</version>
 				<configuration>
 					<propertyFile>src/main/resources/liquibase.properties</propertyFile>
 				</configuration>
@@ -212,12 +213,12 @@
 					<dependency>
                         <groupId>org.liquibase</groupId>
                         <artifactId>liquibase-core</artifactId>
-                        <version>4.10.0</version>
+                        <version>4.15.0</version>
                     </dependency>
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
                         <artifactId>liquibase-hibernate5</artifactId>
-                        <version>4.10.0</version>
+                        <version>4.15.0</version>
 						<scope>runtime</scope>
                     </dependency>
 					<dependency>
