@@ -18,7 +18,7 @@
 	<properties>
 		<java.version>13</java.version>
 		<guava.version>31.1-jre</guava.version>
-		<springdoc.version>1.6.10</springdoc.version>
+		<springdoc.version>1.6.11</springdoc.version>
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
 		<hibernate-types-52.version>2.18.0</hibernate-types-52.version>
 		<hibernate-types-55.version>2.18.0</hibernate-types-55.version>
