@@ -2,10 +2,14 @@ package com.greg.golf.service;
 
 import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.Cycle;
+import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.repository.CycleRepository;
+import com.greg.golf.repository.CycleResultRepository;
+import com.greg.golf.repository.CycleTournamentRepository;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +107,106 @@ class CycleServiceTest {
 
         assertThrows(UnauthorizedException.class, () -> this.cycleService.addCycle(cycle));
     }
+
+    @DisplayName("Should try to delete tournament from empty cycle")
+    @Transactional
+    @Test
+    void deleteTournamentFromEmptyCycleTest(@Autowired CycleRepository cycleRepository) {
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+
+        cycleRepository.save(cycle);
+
+        assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
+    }
+
+    @DisplayName("Should delete tournament from cycle with single tournament")
+    @Transactional
+    @Test
+    void deleteTournamentFromCycleWithSingleTournamentTest(@Autowired CycleRepository cycleRepository,
+                                                           @Autowired CycleTournamentRepository cycleTournamentRepository,
+                                                           @Autowired CycleResultRepository cycleResultRepository) {
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+
+        cycleRepository.save(cycle);
+
+        var cycleTournament = new CycleTournament();
+        cycleTournament.setName("Test cycle tournament");
+        cycleTournament.setBestOf(false);
+        cycleTournament.setRounds(1);
+        cycleTournament.setCycle(cycle);
+        cycleTournamentRepository.save(cycleTournament);
+
+        var cycleResult = new CycleResult();
+        cycleResult.setResults(new int[]{40, 0, 0, 0});
+        cycleResult.setWhs(36.0F);
+        cycleResult.setPlayerName("James Bond");
+        cycleResult.setCycle(cycle);
+        cycleResult.setCycleScore(40);
+        cycleResult.setTotal(40);
+        cycleResultRepository.save(cycleResult);
+
+        assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
+        assertEquals(0, cycleResultRepository.findByCycle(cycle).size());
+        assertEquals(0, cycleTournamentRepository.findByCycleOrderById(cycle).size());
+    }
+
+    @DisplayName("Should delete tournament from cycle with two tournaments")
+    @Transactional
+    @Test
+    void deleteTournamentFromCycleWithTwoTournamentsTest(@Autowired CycleRepository cycleRepository,
+                                                           @Autowired CycleTournamentRepository cycleTournamentRepository,
+                                                           @Autowired CycleResultRepository cycleResultRepository) {
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+
+        cycleRepository.save(cycle);
+
+        var cycleTournament = new CycleTournament();
+        cycleTournament.setName("Test cycle tournament");
+        cycleTournament.setBestOf(false);
+        cycleTournament.setRounds(1);
+        cycleTournament.setCycle(cycle);
+        cycleTournamentRepository.save(cycleTournament);
+
+        var cycleTournament2 = new CycleTournament();
+        cycleTournament2.setName("Test cycle tournament 2");
+        cycleTournament2.setBestOf(false);
+        cycleTournament2.setRounds(1);
+        cycleTournament2.setCycle(cycle);
+        cycleTournamentRepository.save(cycleTournament2);
+
+        var cycleResult = new CycleResult();
+        cycleResult.setResults(new int[]{40, 0, 0, 0, 30, 0, 0, 0});
+        cycleResult.setWhs(36.0F);
+        cycleResult.setPlayerName("James Bond");
+        cycleResult.setCycle(cycle);
+        cycleResult.setCycleScore(70);
+        cycleResult.setTotal(70);
+        cycleResultRepository.save(cycleResult);
+
+        assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
+        var cycleResult2 = cycleResultRepository.findByCycle(cycle);
+        assertEquals(1, cycleResult2.size());
+        assertEquals(4, cycleResult2.get(0).getResults().length);
+        assertEquals(40, cycleResult2.get(0).getCycleScore());
+        assertEquals(40, cycleResult2.get(0).getTotal());
+        assertEquals(1, cycleTournamentRepository.findByCycleOrderById(cycle).size());
+    }
+
 
     @DisplayName("Should add the cycle tournament")
     @Transactional
@@ -276,6 +380,21 @@ class CycleServiceTest {
         assertThrows(UnauthorizedException.class, () -> this.cycleService.closeCycle(cycleId));
     }
 
+    @DisplayName("Should delete cycle by authorized user")
+    @Transactional
+    @Test
+    void deleteByAuthorizedUserTest() {
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+
+        cycle = cycleService.addCycle(cycle);
+
+        assertDoesNotThrow(() -> cycleService.deleteCycle(cycle.getId()));
+    }
 
     @AfterAll
     public static void done() {
