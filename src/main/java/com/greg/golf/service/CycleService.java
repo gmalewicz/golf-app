@@ -83,13 +83,11 @@ public class CycleService {
         if (!tournaments.isEmpty()) {
             // find the last tournament
             var lstTournament = tournaments.get(tournaments.size() - 1);
-            //var rndCnt = tournaments.size();
 
             // update results for cycle with more than 1 tournament otherwise delete all results
             if (tournaments.size() > 1) {
                 cycleResultRepository.saveAll(removeTournamentFromResult(cycle, lstTournament));
             } else {
-                //cycleResultRepository.deleteByCycle(cycle);
                 cycleResultRepository.deleteForCycle(cycle.getId());
             }
             // remove the last tournament
@@ -102,7 +100,7 @@ public class CycleService {
 
         // first remove results
         results.forEach(result -> result.setResults(Arrays.stream(result.getResults())
-                .limit(result.getResults().length - ROUNDS_PER_TOURNAMENT).toArray()));
+                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray()));
 
         // then update totals
         return updCycleResultAndTotal(cycleTournament, results);
