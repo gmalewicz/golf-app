@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -68,6 +70,43 @@ public class CycleService {
         addResults(cycleTournament, eagleResultDto);
 
         return cycleTournamentRepository.save(cycleTournament);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Modifying
+    public void removeLastCycleTournament(Cycle cycle) {
+
+        RoleVerification.verifyRole(Common.ADMIN, "Attempt to remove tournament from cycle by unauthorized user");
+
+        var tournaments = cycleTournamentRepository.findByCycleOrderById(cycle);
+
+        if (!tournaments.isEmpty()) {
+            // find the last tournament
+            var lstTournament = tournaments.get(tournaments.size() - 1);
+            //var rndCnt = tournaments.size();
+
+            // update results for cycle with more than 1 tournament otherwise delete all results
+            if (tournaments.size() > 1) {
+                cycleResultRepository.saveAll(removeTournamentFromResult(cycle, lstTournament));
+            } else {
+                //cycleResultRepository.deleteByCycle(cycle);
+                cycleResultRepository.deleteForCycle(cycle.getId());
+            }
+            // remove the last tournament
+            cycleTournamentRepository.delete(lstTournament);
+        }
+    }
+
+    private List<CycleResult> removeTournamentFromResult(Cycle cycle, CycleTournament cycleTournament) {
+        var results = cycleResultRepository.findByCycle(cycle);
+
+        // first remove results
+        results.forEach(result -> result.setResults(Arrays.stream(result.getResults())
+                .limit(result.getResults().length - ROUNDS_PER_TOURNAMENT).toArray()));
+
+        // then update totals
+        return updCycleResultAndTotal(cycleTournament, results);
+
     }
 
     private void addResults(CycleTournament cycleTournament, EagleResultDto[] eagleResultDto) {
@@ -211,5 +250,13 @@ public class CycleService {
         cycleRepository.save(cycle);
 
     }
+
+    public void deleteCycle(Long cycleId) {
+
+        RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete cycle by unauthorized user");
+
+        cycleRepository.deleteById(cycleId);
+    }
+
 
 }

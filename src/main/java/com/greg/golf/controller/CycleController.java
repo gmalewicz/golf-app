@@ -97,4 +97,31 @@ public class CycleController extends BaseController {
 
 		return HttpStatus.OK;
 	}
+
+	@SuppressWarnings("SameReturnValue")
+	@Tag(name = "Cycle API")
+	@Operation(summary = "Deletes the last cycle tournament")
+	@PostMapping(value = "/rest/DeleteCycleTournament")
+	public HttpStatus deleteCycleTournament(
+			@Parameter(description = "Cycle object", required = true) @RequestBody CycleDto cycleDto) {
+
+		log.info("trying to delete tournament for cycle: " + cycleDto.getName());
+
+		cycleService.removeLastCycleTournament(modelMapper.map(cycleDto, Cycle.class));
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Cycle API")
+	@Operation(summary = "Deletes the cycle")
+	@DeleteMapping(value = "/rest/Cycle/{cycleId}")
+	public HttpStatus deleteCycle(
+			@Parameter(description = "Cycle id to be deleted", required = true) @PathVariable("cycleId") Long cycleId) {
+
+		log.info("trying to delete cycle: " + cycleId);
+
+		cycleService.deleteCycle(cycleId);
+
+		return HttpStatus.OK;
+	}
 }

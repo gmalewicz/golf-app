@@ -34,6 +34,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
@@ -166,6 +167,29 @@ class CycleControllerTest {
 		mockMvc.perform(patch("/rest/CycleClose/1")).andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should delete cycle tournament with correct result")
+	@Test
+	void deleteCycleTournamentWhenValidInputThenReturns200() throws Exception {
+
+		var input = new CycleDto();
+		input.setName("Test cycle tournament");
+		input.setStatus(Cycle.STATUS_OPEN);
+		input.setBestRounds(1);
+		input.setMaxWhs(12.0F);
+
+		when(modelMapper.map(any(), any())).thenReturn(null);
+
+		mockMvc.perform(post("/rest/DeleteCycleTournament").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should delete cycle with correct result")
+	@Test
+	void deleteCycleWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(cycleService).deleteCycle(any());
+		mockMvc.perform(delete("/rest/Cycle/1")).andExpect(status().isOk()).andReturn();
+	}
 
 	@AfterAll
 	public static void done() {
