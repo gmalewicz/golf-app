@@ -32,11 +32,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		log.info(this.getAllowedOrigins());
 		registry.addEndpoint("/websocket/onlinescorecard")
-				.setAllowedOrigins("http://" + this.getAllowedOrigins(), 
+				.setAllowedOrigins("http://" + this.getAllowedOrigins(),
 								   "https://" + this.getAllowedOrigins(),
 								   "http://www." + this.getAllowedOrigins(), 
 								   "https://www." + this.getAllowedOrigins())
-				.withSockJS();
+				;
 		log.debug("STOMP endpoint registered");
 	}
 }

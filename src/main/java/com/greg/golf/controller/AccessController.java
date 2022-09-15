@@ -134,16 +134,39 @@ public class AccessController {
 
 		if (request.getAttribute(REFRESH_TOKEN) != null) {
 
-			final GolfUserDetails userDetails = playerService.loadUserById(id);
-			
-			responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-			responseHeaders.set("Jwt",  playerService.generateJwtToken(userDetails));
-			// regenerate refresh token
-			responseHeaders.set("Refresh", playerService.generateRefreshToken(userDetails));
+			updateRefreshHeader(responseHeaders, id);
 		}
 
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
 	}
+
+	@SuppressWarnings("UnusedReturnValue")
+	@Tag(name = "Access API")
+	@Operation(summary = "Refresh player JWT on demand")
+	@GetMapping(value = "/rest/RefreshToken/{id}")
+	public ResponseEntity<String> refreshTokenOnDemand(HttpServletRequest request,
+											   @Parameter(required = true, description = "Id of the player") @PathVariable("id") Long id) {
+
+		log.debug("trying to refresh token on demand for player id: " + id);
+
+		var responseHeaders = new HttpHeaders();
+
+		updateRefreshHeader(responseHeaders, id);
+
+		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
+	}
+
+	private void updateRefreshHeader(HttpHeaders responseHeaders, Long id) {
+
+		final GolfUserDetails userDetails = playerService.loadUserById(id);
+
+		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
+		responseHeaders.set("Jwt",  playerService.generateJwtToken(userDetails));
+		// regenerate refresh token
+		responseHeaders.set("Refresh", playerService.generateRefreshToken(userDetails));
+
+	}
+
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Delete player")
