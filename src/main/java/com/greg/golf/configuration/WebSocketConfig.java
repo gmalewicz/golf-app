@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void configureMessageBroker(MessageBrokerRegistry config) {
 		config	.enableSimpleBroker("/topic")
 				.setTaskScheduler(new DefaultManagedTaskScheduler())
-				.setHeartbeatValue(new long[]{0,4000});
+				.setHeartbeatValue(new long[]{4000, 0});
 		config.setApplicationDestinationPrefixes("/app");
 		log.debug("Message broker configured");
 	}
