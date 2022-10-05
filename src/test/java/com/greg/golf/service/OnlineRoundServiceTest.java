@@ -330,6 +330,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard2.setHole(1);
 		onlineScoreCard2.setOnlineRound(onlineRound);
 		onlineScoreCard2.setStroke(2);
+		onlineScoreCard2.setOrId(onlineRound.getId());
 		onlineScoreCard2.setUpdate(false);
 		onlineScoreCard2.setTime("10:00");
 
