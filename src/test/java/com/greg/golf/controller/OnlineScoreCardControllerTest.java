@@ -227,11 +227,9 @@ class OnlineScoreCardControllerTest {
 		input.setOwner(1L);
 		input.setFinalized(false);
 		input.setMatchPlay(false);
-
 		var inputLst = new ArrayList<OnlineRoundDto>();
 		inputLst.add(input);
 
-		when(modelMapper.map(any(), any())).thenReturn(null);
 		doNothing().when(template).convertAndSend(anyString(), (OnlineScoreCardDto)any());
 
 		mockMvc.perform(post("/rest/OnlineScoreCard").contentType("application/json").characterEncoding("utf-8")

@@ -295,7 +295,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard2.setUpdate(true);
 		onlineScoreCard2.setTime("10:00");
 
-		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard));
+		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard2));
 
 		Assertions.assertEquals(1, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
 	}
@@ -333,9 +333,9 @@ class OnlineRoundServiceTest {
 		onlineScoreCard2.setUpdate(false);
 		onlineScoreCard2.setTime("10:00");
 
-		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard));
+		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard2));
 
-		Assertions.assertFalse(onlineScoreCard.isSyncRequired());
+		Assertions.assertFalse(onlineScoreCard2.isSyncRequired());
 	}
 
 	@DisplayName("Attempt to sync online scorecard when required")
