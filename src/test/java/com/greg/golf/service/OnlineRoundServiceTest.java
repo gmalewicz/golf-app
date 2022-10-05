@@ -261,6 +261,112 @@ class OnlineRoundServiceTest {
 		
 		Assertions.assertEquals(1, onlineRoundRepository.findAll().size());
 	}
+
+	@DisplayName("Attempt to sync online scorecard with update")
+	@Transactional
+	@Test
+	void syncOnlineScoreCardWithUpdateFlagTest() {
+
+		OnlineRound onlineRound = new OnlineRound();
+		onlineRound.setCourse(course);
+		onlineRound.setCourseTee(courseTee);
+		onlineRound.setPlayer(player);
+		onlineRound.setDate(new Date());
+		onlineRound.setTeeTime("10:00");
+		onlineRound.setOwner(player.getId());
+		onlineRound.setFinalized(false);
+		onlineRound.setMatchPlay(false);
+		onlineRoundRepository.save(onlineRound);
+
+		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
+		onlineScoreCard.setPlayer(player);
+		onlineScoreCard.setHole(1);
+		onlineScoreCard.setOnlineRound(onlineRound);
+		onlineScoreCard.setStroke(1);
+		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
+		onlineScoreCardRepository.save(onlineScoreCard);
+
+		OnlineScoreCard onlineScoreCard2 = new OnlineScoreCard();
+		onlineScoreCard2.setPlayer(player);
+		onlineScoreCard2.setHole(1);
+		onlineScoreCard2.setOnlineRound(onlineRound);
+		onlineScoreCard2.setStroke(2);
+		onlineScoreCard2.setUpdate(true);
+		onlineScoreCard2.setTime("10:00");
+
+		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard));
+
+		Assertions.assertEquals(1, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+	}
+
+	@DisplayName("Attempt to sync online scorecard witch already exists")
+	@Transactional
+	@Test
+	void syncOnlineScoreCardWhenNotRequiredTest() {
+
+		OnlineRound onlineRound = new OnlineRound();
+		onlineRound.setCourse(course);
+		onlineRound.setCourseTee(courseTee);
+		onlineRound.setPlayer(player);
+		onlineRound.setDate(new Date());
+		onlineRound.setTeeTime("10:00");
+		onlineRound.setOwner(player.getId());
+		onlineRound.setFinalized(false);
+		onlineRound.setMatchPlay(false);
+		onlineRoundRepository.save(onlineRound);
+
+		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
+		onlineScoreCard.setPlayer(player);
+		onlineScoreCard.setHole(1);
+		onlineScoreCard.setOnlineRound(onlineRound);
+		onlineScoreCard.setStroke(1);
+		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
+		onlineScoreCardRepository.save(onlineScoreCard);
+
+		OnlineScoreCard onlineScoreCard2 = new OnlineScoreCard();
+		onlineScoreCard2.setPlayer(player);
+		onlineScoreCard2.setHole(1);
+		onlineScoreCard2.setOnlineRound(onlineRound);
+		onlineScoreCard2.setStroke(2);
+		onlineScoreCard2.setUpdate(false);
+		onlineScoreCard2.setTime("10:00");
+
+		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard));
+
+		Assertions.assertFalse(onlineScoreCard.isSyncRequired());
+	}
+
+	@DisplayName("Attempt to sync online scorecard when required")
+	@Transactional
+	@Test
+	void syncOnlineScoreCardWhenRequiredTest() {
+
+		OnlineRound onlineRound = new OnlineRound();
+		onlineRound.setCourse(course);
+		onlineRound.setCourseTee(courseTee);
+		onlineRound.setPlayer(player);
+		onlineRound.setDate(new Date());
+		onlineRound.setTeeTime("10:00");
+		onlineRound.setOwner(player.getId());
+		onlineRound.setFinalized(false);
+		onlineRound.setMatchPlay(false);
+		onlineRoundRepository.save(onlineRound);
+
+		OnlineScoreCard onlineScoreCard2 = new OnlineScoreCard();
+		onlineScoreCard2.setPlayer(player);
+		onlineScoreCard2.setHole(1);
+		onlineScoreCard2.setOnlineRound(onlineRound);
+		onlineScoreCard2.setStroke(2);
+		onlineScoreCard2.setUpdate(false);
+		onlineScoreCard2.setTime("10:00");
+
+		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard2));
+
+		Assertions.assertTrue(onlineScoreCard2.isSyncRequired());
+		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+	}
 	
 	@AfterAll
 	public static void done() {
