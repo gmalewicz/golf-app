@@ -82,4 +82,7 @@ public class OnlineScoreCard {
 	@Transient
 	private boolean update;
 
+	@Transient
+	private boolean syncRequired;
+
 }

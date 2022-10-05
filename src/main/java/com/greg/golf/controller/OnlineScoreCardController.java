@@ -4,9 +4,11 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,12 +34,15 @@ public class OnlineScoreCardController extends BaseController {
 
 	private final OnlineRoundService onlineRoundService;
 	private final PlayerService playerService;
+	private final SimpMessagingTemplate template;
+
 
 	public OnlineScoreCardController(ModelMapper modelMapper, OnlineRoundService onlineRoundService,
-			PlayerService playerService) {
+			PlayerService playerService, SimpMessagingTemplate template) {
 		super(modelMapper);
 		this.onlineRoundService = onlineRoundService;
 		this.playerService = playerService;
+		this.template = template;
 	}
 
 	@MessageMapping("/hole")
@@ -53,7 +58,25 @@ public class OnlineScoreCardController extends BaseController {
 		return modelMapper.map(onlineScoreCard, OnlineScoreCardDto.class);
 	}
 
-	@Tag(name = "Online scoreard API")
+	@Tag(name = "Online scorecard API")
+	@Operation(summary = "Save hole results for online round")
+	@PostMapping(value = "/rest/OnlineScoreCard")
+	public HttpStatus syncOnlineScoreCards(
+			@Parameter(description = "List of ScoreCard objects", required = true) @RequestBody List<OnlineScoreCardDto> onlineScoreCards) {
+
+		log.debug("Attempt to save hole result for online round");
+
+		List<OnlineScoreCard> oScoreCardLst = mapList(onlineScoreCards, OnlineScoreCard.class);
+
+		oScoreCardLst = onlineRoundService.syncOnlineScoreCards(oScoreCardLst);
+
+		oScoreCardLst.stream().filter(OnlineScoreCard::isSyncRequired).forEach(onlineScoreCard ->
+				template.convertAndSend("/topic" ,modelMapper.map(onlineScoreCard, OnlineScoreCardDto.class)));
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Adds online rounds")
 	@PostMapping(value = "/rest/OnlineRounds")
 	public List<OnlineRoundDto> addOnlineRounds(

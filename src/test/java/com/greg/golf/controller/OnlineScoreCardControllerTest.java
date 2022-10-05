@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -62,6 +63,9 @@ class OnlineScoreCardControllerTest {
 
 	@MockBean
 	private ModelMapper modelMapper;
+
+	@MockBean
+	private SimpMessagingTemplate template;
 
 	@MockBean
 	private GolfOAuth2UserService golfOAuth2UserService;
@@ -211,6 +215,25 @@ class OnlineScoreCardControllerTest {
 		
 		
 		Assertions.assertNull(onlineScoreCardController.send(onlineScorecardDto));
+
+	}
+
+	@DisplayName("Should sync online scorecard with correct result")
+	@Test
+	void syncOnlineScoreCardWhenValidInputThenReturns200() throws Exception {
+
+		var input = new OnlineRoundDto();
+		input.setTeeTime("10:00");
+		input.setOwner(1L);
+		input.setFinalized(false);
+		input.setMatchPlay(false);
+		var inputLst = new ArrayList<OnlineRoundDto>();
+		inputLst.add(input);
+
+		doNothing().when(template).convertAndSend(anyString(), (OnlineScoreCardDto)any());
+
+		mockMvc.perform(post("/rest/OnlineScoreCard").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(inputLst))).andExpect(status().isOk()).andReturn();
 
 	}
 	
