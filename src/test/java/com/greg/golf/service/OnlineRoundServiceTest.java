@@ -290,14 +290,14 @@ class OnlineRoundServiceTest {
 		OnlineScoreCard onlineScoreCard2 = new OnlineScoreCard();
 		onlineScoreCard2.setPlayer(player);
 		onlineScoreCard2.setHole(1);
-		onlineScoreCard2.setOnlineRound(onlineRound);
+		onlineScoreCard2.setOrId(onlineRound.getId());
 		onlineScoreCard2.setStroke(2);
 		onlineScoreCard2.setUpdate(true);
 		onlineScoreCard2.setTime("10:00");
 
 		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard2));
 
-		Assertions.assertEquals(1, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
 	}
 
 	@DisplayName("Attempt to sync online scorecard witch already exists")
