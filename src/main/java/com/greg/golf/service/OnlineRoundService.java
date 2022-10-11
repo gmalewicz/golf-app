@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
-import com.greg.golf.controller.dto.OnlineScoreCardDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -62,8 +61,6 @@ public class OnlineRoundService {
 	@Transactional
 	public OnlineScoreCard saveOnlineScoreCard(OnlineScoreCard onlineScoreCard) {
 
-		OnlineScoreCard retOnlineScoreCard = null;
-		
 		var onlineRound = new OnlineRound();
 		onlineRound.setId(onlineScoreCard.getOrId());
 		onlineScoreCard.setOnlineRound(onlineRound);
@@ -80,19 +77,15 @@ public class OnlineRoundService {
 		}
 
 		log.debug("Adding of the score card executed: " + onlineScoreCard);
-		try {
-			retOnlineScoreCard =  onlineScoreCardRepository.save(onlineScoreCard);
-		} catch (Exception ex) {
-			log.error("Synchronization executed first - processing not required");
-		}
-		return onlineScoreCard;
-
+		return onlineScoreCardRepository.save(onlineScoreCard);
 	}
 
 	private void syncOnlineScoreCard(OnlineScoreCard onlineScoreCard) {
 
 		// skip updates - just in case
 		if (onlineScoreCard.isUpdate()) {
+			saveOnlineScoreCard(onlineScoreCard);
+			onlineScoreCard.setSyncRequired(true);
 			return;
 		}
 
@@ -105,12 +98,7 @@ public class OnlineRoundService {
 
 		if (updatedScoreCard.isEmpty()) {
 			log.info("Synchronization required for player id " + onlineScoreCard.getPlayer().getId() + " : hole " + onlineScoreCard.getHole());
-			try {
-				onlineScoreCardRepository.save(onlineScoreCard);
-			} catch (Exception ex) {
-				log.error("Synchronization attempt too late - not required");
-				onlineScoreCard.setSyncRequired(false);
-			}
+			onlineScoreCardRepository.save(onlineScoreCard);
 			onlineScoreCard.setSyncRequired(true);
 		} else {
 			onlineScoreCard.setSyncRequired(false);
