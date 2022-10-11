@@ -61,6 +61,8 @@ public class OnlineRoundService {
 
 	@Transactional
 	public OnlineScoreCard saveOnlineScoreCard(OnlineScoreCard onlineScoreCard) {
+
+		OnlineScoreCard retOnlineScoreCard = null;
 		
 		var onlineRound = new OnlineRound();
 		onlineRound.setId(onlineScoreCard.getOrId());
@@ -78,7 +80,12 @@ public class OnlineRoundService {
 		}
 
 		log.debug("Adding of the score card executed: " + onlineScoreCard);
-		return onlineScoreCardRepository.save(onlineScoreCard);
+		try {
+			retOnlineScoreCard =  onlineScoreCardRepository.save(onlineScoreCard);
+		} catch (Exception ex) {
+			log.error("Synchronization executed first - processing not required");
+		}
+		return retOnlineScoreCard;
 
 	}
 
@@ -98,7 +105,12 @@ public class OnlineRoundService {
 
 		if (updatedScoreCard.isEmpty()) {
 			log.info("Synchronization required for player id " + onlineScoreCard.getPlayer().getId() + " : hole " + onlineScoreCard.getHole());
-			onlineScoreCardRepository.save(onlineScoreCard);
+			try {
+				onlineScoreCardRepository.save(onlineScoreCard);
+			} catch (Exception ex) {
+				log.error("Synchronization attempt too late - not required");
+				onlineScoreCard.setSyncRequired(false);
+			}
 			onlineScoreCard.setSyncRequired(true);
 		} else {
 			onlineScoreCard.setSyncRequired(false);
