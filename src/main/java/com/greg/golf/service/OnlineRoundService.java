@@ -85,7 +85,7 @@ public class OnlineRoundService {
 		} catch (Exception ex) {
 			log.error("Synchronization executed first - processing not required");
 		}
-		return retOnlineScoreCard;
+		return onlineScoreCard;
 
 	}
 
