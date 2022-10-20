@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>2.26.0</version>
+	<version>2.27.0</version>
 	<name>golf</name>
 	<description>DrunkGolfers and NiceGirls</description>
 
@@ -21,12 +21,14 @@
 		<guava.version>31.1-jre</guava.version>
 		<springdoc.version>1.6.11</springdoc.version>
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
-		<hibernate-types-52.version>2.19.2</hibernate-types-52.version>
-		<hibernate-types-55.version>2.19.2</hibernate-types-55.version>
+		<hibernate-types-52.version>2.20.0</hibernate-types-52.version>
+		<hibernate-types-55.version>2.20.0</hibernate-types-55.version>
 		<modelmapper.version>3.1.0</modelmapper.version>
-		<liquibase-maven-plugin.version>4.15.0</liquibase-maven-plugin.version>
-		<org.testcontainers.postgresql.version>1.17.3</org.testcontainers.postgresql.version>
+		<liquibase-maven-plugin.version>4.17.0</liquibase-maven-plugin.version>
+		<org.testcontainers.postgresql.version>1.17.5</org.testcontainers.postgresql.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -216,7 +218,7 @@
 					<dependency>
                         <groupId>org.liquibase</groupId>
                         <artifactId>liquibase-core</artifactId>
-                        <version>4.15.0</version>
+                        <version>4.17.0</version>
                     </dependency>
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
