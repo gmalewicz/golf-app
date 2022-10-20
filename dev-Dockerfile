@@ -21,6 +21,6 @@ WORKDIR /opt/golf
 
 COPY ${APP} golf.jar
 
-ENTRYPOINT ["java","-Dliquibase.hub.mode=off", "-Dhibernate.types.print.banner=false", "-jar","golf.jar"]
+ENTRYPOINT ["java","-Dliquibase.hub.mode=off", "-Dhibernate.types.print.banner=false", "-Dspring.profiles.active=dev", "-Dspring.datasource.url=jdbc:postgresql://172.17.0.2:5432/golf",  "-jar" ,"golf.jar"]
 
 EXPOSE 8080
