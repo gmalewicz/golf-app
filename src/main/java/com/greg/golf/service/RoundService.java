@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.repository.PlayerRepository;
+import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +39,7 @@ public class RoundService {
 	private final RoundRepository roundRepository;
 	private final PlayerRoundRepository playerRoundRepository;
 	private final ApplicationEventPublisher applicationEventPublisher;
+	private final PlayerRepository playerRepository;
 	
 	public Optional<Round> getWithPlayers (Long id) {
 		return roundRepository.findById(id);
@@ -213,6 +217,31 @@ public class RoundService {
 	@Transactional
 	public void updateRoundWhs(Long playerId, Long roundId, Float whs) {
 		playerRoundRepository.updatePlayerRoundWhs(whs, playerId, roundId);
+	}
+
+	@Transactional
+	public void swapPlayer(Long oldPlayerId, Long newPlayerId, Long roundId) {
+
+		RoleVerification.verifyRole(Common.ADMIN, "Attempt to swap player in the round by unauthorized user");
+
+		// get data
+		Round round = roundRepository.findById(roundId).orElseThrow();
+		Player newPlayer = playerRepository.findById(newPlayerId).orElseThrow();
+
+		round.getScoreCard().forEach(sc -> {
+
+			if (sc.getPlayer().getId().equals(oldPlayerId)) {
+				sc.setPlayer(newPlayer);
+			}
+		});
+		//update round (score cards)
+		roundRepository.save(round);
+
+		//update player round (player id)
+		PlayerRound playerRound = playerRoundRepository.getForPlayerAndRound(oldPlayerId, roundId).orElseThrow();
+		playerRound.setPlayerId(newPlayerId);
+		playerRoundRepository.save(playerRound);
+
 	}
 
 }

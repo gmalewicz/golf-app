@@ -1,7 +1,7 @@
 package com.greg.golf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.PlayerDto;
+import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.Player;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
@@ -98,7 +98,7 @@ class AccessControllerTest {
 	@Test
 	void processAuthenticationWhenValidInputThenReturns200() throws Exception {
 
-		var input = new PlayerDto();
+		var input = new PlayerCredentialsDto();
 		input.setNick("Test");
 		input.setPassword("Password");
 
@@ -117,9 +117,12 @@ class AccessControllerTest {
 	@Test
 	void processAddPlayerWhenValidInputThenReturns200() throws Exception {
 
-		var input = new PlayerDto();
+		var input = new PlayerRegistrationDto();
 		input.setNick("Test");
 		input.setPassword("Password");
+		input.setSex(false);
+		input.setCaptcha("captcha");
+		input.setWhs(1.0F);
 
 		doNothing().when(playerService).addPlayer(any());
 
@@ -131,15 +134,11 @@ class AccessControllerTest {
 	@Test
 	void processUpdatePlayerWhenValidInputThenReturns200() throws Exception {
 
-		var input = new PlayerDto();
-		input.setNick("Test");
+		var input = new PlayerUpdateDto();
+		input.setId(1L);
 		input.setPassword("Password");
 
-		var output = new Player();
-		output.setNick("Test");
-		output.setPassword("Password");
-
-		when(playerService.update(any())).thenReturn(output);
+		when(playerService.update(any())).thenReturn(null);
 
 		mockMvc.perform(patch("/rest/PatchPlayer").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
@@ -149,7 +148,7 @@ class AccessControllerTest {
 	@Test
 	void processPasswordByPrivilegedUserWhenValidInputThenReturns200() throws Exception {
 
-		var input = new PlayerDto();
+		var input = new PlayerCredentialsDto();
 		input.setNick("Test");
 		input.setPassword("Password");
 
@@ -163,13 +162,15 @@ class AccessControllerTest {
 	@Test
 	void processAddPlayerOnBehalfWhenValidInputThenReturns200() throws Exception {
 
-		var input = new PlayerDto();
+		var input = new PlayerUpdateOnBehalfDto();
 		input.setNick("Test");
-		input.setPassword("Password");
+		input.setSex(false);
+		input.setWhs(1.0F);
 
 		var output = new Player();
 		output.setNick("Test");
-		output.setPassword("Password");
+		output.setSex(false);
+		output.setWhs(1.0F);
 
 		when(playerService.addPlayerOnBehalf(any())).thenReturn(output);
 

@@ -35,24 +35,18 @@ public class Player implements Comparable<Player> {
 	private Long id;
 
 	@EqualsAndHashCode.Exclude
-	@NotNull
 	@Column(name = "nick")
 	private String nick;
 
-	@NotNull
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@Column(name = "password")
 	private String password;
 
 	@EqualsAndHashCode.Exclude
-	@NotNull
 	private Boolean sex;
 
 	@EqualsAndHashCode.Exclude
-	@NotNull
-	@Min(value = -5)
-	@Max(value = 54)
 	@Column(name = "whs")
 	private Float whs;
 

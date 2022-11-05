@@ -9,6 +9,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -129,7 +130,10 @@ public class ApiExceptionHandler {
 		
 		var errors = new StringBuilder();
 	    ex.getBindingResult().getAllErrors().forEach(error -> {
+			String fieldName = ((FieldError) error).getField();
 	        String errorMessage = error.getDefaultMessage();
+			errors.append(fieldName);
+			errors.append(" - ");
 	        errors.append(errorMessage);
 	        errors.append(" ");
 	    });
