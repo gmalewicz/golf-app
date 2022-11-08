@@ -1,14 +1,15 @@
 package com.greg.golf.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import com.greg.golf.controller.dto.PlayerIdDto;
+import javax.validation.Valid;
+
+import com.greg.golf.controller.dto.*;
 import com.greg.golf.security.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.greg.golf.controller.dto.PlayerDto;
 import com.greg.golf.entity.Player;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.helpers.GolfUserDetails;
@@ -34,12 +35,12 @@ public class AccessController {
 	@Tag(name = "Access API")
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
 	@PostMapping(value = "/rest/Authenticate")
-	public ResponseEntity<PlayerDto> authenticatePlayer(
-			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+	public ResponseEntity<PlayerDto> authenticatePlayer( @Valid
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerCredentialsDto playerCredentialsDto) {
 
-		log.info("trying to authenticate player: " + playerDto.getNick() + " with password *****");
+		log.info("trying to authenticate player: " + playerCredentialsDto.getNick() + " with password *****");
 
-		GolfUserDetails userDetails =playerService.authenticatePlayer(modelMapper.map(playerDto, Player.class));
+		GolfUserDetails userDetails =playerService.authenticatePlayer(modelMapper.map(playerCredentialsDto, Player.class));
 
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
@@ -71,12 +72,12 @@ public class AccessController {
 	@Tag(name = "Access API")
 	@Operation(summary = "Add player.")
 	@PostMapping(value = "/rest/AddPlayer")
-	public HttpStatus addPlayer(
-			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+	public HttpStatus addPlayer(@Valid
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerRegistrationDto playerRegistrationDto) {
 
-		log.info("trying to add player: " + playerDto.getNick());
+		log.info("trying to add player: " + playerRegistrationDto.getNick());
 
-		playerService.addPlayer(modelMapper.map(playerDto, Player.class));
+		playerService.addPlayer(modelMapper.map(playerRegistrationDto, Player.class));
 
 		return HttpStatus.OK;
 	}
@@ -84,41 +85,41 @@ public class AccessController {
 	@Tag(name = "Access API")
 	@Operation(summary = "Update player. Only WHS and/or password can be updated.")
 	@PatchMapping(value = "/rest/PatchPlayer")
-	public ResponseEntity<PlayerDto> updatePlayer(
-			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+	public HttpStatus updatePlayer( @Valid
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerUpdateDto playerUpdateDto) {
 
-		log.info("trying to update player: " + playerDto.getNick());
+		log.info("trying to update player id: " + playerUpdateDto.getId());
 
-		Player player = playerService.update(modelMapper.map(playerDto, Player.class));
+		playerService.update(modelMapper.map(playerUpdateDto, Player.class));
 
-		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
+		return HttpStatus.OK;
 	}
 
 	@SuppressWarnings({"UnusedReturnValue"})
 	@Tag(name = "Access API")
 	@Operation(summary = "Administrative task: Reset password.")
 	@PatchMapping(value = "/rest/ResetPassword")
-	public HttpStatus resetPassword(
-			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+	public HttpStatus resetPassword( @Valid
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerCredentialsDto playerCredentialsDto) {
 
-		log.info("trying to reset the password for player: " + playerDto.getNick());
+		log.info("trying to reset the password for player: " + playerCredentialsDto.getNick());
 
-		playerService.resetPassword(modelMapper.map(playerDto, Player.class));
+		playerService.resetPassword(modelMapper.map(playerCredentialsDto, Player.class));
 
 		return HttpStatus.OK;
 	}
 
 	@Tag(name = "Access API")
-	@Operation(summary = "Add player on behalf of him. It will have temporary 'welcome' password.")
+	@Operation(summary = "Add player on behalf of him. It will have temporary password.")
 	@PostMapping(value = "/rest/AddPlayerOnBehalf")
-	public ResponseEntity<PlayerDto> addPlayerOnBehalf(
-			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+	public ResponseEntity<PlayerUpdateOnBehalfDto> addPlayerOnBehalf( @Valid
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerUpdateOnBehalfDto playerUpdateOnBehalfDto) {
 
-		log.info("trying to add player on behalf: " + playerDto.getNick() + " with temporary password");
+		log.info("trying to add player on behalf: " + playerUpdateOnBehalfDto.getNick() + " with temporary password");
 
-		Player player = playerService.addPlayerOnBehalf(modelMapper.map(playerDto, Player.class));
+		Player player = playerService.addPlayerOnBehalf(modelMapper.map(playerUpdateOnBehalfDto, Player.class));
 
-		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.class), HttpStatus.OK);
+		return new ResponseEntity<>(modelMapper.map(player, PlayerUpdateOnBehalfDto.class), HttpStatus.OK);
 	}
 
 	@SuppressWarnings("UnusedReturnValue")
@@ -171,12 +172,12 @@ public class AccessController {
 	@Tag(name = "Access API")
 	@Operation(summary = "Delete player")
 	@PostMapping(value = "/rest/DeletePlayer")
-	public HttpStatus deletePlayer(
-			@Parameter(description = "Player id", required = true) @RequestBody PlayerIdDto playerIdDto) {
+	public HttpStatus deletePlayer(@Valid
+			@Parameter(description = "Player id", required = true) @RequestBody IdDto idDto) {
 
-		log.info("trying to delete player with id: " + playerIdDto.getId());
+		log.info("trying to delete player with id: " + idDto.getId());
 
-		playerService.delete(playerIdDto.getId());
+		playerService.delete(idDto.getId());
 
 		return HttpStatus.OK;
 	}
@@ -185,12 +186,12 @@ public class AccessController {
 	@Operation(summary = "Update player by administrator.")
 	@PatchMapping(value = "/rest/UpdatePlayerOnBehalf")
 	public HttpStatus updatePlayerOnBehalf(
-			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerDto playerDto) {
+			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerUpdateOnBehalfDto playerUpdateOnBehalfDto) {
 
-		log.info("trying to update player: " + playerDto.getNick() + " by admin or other player");
-		boolean updateSocial = playerDto.getUpdateSocial() != null && playerDto.getUpdateSocial();
+		log.info("trying to update player: " + playerUpdateOnBehalfDto.getNick() + " by admin or other player");
+		boolean updateSocial = playerUpdateOnBehalfDto.getUpdateSocial() != null && playerUpdateOnBehalfDto.getUpdateSocial();
 
-		playerService.updatePlayerOnBehalf(modelMapper.map(playerDto, Player.class), updateSocial);
+		playerService.updatePlayerOnBehalf(modelMapper.map(playerUpdateOnBehalfDto, Player.class), updateSocial);
 
 		return HttpStatus.OK;
 	}

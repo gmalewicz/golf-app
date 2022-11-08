@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -148,7 +149,7 @@ class RoundServiceTest {
 	void deleteScoreCardForRoundWithTwoPlayerTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		var player = new Player();
 		player.setNick("player2");
@@ -185,7 +186,7 @@ class RoundServiceTest {
 	void saveRoundWithMoreThan4PlayersTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		var player = new Player();
 		player.setNick("player2");
@@ -247,7 +248,7 @@ class RoundServiceTest {
 	void saveRoundForTheSamePlayerTwiceTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		// create the player
 		var player = new Player();
@@ -275,7 +276,7 @@ class RoundServiceTest {
 	void addScorecardToExistingRoundTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		// create the new player
 		var player = new Player();
@@ -318,7 +319,7 @@ class RoundServiceTest {
 	void addScorecardWithTournamentToExistingRoundTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		var tournament = new Tournament();
 		tournament.setEndDate(round.getRoundDate());
@@ -374,7 +375,7 @@ class RoundServiceTest {
 	void scoreCardUpdateThatIsAssignedToTournamentTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		var tournament = new Tournament();
 		tournament.setEndDate(round.getRoundDate());
@@ -406,7 +407,7 @@ class RoundServiceTest {
 	void correctScoreCardUpdateTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		// create the new round
 		var newRound = new Round();
@@ -429,7 +430,7 @@ class RoundServiceTest {
 		// update the scorecard
 		roundService.updateScoreCard(newRound);
 
-		round = roundRepository.getById(roundId);
+		round = roundRepository.findById(roundId).orElseThrow();
 
 		Assertions.assertEquals(1, round.getScoreCard().size());
 		Assertions.assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
@@ -452,7 +453,7 @@ class RoundServiceTest {
 		player.setType(Common.TYPE_PLAYER_LOCAL);
 		playerRepository.save(player);
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		// create the new round
 		var newRound = new Round();
@@ -474,7 +475,7 @@ class RoundServiceTest {
 	void scoreCardUpdateWithoutPlayerTest(@Autowired RoundRepository roundRepository,
 			@Autowired PlayerRepository playerRepository) {
 
-		var round = roundRepository.getById(roundId);
+		var round = roundRepository.findById(roundId).orElseThrow();
 
 		// create the new round
 		var newRound = new Round();
@@ -641,6 +642,33 @@ class RoundServiceTest {
 				new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
 		assertThrows(UnauthorizedException.class, playerService::getPlayerRoundCnt);
+	}
+
+	@DisplayName("Swap players for round")
+	@Transactional
+	@Test
+	void swapPlayersForTest(@Autowired PlayerRepository playerRepository, @Autowired PlayerRoundRepository playerRoundRepository) {
+
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
+
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
+
+		// create the new player
+		var player = new Player();
+		player.setNick("player5");
+		player.setPassword("test");
+		player.setSex(true);
+		player.setWhs(30.1f);
+		player.setRole(0);
+		player.setModified(false);
+		player.setType(Common.TYPE_PLAYER_LOCAL);
+		playerRepository.save(player);
+
+		roundService.swapPlayer(1L, player.getId(), roundId);
+
+		assertEquals(player.getId(), playerRoundRepository.getForPlayerAndRound(player.getId(), roundId).orElseThrow().getPlayerId());
 	}
 
 	@AfterAll

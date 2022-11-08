@@ -24,6 +24,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 @OpenAPIDefinition(tags = { @Tag(name = "Round API") })
@@ -180,11 +182,25 @@ public class RoundController extends BaseController {
 	}
 
 	@SuppressWarnings("UnusedReturnValue")
-	@Tag(name = "Access API")
+	@Tag(name = "Round API")
 	@Operation(summary = "Get player data")
 	@GetMapping(value = "/rest/PlayerRoundCnt")
 	public List<PlayerRoundCntDto> getPlayerList() {
 		log.info("Requested player round cnt");
 		return mapList(playerService.getPlayerRoundCnt(), PlayerRoundCntDto.class);
+	}
+
+	@Tag(name = "Round API")
+	@Operation(summary = "Swap player in the round")
+	@PatchMapping(value = "/rest/SwapPlrRnd")
+	public HttpStatus swapPlayerRnd( @Valid
+									 @Parameter(description = "Swap Player Round DTO object", required = true) @RequestBody SwapPlrRndDto playerUpdateDto) {
+
+		log.info("trying to swap player id: " + playerUpdateDto.getOldPlrId() + " with new player id " +
+				playerUpdateDto.getNewPlrId() + " for round id: " + playerUpdateDto.getRoundId());
+
+		roundService.swapPlayer(playerUpdateDto.getOldPlrId(), playerUpdateDto.getNewPlrId(), playerUpdateDto.getRoundId());
+
+		return HttpStatus.OK;
 	}
 }

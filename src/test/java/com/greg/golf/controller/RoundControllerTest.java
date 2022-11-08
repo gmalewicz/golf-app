@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 
 import com.greg.golf.controller.dto.RoundWhsDto;
+import com.greg.golf.controller.dto.SwapPlrRndDto;
 import com.greg.golf.entity.*;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
@@ -272,6 +273,22 @@ class RoundControllerTest {
 		when(playerService.getPlayerRoundCnt()).thenReturn(new ArrayList<>());
 
 		mockMvc.perform(get("/rest/PlayerRoundCnt")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should swap players for round with correct result")
+	@Test
+	void swapPlayerForRoundRoundWhenValidInputThenReturns200() throws Exception {
+
+		var input = new SwapPlrRndDto();
+
+		input.setRoundId(1L);
+		input.setOldPlrId(2L);
+		input.setNewPlrId(3L);
+
+		doNothing().when(roundService).swapPlayer(any(), any(), any());
+
+		mockMvc.perform(patch("/rest/SwapPlrRnd").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
 	@AfterAll
