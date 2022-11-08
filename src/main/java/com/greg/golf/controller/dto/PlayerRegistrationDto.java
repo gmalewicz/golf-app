@@ -8,10 +8,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Getter
 @Setter
