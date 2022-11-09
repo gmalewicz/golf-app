@@ -16,8 +16,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.*;
 @Setter
 public class PlayerUpdateOnBehalfDto {
 
-	@JsonProperty(value = "id", access = JsonProperty.Access.READ_ONLY)
-	@Schema(description = "player identifier", example = "1", accessMode = READ_ONLY)
+	@Schema(description = "player identifier", example = "1", accessMode = READ_WRITE)
 	private Long id;
 
 	@NotNull
