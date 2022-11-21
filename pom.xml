@@ -19,7 +19,7 @@
 		<java.version>17</java.version>
 		<spring-boot.version>2.7.4</spring-boot.version>
 		<guava.version>31.1-jre</guava.version>
-		<springdoc.version>1.6.11</springdoc.version>
+		<springdoc.version>1.6.13</springdoc.version>
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
 		<hibernate-types-52.version>2.20.0</hibernate-types-52.version>
 		<hibernate-types-55.version>2.20.0</hibernate-types-55.version>
