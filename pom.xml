@@ -234,7 +234,7 @@
 					<dependency>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-starter-data-jpa</artifactId>
-						<version>2.7.4</version>
+						<version>3.0.0</version>
 					</dependency>
 					<dependency>
                         <groupId>javax.validation</groupId>
