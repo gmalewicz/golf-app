@@ -16,9 +16,6 @@ spec:
       - name: myapp
         image: <IMAGE>
         resources:
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
         ports:
         - containerPort: 8080
         env: 
