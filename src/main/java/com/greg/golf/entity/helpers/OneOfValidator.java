@@ -1,9 +1,9 @@
 package com.greg.golf.entity.helpers;
 
-import java.util.stream.IntStream;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import java.util.stream.IntStream;
 
 public class OneOfValidator implements ConstraintValidator<OneOf, Integer> {
 	

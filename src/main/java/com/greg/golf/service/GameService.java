@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public class GameService {
 	public void sendGameDetail(GameSendData gameSendData) throws MessagingException, NoSuchElementException {
 		
 		Optional<Game> game = gameRepository.findById(gameSendData.getGameId());
-		log.debug("Game data retrived");
+		log.debug("Game data retrieved");
 		
 		var context = new Context(); 
 		context.setVariable("gameName", gameIdNameMap.get(game.orElseThrow().getGameId()));

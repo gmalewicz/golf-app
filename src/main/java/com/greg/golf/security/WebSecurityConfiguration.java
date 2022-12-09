@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,7 +32,7 @@ import lombok.Setter;
 @Configuration
 @EnableCaching
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfiguration implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
@@ -69,12 +69,13 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
         
 		httpSecurity
 			//.csrf().disable()
-			.authorizeRequests()
-			.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**").permitAll()
+			.securityMatcher("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
+			.authorizeHttpRequests(authorize -> authorize
 			//.antMatchers("/websocket/**").authenticated()
 			// all other requests need to be authenticated
-			.anyRequest().authenticated()
-			.and()
+				.anyRequest().authenticated()
+			)
+			//.and()
 			// make sure we use stateless session; session won't be used to
 			// store user's state.
 			.exceptionHandling()
@@ -94,7 +95,7 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 		 
 		httpSecurity
 		 	.csrf()
-		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
+		 	    .ignoringRequestMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
 		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
 		return httpSecurity.build();

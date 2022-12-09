@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.service.PlayerService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import javax.validation.Valid;
 
 @Slf4j
 @RestController

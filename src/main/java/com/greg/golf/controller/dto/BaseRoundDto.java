@@ -2,14 +2,10 @@ package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-
 import java.util.Date;
-
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
