@@ -17,4 +17,4 @@ Configuration:
       AppenderRef:
       - ref: Console
  #     - ref: File
-      level: debug
+      level: info

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 @Slf4j
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "course")
+//@ConfigurationProperties(prefix = "course")
 @Service("courseService")
 public class CourseService {
 

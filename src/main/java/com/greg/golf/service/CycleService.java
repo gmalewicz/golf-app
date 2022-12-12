@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "cycle")
+//@ConfigurationProperties(prefix = "cycle")
 @Service("cycleService")
 public class CycleService {
 
