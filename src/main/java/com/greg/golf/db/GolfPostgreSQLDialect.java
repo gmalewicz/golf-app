@@ -1,6 +1,5 @@
 package com.greg.golf.db;
 
-import com.vladmihalcea.hibernate.type.ImmutableType;
 import com.vladmihalcea.hibernate.type.array.*;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLHStoreType;
@@ -14,11 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.type.BasicType;
 import org.hibernate.usertype.UserType;
-
-
-
 
 @Slf4j
 public class GolfPostgreSQLDialect extends PostgreSQLDialect {
