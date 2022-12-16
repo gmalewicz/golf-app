@@ -192,6 +192,7 @@
 
 	<build>
 		<plugins>
+<!--
 			<plugin>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
@@ -200,7 +201,7 @@
 					<propertyFile>src/main/resources/liquibase.properties</propertyFile>
 				</configuration>
 				<dependencies>
-					<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8 -->
+
 					<dependency>
 						<groupId>com.fasterxml.jackson.datatype</groupId>
 						<artifactId>jackson-datatype-jdk8</artifactId>
@@ -244,6 +245,7 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			-->
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<!--
