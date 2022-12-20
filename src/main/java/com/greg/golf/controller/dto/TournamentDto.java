@@ -2,15 +2,10 @@ package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-
 import java.util.Date;
-
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,12 +21,12 @@ public class TournamentDto {
 	private String name;
 
 	@NotNull
-	@Schema(description = "Tournamnet start date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
+	@Schema(description = "Tournament start date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date startDate;
 
 	@NotNull
-	@Schema(description = "Tournamnet end date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
+	@Schema(description = "Tournament end date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
 	private Date endDate;
 
@@ -40,6 +35,6 @@ public class TournamentDto {
 			example = "0", minimum = "0", maximum = "10", accessMode = READ_WRITE)
 	private Integer bestRounds;
 
-	@Schema(description = "Tournamnet owner", accessMode = READ_WRITE)
+	@Schema(description = "Tournament owner", accessMode = READ_WRITE)
 	private PlayerDto player;
 }

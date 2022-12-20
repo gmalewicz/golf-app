@@ -1,20 +1,9 @@
 package com.greg.golf.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -61,7 +50,6 @@ public class TournamentRound {
 	private Boolean strokes;
 	
 	@NotNull
-	//@JsonProperty( value = "courseName", access = JsonProperty.Access.READ_ONLY)
 	@Size(min = 3, max = 100, message = "Course name should be between 3 and 100 characters")
 	@Column(name = "course_name")
 	private String courseName;

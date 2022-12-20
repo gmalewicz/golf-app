@@ -2,8 +2,7 @@ package com.greg.golf.captcha;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ import com.greg.golf.error.ReCaptchaUnavailableException;
 public class CaptchaService extends AbstractCaptchaService {
 
 	public CaptchaService(HttpServletRequest request, CaptchaSettings captchaSettings,
-			ReCaptchaAttemptService reCaptchaAttemptService, @Lazy RestOperations restTemplate) {
+						  ReCaptchaAttemptService reCaptchaAttemptService, @Lazy RestOperations restTemplate) {
 		super(request, captchaSettings, reCaptchaAttemptService, restTemplate);
 	}
 

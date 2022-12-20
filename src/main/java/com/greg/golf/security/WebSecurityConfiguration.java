@@ -13,14 +13,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -32,7 +34,7 @@ import lombok.Setter;
 @Configuration
 @EnableCaching
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfiguration implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
@@ -56,7 +58,7 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity httpSecurity,
+	public DefaultSecurityFilterChain filterChain(HttpSecurity httpSecurity,
 										   @Autowired JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
 										   @Autowired JwtRequestFilter jwtRequestFilter,
 										   @Autowired GolfOAuth2UserService oauth2UserService,
@@ -66,22 +68,24 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 		// Add a filter to validate the tokens with every request
 		httpSecurity
 			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
 		httpSecurity
-			//.csrf().disable()
-			.authorizeRequests()
-			.antMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**").permitAll()
-			//.antMatchers("/websocket/**").authenticated()
-			// all other requests need to be authenticated
-			.anyRequest().authenticated()
-			.and()
-			// make sure we use stateless session; session won't be used to
-			// store user's state.
+			.authorizeHttpRequests(authorize -> authorize
+					.requestMatchers("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
+					.permitAll()
+			);
+
+		httpSecurity
+			.authorizeHttpRequests(authorize -> authorize
+					.anyRequest()
+					.authenticated()
+			);
+
+		httpSecurity
 			.exceptionHandling()
-			.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-			.and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
+			.authenticationEntryPoint(jwtAuthenticationEntryPoint);
+
+		httpSecurity
 			.oauth2Login()
 				.userInfoEndpoint()
 					.userService(oauth2UserService)
@@ -90,12 +94,25 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 				.failureHandler(golfAuthenticationFailureHandler);
 
 		httpSecurity
-			.cors();
-		 
+			.sessionManagement(session -> session
+					.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
 		httpSecurity
-		 	.csrf()
-		 	    .ignoringAntMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
-		 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+			.cors();
+
+		CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
+		// set the name of the attribute the CsrfToken will be populated on
+		delegate.setCsrfRequestAttributeName(null);
+		// Use only the handle() method of XorCsrfTokenRequestAttributeHandler and the
+		// default implementation of resolveCsrfTokenValue() from CsrfTokenRequestHandler
+		CsrfTokenRequestHandler requestHandler = delegate::handle;
+
+		httpSecurity
+			.csrf(csrf -> csrf
+				.ignoringRequestMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
+				.csrfTokenRepository(tokenRepository)
+				.csrfTokenRequestHandler(requestHandler));
 
 		return httpSecurity.build();
 	}

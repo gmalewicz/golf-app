@@ -2,9 +2,8 @@ package com.greg.golf.controller;
 
 import java.util.NoSuchElementException;
 
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
-
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

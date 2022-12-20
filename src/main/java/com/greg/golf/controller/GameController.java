@@ -3,8 +3,7 @@ package com.greg.golf.controller;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.mail.MessagingException;
-
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -68,7 +67,6 @@ public class GameController extends BaseController {
 	@Tag(name = "Game API")
 	@Operation(summary = "Sends game details for email address")
 	@PostMapping(value = "/rest/SendGame")
-	// @ApiResponse(responseCode = "500", description="Failed to send an email")
 	public HttpStatus sendGame(
 			@Parameter(description = "GameSendData object", required = true) @RequestBody com.greg.golf.controller.dto.GameSendData gameSendData) {
 

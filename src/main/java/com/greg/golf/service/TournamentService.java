@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -26,9 +28,6 @@ import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 @Slf4j
 @Service("tournamentService")

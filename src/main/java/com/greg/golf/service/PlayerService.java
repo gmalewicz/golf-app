@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Slf4j
-@ConfigurationProperties(prefix = "player")
+//@ConfigurationProperties(prefix = "player")
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
 public class PlayerService {

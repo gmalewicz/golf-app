@@ -1,22 +1,10 @@
 package com.greg.golf.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Size;
-
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
@@ -33,9 +21,6 @@ public class OnlineScoreCard {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	// @JsonProperty(value = "onlineRound_id", access =
-	// JsonProperty.Access.WRITE_ONLY)
-	// @JsonIgnore
 	@JoinColumn(name = "online_round_id", nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private OnlineRound onlineRound;

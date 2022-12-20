@@ -1,22 +1,15 @@
 package com.greg.golf.entity;
 
 import com.vladmihalcea.hibernate.type.array.IntArrayType;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-
-@TypeDef(
-        name = "int-array",
-        typeClass = IntArrayType.class
-)
 @Data
 @Entity
 @Table(name = "cycle_result")
@@ -37,7 +30,7 @@ public class CycleResult {
     @Column(name = "player_name")
     private String playerName;
 
-    @Type(type = "int-array")
+    @Type(IntArrayType.class)
     @NotNull
     @Column(name = "results", columnDefinition = "int[]")
     private int[] results;
