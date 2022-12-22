@@ -1,5 +1,6 @@
 package com.greg.golf.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.TreeSet;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -117,6 +119,7 @@ class TournamentServiceTest {
 		tournament.setStartDate(new Date(1));
 		tournament.setName("Test Cup");
 		tournament.setPlayer(player);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setBestRounds(Common.ALL_ROUNDS);
 		tournamentRepository.save(tournament);
 
@@ -625,6 +628,40 @@ class TournamentServiceTest {
 		Assertions.assertEquals(90, tournamentService.addRoundOnBehalf(tournament.getId(), round2).getStrokesBrutto());
 	}
 
+	@DisplayName("Close tournament by authorized user")
+	@Transactional
+	@Test
+	void closeTournamentByAuthorizedUserTest(@Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		tournamentService.closeTournament(1L);
+
+		assertEquals(Cycle.STATUS_CLOSE, tournamentService.findAllTournaments().get(0).getStatus());
+
+	}
+
+	@DisplayName("Attempt to close tournament by unauthorized user")
+	@Transactional
+	@Test
+	void attemptToCloseTournamentByUnauthorizedUserTest() {
+
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(1L));
+	}
 
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,

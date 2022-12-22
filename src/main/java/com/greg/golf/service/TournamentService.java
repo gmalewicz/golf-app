@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
@@ -15,14 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.greg.golf.entity.Hole;
-import com.greg.golf.entity.Player;
-import com.greg.golf.entity.PlayerRound;
-import com.greg.golf.entity.Round;
-import com.greg.golf.entity.ScoreCard;
-import com.greg.golf.entity.Tournament;
-import com.greg.golf.entity.TournamentResult;
-import com.greg.golf.entity.TournamentRound;
 import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
 import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.service.events.RoundEvent;
@@ -109,6 +102,7 @@ public class TournamentService {
         calendar.roll(Calendar.HOUR, 23);
 
         tournament.setEndDate(calendar.getTime());
+        tournament.setStatus(Tournament.STATUS_OPEN);
 
         return tournamentRepository.save(tournament);
     }
@@ -527,5 +521,17 @@ public class TournamentService {
                 throw new TooFewHolesForTournamentException();
             }
         });
+    }
+
+    public void closeTournament(Long tournamentId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to close tournament result by unauthorized user");
+
+        // set close flag
+        tournament.setStatus(Tournament.STATUS_CLOSE);
+        tournamentRepository.save(tournament);
     }
 }

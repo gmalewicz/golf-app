@@ -30,14 +30,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -146,6 +145,10 @@ class TournamentControllerTest {
 
 		var input = new TournamentDto();
 		input.setId(1L);
+		input.setName("Test");
+		input.setStartDate(new Date(1));
+		input.setEndDate(new Date(1));
+		input.setBestRounds(0);
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
@@ -187,6 +190,15 @@ class TournamentControllerTest {
 
 		doNothing().when(tournamentService).deleteResult(anyLong());
 		mockMvc.perform(delete("/rest/TournamentResult/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should close tournament with correct result")
+	@Test
+	void closeTournamentWithValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).closeTournament(any());
+
+		mockMvc.perform(patch("/rest/TournamentClose/1")).andExpect(status().isOk()).andReturn();
 	}
 
 	@AfterAll

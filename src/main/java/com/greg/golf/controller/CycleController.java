@@ -88,7 +88,7 @@ public class CycleController extends BaseController {
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Close cycle. Further updates will not be possible.")
 	@PatchMapping(value = "/rest/CycleClose/{cycleId}")
-	public HttpStatus resetPassword(
+	public HttpStatus closeCycle(
 			@Parameter(description = "Cycle id to be closed", required = true) @PathVariable("cycleId") Long cycleId) {
 
 		log.info("trying to close cycle: " + cycleId);

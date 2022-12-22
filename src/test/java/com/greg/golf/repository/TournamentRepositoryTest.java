@@ -62,6 +62,7 @@ class TournamentRepositoryTest {
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament = tournamentRepository.save(tournament);
 		assertNotNull("Id should not be null", tournament.getId());
 	}
@@ -80,6 +81,7 @@ class TournamentRepositoryTest {
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament = tournamentRepository.save(tournament);
 		assertNotNull("Tournament should not be null", tournamentRepository.findById(tournament.getId()));
 	}
@@ -97,6 +99,7 @@ class TournamentRepositoryTest {
 		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament = tournamentRepository.save(tournament);
 		tournamentRepository.deleteById(tournament.getId());
 		assertTrue("Tournament should be null", tournamentRepository.findById(tournament.getId()).isEmpty());
