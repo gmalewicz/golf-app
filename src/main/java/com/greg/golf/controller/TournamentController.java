@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.Round;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -79,7 +80,7 @@ public class TournamentController extends BaseController {
 	@Operation(summary = "Add tournament")
 	@PostMapping(value = "/rest/Tournament")
 	public HttpStatus addTournament(
-			@Parameter(description = "Tournament object", required = true) @RequestBody TournamentDto tournamentDto) {
+			@Parameter(description = "Tournament object", required = true) @RequestBody @Valid TournamentDto tournamentDto) {
 
 		log.info("trying to add tournament: " + tournamentDto);
 
@@ -120,6 +121,19 @@ public class TournamentController extends BaseController {
 
 		log.info("Delete result from tournament: " + tournamentResultId);
 		tournamentService.deleteResult(tournamentResultId);
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Close tournament. Further updates will not be possible.")
+	@PatchMapping(value = "/rest/TournamentClose/{tournamentId}")
+	public HttpStatus closeTournament(
+			@Parameter(description = "Tournament id to be closed", required = true) @PathVariable("tournamentId") Long tournamentId) {
+
+		log.info("trying to close cycle: " + tournamentId);
+
+		tournamentService.closeTournament(tournamentId);
 
 		return HttpStatus.OK;
 	}

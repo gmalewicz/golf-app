@@ -37,4 +37,7 @@ public class TournamentDto {
 
 	@Schema(description = "Tournament owner", accessMode = READ_WRITE)
 	private PlayerDto player;
+
+	@Schema(description = "Tournament status: false - open, true - close", example = "false", accessMode = READ_ONLY)
+	private Boolean status;
 }

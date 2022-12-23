@@ -58,6 +58,7 @@ class TournamentResultRepositoryTest {
 		tournament.setEndDate(new Date(1));
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament = tournamentRepository.save(tournament);
 		log.info("Set up completed");
 	}

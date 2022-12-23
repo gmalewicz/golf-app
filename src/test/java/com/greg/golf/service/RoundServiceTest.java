@@ -327,6 +327,7 @@ class RoundServiceTest {
 		tournament.setName("Test tournament");
 		tournament.setPlayer(round.getPlayer().iterator().next());
 		tournament.setBestRounds(0);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournamentRepository.save(tournament);
 
 		round.setTournament(tournament);
@@ -383,6 +384,7 @@ class RoundServiceTest {
 		tournament.setName("Test tournament");
 		tournament.setPlayer(round.getPlayer().iterator().next());
 		tournament.setBestRounds(0);
+		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournamentRepository.save(tournament);
 
 		round.setTournament(tournament);

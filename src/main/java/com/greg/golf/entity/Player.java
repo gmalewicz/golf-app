@@ -39,7 +39,7 @@ public class Player implements Comparable<Player> {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Min(value = 0)
-	@Max(value = 1)
+	@Max(value = 2)
 	@Column(name = "type")
 	private Integer type;
 

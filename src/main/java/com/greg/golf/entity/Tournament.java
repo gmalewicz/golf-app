@@ -15,7 +15,9 @@ import lombok.ToString;
 @Table(name = "tournament")
 public class Tournament {
 
-	
+	public static final boolean STATUS_OPEN = false;
+	public static final boolean STATUS_CLOSE = true;
+
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +49,10 @@ public class Tournament {
 	@NotNull
 	@Column(name = "best_rounds")
 	private Integer bestRounds;
+
+	@EqualsAndHashCode.Exclude
+	@NotNull
+	private Boolean status;
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
