@@ -126,6 +126,44 @@ class TournamentServiceTest {
 		log.info("Set up completed");
 	}
 
+	@DisplayName("Delete tournament")
+	@Transactional
+	@Test
+	void deleteTournamentTest(@Autowired TournamentResultRepository tournamentResultRepository, @Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(0);
+		tournamentResult.setStrokesBrutto(0);
+		tournamentResult.setStrokesNetto(0);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setPlayer(player);
+		var tournament = tournamentService.findAllTournaments().get(0);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		TournamentRound tournamentRound =
+				tournamentService.addTournamentRound(1, 1, 1, 1, 1,
+						"test", tournamentResult, false, roundId);
+
+		tournamentResult.setTournamentRound(new ArrayList<>());
+		tournamentResult.getTournamentRound().add(tournamentRound);
+		tournamentResultRepository.save(tournamentResult);
+
+		tournamentService.deleteTournament(tournament.getId());
+		Assertions.assertEquals(0, tournamentService.findAllTournaments().size());
+	}
+
 	@DisplayName("Delete tournament result")
 	@Transactional
 	@Test

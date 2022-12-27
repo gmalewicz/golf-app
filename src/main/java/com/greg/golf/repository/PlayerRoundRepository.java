@@ -42,4 +42,10 @@ public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> 
 							  @Param("playerId") Long playerId,
 							  @Param("roundId") Long roundId);
 
+	@Transactional(propagation = Propagation.REQUIRED)
+	@Modifying
+	@Query("UPDATE PlayerRound pr SET pr.tournamentId = null where pr.playerId = :playerId AND pr.tournamentId = :tournamentId")
+	void clearTournamentForPlayer(@Param("playerId") Long playerId,
+								  @Param("tournamentId") Long tournamentId);
+
 }

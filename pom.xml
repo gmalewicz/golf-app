@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.1.0</version>
+	<version>3.2.0</version>
 	<name>golf</name>
-	<description>DGNG - close tournament</description>
+	<description>DGNG - delete tournament</description>
 
 	<properties>
 		<java.version>17</java.version>
