@@ -41,7 +41,29 @@ public class TournamentService {
     private final EntityManager entityManager;
 
     @Transactional
+    public void deleteTournament(Long tournamentId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // then verify if player is allowed to delete result
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament result by unauthorized user");
+
+        tournament
+            .getTournamentResult()
+            .stream()
+            .map(TournamentResult::getId)
+            .collect(Collectors.toList())
+            .forEach(this::deleteResult);
+
+        tournamentRepository.deleteById(tournamentId);
+    }
+
+
+    @Transactional
     public void deleteResult(Long resultId) {
+
+        log.debug("resultId");
 
         // first get the object
         var tournamentResult = tournamentResultRepository.findById(resultId).orElseThrow();
@@ -59,11 +81,17 @@ public class TournamentService {
             }
 
         });
+
+        // then clear tournament flag for player round
+        playerRoundRepository.clearTournamentForPlayer(tournamentResult.getPlayer().getId(), tournamentResult.getTournament().getId());
+
         // then delete result
-        var rstLst = tournamentResult.getTournament().getTournamentResult().stream().filter(rst -> rst.getId().equals(resultId)).collect(Collectors.toList());
+        var rstLst = tournamentResult.getTournament().getTournamentResult()
+                                            .stream()
+                                            .filter(rst -> rst.getId().equals(resultId))
+                                            .collect(Collectors.toList());
         tournamentResult.getTournament().getTournamentResult().removeAll(rstLst);
         tournamentRepository.save(tournamentResult.getTournament());
-
     }
 
     @Transactional

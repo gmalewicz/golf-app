@@ -114,7 +114,7 @@ public class TournamentController extends BaseController {
 	}
 
 	@Tag(name = "Tournament API")
-	@Operation(summary = "Deletes result from tournament")
+	@Operation(summary = "Delete result from tournament")
 	@DeleteMapping(value = "/rest/TournamentResult/{tournamentResultId}")
 	public HttpStatus deleteResult(
 			@Parameter(description = "Tournament result id", example = "1", required = true) @PathVariable("tournamentResultId") Long tournamentResultId) {
@@ -134,6 +134,18 @@ public class TournamentController extends BaseController {
 		log.info("trying to close cycle: " + tournamentId);
 
 		tournamentService.closeTournament(tournamentId);
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Delete tournament")
+	@DeleteMapping(value = "/rest/Tournament/{tournamentId}")
+	public HttpStatus deleteTournament(
+			@Parameter(description = "Tournament id to be deleted", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
+
+		log.info("Delete tournament: " + tournamentId);
+		tournamentService.deleteTournament(tournamentId);
 
 		return HttpStatus.OK;
 	}
