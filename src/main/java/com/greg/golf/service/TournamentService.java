@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.DeleteTournamentPlayerException;
 import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
 import jakarta.persistence.EntityManager;
@@ -36,6 +37,8 @@ public class TournamentService {
     private final PlayerRoundRepository playerRoundRepository;
     private final TournamentRoundRepository tournamentRoundRepository;
     private final RoundRepository roundRepository;
+    private final PlayerRepository playerRepository;
+    private final TournamentPlayerRepository tournamentPlayerRepository;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -551,6 +554,7 @@ public class TournamentService {
         });
     }
 
+    @Transactional
     public void closeTournament(Long tournamentId) {
 
         var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
@@ -561,5 +565,71 @@ public class TournamentService {
         // set close flag
         tournament.setStatus(Tournament.STATUS_CLOSE);
         tournamentRepository.save(tournament);
+    }
+
+    @Transactional
+    public void addPlayer(TournamentPlayer tournamentPlayer) {
+
+        var tournament = tournamentRepository.findById(tournamentPlayer.getTournamentId()).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to close tournament result by unauthorized user");
+
+        //check if player exists
+        var player = playerRepository.findById(tournamentPlayer.getPlayerId()).orElseThrow();
+
+        // then check if tournament exists
+        if (!tournamentRepository.existsById(tournamentPlayer.getTournamentId())) {
+            throw new NoSuchElementException();
+        }
+
+        //prepare data to save
+        tournamentPlayer.setNick(player.getNick());
+        tournamentPlayer.setWhs(player.getWhs());
+
+        // save entity
+        tournamentPlayerRepository.save(tournamentPlayer);
+    }
+
+    @Transactional
+    public void deletePlayers(Long tournamentId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament player result by unauthorized user");
+
+        // remove only if tournaments does not have any results
+        if (tournamentResultRepository.findByTournament(tournament).isEmpty()) {
+            tournamentPlayerRepository.deleteByTournamentId(tournamentId);
+        } else {
+            throw new DeleteTournamentPlayerException();
+        }
+    }
+
+    @Transactional
+    public void deletePlayer(Long tournamentId, long playerId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament player result by unauthorized user");
+
+        var player = new Player();
+        player.setId(playerId);
+
+        // remove only if tournaments does not have any results
+        if (tournamentResultRepository.findByPlayerAndTournament(player, tournament).isEmpty()) {
+            tournamentPlayerRepository.deleteByTournamentIdAndPlayerId(tournamentId, playerId);
+        } else {
+            throw new DeleteTournamentPlayerException();
+        }
+    }
+
+    @Transactional
+    public List<TournamentPlayer> getTournamentPlayers(Long tournamentId) {
+
+        return tournamentPlayerRepository.findByTournamentId(tournamentId);
+
     }
 }

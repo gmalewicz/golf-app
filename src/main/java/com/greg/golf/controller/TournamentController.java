@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.Round;
+import com.greg.golf.entity.TournamentPlayer;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,6 +26,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class TournamentController extends BaseController {
 
 	private final TournamentService tournamentService;
+	private Long tournamentId;
+	private Long playerId;
 
 	public TournamentController(ModelMapper modelMapper, TournamentService tournamentService) {
 		super(modelMapper);
@@ -149,4 +152,46 @@ public class TournamentController extends BaseController {
 
 		return HttpStatus.OK;
 	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Add player participant to tournament")
+	@PostMapping(value = "/rest/TournamentPlayer")
+	public HttpStatus addPlayer(
+			@Parameter(description = "TournamentPlayer object", required = true) @RequestBody @Valid TournamentPlayerDto tournamentPlayerDto) {
+
+		log.info("trying to add tournament player: " + tournamentPlayerDto);
+
+		tournamentService.addPlayer(modelMapper.map(tournamentPlayerDto, TournamentPlayer.class));
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Delete player participant or all players from tournament")
+	@DeleteMapping(value = {"/rest/TournamentPlayer/{tournamentId}/{playerId}", "/rest/TournamentPlayer/{tournamentId}"})
+	public HttpStatus deletePlayer(
+			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
+			@Parameter(description = "Player id", example = "1") @PathVariable(name = "playerId", required = false) Long playerId) {
+
+		log.info("Delete tournament player: " + playerId + " for tournament " + tournamentId);
+
+		if (playerId != null) {
+
+			tournamentService.deletePlayer(tournamentId, playerId);
+		} else {
+			tournamentService.deletePlayers(tournamentId);
+		}
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Return all players belonging to the tournament")
+	@GetMapping(value = "/rest/TournamentPlayer/{tournamentId}")
+	public List<TournamentPlayer> getTournamentPlayers(
+			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
+		log.info("Requested player participating in tournament " + tournamentId);
+		return tournamentService.getTournamentPlayers(tournamentId);
+	}
+
 }

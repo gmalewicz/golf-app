@@ -1,14 +1,8 @@
 package com.greg.golf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.CycleTournamentDto;
-import com.greg.golf.controller.dto.LimitedRoundDto;
-import com.greg.golf.controller.dto.RoundDto;
-import com.greg.golf.controller.dto.TournamentDto;
-import com.greg.golf.entity.Round;
-import com.greg.golf.entity.Tournament;
-import com.greg.golf.entity.TournamentResult;
-import com.greg.golf.entity.TournamentRound;
+import com.greg.golf.controller.dto.*;
+import com.greg.golf.entity.*;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
@@ -172,6 +166,7 @@ class TournamentControllerTest {
 
 		var input = new RoundDto();
 		input.setId(1L);
+		input.setMatchPlay(false);
 
 		var outputLst = new TournamentRound();
 
@@ -207,6 +202,46 @@ class TournamentControllerTest {
 
 		doNothing().when(tournamentService).deleteTournament(anyLong());
 		mockMvc.perform(delete("/rest/Tournament/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should add player participant to tournament")
+	@Test
+	void addTournamentPlayerWhenValidInputThenReturns200() throws Exception {
+
+		var input = new TournamentPlayerDto();
+		input.setPlayerId(1L);
+		input.setTournamentId(1L);
+
+		doNothing().when(tournamentService).addPlayer(any());
+
+		mockMvc.perform(post("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should delete tournament single player")
+	@Test
+	void deleteTournamentPlayerWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deletePlayer(anyLong(), anyLong());
+		mockMvc.perform(delete("/rest/TournamentPlayer/1/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should delete tournament all player")
+	@Test
+	void deleteTournamentAllPlayersWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deletePlayers(anyLong());
+		mockMvc.perform(delete("/rest/TournamentPlayer/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should get all players belonging to tournament with correct result")
+	@Test
+	void getAllTournamentPlayersTest() throws Exception {
+
+		var outputLst = new ArrayList<TournamentPlayer>();
+
+		when(tournamentService.getTournamentPlayers(any())).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/TournamentPlayer/1")).andExpect(status().isOk());
 	}
 
 	@AfterAll
