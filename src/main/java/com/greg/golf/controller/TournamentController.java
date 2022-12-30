@@ -26,8 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class TournamentController extends BaseController {
 
 	private final TournamentService tournamentService;
-	private Long tournamentId;
-	private Long playerId;
 
 	public TournamentController(ModelMapper modelMapper, TournamentService tournamentService) {
 		super(modelMapper);

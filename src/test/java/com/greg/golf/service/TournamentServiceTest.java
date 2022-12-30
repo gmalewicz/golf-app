@@ -840,7 +840,7 @@ class TournamentServiceTest {
 
 		var tournament = tournamentRepository.findAll().get(0);
 
-		assertThrows(UnauthorizedException.class, () -> this.tournamentService.deletePlayers(tournament.getId()));
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deletePlayers(tournament.getId()));
 	}
 
 	@DisplayName("Attempt to delete all tournament players but results exist")
@@ -870,7 +870,7 @@ class TournamentServiceTest {
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
 
-		assertThrows(DeleteTournamentPlayerException.class, () -> this.tournamentService.deletePlayers(tournament.getId()));
+		assertThrows(DeleteTournamentPlayerException.class, () -> tournamentService.deletePlayers(tournament.getId()));
 
 	}
 
@@ -918,7 +918,7 @@ class TournamentServiceTest {
 
 		var tournament = tournamentRepository.findAll().get(0);
 
-		assertThrows(UnauthorizedException.class, () -> this.tournamentService.deletePlayer(tournament.getId(), 1L));
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deletePlayer(tournament.getId(), 1L));
 	}
 
 	@DisplayName("Attempt to delete single tournament player but results exist")
@@ -948,7 +948,7 @@ class TournamentServiceTest {
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
 
-		assertThrows(DeleteTournamentPlayerException.class, () -> this.tournamentService.deletePlayer(tournament.getId(), 1L));
+		assertThrows(DeleteTournamentPlayerException.class, () -> tournamentService.deletePlayer(tournament.getId(), 1L));
 
 	}
 
