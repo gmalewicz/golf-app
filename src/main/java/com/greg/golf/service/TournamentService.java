@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.DeleteTournamentPlayerException;
+import com.greg.golf.error.DuplicatePlayerInTournamentException;
 import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
 import jakarta.persistence.EntityManager;
@@ -568,7 +569,7 @@ public class TournamentService {
     }
 
     @Transactional
-    public void addPlayer(TournamentPlayer tournamentPlayer) {
+    public void addPlayer(TournamentPlayer tournamentPlayer) throws DuplicatePlayerInTournamentException {
 
         var tournament = tournamentRepository.findById(tournamentPlayer.getTournamentId()).orElseThrow();
 
@@ -588,7 +589,12 @@ public class TournamentService {
         tournamentPlayer.setWhs(player.getWhs());
 
         // save entity
-        tournamentPlayerRepository.save(tournamentPlayer);
+        // trow exception if player has been already added to the tournament
+        try {
+            tournamentPlayerRepository.save(tournamentPlayer);
+        } catch (Exception ex) {
+            throw new DuplicatePlayerInTournamentException();
+        }
     }
 
     @Transactional

@@ -176,4 +176,12 @@ public class ApiExceptionHandler {
 		var response = new ApiErrorResponse("19", "Unable to delete player of players. Remove results first.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(DuplicatePlayerInTournamentException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInTournamentException ex) {
+
+		var response = new ApiErrorResponse("20", "Player already added to the tournament.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
 }

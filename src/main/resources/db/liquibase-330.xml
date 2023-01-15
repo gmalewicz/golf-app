@@ -23,4 +23,9 @@
 			</column>
 		</createTable>
 	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-11">
+		<createIndex indexName="tour_player_id" tableName="tournament_player" unique="true">
+			<column name="player_id"/>
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>
