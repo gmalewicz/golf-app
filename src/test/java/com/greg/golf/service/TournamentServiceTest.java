@@ -694,16 +694,18 @@ class TournamentServiceTest {
 	@DisplayName("Attempt to close tournament by unauthorized user")
 	@Transactional
 	@Test
-	void attemptToCloseTournamentByUnauthorizedUserTest() {
+	void attemptToCloseTournamentByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
 
-		UserDetails userDetails = new User("200", "fake", new ArrayList<SimpleGrantedAuthority>());
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
 
 		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 				userDetails.getAuthorities());
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(1L));
+		var tournament = tournamentRepository.findAll().get(0);
+
+		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(tournament.getId()));
 	}
 
 	@DisplayName("Attempt to add player to the tournament by unauthorized user")
