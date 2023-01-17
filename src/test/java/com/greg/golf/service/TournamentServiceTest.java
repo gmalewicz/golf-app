@@ -696,7 +696,7 @@ class TournamentServiceTest {
 	@Test
 	void attemptToCloseTournamentByUnauthorizedUserTest() {
 
-		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+		UserDetails userDetails = new User("200", "fake", new ArrayList<SimpleGrantedAuthority>());
 
 		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 				userDetails.getAuthorities());
