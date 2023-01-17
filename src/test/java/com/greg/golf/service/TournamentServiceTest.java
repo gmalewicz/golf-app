@@ -671,7 +671,8 @@ class TournamentServiceTest {
 	@DisplayName("Close tournament by authorized user")
 	@Transactional
 	@Test
-	void closeTournamentByAuthorizedUserTest(@Autowired PlayerService playerService) {
+	void closeTournamentByAuthorizedUserTest(@Autowired PlayerService playerService,
+											 @Autowired TournamentRepository tournamentRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
 
@@ -682,7 +683,9 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		tournamentService.closeTournament(1L);
+		var tournament = tournamentRepository.findAll().get(0);
+
+		tournamentService.closeTournament(tournament.getId());
 
 		assertEquals(Cycle.STATUS_CLOSE, tournamentService.findAllTournaments().get(0).getStatus());
 
