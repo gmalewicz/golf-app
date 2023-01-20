@@ -625,7 +625,7 @@ class TournamentServiceTest {
 
 	}
 
-	@DisplayName("Should return rounds applicable for tournament")
+	@DisplayName("Should return rounds (which exists) applicable for tournament")
 	@Transactional
 	@Test
 	void getApplicableRoundsForTournamentTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository) {
@@ -643,6 +643,30 @@ class TournamentServiceTest {
 		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
 
 		Assertions.assertEquals(1, rndLst.size());
+
+	}
+
+	@DisplayName("Should return rounds (which does not exist) applicable for tournament")
+	@Transactional
+	@Test
+	void getApplicableRoundsForTournamentButRoundNotExistTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository,
+															  @Autowired RoundRepository roundRepository) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setNick("golfer");
+		tournamentPlayer.setWhs(10.0F);
+
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		roundRepository.deleteAll();
+
+		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
+
+		Assertions.assertEquals(0, rndLst.size());
 
 	}
 
