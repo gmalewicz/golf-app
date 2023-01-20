@@ -670,6 +670,28 @@ class TournamentServiceTest {
 
 	}
 
+	@DisplayName("Should attempt add round to tournament for player which is not participant")
+	@Transactional
+	@Test
+	void addRoundToTournamentForPlayerNotParticipantTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository,
+															  @Autowired RoundRepository roundRepository) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setPlayerId(2L);
+		tournamentPlayer.setNick("golfer");
+		tournamentPlayer.setWhs(10.0F);
+
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
+
+		Assertions.assertEquals(0, rndLst.size());
+
+	}
+
 	@DisplayName("Should add round on behalf for tournament")
 	@Transactional
 	@Test
