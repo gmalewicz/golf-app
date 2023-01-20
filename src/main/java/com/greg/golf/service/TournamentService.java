@@ -590,17 +590,11 @@ public class TournamentService {
     public void addPlayer(TournamentPlayer tournamentPlayer) throws DuplicatePlayerInTournamentException {
 
         var tournament = tournamentRepository.findById(tournamentPlayer.getTournamentId()).orElseThrow();
-
         // only tournament owner can do it
         RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to close tournament result by unauthorized user");
 
         //check if player exists
         var player = playerRepository.findById(tournamentPlayer.getPlayerId()).orElseThrow();
-
-        // then check if tournament exists
-        if (!tournamentRepository.existsById(tournamentPlayer.getTournamentId())) {
-            throw new NoSuchElementException();
-        }
 
         //prepare data to save
         tournamentPlayer.setNick(player.getNick());

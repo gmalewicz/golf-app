@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.DeleteTournamentPlayerException;
+import com.greg.golf.error.DuplicatePlayerInTournamentException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
@@ -717,7 +718,7 @@ class TournamentServiceTest {
 		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(tournamentId));
 	}
 
-	@DisplayName("Attempt to add player to the tournament by unauthorized user")
+	@DisplayName("Attempt to add player to the tournament by authorized user")
 	@Transactional
 	@Test
 	void attemptToAddPlayerToTournamentByAuthorizedUserTest(@Autowired PlayerService playerService,
@@ -742,6 +743,12 @@ class TournamentServiceTest {
 		tournamentService.addPlayer(tournamentPlayer);
 
 		assertEquals(1, tournamentPlayerRepository.findAll().size());
+
+		var tempTournamentPlayer = new TournamentPlayer();
+		tempTournamentPlayer.setPlayerId(1L);
+		tempTournamentPlayer.setTournamentId(tournament.getId());
+
+		assertThrows(DuplicatePlayerInTournamentException.class, () -> this.tournamentService.addPlayer(tempTournamentPlayer));
 	}
 
 	@DisplayName("Attempt to add player to the tournament by unauthorized user")
