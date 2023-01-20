@@ -502,9 +502,27 @@ public class TournamentService {
     @Transactional
     public List<Round> getAllPossibleRoundsForTournament(Long tournamentId) {
 
-        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
-        return roundService.findByDates(tournament.getStartDate(), tournament.getEndDate());
+        var retRounds = new ArrayList<Round>();
 
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+        var rounds =  roundService.findByDates(tournament.getStartDate(), tournament.getEndDate());
+
+        if (!rounds.isEmpty()) {
+
+            var tournamentPlayers = tournamentPlayerRepository.findByTournamentId(tournament.getId());
+            var plrIdLst = tournamentPlayers.stream().map(TournamentPlayer::getPlayerId).collect(Collectors.toList());
+
+            rounds.forEach(r -> {
+
+                if (plrIdLst.containsAll(r.getPlayer().stream().map(Player::getId).collect(Collectors.toList()))) {
+                    retRounds.add(r);
+                } else {
+                    log.info("The round with non matching player found: round id " + r.getId() + " with number of players: " + r.getPlayer().size());
+                }
+            });
+        }
+
+        return retRounds;
     }
 
     private int getCourseHCP(PlayerRound playerRound, Round round, Player player) {

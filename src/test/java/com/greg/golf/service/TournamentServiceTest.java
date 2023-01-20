@@ -627,9 +627,18 @@ class TournamentServiceTest {
 	@DisplayName("Should return rounds applicable for tournament")
 	@Transactional
 	@Test
-	void getApplicableRoundsForTournamentTest() {
+	void getApplicableRoundsForTournamentTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository) {
 
 		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setNick("golfer");
+		tournamentPlayer.setWhs(10.0F);
+
+		tournamentPlayerRepository.save(tournamentPlayer);
+
 		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
 
 		Assertions.assertEquals(1, rndLst.size());
@@ -703,9 +712,9 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentId = tournamentRepository.findAll().get(0).getId();
 
-		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(tournament.getId()));
+		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(tournamentId));
 	}
 
 	@DisplayName("Attempt to add player to the tournament by unauthorized user")
