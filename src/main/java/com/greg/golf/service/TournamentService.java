@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.DeleteTournamentPlayerException;
+import com.greg.golf.error.DuplicatePlayerInTournamentException;
 import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
 import jakarta.persistence.EntityManager;
@@ -36,6 +38,8 @@ public class TournamentService {
     private final PlayerRoundRepository playerRoundRepository;
     private final TournamentRoundRepository tournamentRoundRepository;
     private final RoundRepository roundRepository;
+    private final PlayerRepository playerRepository;
+    private final TournamentPlayerRepository tournamentPlayerRepository;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -498,9 +502,27 @@ public class TournamentService {
     @Transactional
     public List<Round> getAllPossibleRoundsForTournament(Long tournamentId) {
 
-        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
-        return roundService.findByDates(tournament.getStartDate(), tournament.getEndDate());
+        var retRounds = new ArrayList<Round>();
 
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+        var rounds =  roundService.findByDates(tournament.getStartDate(), tournament.getEndDate());
+
+        if (!rounds.isEmpty()) {
+
+            var tournamentPlayers = tournamentPlayerRepository.findByTournamentId(tournament.getId());
+            var plrIdLst = tournamentPlayers.stream().map(TournamentPlayer::getPlayerId).collect(Collectors.toList());
+
+            rounds.forEach(r -> {
+
+                if (plrIdLst.containsAll(r.getPlayer().stream().map(Player::getId).collect(Collectors.toList()))) {
+                    retRounds.add(r);
+                } else {
+                    log.info("The round with non matching player found: round id " + r.getId() + " with number of players: " + r.getPlayer().size());
+                }
+            });
+        }
+
+        return retRounds;
     }
 
     private int getCourseHCP(PlayerRound playerRound, Round round, Player player) {
@@ -551,6 +573,7 @@ public class TournamentService {
         });
     }
 
+    @Transactional
     public void closeTournament(Long tournamentId) {
 
         var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
@@ -561,5 +584,70 @@ public class TournamentService {
         // set close flag
         tournament.setStatus(Tournament.STATUS_CLOSE);
         tournamentRepository.save(tournament);
+    }
+
+    @Transactional
+    public void addPlayer(TournamentPlayer tournamentPlayer) throws DuplicatePlayerInTournamentException {
+
+        var tournament = tournamentRepository.findById(tournamentPlayer.getTournamentId()).orElseThrow();
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to close tournament result by unauthorized user");
+
+        //check if player exists
+        var player = playerRepository.findById(tournamentPlayer.getPlayerId()).orElseThrow();
+
+        //prepare data to save
+        tournamentPlayer.setNick(player.getNick());
+        tournamentPlayer.setWhs(player.getWhs());
+
+        // save entity
+        // trow exception if player has been already added to the tournament
+        try {
+            tournamentPlayerRepository.save(tournamentPlayer);
+        } catch (Exception ex) {
+            throw new DuplicatePlayerInTournamentException();
+        }
+    }
+
+    @Transactional
+    public void deletePlayers(Long tournamentId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament player result by unauthorized user");
+
+        // remove only if tournaments does not have any results
+        if (tournamentResultRepository.findByTournament(tournament).isEmpty()) {
+            tournamentPlayerRepository.deleteByTournamentId(tournamentId);
+        } else {
+            throw new DeleteTournamentPlayerException();
+        }
+    }
+
+    @Transactional
+    public void deletePlayer(Long tournamentId, long playerId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament player result by unauthorized user");
+
+        var player = new Player();
+        player.setId(playerId);
+
+        // remove only if tournaments does not have any results
+        if (tournamentResultRepository.findByPlayerAndTournament(player, tournament).isEmpty()) {
+            tournamentPlayerRepository.deleteByTournamentIdAndPlayerId(tournamentId, playerId);
+        } else {
+            throw new DeleteTournamentPlayerException();
+        }
+    }
+
+    @Transactional
+    public List<TournamentPlayer> getTournamentPlayers(Long tournamentId) {
+
+        return tournamentPlayerRepository.findByTournamentId(tournamentId);
+
     }
 }

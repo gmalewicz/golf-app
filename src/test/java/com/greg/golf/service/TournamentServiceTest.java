@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.error.DeleteTournamentPlayerException;
+import com.greg.golf.error.DuplicatePlayerInTournamentException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
@@ -622,15 +625,70 @@ class TournamentServiceTest {
 
 	}
 
-	@DisplayName("Should return rounds applicable for tournament")
+	@DisplayName("Should return rounds (which exists) applicable for tournament")
 	@Transactional
 	@Test
-	void getApplicableRoundsForTournamentTest() {
+	void getApplicableRoundsForTournamentTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository) {
 
 		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setNick("golfer");
+		tournamentPlayer.setWhs(10.0F);
+
+		tournamentPlayerRepository.save(tournamentPlayer);
+
 		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
 
 		Assertions.assertEquals(1, rndLst.size());
+
+	}
+
+	@DisplayName("Should return rounds (which does not exist) applicable for tournament")
+	@Transactional
+	@Test
+	void getApplicableRoundsForTournamentButRoundNotExistTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository,
+															  @Autowired RoundRepository roundRepository) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setNick("golfer");
+		tournamentPlayer.setWhs(10.0F);
+
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		roundRepository.deleteAll();
+
+		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
+
+		Assertions.assertEquals(0, rndLst.size());
+
+	}
+
+	@DisplayName("Should attempt add round to tournament for player which is not participant")
+	@Transactional
+	@Test
+	void addRoundToTournamentForPlayerNotParticipantTest(@Autowired TournamentPlayerRepository tournamentPlayerRepository,
+															  @Autowired RoundRepository roundRepository) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setPlayerId(2L);
+		tournamentPlayer.setNick("golfer");
+		tournamentPlayer.setWhs(10.0F);
+
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
+
+		Assertions.assertEquals(0, rndLst.size());
 
 	}
 
@@ -669,7 +727,8 @@ class TournamentServiceTest {
 	@DisplayName("Close tournament by authorized user")
 	@Transactional
 	@Test
-	void closeTournamentByAuthorizedUserTest(@Autowired PlayerService playerService) {
+	void closeTournamentByAuthorizedUserTest(@Autowired PlayerService playerService,
+											 @Autowired TournamentRepository tournamentRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
 
@@ -680,7 +739,9 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		tournamentService.closeTournament(1L);
+		var tournament = tournamentRepository.findAll().get(0);
+
+		tournamentService.closeTournament(tournament.getId());
 
 		assertEquals(Cycle.STATUS_CLOSE, tournamentService.findAllTournaments().get(0).getStatus());
 
@@ -689,7 +750,7 @@ class TournamentServiceTest {
 	@DisplayName("Attempt to close tournament by unauthorized user")
 	@Transactional
 	@Test
-	void attemptToCloseTournamentByUnauthorizedUserTest() {
+	void attemptToCloseTournamentByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
 
 		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
 
@@ -698,7 +759,286 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(1L));
+		var tournamentId = tournamentRepository.findAll().get(0).getId();
+
+		assertThrows(UnauthorizedException.class, () -> this.tournamentService.closeTournament(tournamentId));
+	}
+
+	@DisplayName("Attempt to add player to the tournament by authorized user")
+	@Transactional
+	@Test
+	void attemptToAddPlayerToTournamentByAuthorizedUserTest(@Autowired PlayerService playerService,
+															@Autowired TournamentRepository tournamentRepository,
+															@Autowired TournamentPlayerRepository tournamentPlayerRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+
+		tournamentService.addPlayer(tournamentPlayer);
+
+		assertEquals(1, tournamentPlayerRepository.findAll().size());
+
+		var tempTournamentPlayer = new TournamentPlayer();
+		tempTournamentPlayer.setPlayerId(1L);
+		tempTournamentPlayer.setTournamentId(tournament.getId());
+
+		assertThrows(DuplicatePlayerInTournamentException.class, () -> this.tournamentService.addPlayer(tempTournamentPlayer));
+	}
+
+	@DisplayName("Attempt to add player to the tournament by unauthorized user")
+	@Transactional
+	@Test
+	void attemptToAddPlayerToTournamentByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
+
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+
+		assertThrows(UnauthorizedException.class, () -> this.tournamentService.addPlayer(tournamentPlayer));
+	}
+
+	@DisplayName("Attempt to add player to the tournament but player does not exist")
+	@Transactional
+	@Test
+	void attemptToAddPlayerToTournamentByAuthorizedUserButPlayerNotExistsTest(@Autowired PlayerService playerService,
+															  @Autowired TournamentRepository tournamentRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(100L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+
+		assertThrows(NoSuchElementException.class, () -> this.tournamentService.addPlayer(tournamentPlayer));
+	}
+
+	@DisplayName("Attempt to add player to the tournament but tournament does not exist")
+	@Transactional
+	@Test
+	void attemptToAddPlayerToTournamentByAuthorizedUserButTournamentNotExistsTest(@Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(100L);
+
+		assertThrows(NoSuchElementException.class, () -> this.tournamentService.addPlayer(tournamentPlayer));
+	}
+
+	@DisplayName("Attempt to delete all tournament players by authorized user")
+	@Transactional
+	@Test
+	void attemptToDeleteAllTournamentPlayersByAuthorizedUserTest(@Autowired PlayerService playerService,
+																 @Autowired TournamentRepository tournamentRepository,
+																 @Autowired TournamentPlayerRepository tournamentPlayerRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setNick("Test");
+		tournamentPlayer.setWhs(1F);
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		assertEquals(1, tournamentPlayerRepository.findAll().size());
+		tournamentService.deletePlayers(tournament.getId());
+		assertEquals(0, tournamentPlayerRepository.findAll().size());
+	}
+
+	@DisplayName("Attempt to delete all tournament players by unauthorized user")
+	@Transactional
+	@Test
+	void attemptToDeleteAllTournamentPlayersByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
+
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournamentId = tournamentRepository.findAll().get(0).getId();
+
+
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deletePlayers(tournamentId));
+	}
+
+	@DisplayName("Attempt to delete all tournament players but results exist")
+	@Transactional
+	@Test
+	void attemptToDeleteAllTournamentPlayersButResultsExistTest(@Autowired PlayerService playerService,
+																 @Autowired TournamentRepository tournamentRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(100);
+		tournamentResult.setStrokesBrutto(100);
+		tournamentResult.setStrokesNetto(100);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		var tournamentId = tournament.getId();
+
+		assertThrows(DeleteTournamentPlayerException.class, () -> tournamentService.deletePlayers(tournamentId));
+
+	}
+
+	@DisplayName("Attempt to delete single tournament player by authorized user")
+	@Transactional
+	@Test
+	void attemptToDeleteSingleTournamentPlayerByAuthorizedUserTest(@Autowired PlayerService playerService,
+																 @Autowired TournamentRepository tournamentRepository,
+																 @Autowired TournamentPlayerRepository tournamentPlayerRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setNick("Test");
+		tournamentPlayer.setWhs(1F);
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		assertEquals(1, tournamentPlayerRepository.findAll().size());
+		tournamentService.deletePlayer(tournament.getId(), 1L);
+		assertEquals(0, tournamentPlayerRepository.findAll().size());
+	}
+
+	@DisplayName("Attempt to delete single tournament player by unauthorized user")
+	@Transactional
+	@Test
+	void attemptToDeleteSingleTournamentPlayerByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
+
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournamentId = tournamentRepository.findAll().get(0).getId();
+
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deletePlayer(tournamentId, 1L));
+	}
+
+	@DisplayName("Attempt to delete single tournament player but results exist")
+	@Transactional
+	@Test
+	void attemptToDeleteSingleTournamentPlayerButResultsExistTest(@Autowired PlayerService playerService,
+																@Autowired TournamentRepository tournamentRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(100);
+		tournamentResult.setStrokesBrutto(100);
+		tournamentResult.setStrokesNetto(100);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		var tournamentId = tournament.getId();
+
+		assertThrows(DeleteTournamentPlayerException.class, () -> tournamentService.deletePlayer(tournamentId, 1L));
+
+	}
+
+	@DisplayName("Attempt to get tournament players")
+	@Transactional
+	@Test
+	void attemptToGetTournamentPlayersTest(@Autowired TournamentRepository tournamentRepository,
+										   @Autowired TournamentPlayerRepository tournamentPlayerRepository) {
+
+		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setNick("Test");
+		tournamentPlayer.setWhs(1F);
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		assertEquals(1, tournamentService.getTournamentPlayers(tournament.getId()).size());
 	}
 
 	@AfterAll

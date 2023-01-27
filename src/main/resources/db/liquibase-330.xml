@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ" id="2000000000001-10">
+		<createTable tableName="tournament_player">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="tournament_player_pkey"/>
+			</column>
+			<column name="tournament_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="player_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="nick" type="VARCHAR(20)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="whs" type="numeric(3, 1)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-11">
+		<createIndex indexName="tour_player_id" tableName="tournament_player" unique="true">
+			<column name="player_id"/>
+		</createIndex>
+	</changeSet>
+</databaseChangeLog>

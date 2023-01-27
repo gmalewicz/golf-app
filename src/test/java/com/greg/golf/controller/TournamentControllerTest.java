@@ -1,14 +1,11 @@
 package com.greg.golf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.CycleTournamentDto;
-import com.greg.golf.controller.dto.LimitedRoundDto;
-import com.greg.golf.controller.dto.RoundDto;
-import com.greg.golf.controller.dto.TournamentDto;
-import com.greg.golf.entity.Round;
-import com.greg.golf.entity.Tournament;
-import com.greg.golf.entity.TournamentResult;
-import com.greg.golf.entity.TournamentRound;
+import com.greg.golf.controller.dto.*;
+import com.greg.golf.entity.*;
+import com.greg.golf.error.ApiErrorResponse;
+import com.greg.golf.error.DeleteTournamentPlayerException;
+import com.greg.golf.error.DuplicatePlayerInTournamentException;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
@@ -28,14 +25,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -172,6 +170,7 @@ class TournamentControllerTest {
 
 		var input = new RoundDto();
 		input.setId(1L);
+		input.setMatchPlay(false);
 
 		var outputLst = new TournamentRound();
 
@@ -207,6 +206,77 @@ class TournamentControllerTest {
 
 		doNothing().when(tournamentService).deleteTournament(anyLong());
 		mockMvc.perform(delete("/rest/Tournament/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should add player participant to tournament")
+	@Test
+	void addTournamentPlayerWhenValidInputThenReturns200() throws Exception {
+
+		var input = new TournamentPlayerDto();
+		input.setPlayerId(1L);
+		input.setTournamentId(1L);
+
+		doNothing().when(tournamentService).addPlayer(any());
+
+		mockMvc.perform(post("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should delete tournament single player")
+	@Test
+	void deleteTournamentPlayerWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deletePlayer(anyLong(), anyLong());
+		mockMvc.perform(delete("/rest/TournamentPlayer/1/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should delete tournament all player")
+	@Test
+	void deleteTournamentAllPlayersWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deletePlayers(anyLong());
+		mockMvc.perform(delete("/rest/TournamentPlayer/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should get all players belonging to tournament with correct result")
+	@Test
+	void getAllTournamentPlayersTest() throws Exception {
+
+		var outputLst = new ArrayList<TournamentPlayer>();
+
+		when(tournamentService.getTournamentPlayers(any())).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/TournamentPlayer/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Delete player with results")
+	@Test
+	void deletePlayer_withResults_thenReturns405() throws Exception {
+
+		doThrow(new DeleteTournamentPlayerException()).when(tournamentService).deletePlayers(1L);
+		MvcResult mvcResult = mockMvc.perform(delete("/rest/TournamentPlayer/1")).andExpect(status().isMethodNotAllowed()).andReturn();
+
+		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+
+		assertThat(actualResponseBody)
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("19", "Unable to delete player from tournament. Remove results first.")));
+	}
+
+	@DisplayName("Attempt to add the player twice")
+	@Test
+	void addPlayerTwice_thenReturns405() throws Exception {
+
+		var input = new TournamentPlayerDto();
+		input.setPlayerId(1L);
+		input.setTournamentId(1L);
+
+		doThrow(new DuplicatePlayerInTournamentException()).when(tournamentService).addPlayer(any());
+		MvcResult mvcResult = mockMvc.perform(post("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isMethodNotAllowed()).andReturn();
+
+		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+
+		assertThat(actualResponseBody)
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("20", "Player already added to the tournament.")));
 	}
 
 	@AfterAll

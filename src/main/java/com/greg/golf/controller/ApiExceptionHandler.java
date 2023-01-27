@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import java.util.NoSuchElementException;
 
+import com.greg.golf.error.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -13,19 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import com.greg.golf.error.ApiErrorResponse;
-import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
-import com.greg.golf.error.PlayerNickInUseException;
-import com.greg.golf.error.ReCaptchaInvalidException;
-import com.greg.golf.error.ReCaptchaUnavailableException;
-import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
-import com.greg.golf.error.ScoreCardUpdateException;
-import com.greg.golf.error.SendingMailFailureException;
-import com.greg.golf.error.TooFewHolesForTournamentException;
-import com.greg.golf.error.TooManyPlayersException;
-import com.greg.golf.error.TooShortStringForSearchException;
-import com.greg.golf.error.UnauthorizedException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -178,6 +166,22 @@ public class ApiExceptionHandler {
 	public ResponseEntity<ApiErrorResponse> handleApiException(ScoreCardUpdateException ex) {
 		
 		var response = new ApiErrorResponse("18", "Unable to update scorecard");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(DeleteTournamentPlayerException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DeleteTournamentPlayerException ex) {
+
+		var response = new ApiErrorResponse("19", "Unable to delete player from tournament. Remove results first.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(DuplicatePlayerInTournamentException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInTournamentException ex) {
+
+		var response = new ApiErrorResponse("20", "Player already added to the tournament.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 }
