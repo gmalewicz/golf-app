@@ -258,7 +258,7 @@ class TournamentControllerTest {
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("19", "Unable to delete player of players. Remove results first.")));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("19", "Unable to delete player from tournament. Remove results first.")));
 	}
 
 	@DisplayName("Attempt to add the player twice")
