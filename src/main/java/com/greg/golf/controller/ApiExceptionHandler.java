@@ -173,7 +173,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(DeleteTournamentPlayerException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DeleteTournamentPlayerException ex) {
 
-		var response = new ApiErrorResponse("19", "Unable to delete player of players. Remove results first.");
+		var response = new ApiErrorResponse("19", "Unable to delete player from tournament. Remove results first.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
