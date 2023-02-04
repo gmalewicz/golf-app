@@ -2,7 +2,6 @@ package com.greg.golf.entity;
 
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -26,12 +25,6 @@ public class Tournament {
 	@NotNull
 	@Column(name = "name")
 	private String name;
-
-	@ToString.Exclude
-	@EqualsAndHashCode.Exclude
-	//@JsonIgnore
-	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "tournament")
-	private List<Round> round = new ArrayList<>();
 
 	@NotNull
 	@EqualsAndHashCode.Exclude
@@ -65,15 +58,5 @@ public class Tournament {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;
-	
-	public void addRound(Round roundItem) {
-		this.round.add(roundItem);
-		roundItem.setTournament(this);
-	}
-
-	public void removeRound(Round roundItem) {
-		this.round.remove(roundItem);
-		roundItem.setTournament(null);
-	}
 
 }

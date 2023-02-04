@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -245,8 +244,7 @@ class RoundServiceTest {
 	@DisplayName("Try to save the round for the same player twice")
 	@Transactional
 	@Test
-	void saveRoundForTheSamePlayerTwiceTest(@Autowired RoundRepository roundRepository,
-			@Autowired PlayerRepository playerRepository) {
+	void saveRoundForTheSamePlayerTwiceTest(@Autowired RoundRepository roundRepository) {
 
 		var round = roundRepository.findById(roundId).orElseThrow();
 
@@ -330,7 +328,6 @@ class RoundServiceTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournamentRepository.save(tournament);
 
-		round.setTournament(tournament);
 		round = roundRepository.save(round);
 
 		// create the new player
@@ -370,44 +367,10 @@ class RoundServiceTest {
 		Assertions.assertEquals(2, roundRepository.findById(round.getId()).orElseThrow().getPlayer().size());
 	}
 
-	@DisplayName("Try to update scorecard assigned to tournament")
-	@Transactional
-	@Test
-	void scoreCardUpdateThatIsAssignedToTournamentTest(@Autowired RoundRepository roundRepository,
-			@Autowired PlayerRepository playerRepository, @Autowired TournamentRepository tournamentRepository) {
-
-		var round = roundRepository.findById(roundId).orElseThrow();
-
-		var tournament = new Tournament();
-		tournament.setEndDate(round.getRoundDate());
-		tournament.setStartDate(round.getRoundDate());
-		tournament.setName("Test tournament");
-		tournament.setPlayer(round.getPlayer().iterator().next());
-		tournament.setBestRounds(0);
-		tournament.setStatus(Tournament.STATUS_OPEN);
-		tournamentRepository.save(tournament);
-
-		round.setTournament(tournament);
-		round = roundRepository.save(round);
-
-		// create the new round
-		var newRound = new Round();
-		newRound.setId(round.getId());
-		newRound.setCourse(round.getCourse());
-		var playerSet = new TreeSet<Player>();
-		playerSet.add(round.getPlayer().iterator().next());
-		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
-		newRound.setRoundDate(round.getRoundDate());
-
-		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
-	}
-
 	@DisplayName("Try to update correct scorecard")
 	@Transactional
 	@Test
-	void correctScoreCardUpdateTest(@Autowired RoundRepository roundRepository,
-			@Autowired PlayerRepository playerRepository) {
+	void correctScoreCardUpdateTest(@Autowired RoundRepository roundRepository) {
 
 		var round = roundRepository.findById(roundId).orElseThrow();
 
@@ -474,8 +437,7 @@ class RoundServiceTest {
 	@DisplayName("Try to update scorecard without player")
 	@Transactional
 	@Test
-	void scoreCardUpdateWithoutPlayerTest(@Autowired RoundRepository roundRepository,
-			@Autowired PlayerRepository playerRepository) {
+	void scoreCardUpdateWithoutPlayerTest(@Autowired RoundRepository roundRepository) {
 
 		var round = roundRepository.findById(roundId).orElseThrow();
 
@@ -607,7 +569,7 @@ class RoundServiceTest {
 	@DisplayName("Update player hcp for round")
 	@Transactional
 	@Test
-	void updatePlayerRoundWhsTest(@Autowired PlayerRepository playerRepository) {
+	void updatePlayerRoundWhsTest() {
 
 		roundService.updateRoundWhs(1L, roundId, 11.3F);
 		var playerRound =  roundService.getForPlayerRoundDetails(1L, roundId);

@@ -51,20 +51,5 @@ public class Round {
 	@ToString.Exclude
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
 	private List<ScoreCard> scoreCard = new ArrayList<>();
-	
-	@EqualsAndHashCode.Exclude
-	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Tournament tournament;
-	
-	public void addScoreCard(ScoreCard scoreCardItem) {
-		this.scoreCard.add(scoreCardItem);
-		scoreCardItem.setRound(this);
-	}
-
-	public void removeScoreCard(ScoreCard scoreCardItem) {
-		this.scoreCard.remove(scoreCardItem);
-		scoreCardItem.setRound(null);
-	}
 
 }

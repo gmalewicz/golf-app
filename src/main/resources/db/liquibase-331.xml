@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ" id="2000000000001-12">
+		<dropIndex indexName="tour_player_id" schemaName="public" tableName="tournament_player"/>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-13">
+		<createIndex indexName="tour_player_id" tableName="tournament_player" unique="true">
+			<column name="player_id"/>
+			<column name="tournament_id"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-14">
+		<dropColumn
+			columnName="tournament_id"
+			schemaName="public"
+			tableName="round">
+		</dropColumn>
+	</changeSet>
+</databaseChangeLog>

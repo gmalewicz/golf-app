@@ -11,7 +11,6 @@ import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ import com.greg.golf.error.ScoreCardUpdateException;
 import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
-import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +36,6 @@ public class RoundService {
 	private final RoundServiceConfig roundServiceConfig;
 	private final RoundRepository roundRepository;
 	private final PlayerRoundRepository playerRoundRepository;
-	private final ApplicationEventPublisher applicationEventPublisher;
 	private final PlayerRepository playerRepository;
 	
 	public Optional<Round> getWithPlayers (Long id) {
@@ -47,7 +44,7 @@ public class RoundService {
 
 	@Transactional(readOnly = true)
 	public List<Round> findByDates(Date startDate, Date endDate) {
-		return roundRepository.findByTournamentIsNullAndRoundDateBetween(startDate, endDate);
+		return roundRepository.findByRoundDateBetween(startDate, endDate);
 	}
 
 	@Transactional 
@@ -92,14 +89,6 @@ public class RoundService {
 														round.getCourse().getTees().get(0).getTeeType(),
 														player.getId(), 
 														round.getId());
-			
-			// verify if tournament shall be updated (only if the round is already assigned to tournament)
-			if (existingRound.getTournament() != null) {
-				log.info("Tournament round sent for checking if tournament result update shall be done");
-				var roundEvent = new RoundEvent(this, existingRound);
-				applicationEventPublisher.publishEvent(roundEvent);
-			}
-
 		}, () -> {
 			log.debug("trying to add not matching round");
 			round.getScoreCard().forEach(card -> card.setRound(round));
@@ -181,16 +170,17 @@ public class RoundService {
 		
 		// verify if round contains one and only one player
 		// also update the round which was assigned for tournament is not allowed
-		if (updRound.getPlayer() == null || updRound.getPlayer().size() != 1 || 
-				round.getTournament() != null) {
+		if (updRound.getPlayer() == null || updRound.getPlayer().size() != 1) {
 			throw new ScoreCardUpdateException();
 		}
 		
 		// get first player from set
 		var player = updRound.getPlayer().iterator().next();
 		// remove scorecard object that matching player from round
-		round.getScoreCard().removeAll((round.getScoreCard().stream()
-				.filter(sc -> sc.getPlayer().getId().equals(player.getId())).collect(Collectors.toList())));
+		round.getScoreCard().removeAll((round.getScoreCard()
+				.stream()
+				.filter(sc -> sc.getPlayer().getId().equals(player.getId()))
+				.toList()));
 
 		updRound.getScoreCard().forEach(sc -> {
 			sc.setRound(updRound);

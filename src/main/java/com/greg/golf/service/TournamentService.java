@@ -1,7 +1,6 @@
 package com.greg.golf.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.greg.golf.error.RoundAlreadyAddedToTournamentException;
 import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.service.events.RoundEvent;
 
@@ -37,7 +35,6 @@ public class TournamentService {
     private final CourseService courseService;
     private final PlayerRoundRepository playerRoundRepository;
     private final TournamentRoundRepository tournamentRoundRepository;
-    private final RoundRepository roundRepository;
     private final PlayerRepository playerRepository;
     private final TournamentPlayerRepository tournamentPlayerRepository;
 
@@ -57,7 +54,7 @@ public class TournamentService {
             .getTournamentResult()
             .stream()
             .map(TournamentResult::getId)
-            .collect(Collectors.toList())
+            .toList()
             .forEach(this::deleteResult);
 
         tournamentRepository.deleteById(tournamentId);
@@ -74,17 +71,6 @@ public class TournamentService {
         // then verify if player is allowed to delete result
         // only tournament owner can do it
         RoleVerification.verifyPlayer(tournamentResult.getTournament().getPlayer().getId(), "Attempt to delete tournament result by unauthorized user");
-        // then clear tournament flag for rounds
-        tournamentResult.getTournamentRound().forEach(tournamentRnd -> {
-
-            if (tournamentRnd.getRoundId() != null) {
-
-                var round = roundRepository.findById(tournamentRnd.getRoundId().longValue()).orElseThrow();
-                round.setTournament(null);
-                roundRepository.save(round);
-            }
-
-        });
 
         // then clear tournament flag for player round
         playerRoundRepository.clearTournamentForPlayer(tournamentResult.getPlayer().getId(), tournamentResult.getTournament().getId());
@@ -93,7 +79,7 @@ public class TournamentService {
         var rstLst = tournamentResult.getTournament().getTournamentResult()
                                             .stream()
                                             .filter(rst -> rst.getId().equals(resultId))
-                                            .collect(Collectors.toList());
+                                            .toList();
         tournamentResult.getTournament().getTournamentResult().removeAll(rstLst);
         tournamentRepository.save(tournamentResult.getTournament());
     }
@@ -164,16 +150,6 @@ public class TournamentService {
         // get tournament object
         var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
 
-        // next check if round is not already added to that tournament
-        if (tournament.getRound().contains(round)) {
-            log.warn("Attempt to add twice the same round to tournament");
-            throw new RoundAlreadyAddedToTournamentException();
-        }
-
-        // add round to tournament
-        tournament.addRound(round);
-        tournamentRepository.save(tournament);
-
         tournament = tournamentRepository.findById(tournament.getId()).orElseThrow();
 
         // update tournament result
@@ -187,13 +163,17 @@ public class TournamentService {
     @EventListener
     public void handleRoundEvent(RoundEvent roundEvent) {
         log.debug("Handling round event...");
-        updateTournamentResult(roundEvent.getRound(), roundEvent.getRound().getTournament());
     }
 
     @Transactional
     public List<TournamentRound> updateTournamentResult(Round round, Tournament tournament) {
 
         var tournamentRoundLst = new ArrayList<TournamentRound>();
+
+        var plrIdLst = tournamentPlayerRepository.findByTournamentId(tournament.getId())
+                                                    .stream()
+                                                    .map(TournamentPlayer::getPlayerId)
+                                                    .toList();
 
         // first verify if round has 18 holes played for each player
         verifyRoundCorrectness(round);
@@ -203,71 +183,74 @@ public class TournamentService {
 
             var playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 
-            Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
-                    .findByPlayerAndTournament(player, round.getTournament());
-            tournamentResultOpt.ifPresentOrElse(tournamentResult -> {
-                log.debug("Attempting to update tournament result");
-                // first check if the round has not been already added
-                if (playerRound.getTournamentId() == null) {
-                    tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
-                    int grossStrokes = 0;
-                    int netStrokes = 0;
+            if (playerRound.getTournamentId() == null && plrIdLst.contains(playerRound.getPlayerId())) {
+
+                Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
+                        .findByPlayerAndTournament(player, tournament);
+                tournamentResultOpt.ifPresentOrElse(tournamentResult -> {
+                    log.debug("Attempting to update tournament result");
+                    // first check if the round has not been already added
+                    if (playerRound.getTournamentId() == null) {
+                        tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
+                        int grossStrokes = 0;
+                        int netStrokes = 0;
+                        List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
+                        // check if round is applicable for stroke statistic
+                        boolean strokeApplicable = applicableForStroke(round, player);
+                        if (strokeApplicable) {
+                            tournamentResult.increaseStrokeRounds();
+                            grossStrokes = getGrossStrokes(player, round);
+                            netStrokes = getNetStrokes(player, round, grossStrokes, playerRound);
+                        }
+                        tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
+                        tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
+
+                        // save entity
+                        tournamentResultRepository.save(tournamentResult);
+                        tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
+                                getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
+                                tournamentResult, strokeApplicable, round.getId()));
+
+                        // here needs to be an update of TournamentResults in case if number of added rounds is greater
+                        // than bestRounds assuming that bestRounds is not 0
+                        updateForBestRounds(tournament, tournamentResult);
+
+                    } else {
+                        log.warn("Attempt to update round which is already part of the tournament");
+                    }
+
+                }, () -> {
+                    log.debug("Attempting to add the new round to tournament result");
+                    // if it is the first record to be added to result than create it
+                    var tournamentResult = buildEmptyTournamentResult(player);
+                    tournamentResult.setTournament(tournament);
+                    // update stb results
                     List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
                     // check if round is applicable for stroke statistic
                     boolean strokeApplicable = applicableForStroke(round, player);
                     if (strokeApplicable) {
                         tournamentResult.increaseStrokeRounds();
-                        grossStrokes = getGrossStrokes(player, round);
-                        netStrokes = getNetStrokes(player, round, grossStrokes, playerRound);
+                        // get gross and net strokes
+                        tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
+                        tournamentResult.setStrokesNetto(
+                                getNetStrokes(player, round, tournamentResult.getStrokesBrutto(), playerRound));
+                    } else {
+                        tournamentResult.setStrokesBrutto(0);
+                        tournamentResult.setStrokesNetto(0);
                     }
-                    tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
-                    tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
-
                     // save entity
                     tournamentResultRepository.save(tournamentResult);
-                    tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
-                            getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
-                            tournamentResult, strokeApplicable, round.getId()));
 
-                    // here needs to be an update of TournamentResults in case if number of added rounds is greater
-                    // than bestRounds assuming that bestRounds is not 0
-                    updateForBestRounds(tournament, tournamentResult);
+                    tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
+                            tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
+                            round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId()));
 
-                } else {
-                    log.warn("Attempt to update round which is already part of the tournament");
-                }
+                });
 
-            }, () -> {
-                log.debug("Attempting to add the new round to tournament result");
-                // if it is the first record to be added to result than create it
-                var tournamentResult = buildEmptyTournamentResult(player);
-                tournamentResult.setTournament(round.getTournament());
-                // update stb results
-                List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
-                // check if round is applicable for stroke statistic
-                boolean strokeApplicable = applicableForStroke(round, player);
-                if (strokeApplicable) {
-                    tournamentResult.increaseStrokeRounds();
-                    // get gross and net strokes
-                    tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
-                    tournamentResult.setStrokesNetto(
-                            getNetStrokes(player, round, tournamentResult.getStrokesBrutto(), playerRound));
-                } else {
-                    tournamentResult.setStrokesBrutto(0);
-                    tournamentResult.setStrokesNetto(0);
-                }
-                // save entity
-                tournamentResultRepository.save(tournamentResult);
-
-                tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
-                        tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
-                        round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId()));
-
-            });
-
-            // set tournament id in player_round
-            playerRound.setTournamentId(round.getTournament().getId());
-            playerRoundRepository.save(playerRound);
+                // set tournament id in player_round
+                playerRound.setTournamentId(tournament.getId());
+                playerRoundRepository.save(playerRound);
+            }
         });
 
         return tournamentRoundLst;
@@ -468,8 +451,10 @@ public class TournamentService {
 
         List<Hole> holes = round.getCourse().getHoles();
         // get list of scorecard for player
-        List<ScoreCard> playerScoreCard = round.getScoreCard().stream()
-                .filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId())).collect(Collectors.toList());
+        List<ScoreCard> playerScoreCard = round.getScoreCard()
+                                            .stream()
+                                            .filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()))
+                                            .toList();
         playerScoreCard.forEach(scoreCard -> {
             if (hcpIncMaxHole > 0 && holes.get(scoreCard.getHole() - 1).getSi() <= hcpIncMaxHole) {
                 // if some holes needs hcp update increase them
@@ -510,14 +495,26 @@ public class TournamentService {
         if (!rounds.isEmpty()) {
 
             var tournamentPlayers = tournamentPlayerRepository.findByTournamentId(tournament.getId());
-            var plrIdLst = tournamentPlayers.stream().map(TournamentPlayer::getPlayerId).collect(Collectors.toList());
+            var plrIdLst = tournamentPlayers
+                            .stream()
+                            .map(TournamentPlayer::getPlayerId)
+                            .toList();
 
             rounds.forEach(r -> {
 
-                if (plrIdLst.containsAll(r.getPlayer().stream().map(Player::getId).collect(Collectors.toList()))) {
-                    retRounds.add(r);
-                } else {
+                if (Collections.disjoint(plrIdLst,
+                                         playerRoundRepository.findByRoundIdOrderByPlayerId(r.getId())
+                                                .orElseThrow()
+                                                .stream()
+                                                .filter(pr -> pr.getTournamentId() == null)
+                                                .map(PlayerRound::getPlayerId)
+                                                .toList())) {
+
                     log.info("The round with non matching player found: round id " + r.getId() + " with number of players: " + r.getPlayer().size());
+
+                } else {
+
+                    retRounds.add(r);
                 }
             });
         }
