@@ -189,35 +189,32 @@ public class TournamentService {
                         .findByPlayerAndTournament(player, tournament);
                 tournamentResultOpt.ifPresentOrElse(tournamentResult -> {
                     log.debug("Attempting to update tournament result");
-                    // first check if the round has not been already added
-                    if (playerRound.getTournamentId() == null) {
-                        tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
-                        int grossStrokes = 0;
-                        int netStrokes = 0;
-                        List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
-                        // check if round is applicable for stroke statistic
-                        boolean strokeApplicable = applicableForStroke(round, player);
-                        if (strokeApplicable) {
-                            tournamentResult.increaseStrokeRounds();
-                            grossStrokes = getGrossStrokes(player, round);
-                            netStrokes = getNetStrokes(player, round, grossStrokes, playerRound);
-                        }
-                        tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
-                        tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
 
-                        // save entity
-                        tournamentResultRepository.save(tournamentResult);
-                        tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
-                                getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
-                                tournamentResult, strokeApplicable, round.getId()));
-
-                        // here needs to be an update of TournamentResults in case if number of added rounds is greater
-                        // than bestRounds assuming that bestRounds is not 0
-                        updateForBestRounds(tournament, tournamentResult);
-
-                    } else {
-                        log.warn("Attempt to update round which is already part of the tournament");
+                    tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
+                    int grossStrokes = 0;
+                    int netStrokes = 0;
+                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
+                    // check if round is applicable for stroke statistic
+                    boolean strokeApplicable = applicableForStroke(round, player);
+                    if (strokeApplicable) {
+                        tournamentResult.increaseStrokeRounds();
+                        grossStrokes = getGrossStrokes(player, round);
+                        netStrokes = getNetStrokes(player, round, grossStrokes, playerRound);
                     }
+                    tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
+                    tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
+
+                    // save entity
+                    tournamentResultRepository.save(tournamentResult);
+                    tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
+                            getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
+                            tournamentResult, strokeApplicable, round.getId()));
+
+                    // here needs to be an update of TournamentResults in case if number of added rounds is greater
+                    // than bestRounds assuming that bestRounds is not 0
+                    updateForBestRounds(tournament, tournamentResult);
+
+
 
                 }, () -> {
                     log.debug("Attempting to add the new round to tournament result");
