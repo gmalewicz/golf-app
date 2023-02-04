@@ -168,7 +168,7 @@ public class TournamentService {
     @Transactional
     public List<TournamentRound> updateTournamentResult(Round round, Tournament tournament) {
 
-        var tournamentRoundLst = new ArrayList<TournamentRound>();
+       var tournamentRoundLst = new ArrayList<TournamentRound>();
 
         var plrIdLst = tournamentPlayerRepository.findByTournamentId(tournament.getId())
                                                     .stream()
@@ -206,6 +206,7 @@ public class TournamentService {
 
                     // save entity
                     tournamentResultRepository.save(tournamentResult);
+
                     tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
                             getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
                             tournamentResult, strokeApplicable, round.getId()));
@@ -213,7 +214,6 @@ public class TournamentService {
                     // here needs to be an update of TournamentResults in case if number of added rounds is greater
                     // than bestRounds assuming that bestRounds is not 0
                     updateForBestRounds(tournament, tournamentResult);
-
 
 
                 }, () -> {
