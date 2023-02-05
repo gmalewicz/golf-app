@@ -1,6 +1,7 @@
 package com.greg.golf.service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
@@ -162,7 +163,7 @@ public class TournamentService {
     @Transactional(propagation = Propagation.REQUIRED)
     @EventListener
     public void handleRoundEvent(RoundEvent roundEvent) {
-        log.debug("Handling round event...");
+        log.info("Handling round event... however tournament cannot be updated that way");
     }
 
     @Transactional
@@ -170,10 +171,10 @@ public class TournamentService {
 
        var tournamentRoundLst = new ArrayList<TournamentRound>();
 
-        var plrIdLst = tournamentPlayerRepository.findByTournamentId(tournament.getId())
-                                                    .stream()
-                                                    .map(TournamentPlayer::getPlayerId)
-                                                    .toList();
+       var tournamentPlayers = tournamentPlayerRepository
+                                .findByTournamentId(tournament.getId())
+                                .stream()
+                                .collect(Collectors.toMap(TournamentPlayer::getPlayerId, TournamentPlayer::getWhs));
 
         // first verify if round has 18 holes played for each player
         verifyRoundCorrectness(round);
@@ -183,7 +184,7 @@ public class TournamentService {
 
             var playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 
-            if (playerRound.getTournamentId() == null && plrIdLst.contains(playerRound.getPlayerId())) {
+            if (playerRound.getTournamentId() == null && tournamentPlayers.containsKey(playerRound.getPlayerId())) {
 
                 Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
                         .findByPlayerAndTournament(player, tournament);
@@ -193,13 +194,13 @@ public class TournamentService {
                     tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
                     int grossStrokes = 0;
                     int netStrokes = 0;
-                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
+                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player, tournamentPlayers.get(player.getId()));
                     // check if round is applicable for stroke statistic
                     boolean strokeApplicable = applicableForStroke(round, player);
                     if (strokeApplicable) {
                         tournamentResult.increaseStrokeRounds();
                         grossStrokes = getGrossStrokes(player, round);
-                        netStrokes = getNetStrokes(player, round, grossStrokes, playerRound);
+                        netStrokes = getNetStrokes(player, round, grossStrokes, playerRound, tournamentPlayers.get(player.getId()));
                     }
                     tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
                     tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
@@ -222,7 +223,7 @@ public class TournamentService {
                     var tournamentResult = buildEmptyTournamentResult(player);
                     tournamentResult.setTournament(tournament);
                     // update stb results
-                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player);
+                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player, tournamentPlayers.get(player.getId()));
                     // check if round is applicable for stroke statistic
                     boolean strokeApplicable = applicableForStroke(round, player);
                     if (strokeApplicable) {
@@ -230,7 +231,7 @@ public class TournamentService {
                         // get gross and net strokes
                         tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
                         tournamentResult.setStrokesNetto(
-                                getNetStrokes(player, round, tournamentResult.getStrokesBrutto(), playerRound));
+                                getNetStrokes(player, round, tournamentResult.getStrokesBrutto(), playerRound, tournamentPlayers.get(player.getId())));
                     } else {
                         tournamentResult.setStrokesBrutto(0);
                         tournamentResult.setStrokesNetto(0);
@@ -412,10 +413,10 @@ public class TournamentService {
 
     // calculate net strokes
     @Transactional
-    public int getNetStrokes(Player player, Round round, int grossStrokes, PlayerRound playerRound) {
+    public int getNetStrokes(Player player, Round round, int grossStrokes, PlayerRound playerRound, Float playerHcp) {
 
         // calculate course HCP
-        int courseHCP = getCourseHCP(playerRound, round, player);
+        int courseHCP = getCourseHCP(playerRound, round, player, playerHcp);
 
         int netStrokes = grossStrokes - courseHCP;
         if (netStrokes < 0) {
@@ -429,13 +430,13 @@ public class TournamentService {
     // returns STB net at index 0 and STB gross at index 1
     @Transactional
     public List<Integer> updateSTB(TournamentResult tournamentResult, Round round, PlayerRound playerRound,
-                                   Player player) {
+                                   Player player, Float playerHcp) {
 
         // create List of ret values
         List<Integer> retStb = new ArrayList<>();
 
         // calculate course HCP
-        int courseHCP = getCourseHCP(playerRound, round, player);
+        int courseHCP = getCourseHCP(playerRound, round, player, playerHcp);
 
         // calculate hole HCP for player
         int hcpAll = (int) Math.floor((double) courseHCP / 18);
@@ -519,7 +520,7 @@ public class TournamentService {
         return retRounds;
     }
 
-    private int getCourseHCP(PlayerRound playerRound, Round round, Player player) {
+    private int getCourseHCP(PlayerRound playerRound, Round round, Player player, Float playerHcp) {
 
         if (playerRound == null) {
 
@@ -530,7 +531,7 @@ public class TournamentService {
 
         // calculate course HCP
         int courseHCP = Math
-                .round(playerRound.getWhs() * courseTee.getSr() / 113 + courseTee.getCr() - round.getCourse().getPar());
+                .round(playerHcp * courseTee.getSr() / 113 + courseTee.getCr() - round.getCourse().getPar());
 
         log.debug("Course SR: " + courseTee.getSr());
         log.debug("Course CR: " + courseTee.getCr());

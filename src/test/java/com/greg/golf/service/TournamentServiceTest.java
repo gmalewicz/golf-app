@@ -224,7 +224,7 @@ class TournamentServiceTest {
 		tournamentResultRepository.save(tournamentResult);
 
 		var retRound = roundRepository.findAll().get(0);
-		tournamentService.updateSTB(tournamentResult, retRound, null, player);
+		tournamentService.updateSTB(tournamentResult, retRound, null, player, 38.4F);
 
 		log.info("STB net: " + tournamentResult.getStbNet());
 		log.info("STB gross: " + tournamentResult.getStbGross());
@@ -363,7 +363,7 @@ class TournamentServiceTest {
 		var player = playerService.getPlayer(1L).orElseThrow();
 		var round = roundRepository.findAll().get(0);
 
-		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null);
+		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null, 38.4F);
 
 		Assertions.assertEquals(54, netStrokes);
 
@@ -377,27 +377,12 @@ class TournamentServiceTest {
 		var round = roundRepository.findAll().get(0);
 		var player = playerService.getPlayer(1L).orElseThrow();
 
-		var netStrokes = tournamentService.getNetStrokes(player, round, 22, null);
+		var netStrokes = tournamentService.getNetStrokes(player, round, 22, null, 38.4F);
 
 		Assertions.assertEquals(0, netStrokes);
 
 	}
-/*
-	@DisplayName("Should add round to tournament")
-	@Transactional
-	@Test
-	void addRoundTest(@Autowired RoundRepository roundRepository) {
 
-		var round = roundRepository.findAll().get(0);
-
-		tournamentService.addRound(tournamentService.findAllTournaments().get(0).getId(), round.getId(), false);
-
-		var t = tournamentService.findAllTournaments().get(0);
-
-		Assertions.assertEquals(t.getRound().get(0).getId(), round.getId());
-
-	}
-*/
 	@DisplayName("Should not allow add the same round to tournament twice")
 	@Transactional
 	@Test
