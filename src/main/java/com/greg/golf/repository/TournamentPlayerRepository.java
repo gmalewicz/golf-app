@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TournamentPlayerRepository extends JpaRepository<TournamentPlayer, Long> {
@@ -14,4 +15,7 @@ public interface TournamentPlayerRepository extends JpaRepository<TournamentPlay
     void deleteByTournamentIdAndPlayerId(Long tournamentId, Long playerId);
 
     List<TournamentPlayer> findByTournamentId(Long tournamentId);
+
+    Optional<TournamentPlayer> findByTournamentIdAndPlayerId(Long tournamentId, Long playerId);
+
 }

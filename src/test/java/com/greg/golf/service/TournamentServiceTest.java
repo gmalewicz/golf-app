@@ -1104,6 +1104,26 @@ class TournamentServiceTest {
 		assertEquals(1, tournamentService.getTournamentPlayers(tournament.getId()).size());
 	}
 
+	@DisplayName("Attempt to update tournament player handicap")
+	@Transactional
+	@Test
+	void attemptToUpdateTournamentPlayerHcpTest(@Autowired TournamentRepository tournamentRepository,
+										   @Autowired TournamentPlayerRepository tournamentPlayerRepository) {
+
+		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setNick("Test");
+		tournamentPlayer.setWhs(1F);
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		tournamentService.updatePlayer(tournamentPlayer.getTournamentId(), tournamentPlayer.getPlayerId(), 2F);
+
+		assertEquals(2F, tournamentService.getTournamentPlayers(tournament.getId()).get(0).getWhs());
+	}
+
+
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,
 			@Autowired TournamentRepository tournamentRepository, @Autowired TournamentResultRepository tr) {

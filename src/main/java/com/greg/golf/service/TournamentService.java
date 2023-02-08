@@ -645,4 +645,16 @@ public class TournamentService {
         return tournamentPlayerRepository.findByTournamentId(tournamentId);
 
     }
+
+    @Transactional
+    public void updatePlayer(Long tournamentId, Long playerId, Float whs)  {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to update player handicap by unauthorized user");
+
+        var tournamentPlayer = tournamentPlayerRepository.findByTournamentIdAndPlayerId(tournamentId, playerId).orElseThrow();
+        tournamentPlayer.setWhs(whs);
+        tournamentPlayerRepository.save(tournamentPlayer);
+    }
 }

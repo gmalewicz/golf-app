@@ -279,6 +279,20 @@ class TournamentControllerTest {
 				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("20", "Player already added to the tournament.")));
 	}
 
+	@DisplayName("Should update player handicap")
+	@Test
+	void updateTournamentPlayerWhenValidInputThenReturns200() throws Exception {
+
+		var input = new TournamentPlayerDto();
+		input.setPlayerId(1L);
+		input.setTournamentId(1L);
+		input.setWhs(1F);
+
+		doNothing().when(tournamentService).updatePlayer(anyLong(), anyLong(), anyFloat());
+		mockMvc.perform(patch("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
 	@AfterAll
 	public static void done() {
 
