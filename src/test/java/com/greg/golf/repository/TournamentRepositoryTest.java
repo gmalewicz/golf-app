@@ -3,7 +3,6 @@ package com.greg.golf.repository;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import com.greg.golf.security.JwtRequestFilter;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.greg.golf.entity.Player;
-import com.greg.golf.entity.Round;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -57,9 +55,6 @@ class TournamentRepositoryTest {
 		tournament.setName("Test tournament");
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
-		var roundList = new ArrayList<Round>();
-		// roundList.add(round);
-		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);
@@ -76,9 +71,6 @@ class TournamentRepositoryTest {
 		tournament.setName("Test tournament");
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
-		var roundList = new ArrayList<Round>();
-		// roundList.add(round);
-		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);
@@ -95,8 +87,6 @@ class TournamentRepositoryTest {
 		tournament.setName("Test tournament"); 
 		tournament.setStartDate(new Date(1));
 		tournament.setEndDate(new Date(1));
-		var roundList = new ArrayList<Round>();
-		tournament.setRound(roundList);
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);

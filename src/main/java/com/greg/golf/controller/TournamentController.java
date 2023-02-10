@@ -192,4 +192,17 @@ public class TournamentController extends BaseController {
 		return tournamentService.getTournamentPlayers(tournamentId);
 	}
 
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Update player handicap")
+	@PatchMapping(value = "/rest/TournamentPlayer")
+	public HttpStatus updatePlayer(
+			@Parameter(description = "TournamentPlayer object", required = true) @RequestBody @Valid TournamentPlayerDto tournamentPlayerDto) {
+
+		log.info("trying to update tournament player whs: " + tournamentPlayerDto);
+
+		tournamentService.updatePlayer(tournamentPlayerDto.getTournamentId(), tournamentPlayerDto.getPlayerId(), tournamentPlayerDto.getWhs());
+
+		return HttpStatus.OK;
+	}
+
 }

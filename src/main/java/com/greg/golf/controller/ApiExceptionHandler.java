@@ -62,15 +62,7 @@ public class ApiExceptionHandler {
 		var response = new ApiErrorResponse("6", "Data not found");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
-	
-	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-	@ExceptionHandler(RoundAlreadyAddedToTournamentException.class)
-	public ResponseEntity<ApiErrorResponse> handleApiException(RoundAlreadyAddedToTournamentException ex) {
-		
-		var response = new ApiErrorResponse("7", "Round already added to tournament");
-		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
-	}
-	
+
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(TooFewHolesForTournamentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooFewHolesForTournamentException ex) {

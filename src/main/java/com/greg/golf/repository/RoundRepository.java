@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.greg.golf.entity.Tournament;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -20,19 +19,14 @@ import com.greg.golf.entity.Round;
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
 	
-	 List<Round> findByPlayer(Player player);
-	
 	 Optional<Round> findRoundByCourseAndRoundDate(Course course, Date roundDate);
 	 
 	 @EntityGraph(attributePaths = { "player"})
-	 List<Round> findByTournamentIsNullAndRoundDateBetween(Date startDate, Date endDate);
+	 List<Round> findByRoundDateBetween(Date startDate, Date endDate);
 
 	 @EntityGraph(attributePaths = { "course"})
 	 List<Round> findByPlayerOrderByRoundDateDesc(Player player, Pageable pageable);
-	 
-	 @EntityGraph(attributePaths = { "course", "player"})
-	 List<Round> findByOrderByRoundDateDescPlayerAsc(Pageable pageable);
-	 
+
 	 @Query("SELECT r.id FROM Round r ORDER BY r.id DESC") 
 	 List<Long> getIdsForPage(Pageable pageable);
 	 
@@ -43,6 +37,4 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 @EntityGraph(attributePaths = { "player"})
      @NonNull
      Optional<Round> findById(@NonNull Long id);
-
-	List<Round> findByTournament(Tournament tournament);
 }

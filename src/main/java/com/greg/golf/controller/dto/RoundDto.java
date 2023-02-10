@@ -23,8 +23,4 @@ public class RoundDto extends BaseRoundDto {
 	@JsonProperty(value = "scoreCard", access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "Round score card list (one per hole)", accessMode = READ_WRITE)
 	private List<ScoreCardDto> scoreCard;
-	
-	@JsonProperty(value = "tournament", access = JsonProperty.Access.WRITE_ONLY)
-	@Schema(description = "Round tournament", accessMode = READ_WRITE)
-	private TournamentDto tournament;
 }
