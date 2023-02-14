@@ -22,6 +22,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -87,7 +89,7 @@ class PlayerServiceTest {
 	@DisplayName("Unauthorized attempt to change password")
 	@Transactional
 	@Test
-	void changePasswordUnauthorizedTest(@Autowired PlayerRepository playerRepository) {
+	void changePasswordUnauthorizedTest() {
 
 		player.setPassword("test");
 		
@@ -104,7 +106,7 @@ class PlayerServiceTest {
 	@DisplayName("Attempt to change password for nonexistent user")
 	@Transactional
 	@Test
-	void changePasswordForNonexistentUserTest(@Autowired PlayerRepository playerRepository) {
+	void changePasswordForNonexistentUserTest() {
 		
 		var authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
@@ -178,29 +180,47 @@ class PlayerServiceTest {
 	@Test
 	void updatePlayerWhsTest() {
 
-		Player player = new Player();
-		player.setWhs(10.0F);
-		player.setId(1L);
+		var player = playerService.getPlayer(1L).orElseThrow();
 
-		player = playerService.update(player);
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 
-		Assertions.assertEquals(10.0F, player.getWhs(), 0);
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		Player updPlayer = new Player();
+		updPlayer.setWhs(10.0F);
+		updPlayer.setId(1L);
+
+		updPlayer = playerService.update(updPlayer);
+
+		Assertions.assertEquals(10.0F, updPlayer.getWhs(), 0);
 	}
 
 	@DisplayName("Update player password")
 	@Transactional
 	@Test
-	void updatePlayerPasswordTest(@Autowired PlayerRepository playerRepository) {
+	void updatePlayerPasswordTest() {
 
-		String orgPlayerPwd = playerRepository.findById(1L).orElseThrow().getPassword();
+		var player = playerService.getPlayer(1L).orElseThrow();
 
-		Player player = new Player();
-		player.setPassword("newPassword");
-		player.setId(1L);
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 
-		player = playerService.update(player);
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
 
-		Assertions.assertNotSame(orgPlayerPwd, player.getPassword());
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		String orgPlayerPwd = player.getPassword();
+
+		Player updPlayer = new Player();
+		updPlayer.setPassword("newPassword");
+		updPlayer.setId(1L);
+
+		updPlayer = playerService.update(updPlayer);
+
+		Assertions.assertNotSame(orgPlayerPwd, updPlayer.getPassword());
 	}
 
 	@DisplayName("Add player on behalf test")
@@ -286,7 +306,7 @@ class PlayerServiceTest {
 		player.setSex(!Common.PLAYER_SEX_MALE);
 		playerService.updatePlayerOnBehalf(player, false);
 
-		Player persistedPlayer = playerRepository.getById(1L);
+		Player persistedPlayer = playerRepository.findById(1L).orElseThrow();
 
 		Assertions.assertEquals("Test", persistedPlayer.getNick());
 		Assertions.assertEquals(33.3F, persistedPlayer.getWhs());
@@ -375,7 +395,6 @@ class PlayerServiceTest {
 		player.setNick("Test.Pl");
 		player.setPassword("welcome");
 
-		GolfUserDetails response = playerService.authenticatePlayer(player);
 		player = playerRepository.findById(admin.getId()).orElseThrow();
 
 		Assertions.assertFalse(player.getModified());
