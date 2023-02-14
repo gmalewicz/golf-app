@@ -12,7 +12,6 @@ import com.greg.golf.security.RefreshTokenUtil;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -196,6 +195,9 @@ public class PlayerService {
 	@Transactional
 	public Player update(@NonNull Player player) {
 
+		// player can be updated only by himself
+		RoleVerification.verifyPlayer(player.getId(), "Attempt to update player result by unauthorized user");
+
 		var persistedPlayer = playerRepository.findById(player.getId()).orElseThrow();
 
 		if (player.getWhs() != null) {
@@ -266,11 +268,8 @@ public class PlayerService {
 
 		Optional<Player> player = playerRepository.findPlayerByNick(nick);
 
-		if (player.isEmpty()) {
-			return null;
-		}
+		return player.orElse(null);
 
-		return player.get();
 	}
 
 	@Transactional
