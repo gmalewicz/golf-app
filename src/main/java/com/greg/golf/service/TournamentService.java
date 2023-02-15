@@ -129,6 +129,9 @@ public class TournamentService {
     @Transactional
     public TournamentRound addRoundOnBehalf(Long tournamentId, Round round) {
 
+        var gc = new GregorianCalendar();
+        round.setRoundDate(gc.getTime());
+
         round = roundService.saveRound(round);
         entityManager.detach(round);
 
