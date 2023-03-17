@@ -6,14 +6,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.2</version>
+		<version>3.0.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.3.4</version>
+	<version>3.3.9</version>
 	<name>golf</name>
-	<description>DGNG - tournament fixes</description>
+	<description>DGNG - webscoket RECEIPT support</description>
 
 	<properties>
 		<java.version>17</java.version>
