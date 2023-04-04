@@ -7,12 +7,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class OnlineScoreCardDto {
 
-	@Schema(description = "Course identifier", example = "25", accessMode = READ_ONLY)
+
+	@ToString.Exclude
+	@Schema(description = "OnlineSCoreCard identifier", example = "25", accessMode = READ_ONLY)
 	private Long id;
 
 	@NotNull
@@ -39,6 +43,7 @@ public class OnlineScoreCardDto {
 			"false" })
 	private boolean update;
 
+	@ToString.Exclude
 	@Schema(description = "Time", example = "10:59", accessMode = READ_WRITE, minimum = "00:00", maximum = "23:59")
 	@Pattern(regexp = "^(0\\d|1\\d|2[0-3]):[0-5]\\d$")
 	private String time;

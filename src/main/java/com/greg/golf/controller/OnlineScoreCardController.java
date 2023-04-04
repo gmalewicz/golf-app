@@ -4,7 +4,6 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -49,7 +48,7 @@ public class OnlineScoreCardController extends BaseController {
 	@SendTo("/topic")
 	public OnlineScoreCardDto send(OnlineScoreCardDto onlineScoreCardDto) {
 
-		log.debug("Received s -  " + onlineScoreCardDto);
+		log.info("Received s -  " + onlineScoreCardDto);
 
 		var onlineScoreCard = modelMapper.map(onlineScoreCardDto, OnlineScoreCard.class);
 
@@ -64,7 +63,7 @@ public class OnlineScoreCardController extends BaseController {
 	public HttpStatus syncOnlineScoreCards(
 			@Parameter(description = "List of ScoreCard objects", required = true) @RequestBody List<OnlineScoreCardDto> onlineScoreCards) {
 
-		log.debug("Attempt to save hole result for online round");
+		log.info("Attempt to save hole result for online round");
 
 		List<OnlineScoreCard> oScoreCardLst = mapList(onlineScoreCards, OnlineScoreCard.class);
 
