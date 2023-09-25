@@ -176,4 +176,28 @@ public class ApiExceptionHandler {
 		var response = new ApiErrorResponse("20", "Player already added to the tournament.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(DuplicatePlayerInLeagueException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInLeagueException ex) {
+
+		var response = new ApiErrorResponse("21", "Player already added to the league.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(DuplicateMatchInLeagueException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicateMatchInLeagueException ex) {
+
+		var response = new ApiErrorResponse("22", "Match result already exists in the league.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler( MatchResultForNotLeaguePleayerException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(MatchResultForNotLeaguePleayerException ex) {
+
+		var response = new ApiErrorResponse("23", "Match result cannot be added for player who is not part of the league.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
 }

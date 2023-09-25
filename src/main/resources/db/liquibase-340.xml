@@ -20,4 +20,39 @@
 			</column>
 		</createTable>
 	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-15">
+		<createTable tableName="league_player">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="league_player_pkey"/>
+			</column>
+			<column name="league_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="player_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="nick" type="VARCHAR(20)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-16">
+		<createTable tableName="league_match">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="league_match_pkey"/>
+			</column>
+			<column name="league_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="winner_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="looser_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="result" type="VARCHAR(4)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
 </databaseChangeLog>
