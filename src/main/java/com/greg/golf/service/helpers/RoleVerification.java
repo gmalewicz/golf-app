@@ -23,10 +23,9 @@ public class RoleVerification {
 
     public static void verifyPlayer(Long playerId, String errorTxt) throws UnauthorizedException {
 
-        log.info(playerId.toString());
-        log.info(SecurityContextHolder.getContext().getAuthentication().getName());
-        log.info(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()).toString());
-
+        log.debug(playerId.toString());
+        log.debug(SecurityContextHolder.getContext().getAuthentication().getName());
+        log.debug(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()).toString());
 
         if (!Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()).equals(playerId)) {
 

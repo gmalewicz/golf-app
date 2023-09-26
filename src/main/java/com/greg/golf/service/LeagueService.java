@@ -42,9 +42,8 @@ public class LeagueService {
     @Transactional
     public void addPlayer(LeaguePlayer leaguePlayer) throws DuplicatePlayerInLeagueException {
 
-        var league = leagueRepository.findById(leaguePlayer.getLeagueId()).orElseThrow();
         // only league owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to add player by unauthorized user");
+        RoleVerification.verifyPlayer(leaguePlayer.getPlayerId(), "Attempt to add player by unauthorized user");
 
         //check if player exists
         var player = playerRepository.findById(leaguePlayer.getPlayerId()).orElseThrow();
@@ -123,6 +122,7 @@ public class LeagueService {
     @Transactional
     public List<LeagueMatch> getMatches(Long leagueId) {
 
+
         return leagueMatchRepository.findByLeagueId(leagueId);
 
     }
@@ -159,6 +159,18 @@ public class LeagueService {
         RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to delete league player result by unauthorized user");
 
         leagueMatchRepository.deleteByLeagueIdAndWinnerIdAndLooserId(leagueId, winnerId, looserId);
+
+    }
+
+    @Transactional
+    public void deleteLeague(Long leagueId) {
+
+        var league = leagueRepository.findById(leagueId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to delete league player result by unauthorized user");
+
+        leagueRepository.delete(league);
 
     }
 

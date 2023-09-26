@@ -145,4 +145,17 @@ public class LeagueController extends BaseController {
 
         return HttpStatus.OK;
     }
+
+    @Tag(name = "League API")
+    @Operation(summary = "Delete league for given id")
+    @DeleteMapping(value = "/rest/League/{leagueId}")
+    public HttpStatus deleteLeague(
+            @Parameter(description = "league id", example = "1", required = true) @PathVariable("leagueId") Long leagueId) {
+
+        log.info("Delete league: " + leagueId);
+
+        leagueService.deleteLeague(leagueId);
+
+        return HttpStatus.OK;
+    }
 }
