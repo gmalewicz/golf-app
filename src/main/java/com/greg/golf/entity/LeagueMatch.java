@@ -1,5 +1,6 @@
 package com.greg.golf.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,9 +16,9 @@ public class LeagueMatch {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ToString.Exclude
-	@Column(name = "league_id")
-	private Long leagueId;
+	//@ToString.Exclude
+	//@Column(name = "league_id")
+	//private Long leagueId;
 
 	@ToString.Exclude
 	@Column(name = "winner_id")
@@ -28,4 +29,11 @@ public class LeagueMatch {
 	@EqualsAndHashCode.Exclude
 	@Column(name = "result")
 	private String result;
+
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	@JsonIgnore
+	@JoinColumn(name = "league_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private League league;
 }

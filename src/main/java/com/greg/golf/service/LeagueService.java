@@ -20,6 +20,8 @@ import java.util.List;
 @Service("leagueService")
 public class LeagueService {
 
+    private static final String AUTHORIZATION_ERROR = "Attempt to add player by unauthorized user";
+
     private final LeagueRepository leagueRepository;
 
     private final PlayerRepository playerRepository;
@@ -29,9 +31,9 @@ public class LeagueService {
     private final LeagueMatchRepository leagueMatchRepository;
 
     @Transactional
-    public League addLeague(League league) {
+    public void addLeague(League league) {
 
-        return leagueRepository.save(league);
+        leagueRepository.save(league);
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +45,7 @@ public class LeagueService {
     public void addPlayer(LeaguePlayer leaguePlayer) throws DuplicatePlayerInLeagueException {
 
         // only league owner can do it
-        RoleVerification.verifyPlayer(leaguePlayer.getPlayerId(), "Attempt to add player by unauthorized user");
+        RoleVerification.verifyPlayer(leaguePlayer.getLeague().getPlayer().getId(), AUTHORIZATION_ERROR);
 
         //check if player exists
         var player = playerRepository.findById(leaguePlayer.getPlayerId()).orElseThrow();
@@ -61,42 +63,24 @@ public class LeagueService {
     }
 
     @Transactional
-    public void deletePlayers(Long leagueId) {
+    public void deletePlayer(Long leagueId, long playerId) throws PlayerHasMatchException {
 
         var league = leagueRepository.findById(leagueId).orElseThrow();
 
-        // only tournament owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to delete league player result by unauthorized user");
+        // only league owner can do it
+        RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
-        // remove only if tournaments does not have any results
-        //TO DO
-
-        //if (tournamentResultRepository.findByTournament(tournament).isEmpty()) {
-            leaguePlayerRepository.deleteByLeagueId(leagueId);
-        //} else {
-        //    throw new DeleteTournamentPlayerException();
-        //}
-
-    }
-
-    @Transactional
-    public void deletePlayer(Long leagueId, long playerId) {
-
-        var league = leagueRepository.findById(leagueId).orElseThrow();
-
-        // only tournament owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to delete league player result by unauthorized user");
+        // verify if player can be deleted. He cannot participate in any match.
+        league.getLeagueMatches().forEach(match -> {
+            if (match.getWinnerId() == playerId || match.getLooserId() == playerId) {
+                throw new PlayerHasMatchException();
+            }
+        });
 
         var player = new Player();
         player.setId(playerId);
 
-        // remove only if tournaments does not have any results
-        //TO DO
-        //if (tournamentResultRepository.findByPlayerAndTournament(player, tournament).isEmpty()) {
-            leaguePlayerRepository.deleteByLeagueIdAndPlayerId(leagueId, playerId);
-        //} else {
-        //    throw new DeleteTournamentPlayerException();
-        //}
+        leaguePlayerRepository.deleteByLeagueIdAndPlayerId(leagueId, playerId);
     }
 
     @Transactional
@@ -112,7 +96,7 @@ public class LeagueService {
         var league = leagueRepository.findById(leagueId).orElseThrow();
 
         // only tournament owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to close league by unauthorized user");
+        RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // set close flag
         league.setStatus(League.STATUS_CLOSE);
@@ -129,14 +113,14 @@ public class LeagueService {
 
     public void addMatch(LeagueMatch leagueMatch) throws DuplicateMatchInLeagueException, MatchResultForNotLeaguePleayerException {
 
-        var league = leagueRepository.findById(leagueMatch.getLeagueId()).orElseThrow();
+        var league = leagueRepository.findById(leagueMatch.getLeague().getId()).orElseThrow();
 
         // only league owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to add player by unauthorized user");
+        RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // match cannot be added twice
         if (!leagueMatchRepository
-                .findByWinnerIdAndLooserIdAndLeagueId(leagueMatch.getWinnerId(), leagueMatch.getLooserId(), leagueMatch.getLeagueId()).isEmpty()) {
+                .findByWinnerIdAndLooserIdAndLeague(leagueMatch.getWinnerId(), leagueMatch.getLooserId(), leagueMatch.getLeague()).isEmpty()) {
             throw new DuplicateMatchInLeagueException();
         }
 
@@ -156,7 +140,7 @@ public class LeagueService {
         var league = leagueRepository.findById(leagueId).orElseThrow();
 
         // only tournament owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to delete league player result by unauthorized user");
+        RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         leagueMatchRepository.deleteByLeagueIdAndWinnerIdAndLooserId(leagueId, winnerId, looserId);
 
@@ -168,7 +152,7 @@ public class LeagueService {
         var league = leagueRepository.findById(leagueId).orElseThrow();
 
         // only tournament owner can do it
-        RoleVerification.verifyPlayer(league.getPlayer().getId(), "Attempt to delete league player result by unauthorized user");
+        RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         leagueRepository.delete(league);
 

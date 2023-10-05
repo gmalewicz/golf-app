@@ -1,12 +1,6 @@
 package com.greg.golf.service;
 
-import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.*;
-import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.UnauthorizedException;
-import com.greg.golf.repository.CycleRepository;
-import com.greg.golf.repository.CycleResultRepository;
-import com.greg.golf.repository.CycleTournamentRepository;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -16,21 +10,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
@@ -69,7 +54,7 @@ class LeagueServiceTest {
     @Test
     void addLeagueTest() {
 
-        league = leagueService.addLeague(league);
+        leagueService.addLeague(league);
 
         assertNotNull(league.getId());
     }

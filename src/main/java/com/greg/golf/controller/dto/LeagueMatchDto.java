@@ -17,8 +17,8 @@ public class LeagueMatchDto {
 	private Long id;
 
 	@NotNull
-	@Schema(description = "League identifier", example = "25", accessMode = READ_WRITE)
-	private Long leagueId;
+	@Schema(description = "League object", accessMode = READ_WRITE)
+	private LeagueDto league;
 
 	@NotNull
 	@Schema(description = "Winner identifier", example = "25", accessMode = READ_WRITE)
@@ -27,7 +27,7 @@ public class LeagueMatchDto {
 	@NotNull
 	@Schema(description = "Looser identifier", example = "25", accessMode = READ_WRITE)
 	private Long looserId;
-
+	@NotNull
 	@Size(min = 3, max = 4, message = "Result must be between 3 and 4 characters")
 	@Schema(description = "Match result", example = "A/S", accessMode = READ_WRITE, maxLength=4)
 	private String result;

@@ -23,6 +23,7 @@ public class LeagueDto {
 	@Schema(description = "League status: false - open, true - close", example = "false", accessMode = READ_WRITE)
 	private Boolean status;
 
+	@NotNull
 	@Schema(description = "League owner", accessMode = READ_WRITE)
 	private PlayerDto player;
 }

@@ -35,7 +35,7 @@ public class LeagueController extends BaseController {
     @Operation(summary = "Adds league")
     @PostMapping(value = "/rest/League")
     public HttpStatus addLeague(
-            @Parameter(description = "League object", required = true) @RequestBody LeagueDto leagueDto) {
+            @Parameter(description = "League object", required = true) @RequestBody @Valid LeagueDto leagueDto) {
 
         log.info("trying to add league: " + leagueDto.getName());
 
@@ -59,7 +59,7 @@ public class LeagueController extends BaseController {
     public HttpStatus addPlayer(
             @Parameter(description = "LeaguePlayer object", required = true) @RequestBody @Valid LeaguePlayerDto leaguePlayerDto) {
 
-        log.info("trying to add league player: " + leaguePlayerDto);
+        log.info("trying to add league player: " + leaguePlayerDto.getNick());
 
         leagueService.addPlayer(modelMapper.map(leaguePlayerDto, LeaguePlayer.class));
 
@@ -67,20 +67,15 @@ public class LeagueController extends BaseController {
     }
 
     @Tag(name = "League API")
-    @Operation(summary = "Delete player participant or all players from league")
-    @DeleteMapping(value = {"/rest/LeaguePlayer/{leagueId}/{playerId}", "/rest/LeaguePlayer/{leagueId}"})
+    @Operation(summary = "Delete player participant from league")
+    @DeleteMapping(value = "/rest/LeaguePlayer/{leagueId}/{playerId}")
     public HttpStatus deletePlayer(
             @Parameter(description = "League id", example = "1", required = true) @PathVariable("leagueId") Long leagueId,
-            @Parameter(description = "Player id", example = "1") @PathVariable(name = "playerId", required = false) Long playerId) {
+            @Parameter(description = "Player id", example = "1", required = true) @PathVariable(name = "playerId", required = false) Long playerId) {
 
         log.info("Delete league player: " + playerId + " for league " + leagueId);
 
-        if (playerId != null) {
-
-            leagueService.deletePlayer(leagueId, playerId);
-        } else {
-            leagueService.deletePlayers(leagueId);
-        }
+        leagueService.deletePlayer(leagueId, playerId);
 
         return HttpStatus.OK;
     }

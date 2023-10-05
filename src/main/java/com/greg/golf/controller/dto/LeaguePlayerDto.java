@@ -21,8 +21,8 @@ public class LeaguePlayerDto {
 	private Long playerId;
 
 	@NotNull
-	@Schema(description = "League identifier", example = "25", accessMode = READ_WRITE)
-	private Long leagueId;
+	@Schema(description = "League object", accessMode = READ_WRITE)
+	private LeagueDto league;
 
 	@Size(min = 1, max = 20, message = "Nick must be between 1 and 20 characters")
 	@Schema(description = "Player nick name", example = "golfer", accessMode = READ_ONLY, maxLength=20)

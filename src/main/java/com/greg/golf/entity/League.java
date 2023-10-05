@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "league")
@@ -32,4 +34,14 @@ public class League {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;
+
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "league")
+	private List<LeaguePlayer> leaguePlayers;
+
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "league")
+	private List<LeagueMatch> leagueMatches;
 }
