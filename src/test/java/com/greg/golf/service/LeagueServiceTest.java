@@ -94,6 +94,8 @@ class LeagueServiceTest {
     @Test
     void addLeaguePlayerByUnauthorizedUserTest() {
 
+        league.setStatus(League.STATUS_OPEN);
+        leaguePlayer.setPlayerId(1L);
         leagueService.addLeague(league);
         leaguePlayer.setLeague(league);
 
@@ -112,6 +114,7 @@ class LeagueServiceTest {
     void addLeaguePlayerForClosedLeagueTest() {
 
         league.setStatus(League.STATUS_CLOSE);
+        leaguePlayer.setPlayerId(1L);
         leagueService.addLeague(league);
         leaguePlayer.setLeague(league);
 
