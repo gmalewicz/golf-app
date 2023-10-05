@@ -15,11 +15,6 @@ public class LeagueMatch {
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	//@ToString.Exclude
-	//@Column(name = "league_id")
-	//private Long leagueId;
-
 	@ToString.Exclude
 	@Column(name = "winner_id")
 	private Long winnerId;

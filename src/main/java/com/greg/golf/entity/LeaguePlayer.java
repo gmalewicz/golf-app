@@ -20,10 +20,6 @@ public class LeaguePlayer {
 	@Column(name = "player_id")
 	private Long playerId;
 
-	//@ToString.Exclude
-	//@Column(name = "league_id")
-	//private Long leagueId;
-
 	@EqualsAndHashCode.Exclude
 	@Column(name = "nick")
 	private String nick;

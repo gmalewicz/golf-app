@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @Service("leagueService")
@@ -38,14 +37,20 @@ public class LeagueService {
 
     @Transactional(readOnly = true)
     public List<League> findAllLeagues() {
+
         return leagueRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     @Transactional
-    public void addPlayer(LeaguePlayer leaguePlayer) throws DuplicatePlayerInLeagueException {
+    public void addPlayer(LeaguePlayer leaguePlayer) throws DuplicatePlayerInLeagueException, UnauthorizedException {
 
         // only league owner can do it
         RoleVerification.verifyPlayer(leaguePlayer.getLeague().getPlayer().getId(), AUTHORIZATION_ERROR);
+
+        // league must be opened
+        if (leaguePlayer.getLeague().getStatus() == League.STATUS_CLOSE) {
+            throw new LeagueClosedException();
+        }
 
         //check if player exists
         var player = playerRepository.findById(leaguePlayer.getPlayerId()).orElseThrow();
@@ -54,10 +59,10 @@ public class LeagueService {
         leaguePlayer.setNick(player.getNick());
 
         // save entity
-        // trow exception if player has been already added to the tournament
-        try {
+        // trow exception if player has been already added to the league
+        if (leaguePlayerRepository.findByLeagueIdAndPlayerId(leaguePlayer.getLeague().getId(), leaguePlayer.getPlayerId()).isEmpty()) {
             leaguePlayerRepository.save(leaguePlayer);
-        } catch (Exception ex) {
+        } else {
             throw new DuplicatePlayerInLeagueException();
         }
     }
@@ -69,6 +74,11 @@ public class LeagueService {
 
         // only league owner can do it
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
+
+        // league must be opened
+        if (league.getStatus() == League.STATUS_CLOSE) {
+            throw new LeagueClosedException();
+        }
 
         // verify if player can be deleted. He cannot participate in any match.
         league.getLeagueMatches().forEach(match -> {
@@ -98,6 +108,11 @@ public class LeagueService {
         // only tournament owner can do it
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
+        // league must be opened
+        if (league.getStatus() == League.STATUS_CLOSE) {
+            throw new LeagueClosedException();
+        }
+
         // set close flag
         league.setStatus(League.STATUS_CLOSE);
         leagueRepository.save(league);
@@ -117,6 +132,11 @@ public class LeagueService {
 
         // only league owner can do it
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
+
+        // league must be opened
+        if (league.getStatus() == League.STATUS_CLOSE) {
+            throw new LeagueClosedException();
+        }
 
         // match cannot be added twice
         if (!leagueMatchRepository
@@ -141,6 +161,11 @@ public class LeagueService {
 
         // only tournament owner can do it
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
+
+        // league must be opened
+        if (league.getStatus() == League.STATUS_CLOSE) {
+            throw new LeagueClosedException();
+        }
 
         leagueMatchRepository.deleteByLeagueIdAndWinnerIdAndLooserId(leagueId, winnerId, looserId);
 

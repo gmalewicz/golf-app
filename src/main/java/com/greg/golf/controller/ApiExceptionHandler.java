@@ -208,4 +208,12 @@ public class ApiExceptionHandler {
 		var response = new ApiErrorResponse("24", "Player who played at least one match cannot be deleted.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler( LeagueClosedException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(LeagueClosedException ex) {
+
+		var response = new ApiErrorResponse("24", "League must be opened.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
 }
