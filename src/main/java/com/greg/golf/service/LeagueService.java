@@ -76,7 +76,7 @@ public class LeagueService {
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // league must be opened
-        if (league.getStatus() == League.STATUS_CLOSE) {
+        if (league.getStatus().equals(League.STATUS_CLOSE)) {
             throw new LeagueClosedException();
         }
 
@@ -87,9 +87,7 @@ public class LeagueService {
             }
         });
 
-        var player = new Player();
-        player.setId(playerId);
-
+        league.getLeaguePlayers().removeIf(p ->  p.getPlayerId().equals(playerId) && p.getLeague().getId().equals(leagueId));
         leaguePlayerRepository.deleteByLeagueIdAndPlayerId(leagueId, playerId);
     }
 
@@ -109,7 +107,7 @@ public class LeagueService {
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // league must be opened
-        if (league.getStatus() == League.STATUS_CLOSE) {
+        if (league.getStatus().equals(League.STATUS_CLOSE)) {
             throw new LeagueClosedException();
         }
 

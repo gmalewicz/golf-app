@@ -10,11 +10,9 @@ import java.util.Optional;
 @Repository
 public interface LeaguePlayerRepository extends JpaRepository<LeaguePlayer, Long> {
 
-    void deleteByLeagueId(Long leagueId);
-
     void deleteByLeagueIdAndPlayerId(Long leagueId, Long playerId);
 
     List<LeaguePlayer> findByLeagueId(Long leagueId);
 
-    Optional<LeaguePlayer> findByLeagueIdAndPlayerId(Long leagueId, Long playerId);
+   Optional<LeaguePlayer> findByLeagueIdAndPlayerId(Long leagueId, Long playerId);
 }
