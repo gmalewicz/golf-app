@@ -132,7 +132,7 @@ public class LeagueService {
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // league must be opened
-        if (league.getStatus() == League.STATUS_CLOSE) {
+        if (league.getStatus().equals(League.STATUS_CLOSE)) {
             throw new LeagueClosedException();
         }
 
@@ -161,7 +161,7 @@ public class LeagueService {
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // league must be opened
-        if (league.getStatus() == League.STATUS_CLOSE) {
+        if (league.getStatus().equals(League.STATUS_CLOSE)) {
             throw new LeagueClosedException();
         }
 

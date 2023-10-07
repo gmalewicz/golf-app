@@ -216,7 +216,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("2", "fake", authorities));
 
-        assertThrows(UnauthorizedException.class, () -> this.leagueService.deletePlayer(league.getId(), 1L));
+        var leagueId = league.getId();
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.deletePlayer(leagueId, 1L));
 
     }
 
@@ -237,7 +238,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("1", "fake", authorities));
 
-        assertThrows(LeagueClosedException.class, () -> this.leagueService.deletePlayer(league.getId(), 1L));
+        var leagueId = league.getId();
+        assertThrows(LeagueClosedException.class, () -> this.leagueService.deletePlayer(leagueId, 1L));
 
     }
 
@@ -267,7 +269,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("1", "fake", authorities));
 
-        assertThrows(PlayerHasMatchException.class, () -> this.leagueService.deletePlayer(league.getId(), 1L));
+        var leagueId = league.getId();
+        assertThrows(PlayerHasMatchException.class, () -> this.leagueService.deletePlayer(leagueId, 1L));
 
     }
 
@@ -300,10 +303,10 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("1", "fake", authorities));
 
+        var leagueId = league.getId();
+        leagueService.deletePlayer(leagueId, 1L);
 
-        leagueService.deletePlayer(league.getId(), 1L);
-
-        assertEquals(0, leagueService.getLeaguePlayers(league.getId()).size());
+        assertEquals(0, leagueService.getLeaguePlayers(leagueId).size());
     }
 
     @DisplayName("Should not close league by unauthorized user")
@@ -323,7 +326,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("2", "fake", authorities));
 
-        assertThrows(UnauthorizedException.class, () -> this.leagueService.closeLeague(league.getId()));
+        var leagueId = league.getId();
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.closeLeague(leagueId));
     }
 
     @DisplayName("Should not close league that has been already closed")
@@ -343,7 +347,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("1", "fake", authorities));
 
-        assertThrows(LeagueClosedException.class, () -> this.leagueService.closeLeague(league.getId()));
+        var leagueId = league.getId();
+        assertThrows(LeagueClosedException.class, () -> this.leagueService.closeLeague(leagueId));
     }
 
     @DisplayName("Should close league")
@@ -443,7 +448,8 @@ class LeagueServiceTest {
 
         leagueService.addMatch(leagueMatch);
 
-        assertEquals(1, this.leagueService.getMatches(league.getId()).size());
+        var leagueId = league.getId();
+        assertEquals(1, this.leagueService.getMatches(leagueId).size());
 
         assertThrows(DuplicateMatchInLeagueException.class, () -> this.leagueService.addMatch(leagueMatch));
     }
@@ -555,11 +561,12 @@ class LeagueServiceTest {
 
         leagueService.addMatch(leagueMatch);
 
-        assertEquals(1, leagueService.getMatches(league.getId()).size());
+        var leagueId = league.getId();
+        assertEquals(1, leagueService.getMatches(leagueId).size());
 
         leagueService.deleteMatch(league.getId(), 2L, 1L);
 
-        assertEquals(0, leagueService.getMatches(league.getId()).size());
+        assertEquals(0, leagueService.getMatches(leagueId).size());
 
     }
 
@@ -598,7 +605,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("2", "fake", authorities));
 
-        assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteMatch(league.getId(), 2L, 1L));
+        var leagueId = league.getId();
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteMatch(leagueId, 2L, 1L));
 
     }
 
@@ -637,7 +645,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("1", "fake", authorities));
 
-        assertThrows(LeagueClosedException.class, () -> this.leagueService.deleteMatch(league.getId(), 2L, 1L));
+        var leagueId = league.getId();
+        assertThrows(LeagueClosedException.class, () -> this.leagueService.deleteMatch(leagueId, 2L, 1L));
 
     }
 
@@ -681,7 +690,8 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("2", "fake", authorities));
 
-        assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteLeague(league.getId()));
+        var leagueId = league.getId();
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteLeague(leagueId));
 
     }
 
