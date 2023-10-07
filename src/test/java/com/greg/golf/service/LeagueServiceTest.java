@@ -2,11 +2,10 @@ package com.greg.golf.service;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.DuplicatePlayerInLeagueException;
-import com.greg.golf.error.LeagueClosedException;
-import com.greg.golf.error.PlayerHasMatchException;
-import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.error.*;
 import com.greg.golf.repository.LeagueMatchRepository;
+import com.greg.golf.repository.LeaguePlayerRepository;
+import com.greg.golf.repository.LeagueRepository;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -367,6 +366,323 @@ class LeagueServiceTest {
         this.leagueService.closeLeague(league.getId());
 
         assertTrue(this.leagueService.findAllLeagues().get(0).getStatus());
+    }
+
+    @DisplayName("Should not add match by unauthorized user")
+    @Transactional
+    @Test
+    void addMatchByUnauthorizedUserTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(2L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Test");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("2", "fake", authorities));
+
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.addMatch(leagueMatch));
+    }
+
+    @DisplayName("Should add match to the league")
+    @Transactional
+    @Test
+    void addMatchTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(2L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Test");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+        leagueService.addMatch(leagueMatch);
+
+        assertEquals(1, this.leagueService.getMatches(league.getId()).size());
+
+        assertThrows(DuplicateMatchInLeagueException.class, () -> this.leagueService.addMatch(leagueMatch));
+    }
+
+    @DisplayName("Should add match to the closed league")
+    @Transactional
+    @Test
+    void addMatchToClosedLeagueTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_CLOSE);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(2L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Test");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+        assertThrows(LeagueClosedException.class, () -> this.leagueService.addMatch(leagueMatch));
+    }
+
+    @DisplayName("Should not add match to the league if player is not league participant")
+    @Transactional
+    @Test
+    void addMatchToLeagueWithWrongPlayerTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+        assertThrows(MatchResultForNotLeaguePleayerException.class, () -> this.leagueService.addMatch(leagueMatch));
+    }
+
+    @DisplayName("Should delete match")
+    @Transactional
+    @Test
+    void deleteMatchTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(2L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Test");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+        leagueService.addMatch(leagueMatch);
+
+        assertEquals(1, leagueService.getMatches(league.getId()).size());
+
+        leagueService.deleteMatch(league.getId(), 2L, 1L);
+
+        assertEquals(0, leagueService.getMatches(league.getId()).size());
+
+    }
+
+    @DisplayName("Should not delete match for unauthorized user")
+    @Transactional
+    @Test
+    void deleteMatchByUnauthorizedUserTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(2L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Test");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("2", "fake", authorities));
+
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteMatch(league.getId(), 2L, 1L));
+
+    }
+
+    @DisplayName("Should not delete match for closed league")
+    @Transactional
+    @Test
+    void deleteMatchForClosedLeagueTest(@Autowired LeagueRepository leagueRepository, @Autowired LeaguePlayerRepository leaguePlayerRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_CLOSE);
+        league.setName("Test league");
+        leagueRepository.save(league);
+
+        var leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(1L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Greg");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        leaguePlayer = new LeaguePlayer();
+        leaguePlayer.setPlayerId(2L);
+        leaguePlayer.setLeague(league);
+        leaguePlayer.setNick("Test");
+        leaguePlayerRepository.save(leaguePlayer);
+
+        var leagueMatch = new LeagueMatch();
+        leagueMatch.setLooserId(1L);
+        leagueMatch.setWinnerId(2L);
+        leagueMatch.setResult("A/S");
+        leagueMatch.setLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+        assertThrows(LeagueClosedException.class, () -> this.leagueService.deleteMatch(league.getId(), 2L, 1L));
+
+    }
+
+    @DisplayName("Should delete league")
+    @Transactional
+    @Test
+    void deleteLeagueTest() {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueService.addLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+        leagueService.deleteLeague(league.getId());
+
+        assertEquals(0, leagueService.findAllLeagues().size());
+
+    }
+
+    @DisplayName("Should not delete league by unauthorized user")
+    @Transactional
+    @Test
+    void deleteLeagueByUnauthorizedUserTest() {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueService.addLeague(league);
+
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("2", "fake", authorities));
+
+        assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteLeague(league.getId()));
+
     }
 
     @AfterAll
