@@ -132,7 +132,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus closeTournament(
 			@Parameter(description = "Tournament id to be closed", required = true) @PathVariable("tournamentId") Long tournamentId) {
 
-		log.info("trying to close cycle: " + tournamentId);
+		log.info("trying to close tournament: " + tournamentId);
 
 		tournamentService.closeTournament(tournamentId);
 

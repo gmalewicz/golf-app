@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="2000000000001-15">
+		<createTable tableName="league">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="leaguePK"/>
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="status" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column name="player_id" type="int">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-15">
+		<createTable tableName="league_player">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="league_player_pkey"/>
+			</column>
+			<column name="league_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="player_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="nick" type="VARCHAR(20)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="2000000000001-16">
+		<createTable tableName="league_match">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="league_match_pkey"/>
+			</column>
+			<column name="league_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="winner_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="looser_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="result" type="VARCHAR(4)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

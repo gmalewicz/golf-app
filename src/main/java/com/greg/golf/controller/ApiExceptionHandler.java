@@ -153,7 +153,7 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(ScoreCardUpdateException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(ScoreCardUpdateException ex) {
 		
@@ -161,7 +161,7 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(DeleteTournamentPlayerException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DeleteTournamentPlayerException ex) {
 
@@ -169,11 +169,51 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(DuplicatePlayerInTournamentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInTournamentException ex) {
 
 		var response = new ApiErrorResponse("20", "Player already added to the tournament.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler(DuplicatePlayerInLeagueException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInLeagueException ex) {
+
+		var response = new ApiErrorResponse("21", "Player already added to the league.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler(DuplicateMatchInLeagueException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicateMatchInLeagueException ex) {
+
+		var response = new ApiErrorResponse("22", "Match result already exists in the league.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler( MatchResultForNotLeaguePleayerException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(MatchResultForNotLeaguePleayerException ex) {
+
+		var response = new ApiErrorResponse("23", "Match result cannot be added for player who is not part of the league.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler( PlayerHasMatchException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerHasMatchException ex) {
+
+		var response = new ApiErrorResponse("24", "Player who played at least one match cannot be deleted.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler( LeagueClosedException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(LeagueClosedException ex) {
+
+		var response = new ApiErrorResponse("24", "League must be opened.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 }

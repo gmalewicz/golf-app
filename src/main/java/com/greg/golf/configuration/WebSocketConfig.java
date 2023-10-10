@@ -32,6 +32,9 @@ import java.util.Map;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+	private static final String SIMP_MESSAGE_TYPE = "simpMessageType";
+	private static final String STOMP_COMMAND = "stompCommand";
+
 	@Getter
 	@Setter
 	private String allowedOrigins;
@@ -69,6 +72,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	}
 
 	class OutboundMessageInterceptor implements ChannelInterceptor {
+		@Override
 		public void postSend(@NonNull Message message,
 							 @NonNull MessageChannel channel,
 							 boolean sent) {
@@ -79,15 +83,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	class InboundMessageInterceptor implements ChannelInterceptor {
 
+		@Override
 		public Message<?> preSend(@NonNull Message message, @NonNull MessageChannel channel) {
 			log.debug("preSend: "+message );
 			GenericMessage<?> genericMessage = (GenericMessage<?>)message;
 			MessageHeaders headers = genericMessage.getHeaders();
 			String simpSessionId = (String)headers.get( "simpSessionId" );
-			if( ( SimpMessageType.MESSAGE.equals( headers.get( "simpMessageType" ) ) &&
-					StompCommand.SEND.equals( headers.get( "stompCommand" ) ) ) ||
-					( SimpMessageType.SUBSCRIBE.equals( headers.get( "simpMessageType" ) ) &&
-							StompCommand.SUBSCRIBE.equals( headers.get( "stompCommand" ) ) ) &&
+			if( ( SimpMessageType.MESSAGE.equals( headers.get( SIMP_MESSAGE_TYPE ) ) &&
+					StompCommand.SEND.equals( headers.get( STOMP_COMMAND ) ) ) ||
+					( SimpMessageType.SUBSCRIBE.equals( headers.get( SIMP_MESSAGE_TYPE ) ) &&
+							StompCommand.SUBSCRIBE.equals( headers.get( STOMP_COMMAND ) ) ) &&
 							( simpSessionId != null ) ) {
 				Map<String, List<String>> nativeHeaders = (Map<String,List<String>>)headers.get( "nativeHeaders" );
 				if( nativeHeaders != null ) {
@@ -105,8 +110,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		private void sendReceipt( String rid, String simpSessionId ) {
 			if( outChannel != null ) {
 				HashMap<String,Object> rcptHeaders = new HashMap<>();
-				rcptHeaders.put( "simpMessageType", SimpMessageType.OTHER );
-				rcptHeaders.put( "stompCommand", StompCommand.RECEIPT );
+				rcptHeaders.put( SIMP_MESSAGE_TYPE, SimpMessageType.OTHER );
+				rcptHeaders.put( STOMP_COMMAND, StompCommand.RECEIPT );
 				rcptHeaders.put( "simpSessionId", simpSessionId );
 				HashMap<String,List<String>> nativeHeaders = new HashMap<>();
 				ArrayList<String> receiptElements = new ArrayList<>();

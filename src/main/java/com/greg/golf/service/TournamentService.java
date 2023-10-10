@@ -589,7 +589,7 @@ public class TournamentService {
 
         var tournament = tournamentRepository.findById(tournamentPlayer.getTournamentId()).orElseThrow();
         // only tournament owner can do it
-        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to close tournament result by unauthorized user");
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to add player by unauthorized user");
 
         //check if player exists
         var player = playerRepository.findById(tournamentPlayer.getPlayerId()).orElseThrow();
