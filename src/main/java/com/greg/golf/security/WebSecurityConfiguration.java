@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -82,23 +83,24 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 			);
 
 		httpSecurity
-			.exceptionHandling()
-			.authenticationEntryPoint(jwtAuthenticationEntryPoint);
+			.exceptionHandling(exceptionHandling -> exceptionHandling
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
 		httpSecurity
-			.oauth2Login()
-				.userInfoEndpoint()
-					.userService(oauth2UserService)
-				.and()
+			.oauth2Login(oauth2Login -> oauth2Login
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+						.userService(oauth2UserService)
+				)
 				.successHandler(golfAuthenticationSuccessHandler)
-				.failureHandler(golfAuthenticationFailureHandler);
+				.failureHandler(golfAuthenticationFailureHandler)
+		);
 
 		httpSecurity
 			.sessionManagement(session -> session
 					.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		httpSecurity
-			.cors();
+			.cors(Customizer.withDefaults());
 
 		CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
 		XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
@@ -106,7 +108,7 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 		delegate.setCsrfRequestAttributeName(null);
 		// Use only the handle() method of XorCsrfTokenRequestAttributeHandler and the
 		// default implementation of resolveCsrfTokenValue() from CsrfTokenRequestHandler
-		CsrfTokenRequestHandler requestHandler = delegate::handle;
+		CsrfTokenRequestHandler requestHandler = delegate;
 
 		httpSecurity
 			.csrf(csrf -> csrf
