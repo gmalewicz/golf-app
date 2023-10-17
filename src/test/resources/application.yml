@@ -44,7 +44,7 @@ spring:
     username: golf_usr
     password: welcome
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    database-platform: org.hibernate.dialect.PostgresPlusDialect
     open-in-view: true 
     generate-ddl: false 
     show_sql: false
