@@ -108,7 +108,7 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 		delegate.setCsrfRequestAttributeName(null);
 		// Use only the handle() method of XorCsrfTokenRequestAttributeHandler and the
 		// default implementation of resolveCsrfTokenValue() from CsrfTokenRequestHandler
-		CsrfTokenRequestHandler requestHandler = delegate;
+		CsrfTokenRequestHandler requestHandler = delegate::handle;
 
 		httpSecurity
 			.csrf(csrf -> csrf
