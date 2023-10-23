@@ -104,7 +104,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 					// clear cache for the player that has been modified
 					this.playerService.cacheEvict(player);
 					log.debug("Modifications detected for player " + player.getNick());
-					//return;
 				}
 
 				// if token is valid configure Spring Security to manually set
