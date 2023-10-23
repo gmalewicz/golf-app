@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.4.0</version>
+	<version>3.4.4</version>
 	<name>golf</name>
-	<description>support for MP league</description>
+	<description>player data update moved to header</description>
 
 	<properties>
 		<java.version>17</java.version>
