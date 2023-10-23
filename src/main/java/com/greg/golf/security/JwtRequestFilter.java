@@ -40,6 +40,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private static final String REFRESH = "Refresh";
 	private static final String REFRESH_TOKEN = "refreshToken";
 
+	private static final String HCP_HEADER= "hcp";
+
+	private static final String SEX_HEADER= "sex";
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
 			throws ServletException, IOException {
@@ -77,13 +81,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		}
 
 		// Once we get the token validate it.
-		validateToken(userId, request);
+		validateToken(userId, request, response);
 
 		chain.doFilter(request, response);
 
 	}
 
-	private void validateToken(String userId, HttpServletRequest request) {
+	private void validateToken(String userId, HttpServletRequest request, HttpServletResponse response) {
 
 		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -100,7 +104,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 					// clear cache for the player that has been modified
 					this.playerService.cacheEvict(player);
 					log.debug("Modifications detected for player " + player.getNick());
-					return;
 				}
 
 				// if token is valid configure Spring Security to manually set
@@ -113,6 +116,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				}
 
 				UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), authorities);
+
+				//add whs to the response header to be used by frontend to updated player data
+				response.addHeader(HCP_HEADER, player.getWhs().toString());
+				response.addHeader(SEX_HEADER, player.getSex().toString());
 
 				var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 						userDetails.getAuthorities());
