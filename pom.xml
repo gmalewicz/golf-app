@@ -6,24 +6,24 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.4</version>
+		<version>3.1.5</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.4.4</version>
+	<version>3.4.6</version>
 	<name>golf</name>
-	<description>player data update moved to header</description>
+	<description>libraries update</description>
 
 	<properties>
 		<java.version>17</java.version>
-		<guava.version>31.1-jre</guava.version>
+		<guava.version>32.0.0-jre</guava.version>
 		<springdoc.version>1.7.0</springdoc.version>
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
 		<hibernate-types-60.version>2.21.1</hibernate-types-60.version>
-		<modelmapper.version>3.1.1</modelmapper.version>
+		<modelmapper.version>3.2.0</modelmapper.version>
 		<liquibase-maven-plugin.version>4.17.0</liquibase-maven-plugin.version>
-		<org.testcontainers.postgresql.version>1.18.1</org.testcontainers.postgresql.version>
+		<org.testcontainers.postgresql.version>1.19.1</org.testcontainers.postgresql.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
@@ -264,7 +264,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.10</version>
+				<version>0.8.11</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -297,7 +297,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>properties-maven-plugin</artifactId>
-						<version>1.1.0</version>
+						<version>1.2.0</version>
 						<executions>
 							<execution>
 								<phase>initialize</phase>
