@@ -23,7 +23,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: Set up JDK 17
       uses: actions/setup-java@v3
@@ -39,12 +39,14 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-                
-    - name: Buiild & analyze with SonarCloud
+
+    # only if it is not dependabot push
+    - name: Build & analyze with SonarCloud
+      if: ${{ github.actor != 'dependabot[bot]' }}
       run: mvn -B verify sonar:sonar --file ./pom.xml
         -Dsonar.organization=gmalewicz 
         -Dsonar.host.url=https://sonarcloud.io 
-        -Dsonar.login=$SONAR_TOKEN 
+        -Dsonar.token=$SONAR_TOKEN 
         -Dsonar.projectName=gmalewicz_golf-app
         -Dsonar.java.source=13
         -Dsonar.sources=src/main/java,src/main/resources/templates
@@ -56,8 +58,17 @@ jobs:
         google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
         google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-              
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    # dedicated for dependabot only
+    - name: Build & analyze without SonarCloud
+      if: ${{ github.actor == 'dependabot[bot]' }}
+      run: mvn -B verify --file ./pom.xml
+      env:
+        google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+        google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Rename the file 
       if: startsWith(github.ref, 'refs/tags/')
       #if: always()
