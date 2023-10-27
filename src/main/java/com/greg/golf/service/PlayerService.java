@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.greg.golf.captcha.ICaptchaService;
 import com.greg.golf.configurationproperties.PlayerServiceConfig;
+import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.repository.projection.PlayerRoundCnt;
 import com.greg.golf.security.JwtTokenUtil;
 import com.greg.golf.security.RefreshTokenUtil;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -278,5 +280,16 @@ public class PlayerService {
 		RoleVerification.verifyRole(Common.ADMIN, "Attempt to get player statistic by unauthorized user");
 
 		return playerRepository.getPlayerRoundCnt();
+	}
+
+	@Transactional(readOnly = true)
+	public List<Player> searchForPlayer(String nick, Integer pageNo) throws TooShortStringForSearchException {
+
+		if (nick.length() < playerServiceConfig.getMinSearchLength()) {
+			throw new TooShortStringForSearchException();
+		}
+
+		return playerRepository.findByNickContainingIgnoreCaseOrderByNickAsc(nick,
+				PageRequest.of(pageNo, playerServiceConfig.getPageSize()));
 	}
 }

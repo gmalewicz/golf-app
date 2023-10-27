@@ -72,5 +72,7 @@ course:
   minSearchLength: 3
 player:
   tempPwd: welcome
+  pageSize: 5
+  minSearchLength: 3
 oauth2:
   redirect: https://www.dgng.pl/login

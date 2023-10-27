@@ -289,6 +289,22 @@ class AccessControllerTest {
 		mockMvc.perform(get("/rest/GetSocialPlayer").header("Authorization","Bearer 1234")).andExpect(status().isOk());
 	}
 
+	@DisplayName("Should search for player with correct result")
+	@Test
+	void searchForPlayerWhenValidInputThenReturns200() throws Exception {
+
+		var input = new PlayerNickDto();
+		input.setNick("Test");
+		input.setPage(1);
+
+		var output = new ArrayList<Player>();
+
+		when(playerService.searchForPlayer(any(), any())).thenReturn(output);
+
+		mockMvc.perform(post("/rest/SearchForPlayer").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
+
 	@AfterAll
 	public static void done() {
 
