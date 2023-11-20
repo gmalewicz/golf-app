@@ -16,20 +16,25 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @OpenAPIDefinition(tags = @Tag(name = "Access API"))
-public class AccessController {
+public class AccessController extends BaseController {
 
 	private static final String REFRESH_TOKEN = "refreshToken";
 
 	private final PlayerService playerService;
-	private final ModelMapper modelMapper;
 	private final JwtTokenUtil jwtTokenUtil;
+
+	public AccessController(ModelMapper modelMapper, PlayerService playerService, JwtTokenUtil jwtTokenUtil) {
+		super(modelMapper);
+		this.playerService = playerService;
+		this.jwtTokenUtil = jwtTokenUtil;
+	}
 
 	@Tag(name = "Access API")
 	@Operation(summary = "Authenticate player with given nick name and password. WHS is not relevant.")
@@ -193,5 +198,16 @@ public class AccessController {
 		playerService.updatePlayerOnBehalf(modelMapper.map(playerUpdateOnBehalfDto, Player.class), updateSocial);
 
 		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Access API")
+	@Operation(summary = "Get list of players for nick starting from given string.")
+	@PostMapping(value = "/rest/SearchForPlayer")
+	public List<PlayerDto> searchForPlayer(
+			@Valid @Parameter(description = "PlayerNick DTO object", required = true) @RequestBody PlayerNickDto playerNickDto) {
+
+		log.info("Requested search for player for nick starting with: " + playerNickDto.getNick());
+
+		return mapList(playerService.searchForPlayer(playerNickDto.getNick(), playerNickDto.getPage()), PlayerDto.class);
 	}
 }

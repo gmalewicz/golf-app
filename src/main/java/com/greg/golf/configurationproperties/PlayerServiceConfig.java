@@ -9,4 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("player")
 public class PlayerServiceConfig {
 	private String tempPwd;
+
+	private Integer pageSize;
+
+	private Integer minSearchLength;
 }

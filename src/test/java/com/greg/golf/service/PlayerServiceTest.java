@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.PlayerNickInUseException;
+import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.security.JwtRequestFilter;
@@ -398,6 +399,24 @@ class PlayerServiceTest {
 		player = playerRepository.findById(admin.getId()).orElseThrow();
 
 		Assertions.assertFalse(player.getModified());
+
+	}
+
+	@DisplayName("Search for player with too short string")
+	@Transactional
+	@Test
+	void searchForPlayerWithTooShortStringTest() {
+
+		assertThrows(TooShortStringForSearchException.class, () -> this.playerService.searchForPlayer("G", 0));
+	}
+
+	@DisplayName("Search for player with correct result")
+	@Transactional
+	@Test
+	void searchForPlayerWithCorrectResultTest() {
+
+		var retLst = this.playerService.searchForPlayer("Gol", 0);
+		Assertions.assertEquals(1, retLst.size());
 
 	}
 
