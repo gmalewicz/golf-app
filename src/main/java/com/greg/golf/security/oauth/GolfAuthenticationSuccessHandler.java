@@ -19,17 +19,19 @@ import java.util.Objects;
 @Component
 public class GolfAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private PlayerService playerService;
+    private final PlayerService playerService;
 
     private static final String FACEBOOK = "facebook";
     private static final String GOOGLE = "google";
 
-    @Autowired
-    private Oauth2Config oauth2Config;
+
+    private final Oauth2Config oauth2Config;
 
     @Autowired
-    public GolfAuthenticationSuccessHandler(@Lazy PlayerService playerService) {
+    public GolfAuthenticationSuccessHandler(@Lazy PlayerService playerService, Oauth2Config oauth2Config) {
+
         this.playerService = playerService;
+        this.oauth2Config = oauth2Config;
     }
 
     @Override

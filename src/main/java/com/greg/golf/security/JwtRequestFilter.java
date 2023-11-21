@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -31,8 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private PlayerService playerService;
+	private final PlayerService playerService;
 
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RefreshTokenUtil refreshTokenUtil;
@@ -43,6 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private static final String HCP_HEADER= "hcp";
 
 	private static final String SEX_HEADER= "sex";
+
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)

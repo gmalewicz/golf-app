@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -76,7 +75,6 @@ public class CourseService {
 		return courseRepository.findByHistoricalOrderByNameAsc(false);
 	}
 
-	@Transactional(readOnly = true)
 	public List<Course> listFavourites(Long playerId) {
 
 		var player = new Player();

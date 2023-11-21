@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -40,11 +41,18 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+
+	private final PasswordEncoder passwordEncoder;
+
+	private final UserService userService;
+
 
 	@Autowired
-	private UserService userService;
+	public WebSecurityConfiguration(@Lazy PasswordEncoder passwordEncoder, @Lazy UserService userService) {
+
+		this.passwordEncoder = passwordEncoder;
+		this.userService = userService;
+	}
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
