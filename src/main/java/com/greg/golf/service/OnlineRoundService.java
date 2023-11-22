@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,9 @@ public class OnlineRoundService {
 	private final OnlineRoundRepository onlineRoundRepository;
 	private final OnlineScoreCardRepository onlineScoreCardRepository;
 	private final RoundService roundService;
+
+	@Lazy
+	private final OnlineRoundService self;
 
 	@Scheduled(cron = "0 0 0 * * * ")
 	@Transactional
@@ -80,11 +84,12 @@ public class OnlineRoundService {
 		return onlineScoreCardRepository.save(onlineScoreCard);
 	}
 
+	@Transactional
 	private void syncOnlineScoreCard(OnlineScoreCard onlineScoreCard) {
 
 		// skip updates - just in case
 		if (onlineScoreCard.isUpdate()) {
-			saveOnlineScoreCard(onlineScoreCard);
+			self.saveOnlineScoreCard(onlineScoreCard);
 			onlineScoreCard.setSyncRequired(true);
 			return;
 		}

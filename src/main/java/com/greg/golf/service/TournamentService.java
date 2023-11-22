@@ -12,6 +12,7 @@ import com.greg.golf.service.helpers.RoleVerification;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,9 @@ public class TournamentService {
     private final TournamentRoundRepository tournamentRoundRepository;
     private final PlayerRepository playerRepository;
     private final TournamentPlayerRepository tournamentPlayerRepository;
+
+    @Lazy
+    private final TournamentService self;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -135,7 +139,7 @@ public class TournamentService {
         round = roundService.saveRound(round);
         entityManager.detach(round);
 
-        var tournamentLst = addRound(tournamentId, round.getId(), true);
+        var tournamentLst = self.addRound(tournamentId, round.getId(), true);
 
         //it must be one and only one result
         if (tournamentLst == null || tournamentLst.size() != 1) {
@@ -158,7 +162,7 @@ public class TournamentService {
 
         // update tournament result
         if (updateResults) {
-            return updateTournamentResult(round, tournament);
+            return self.updateTournamentResult(round, tournament);
         }
         return new ArrayList<>();
     }
@@ -357,7 +361,7 @@ public class TournamentService {
     @Transactional
     public float getScoreDifferential(PlayerRound playerRound, Round round, Player player) {
 
-        return (113 / (float) playerRound.getSr()) * (getCorrectedStrokes(player, round) - playerRound.getCr());
+        return (113 / (float) playerRound.getSr()) * (self.getCorrectedStrokes(player, round) - playerRound.getCr());
 
     }
 
