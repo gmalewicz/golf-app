@@ -84,7 +84,6 @@ public class OnlineRoundService {
 		return onlineScoreCardRepository.save(onlineScoreCard);
 	}
 
-	@Transactional
 	private void syncOnlineScoreCard(OnlineScoreCard onlineScoreCard) {
 
 		// skip updates - just in case
