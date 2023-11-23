@@ -89,11 +89,10 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
         log.info(allowedHosts.toString());
         log.info(request.getRequestURL().toString());
 
-        if (!allowedHosts.contains(request.getRequestURL().toString())) {
-
-            throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
-        } else {
+        if (allowedHosts.contains(request.getRequestURL().toString())) {
             xfHeader = request.getHeader("X-Forwarded-For");
+        } else {
+            throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
         }
         if (xfHeader == null) {
             return request.getRemoteAddr();

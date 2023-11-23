@@ -32,7 +32,7 @@ public class GoogleResponse {
 	private ErrorCode[] errorCodes;
 
 	enum ErrorCode {
-		MISSING_SECRET, INVALID_SECRET, MISSING_RESPONSE, INVALID_RESPONSE, BAD_REQUEST, TMEOUT_OR_DUPLICATE;
+		MISSING_SECRET, INVALID_SECRET, MISSING_RESPONSE, INVALID_RESPONSE, BAD_REQUEST, TIMEOUT_OR_DUPLICATE;
 
 		private static final Map<String, ErrorCode> errorsMap = new HashMap<>(4);
 
@@ -42,7 +42,7 @@ public class GoogleResponse {
 			errorsMap.put("missing-input-response", MISSING_RESPONSE);
 			errorsMap.put("bad-request", INVALID_RESPONSE);
 			errorsMap.put("invalid-input-response", BAD_REQUEST);
-			errorsMap.put("timeout-or-duplicate", TMEOUT_OR_DUPLICATE);
+			errorsMap.put("timeout-or-duplicate", TIMEOUT_OR_DUPLICATE);
 		}
 
 		@JsonCreator
@@ -58,10 +58,9 @@ public class GoogleResponse {
 			return false;
 		}
 		for (final ErrorCode error : errors) {
-			switch (error) {
-			case INVALID_RESPONSE, MISSING_RESPONSE, BAD_REQUEST:
+			if (error == ErrorCode.INVALID_RESPONSE || error == ErrorCode.MISSING_RESPONSE || error == ErrorCode.BAD_REQUEST) {
 				return true;
-			default:
+			} else {
 				break;
 			}
 		}
