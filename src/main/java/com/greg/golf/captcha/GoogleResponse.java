@@ -59,9 +59,7 @@ public class GoogleResponse {
 		}
 		for (final ErrorCode error : errors) {
 			switch (error) {
-			case INVALID_RESPONSE:
-			case MISSING_RESPONSE:
-			case BAD_REQUEST:
+			case INVALID_RESPONSE, MISSING_RESPONSE, BAD_REQUEST:
 				return true;
 			default:
 				break;

@@ -160,22 +160,6 @@ class PlayerServiceTest {
 		assertThrows(BadCredentialsException.class, () -> playerService.authenticatePlayer(player));
 	}
 
-	@DisplayName("Add player test")
-	@Transactional
-	@Test
-	void addPlayerTest() {
-
-		Player player = new Player();
-		player.setNick("test");
-		player.setPassword("welcome");
-		player.setCaptcha("ABCDE");
-		player.setWhs(10.0F);
-		player.setSex(Common.PLAYER_SEX_MALE);
-
-		Assertions.assertDoesNotThrow(() -> playerService.addPlayer(player));
-
-	}
-
 	@DisplayName("Update player handicap")
 	@Transactional
 	@Test

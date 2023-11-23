@@ -76,6 +76,8 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
     protected String getClientIP() {
 
+        String xfHeader;
+
         var allowedHosts = new ArrayList<String>();
         // for production
         allowedHosts.add("https://" + allowedOrigins + "/rest/AddPlayer");
@@ -90,9 +92,9 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
         if (!allowedHosts.contains(request.getRequestURL().toString())) {
 
             throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
+        } else {
+            xfHeader = request.getHeader("X-Forwarded-For");
         }
-
-        final String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {
             return request.getRemoteAddr();
         }

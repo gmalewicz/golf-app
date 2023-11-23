@@ -2,7 +2,6 @@ package com.greg.golf.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +92,7 @@ public class CourseService {
 	public List<Course> listFavourites(Player player) {
 		List<FavouriteCourse> favouriteCourses = favouriteCourseRepository.findByPlayer(player);
 
-		return favouriteCourses.stream().map(FavouriteCourse::getCourse).collect(Collectors.toList());
+		return favouriteCourses.stream().map(FavouriteCourse::getCourse).toList();
 	}
 
 	@Transactional(readOnly = true)

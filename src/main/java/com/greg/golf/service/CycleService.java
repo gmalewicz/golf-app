@@ -11,7 +11,6 @@ import com.greg.golf.repository.CycleTournamentRepository;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
@@ -179,7 +178,7 @@ public class CycleService {
                     cycleResult.setWhs(e.getWhs());
 
                     return cycleResult;})
-                .collect(Collectors.toList());
+                .toList();
 
         log.debug("initial cycle results created");
 

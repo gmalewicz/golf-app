@@ -69,7 +69,7 @@ public class PlayerService {
 		String newPlayerQuery = "";
 
 		// check if player already exists
-		Player player = getPlayerForNick(nick);
+		Player player = self.getPlayerForNick(nick);
 
 		if (player == null) {
 			log.info("Social media player not found: " + nick + " - adding the new player for " + firstName + " " + lastName);
