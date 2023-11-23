@@ -77,10 +77,14 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
     protected String getClientIP() {
 
         var allowedHosts = new ArrayList<String>();
-        allowedHosts.add("https://"  + allowedOrigins + "/rest/AddPlayer");
+        allowedHosts.add("https://" + allowedOrigins + "/rest/AddPlayer");
+
         allowedHosts.add("http://"  + allowedOrigins + "/rest/AddPlayer");
 
+        log.info(request.getRequestURL().toString());
+
         if (!allowedHosts.contains(request.getRequestURL().toString())) {
+
             throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
         }
 
