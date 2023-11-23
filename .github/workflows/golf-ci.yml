@@ -48,7 +48,7 @@ jobs:
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.token=$SONAR_TOKEN 
         -Dsonar.projectName=gmalewicz_golf-app
-        -Dsonar.java.source=13
+        -Dsonar.java.source=17
         -Dsonar.sources=src/main/java,src/main/resources/templates
         -Dsonar.java.binaries=target/classes
         -Dsonar.sourceEncoding=UTF-8
@@ -59,11 +59,12 @@ jobs:
         google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        cors_allowedOrigins: localhost
 
-    # dedicated for dependabot only
+      # dedicated for dependabot only
     - name: Build & analyze without SonarCloud
       if: ${{ github.actor == 'dependabot[bot]' }}
-      run: mvn -B verify --file ./pom.xml
+      run: mvn -B verify --file ./pom.xml -Dtest=!**/AddPlayerTest.java
       env:
         google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
         google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}

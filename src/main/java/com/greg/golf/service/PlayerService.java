@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,6 +51,9 @@ public class PlayerService {
 	private final PasswordEncoder bCryptPasswordEncoder;
 	private final AuthenticationManager authenticationManager;
 
+	@Lazy
+	private final PlayerService self;
+
 	@Transactional
 	public GolfUserDetails authenticatePlayer(Player player) {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), player.getPassword()));
@@ -65,7 +69,7 @@ public class PlayerService {
 		String newPlayerQuery = "";
 
 		// check if player already exists
-		Player player = getPlayerForNick(nick);
+		Player player = self.getPlayerForNick(nick);
 
 		if (player == null) {
 			log.info("Social media player not found: " + nick + " - adding the new player for " + firstName + " " + lastName);
@@ -77,7 +81,7 @@ public class PlayerService {
 			newPlayer.setSex(false);
 			newPlayer.setPassword((playerServiceConfig.getTempPwd()));
 			newPlayer.setType(playerType);
-			addPlayerOnBehalf(newPlayer);
+			self.addPlayerOnBehalf(newPlayer);
 			newPlayerQuery = "&new_player=true";
 		} else {
 			log.debug("Player with such nick already exists: " + nick);

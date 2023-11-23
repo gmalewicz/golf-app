@@ -74,7 +74,7 @@ class JwtRequestFilterTest {
 	@Test
 	void requestWithoutTokenTest() {
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -93,7 +93,7 @@ class JwtRequestFilterTest {
 
 		when(request.getHeader("Authorization")).thenReturn("Bearer " + jwtToken);
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -113,7 +113,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn(null);
 		when(request.getParameter("token")).thenReturn(jwtToken);
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -130,7 +130,7 @@ class JwtRequestFilterTest {
 
 		when(request.getHeader("Authorization")).thenReturn("invalid");
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -147,7 +147,7 @@ class JwtRequestFilterTest {
 
 		when(request.getHeader("Authorization")).thenReturn("Bearer 1234");
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -167,7 +167,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn(
 				"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjIyNzQ3NDQ4LCJpYXQiOjE2MjI3MTg2NDh9.W5ZGbvT4pSr7lZBVuUBNhhuBSH0GC0LExwkvI29RU8rCOMPIjnOqWOO4wG56fzwy2McYnq7E0FkWdh-4sh0TVg");
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -192,7 +192,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Refresh")).thenReturn(refreshToken);
 		
 		
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -212,7 +212,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn("Bearer " + jwtToken);
 		
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 
@@ -250,7 +250,7 @@ class JwtRequestFilterTest {
 		when(request.getHeader("Authorization")).thenReturn(null);
 		when(request.getParameter("token")).thenReturn(jwtToken);
 
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtTokenUtil, refreshTokenUtil);
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
 

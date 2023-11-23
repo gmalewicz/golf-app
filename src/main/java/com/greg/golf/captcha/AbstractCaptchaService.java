@@ -1,9 +1,13 @@
 package com.greg.golf.captcha;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
@@ -13,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import com.greg.golf.error.ReCaptchaInvalidException;
 
 @Slf4j
+@ConfigurationProperties(prefix = "cors")
 public abstract class AbstractCaptchaService implements ICaptchaService{
 	
 	protected static final Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");    
@@ -22,6 +27,10 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
     protected final CaptchaSettings captchaSettings;
     protected final ReCaptchaAttemptService reCaptchaAttemptService;
     protected final RestOperations restTemplate;
+
+    @Getter
+    @Setter
+    private String allowedOrigins;
 
     protected AbstractCaptchaService(HttpServletRequest request, CaptchaSettings captchaSettings,
     		ReCaptchaAttemptService reCaptchaAttemptService, RestOperations restTemplate) {
@@ -66,7 +75,25 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
     }
 
     protected String getClientIP() {
-        final String xfHeader = request.getHeader("X-Forwarded-For");
+
+        String xfHeader;
+
+        var allowedHosts = new ArrayList<String>();
+        // for production
+        allowedHosts.add("https://" + allowedOrigins + "/rest/AddPlayer");
+        // for local tests
+        allowedHosts.add("http://"  + allowedOrigins + "/rest/AddPlayer");
+        // for CI/CD
+        allowedHosts.add("http://"  + allowedOrigins);
+
+        log.info(allowedHosts.toString());
+        log.info(request.getRequestURL().toString());
+
+        if (allowedHosts.contains(request.getRequestURL().toString())) {
+            xfHeader = request.getHeader("X-Forwarded-For");
+        } else {
+            throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
+        }
         if (xfHeader == null) {
             return request.getRemoteAddr();
         }

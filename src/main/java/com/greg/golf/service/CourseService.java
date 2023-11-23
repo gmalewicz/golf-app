@@ -2,11 +2,10 @@ package com.greg.golf.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,7 @@ import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.HoleRepository;
 
+
 import lombok.RequiredArgsConstructor;
 
 @Slf4j
@@ -39,6 +39,9 @@ public class CourseService {
 	private final CourseTeeRepository courseTeeRepository;
 	private final FavouriteCourseRepository favouriteCourseRepository;
 	private final HoleRepository holeRepository;
+
+	@Lazy
+	private final CourseService self;
 
 	@Transactional(readOnly = true)
 	public List<Course> searchForCourses(String courseName) {
@@ -82,14 +85,14 @@ public class CourseService {
 		var player = new Player();
 		player.setId(playerId);
 
-		return listFavourites(player);
+		return self.listFavourites(player);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Course> listFavourites(Player player) {
 		List<FavouriteCourse> favouriteCourses = favouriteCourseRepository.findByPlayer(player);
 
-		return favouriteCourses.stream().map(FavouriteCourse::getCourse).collect(Collectors.toList());
+		return favouriteCourses.stream().map(FavouriteCourse::getCourse).toList();
 	}
 
 	@Transactional(readOnly = true)
