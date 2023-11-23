@@ -81,6 +81,7 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
         allowedHosts.add("http://"  + allowedOrigins + "/rest/AddPlayer");
 
+        log.info(allowedHosts.toString());
         log.info(request.getRequestURL().toString());
 
         if (!allowedHosts.contains(request.getRequestURL().toString())) {
