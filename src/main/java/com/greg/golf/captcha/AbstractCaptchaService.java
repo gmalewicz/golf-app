@@ -77,9 +77,12 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
     protected String getClientIP() {
 
         var allowedHosts = new ArrayList<String>();
+        // for production
         allowedHosts.add("https://" + allowedOrigins + "/rest/AddPlayer");
-
+        // for local tests
         allowedHosts.add("http://"  + allowedOrigins + "/rest/AddPlayer");
+        // for CI/CD
+        allowedHosts.add("http://"  + allowedOrigins);
 
         log.info(allowedHosts.toString());
         log.info(request.getRequestURL().toString());

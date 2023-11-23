@@ -59,7 +59,7 @@ jobs:
         google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        allowedOrigins: localhost
+        cors_allowedOrigins: localhost
 
       # dedicated for dependabot only
     - name: Build & analyze without SonarCloud
