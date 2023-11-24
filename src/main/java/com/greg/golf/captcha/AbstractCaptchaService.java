@@ -75,6 +75,7 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
     protected String getClientIP() {
 
+
         String xfHeader;
 
         if (allowedOrigins.equals(request.getServerName())) {
