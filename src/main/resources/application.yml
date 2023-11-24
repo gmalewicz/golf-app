@@ -47,8 +47,8 @@ spring:
     open-in-view: true  
     show_sql: true
 jwt:
-  secret: golfBackendSecret
-  refresh: refreshSecret
+  secret: golfBackendSecretLongEnoughPassword123456789012345678901234567890
+  refresh: golfBackendSecretLongEnoughRefreshPassword123456789012345678901234567890
 springdoc:
   swagger-ui:
     path: /api/swagger-ui.html

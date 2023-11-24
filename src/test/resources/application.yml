@@ -51,8 +51,8 @@ spring:
   liquibase:
     change-log: classpath:/db/dbChangeLog-dev.xml
 jwt:
-  secret: golfBackendSecret
-  refresh: refreshSecret
+  secret: abcdefghijklmnoprstuvwxyzabcdefghijklmnoprstuvwxyzabcdefghijklmnoprstuvwxyzabcdefghijklmnoprstuvwxyz
+  refresh: abcdefghijklmnoprstuvwxyzabcdefghijklmnoprstuvwxyzabcdefghijklmnoprstuvwxyzabcdefghijklmnoprstuvwxyz
 springdoc:
   swagger-ui:
     path: /api/swagger-ui.html

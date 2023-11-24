@@ -1,5 +1,6 @@
 package com.greg.golf.security;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
@@ -9,7 +10,8 @@ import com.greg.golf.configurationproperties.JwtConfig;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
+import javax.crypto.SecretKey;
 
 @Component
 public class RefreshTokenUtil extends TokenUtil implements Serializable {
@@ -18,6 +20,7 @@ public class RefreshTokenUtil extends TokenUtil implements Serializable {
 		super(jwtConfig);
 	}
 
+	@Serial
 	private static final long serialVersionUID = -2550185165626007489L;
 
 	public static final long JWT_TOKEN_VALIDITY = (long) 60 * 60 * 24 * 7;
@@ -30,14 +33,13 @@ public class RefreshTokenUtil extends TokenUtil implements Serializable {
 	// compaction of the JWT to a URL-safe string
 	protected String doGenerateToken(Map<String, Object> claims, String subject) {
 
-		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-				.signWith(SignatureAlgorithm.HS512, jwtConfig.getRefresh()).compact();
+		return Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+				.signWith(getSigningKey(jwtConfig.getRefresh())).compact();
 	}
 
 	// for retrieving any information from token we will need the secret key
 	protected Claims getAllClaimsFromToken(String token) {
-
-		return Jwts.parser().setSigningKey(jwtConfig.getRefresh()).parseClaimsJws(token).getBody();
+		return Jwts.parser().verifyWith((SecretKey)getSigningKey(jwtConfig.getRefresh())).build().parseSignedClaims(token).getPayload();
 	}
 }
