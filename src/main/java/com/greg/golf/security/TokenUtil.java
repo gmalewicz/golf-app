@@ -1,10 +1,13 @@
 package com.greg.golf.security;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +26,6 @@ public abstract class TokenUtil {
 	protected static final String ROLES = "roles";
 
 	protected final JwtConfig jwtConfig;
-
-	protected TokenUtil() {
-		jwtConfig = null;
-	}
 
 	// retrieve user id from jwt token
 	public String getUserIdFromToken(String token) {
@@ -85,5 +84,10 @@ public abstract class TokenUtil {
 	public boolean validateToken(String token, UserDetails userDetails) {
 		final String userId = getUserIdFromToken(token);
 		return (userId.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	}
+
+	protected Key getSigningKey(String secret) {
+		byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+		return Keys.hmacShaKeyFor(keyBytes);
 	}
 }
