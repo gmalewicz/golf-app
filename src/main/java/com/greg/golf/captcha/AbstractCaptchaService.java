@@ -1,6 +1,5 @@
 package com.greg.golf.captcha;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,18 +77,7 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
         String xfHeader;
 
-        var allowedHosts = new ArrayList<String>();
-        // for production
-        allowedHosts.add("https://" + allowedOrigins + "/rest/AddPlayer");
-        // for local tests
-        allowedHosts.add("http://"  + allowedOrigins + "/rest/AddPlayer");
-        // for CI/CD
-        allowedHosts.add("http://"  + allowedOrigins);
-
-        log.info(allowedHosts.toString());
-        log.info(request.getRequestURL().toString());
-
-        if (allowedHosts.contains(request.getRequestURL().toString())) {
+        if (allowedOrigins.equals(request.getServerName())) {
             xfHeader = request.getHeader("X-Forwarded-For");
         } else {
             throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
