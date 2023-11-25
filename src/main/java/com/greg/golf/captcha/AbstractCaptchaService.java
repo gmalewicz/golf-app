@@ -75,14 +75,8 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
     protected String getClientIP() {
 
+        String xfHeader = request.getHeader("X-Forwarded-For");
 
-        String xfHeader;
-
-        if (allowedOrigins.equals(request.getServerName())) {
-            xfHeader = request.getHeader("X-Forwarded-For");
-        } else {
-            throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
-        }
         if (xfHeader == null) {
             return request.getRemoteAddr();
         }
