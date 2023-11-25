@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.5.3</version>
+	<version>3.5.4</version>
 	<name>golf</name>
-	<description>jwtt upgrade</description>
+	<description>vulnerabilities fix</description>
 
 	<properties>
 		<java.version>17</java.version>
