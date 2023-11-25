@@ -23,10 +23,18 @@ public class CaptchaService extends AbstractCaptchaService {
 
 	@Override
 	public void processResponse(final String response) {
+
+		URI verifyUri;
 		securityCheck(response);
 
-		final var verifyUri = URI
-				.create(String.format(RECAPTCHA_URL_TEMPLATE, getReCaptchaSecret(), response, getClientIP()));
+		if (allowedOrigins.equals(request.getServerName())) {
+			 verifyUri = URI
+					.create(String.format(RECAPTCHA_URL_TEMPLATE, getReCaptchaSecret(), response, getClientIP()));
+		} else {
+			throw new ReCaptchaInvalidException("Attempt to validate recaptcha from unauthorized site");
+		}
+
+
 		try {
 			final var googleResponse = restTemplate.getForObject(verifyUri, GoogleResponse.class);
 

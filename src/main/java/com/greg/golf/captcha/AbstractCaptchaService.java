@@ -29,7 +29,7 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
     @Getter
     @Setter
-    private String allowedOrigins;
+    protected String allowedOrigins;
 
     protected AbstractCaptchaService(HttpServletRequest request, CaptchaSettings captchaSettings,
     		ReCaptchaAttemptService reCaptchaAttemptService, RestOperations restTemplate) {
