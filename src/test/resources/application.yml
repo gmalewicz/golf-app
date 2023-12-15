@@ -76,3 +76,5 @@ player:
   minSearchLength: 3
 oauth2:
   redirect: https://www.dgng.pl/login
+app:
+  version: '@project.version@'
