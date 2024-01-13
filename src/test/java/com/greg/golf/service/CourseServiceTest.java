@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.greg.golf.error.TeeAlreadyExistsException;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -58,6 +59,39 @@ class CourseServiceTest {
 	@BeforeAll
 	public static void setup(@Autowired PlayerRepository playerRepository) {
 		log.info("Set up completed");
+	}
+
+	@DisplayName("Add tee test")
+	@Transactional
+	@Test
+	void addTeeTest() {
+
+		CourseTee courseTee = new CourseTee();
+		courseTee.setTeeType(Common.TEE_TYPE_18);
+		courseTee.setTee("brown");
+		courseTee.setSr(123);
+		courseTee.setCr(67.2F);
+		courseTee.setSex(false);
+
+		courseService.addTee(courseTee, 1L);
+
+		List<CourseTee> tees = courseService.getTees(1L);
+		assertEquals(10, tees.size());
+	}
+
+	@DisplayName("Add duplicate tee test")
+	@Transactional
+	@Test
+	void addDuplicateTeeTest() {
+
+		CourseTee courseTee = new CourseTee();
+		courseTee.setTeeType(Common.TEE_TYPE_18);
+		courseTee.setTee("ladies red");
+		courseTee.setSr(123);
+		courseTee.setCr(67.2F);
+		courseTee.setSex(false);
+
+		assertThrows(TeeAlreadyExistsException.class, () -> courseService.addTee(courseTee, 1L));
 	}
 
 	@DisplayName("Get list of courses")
@@ -125,7 +159,7 @@ class CourseServiceTest {
 		
 		assertFalse(course.isPresent());
 	}
-	
+
 	@DisplayName("Get tees")
 	@Transactional
 	@Test
@@ -203,7 +237,7 @@ class CourseServiceTest {
 		assertEquals(1, retVal);
 	}
 	
-	@DisplayName("Serach for courses")
+	@DisplayName("Search for courses")
 	@Transactional
 	@Test
 	void searchForCoursesTest() {
@@ -213,7 +247,7 @@ class CourseServiceTest {
 		assertEquals(1, retVal.size());
 	}
 	
-	@DisplayName("Serach for too short course string")
+	@DisplayName("Search for too short course string")
 	@Transactional
 	@Test
 	void searchForToShortCoursesTest() {
@@ -262,7 +296,7 @@ class CourseServiceTest {
 		assertEquals(0, favouriteCourseRepository.findAll().size());	
 	}
 	
-	@DisplayName("Should not move course to history by unathorized user")
+	@DisplayName("Should not move course to history by unauthorized user")
 	@Transactional
 	@Test
 	void moveCourseToHistoryByUnauthorizedUserTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {

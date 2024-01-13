@@ -2,7 +2,11 @@ package com.greg.golf.controller;
 
 import java.util.List;
 
+import com.greg.golf.controller.dto.*;
+import com.greg.golf.entity.CourseTee;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -13,10 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.greg.golf.controller.dto.CourseDto;
-import com.greg.golf.controller.dto.CourseNameDto;
-import com.greg.golf.controller.dto.CourseTeeDto;
-import com.greg.golf.controller.dto.HoleDto;
 import com.greg.golf.entity.Course;
 import com.greg.golf.service.CourseService;
 
@@ -174,11 +174,30 @@ public class CourseController extends BaseController {
 	@Operation(summary = "Purge historical courses from favourites")
 	@PostMapping(value = "/rest/MoveToHistoryCourse/{courseId}")
 	public HttpStatus moveToHistoryCurse(
-			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("courseId") Long courseId) {
+			@Parameter(description = "Course id", example = "1", required = true) Long courseId) {
 
 		log.info("trying to move course to history");
 
 		courseService.moveToHistoryCurse(courseId);
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Course API")
+	@Operation(summary = "Adds tee to course")
+	@PostMapping(value = "/rest/Tee/{courseId}")
+	public HttpStatus addTee(
+			@Parameter(description = "Tee object", required = true)
+				@Valid
+				@RequestBody CourseTeeDto courseTeeDto,
+			@Parameter(description = "Course id", example = "1", required = true)
+				@NotNull
+				@Min(value = 1)
+				@PathVariable("courseId") Long courseId) {
+
+		log.info("trying to add tee: " + courseTeeDto.getTee() + " for sex: " + courseTeeDto.getSex() + " for course id: " + courseId);
+
+		courseService.addTee(modelMapper.map(courseTeeDto, CourseTee.class), courseId);
 
 		return HttpStatus.OK;
 	}

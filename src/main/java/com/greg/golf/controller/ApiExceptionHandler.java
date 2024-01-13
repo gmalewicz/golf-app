@@ -216,4 +216,12 @@ public class ApiExceptionHandler {
 		var response = new ApiErrorResponse("24", "League must be opened.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler( TeeAlreadyExistsException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(TeeAlreadyExistsException ex) {
+
+		var response = new ApiErrorResponse("25", "Tee must be unique for a course.");
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
 }

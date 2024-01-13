@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.5.7</version>
+	<version>3.5.9</version>
 	<name>golf</name>
-	<description>libraries upgrade</description>
+	<description>add tee endpoint</description>
 
 	<properties>
 		<java.version>17</java.version>

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import com.greg.golf.controller.dto.*;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
@@ -31,8 +32,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.CourseDto;
-import com.greg.golf.controller.dto.CourseNameDto;
 import com.greg.golf.entity.Course;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
@@ -226,7 +225,24 @@ class CourseControllerMockTest {
 		doNothing().when(courseService).moveToHistoryCurse(1L);
 		mockMvc.perform(post("/rest/MoveToHistoryCourse/1")).andExpect(status().isOk());
 	}
-	
+
+
+	@DisplayName("Should add tee with correct result")
+	@Test
+	void addTeeWhenValidInputThenReturns200() throws Exception {
+
+		var input = new CourseTeeDto();
+		input.setTee("Ladies red");
+		input.setCr(64.6F);
+		input.setSr(123);
+		input.setSex(false);
+		input.setTeeType(0);
+
+		doNothing().when(courseService).addTee(any(), any());
+
+		mockMvc.perform(post("/rest/Tee/1").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+	}
 
 	@AfterAll
 	public static void done() {
