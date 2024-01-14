@@ -1,6 +1,7 @@
 package com.greg.golf.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.greg.golf.error.TeeAlreadyExistsException;
@@ -52,7 +53,9 @@ public class CourseService {
 		// not to add tee if the same sex and colour already exist
 		if (course.getTees()
 				.stream()
-				.anyMatch(tee -> tee.getSex() == courseTee.getSex() && tee.getTee().equals(courseTee.getTee()))) {
+				.anyMatch(tee -> tee.getSex() == courseTee.getSex() &&
+						Objects.equals(tee.getTee(), courseTee.getTee()) &&
+						Objects.equals(tee.getTeeType(), courseTee.getTeeType()))) {
 			throw new TeeAlreadyExistsException();
 		}
 
