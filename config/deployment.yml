@@ -13,63 +13,23 @@ spec:
         app: golf-app
     spec:
       containers:
-      - name: myapp
-        image: <IMAGE>
-        resources:
-        ports:
-        - containerPort: 8080
-        env: 
-        - name: spring.datasource.username
-          valueFrom:
-            secretKeyRef:
-              name: golf-db-secret
-              key: golf-db-username
-        - name: spring.datasource.password
-          valueFrom:
-            secretKeyRef:
-              name: golf-db-secret
-              key: golf-db-password
-        - name: spring.mail.username
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: mail-username           
-        - name: spring.mail.password
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: mail-password  
-        - name: google.recaptcha.key.site
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: recaptcha-site
-        - name: google.recaptcha.key.secret
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: recaptcha-secret
-        - name: cors.allowedOrigins
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: allowed-origins
-        - name: spring.security.oauth2.client.registration.facebook.client-secret
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: facebook-secret
-        - name: spring.security.oauth2.client.registration.google.client-secret
-          valueFrom:
-            secretKeyRef:
-              name: golf-app-secret
-              key: google-secret
-        - name: PG_SERVER
-          valueFrom:
-            configMapKeyRef:
-              name: golf-db-configmap
-              key: database_url
-        - name: spring.datasource.url
-          value: jdbc:postgresql://${PG_SERVER}/golf
-        - name: spring.profiles.active
-          value: prod
+        - name: myapp
+          image: gmalewicz/golf-app
+          envFrom:
+            - configMapRef:
+                name: golf-app-configmap
+            - secretRef:
+                name: golf-app-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          resources:
+            requests:
+              memory: "300Mi"
+              cpu: "700m"
+            limits:
+              memory: "800Mi"
+              cpu: "700m"
+          ports:
+            - containerPort: 8080

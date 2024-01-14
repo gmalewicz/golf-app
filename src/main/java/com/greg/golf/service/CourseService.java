@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.greg.golf.error.TeeAlreadyExistsException;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -42,6 +43,23 @@ public class CourseService {
 
 	@Lazy
 	private final CourseService self;
+
+	@Transactional()
+	public void addTee(CourseTee courseTee, Long courseId) throws TeeAlreadyExistsException {
+
+		Course course = courseRepository.findById(courseId).orElseThrow();
+
+		// not to add tee if the same sex and colour already exist
+		if (course.getTees()
+				.stream()
+				.anyMatch(tee -> tee.getSex() == courseTee.getSex() && tee.getTee().equals(courseTee.getTee()))) {
+			throw new TeeAlreadyExistsException();
+		}
+
+		courseTee.setCourse(course);
+		courseTeeRepository.save(courseTee);
+	}
+
 
 	@Transactional(readOnly = true)
 	public List<Course> searchForCourses(String courseName) {
