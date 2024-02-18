@@ -1,7 +1,5 @@
 package com.greg.golf.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.NoSuchElementException;
@@ -33,6 +31,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -1123,6 +1123,175 @@ class TournamentServiceTest {
 		assertEquals(2F, tournamentService.getTournamentPlayers(tournament.getId()).get(0).getWhs());
 	}
 
+	@DisplayName("Attempt to add tee time with no tee time")
+	@Transactional
+	@Test
+	void attemptToAddTeeTimeWithNoTeeTime(@Autowired TeeTimeRepository teeTimeRepository) {
+
+		var teeTimeParameters = new TeeTimeParameters();
+		teeTimeParameters.setTeeTimes(new ArrayList<>());
+
+		tournamentService.addTeeTimes(1L, teeTimeParameters);
+
+		assertEquals(0, teeTimeRepository.findAll().size());
+	}
+
+	@DisplayName("Attempt to add tee time by unauthorized user")
+	@Transactional
+	@Test
+	void attemptToAddTeeTimeByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
+
+		var teeTimeParameters = new TeeTimeParameters();
+		var teeTime = new TeeTime();
+		var teeTimes = new ArrayList<TeeTime>();
+		teeTimes.add(teeTime);
+		teeTimeParameters.setTeeTimes(teeTimes);
+
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		assertThrows(UnauthorizedException.class, () -> tournamentService.addTeeTimes(1L, teeTimeParameters));
+	}
+
+	@DisplayName("Attempt to add tee time by authorized user")
+	@Transactional
+	@Test
+	void attemptToAddTeeTimeByAuthorizedUserTest(@Autowired TeeTimeParametersRepository teeTimeParametersRepository,
+												 @Autowired PlayerService playerService) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var teeTimeParameters = new TeeTimeParameters();
+		teeTimeParameters.setFirstTeeTime("10:00");
+		teeTimeParameters.setFlightSize(4);
+		teeTimeParameters.setPublished(false);
+		teeTimeParameters.setTeeTimeStep(10);
+
+		var teeTime = new TeeTime();
+		teeTime.setTime("10:00");
+		teeTime.setFlight(1);
+		teeTime.setHcp(10.0F);
+		teeTime.setNick("Golfer");
+
+		var teeTimes = new ArrayList<TeeTime>();
+		teeTimes.add(teeTime);
+		teeTimeParameters.setTeeTimes(teeTimes);
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		tournamentService.addTeeTimes(tournament.getId(), teeTimeParameters);
+
+		assertEquals(1, teeTimeParametersRepository.findAll().size());
+	}
+
+	@DisplayName("Attempt to get tee times")
+	@Transactional
+	@Test
+	void attemptToGetTeeTimes(@Autowired TeeTimeRepository teeTimeRepository,
+							  @Autowired PlayerService playerService) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var teeTimeParameters = new TeeTimeParameters();
+		teeTimeParameters.setFirstTeeTime("10:00");
+		teeTimeParameters.setFlightSize(4);
+		teeTimeParameters.setPublished(false);
+		teeTimeParameters.setTeeTimeStep(10);
+
+		var teeTime = new TeeTime();
+		teeTime.setTime("10:00");
+		teeTime.setFlight(1);
+		teeTime.setHcp(10.0F);
+		teeTime.setNick("Golfer");
+
+		var teeTimes = new ArrayList<TeeTime>();
+		teeTimes.add(teeTime);
+		teeTimeParameters.setTeeTimes(teeTimes);
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		tournamentService.addTeeTimes(tournament.getId(), teeTimeParameters);
+
+		assertDoesNotThrow(() -> tournamentService.getTeeTimes(tournament.getId()));
+	}
+
+	@DisplayName("Attempt to delete tee times by unauthorized user")
+	@Transactional
+	@Test
+	void attemptToDeleteTeeTimesByUnauthorizedUserTest() {
+
+		var teeTimeParameters = new TeeTimeParameters();
+		var teeTime = new TeeTime();
+		var teeTimes = new ArrayList<TeeTime>();
+		teeTimes.add(teeTime);
+		teeTimeParameters.setTeeTimes(teeTimes);
+
+		UserDetails userDetails = new User("2", "fake", new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deleteTeeTimes(1L));
+	}
+
+	@DisplayName("Attempt to delete tee times by authorized user")
+	@Transactional
+	@Test
+	void attemptToDeleteTeeTimesByAuthorizedUserTest(@Autowired TeeTimeParametersRepository teeTimeParametersRepository,
+												 @Autowired PlayerService playerService) {
+
+		var tournament = tournamentService.findAllTournaments().get(0);
+
+		var teeTimeParameters = new TeeTimeParameters();
+		teeTimeParameters.setFirstTeeTime("10:00");
+		teeTimeParameters.setFlightSize(4);
+		teeTimeParameters.setPublished(false);
+		teeTimeParameters.setTeeTimeStep(10);
+
+		var teeTime = new TeeTime();
+		teeTime.setTime("10:00");
+		teeTime.setFlight(1);
+		teeTime.setHcp(10.0F);
+		teeTime.setNick("Golfer");
+
+		var teeTimes = new ArrayList<TeeTime>();
+		teeTimes.add(teeTime);
+		teeTimeParameters.setTeeTimes(teeTimes);
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		tournamentService.addTeeTimes(tournament.getId(), teeTimeParameters);
+		tournamentService.deleteTeeTimes(tournament.getId());
+
+		assertNull(tournamentService.getTeeTimes(tournament.getId()));
+	}
 
 	@AfterAll
 	public static void done(@Autowired RoundRepository roundRepository,

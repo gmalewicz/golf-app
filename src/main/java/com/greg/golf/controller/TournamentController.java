@@ -3,16 +3,16 @@ package com.greg.golf.controller;
 import java.util.List;
 
 import com.greg.golf.controller.dto.*;
-import com.greg.golf.entity.Round;
-import com.greg.golf.entity.TournamentPlayer;
+import com.greg.golf.entity.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.greg.golf.entity.Tournament;
-import com.greg.golf.entity.TournamentRound;
 import com.greg.golf.service.TournamentService;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -202,6 +202,51 @@ public class TournamentController extends BaseController {
 
 		tournamentService.updatePlayer(tournamentPlayerDto.getTournamentId(), tournamentPlayerDto.getPlayerId(), tournamentPlayerDto.getWhs());
 
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Add tee times to tournament")
+	@PostMapping(value = "/rest/Tournament/TeeTime/{tournamentId}")
+	public HttpStatus addTeeTimes(
+			@Parameter(description = "Tournament id", example = "1", required = true)
+				@NotNull
+				@Positive
+				@PathVariable("tournamentId") Long tournamentId,
+			@Parameter(description = "TeeTimeParameters object", required = true)
+				@RequestBody
+				@Valid TeeTimeParametersDto teeTimeParametersDto) {
+
+		log.info("trying to add tee times for tournament: " + tournamentId);
+		tournamentService.addTeeTimes(tournamentId, modelMapper.map(teeTimeParametersDto, TeeTimeParameters.class));
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Return tee times for tournament")
+	@GetMapping(value = "/rest/Tournament/TeeTime/{tournamentId}")
+	public ResponseEntity<TeeTimeParametersDto> getTeeTimes(
+			@Parameter(description = "Tournament id", example = "1", required = true)
+			@PathVariable("tournamentId") @NotNull @Positive Long tournamentId) {
+
+		log.info("Requested tee times for tournament " + tournamentId);
+		var teeTimeParameters = tournamentService.getTeeTimes(tournamentId);
+		if (teeTimeParameters == null) {
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.ok(modelMapper.map(teeTimeParameters, TeeTimeParametersDto.class));
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Delete tee times for tournament")
+	@DeleteMapping(value = "/rest/Tournament/TeeTime/{tournamentId}")
+	public HttpStatus deleteTeeTimes(
+			@Parameter(description = "Tournament id", example = "1", required = true)
+			@PathVariable("tournamentId") @NotNull @Positive Long tournamentId) {
+
+		log.info("Delete tee times for tournament " + tournamentId);
+		tournamentService.deleteTeeTimes(tournamentId);
 		return HttpStatus.OK;
 	}
 

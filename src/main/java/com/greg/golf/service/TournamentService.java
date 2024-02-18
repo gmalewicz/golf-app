@@ -39,7 +39,6 @@ public class TournamentService {
     private final TournamentRoundRepository tournamentRoundRepository;
     private final PlayerRepository playerRepository;
     private final TournamentPlayerRepository tournamentPlayerRepository;
-
     @Lazy
     private final TournamentService self;
 
@@ -663,5 +662,44 @@ public class TournamentService {
         var tournamentPlayer = tournamentPlayerRepository.findByTournamentIdAndPlayerId(tournamentId, playerId).orElseThrow();
         tournamentPlayer.setWhs(whs);
         tournamentPlayerRepository.save(tournamentPlayer);
+    }
+
+    @Transactional
+    public void addTeeTimes(Long tournamentId, TeeTimeParameters teeTimeParameters) {
+
+        if  (teeTimeParameters.getTeeTimes().size() == 0) {
+            return;
+        }
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to add tee times by unauthorized user");
+
+        // delete existing tee times if any and replace it
+        // updates are not supported
+        teeTimeParameters.setTournament(tournament);
+        teeTimeParameters.getTeeTimes().forEach(teeTime -> teeTime.setTeeTimeParameters(teeTimeParameters));
+        tournament.setTeeTimeParameters(teeTimeParameters);
+        tournamentRepository.save(tournament);
+    }
+
+    @Transactional
+    public TeeTimeParameters getTeeTimes(Long tournamentId) {
+
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        return tournament.getTeeTimeParameters();
+
+    }
+
+    @Transactional
+    public void deleteTeeTimes(Long tournamentId) {
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tee times by unauthorized user");
+
+        tournament.setTeeTimeParameters(null);
+        tournamentRepository.save(tournament);
+
     }
 }

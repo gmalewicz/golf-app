@@ -293,6 +293,41 @@ class TournamentControllerTest {
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should add tee time for tournament")
+	@Test
+	void addTeeTimesWhenValidInputThenReturns200() throws Exception {
+
+		var teeTimeParametersDto = new TeeTimeParametersDto();
+		teeTimeParametersDto.setFirstTeeTime("10:00");
+		teeTimeParametersDto.setTeeTimes(new ArrayList<>());
+		teeTimeParametersDto.setFlightSize(4);
+		teeTimeParametersDto.setPublished(false);
+		teeTimeParametersDto.setTeeTimeStep(10);
+
+		doNothing().when(tournamentService).addTeeTimes(any(), any());
+
+		mockMvc.perform(post("/rest/Tournament/TeeTime/1").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(teeTimeParametersDto))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should get tee times belonging to tournament with correct result")
+	@Test
+	void getTeeTimeTest() throws Exception {
+
+		var output = new TeeTimeParameters();
+
+		when(tournamentService.getTeeTimes(any())).thenReturn(output);
+		mockMvc.perform(get("/rest/Tournament/TeeTime/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should delete tee time")
+	@Test
+	void deleteTeeTimesWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deleteTeeTimes(anyLong());
+		mockMvc.perform(delete("/rest/Tournament/TeeTime/1")).andExpect(status().isOk());
+	}
+
 	@AfterAll
 	public static void done() {
 
