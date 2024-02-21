@@ -1141,6 +1141,8 @@ class TournamentServiceTest {
 	@Test
 	void attemptToAddTeeTimeByUnauthorizedUserTest(@Autowired TournamentRepository tournamentRepository) {
 
+		var tournament = tournamentService.findAllTournaments().get(0);
+
 		var teeTimeParameters = new TeeTimeParameters();
 		var teeTime = new TeeTime();
 		var teeTimes = new ArrayList<TeeTime>();
@@ -1154,7 +1156,7 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		assertThrows(UnauthorizedException.class, () -> tournamentService.addTeeTimes(1L, teeTimeParameters));
+		assertThrows(UnauthorizedException.class, () -> tournamentService.addTeeTimes(tournament.getId(), teeTimeParameters));
 	}
 
 	@DisplayName("Attempt to add tee time by authorized user")
@@ -1238,6 +1240,8 @@ class TournamentServiceTest {
 	@Test
 	void attemptToDeleteTeeTimesByUnauthorizedUserTest() {
 
+		var tournament = tournamentService.findAllTournaments().get(0);
+
 		var teeTimeParameters = new TeeTimeParameters();
 		var teeTime = new TeeTime();
 		var teeTimes = new ArrayList<TeeTime>();
@@ -1251,7 +1255,7 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		assertThrows(UnauthorizedException.class, () -> tournamentService.deleteTeeTimes(1L));
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deleteTeeTimes(tournament.getId()));
 	}
 
 	@DisplayName("Attempt to delete tee times by authorized user")
