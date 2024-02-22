@@ -59,4 +59,9 @@ public class Tournament {
 	@JoinColumn(name = "player_id", nullable = false)
 	private Player player;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tournament", orphanRemoval = true)
+	private TeeTimeParameters teeTimeParameters;
+
 }

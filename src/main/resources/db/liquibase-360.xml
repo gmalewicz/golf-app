@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ" id="3600000000001-1">
+		<createTable tableName="teetime">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="teetimePK"/>
+			</column>
+			<column name="flight" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="time" type="VARCHAR(5)">
+				<constraints nullable="false" />
+			</column>
+			<column name="nick" type="VARCHAR(20)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="hcp" type="numeric(3, 1)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="tournament_id" type="int">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="3600000000001-2">
+		<createTable tableName="teetime_parameters">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="teetimeparametersPK"/>
+			</column>
+			<column name="flight_size" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="first_teetime" type="VARCHAR(5)">
+				<constraints nullable="false" />
+			</column>
+			<column name="teetime_step" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="tournament_id" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="published" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="3600000000000-3">
+		<addColumn tableName="teetime">
+			<column name="teetime_parameters_id" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+		<dropColumn tableName="teetime">
+			<column name="tournament_id"></column>
+		</dropColumn>
+	</changeSet>
+</databaseChangeLog>
