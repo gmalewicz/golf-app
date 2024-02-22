@@ -1156,7 +1156,8 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		assertThrows(UnauthorizedException.class, () -> tournamentService.addTeeTimes(tournament.getId(), teeTimeParameters));
+		Long id = tournament.getId();
+		assertThrows(UnauthorizedException.class, () -> tournamentService.addTeeTimes(id, teeTimeParameters));
 	}
 
 	@DisplayName("Attempt to add tee time by authorized user")
@@ -1255,7 +1256,8 @@ class TournamentServiceTest {
 
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-		assertThrows(UnauthorizedException.class, () -> tournamentService.deleteTeeTimes(tournament.getId()));
+		Long id = tournament.getId();
+		assertThrows(UnauthorizedException.class, () -> tournamentService.deleteTeeTimes(id));
 	}
 
 	@DisplayName("Attempt to delete tee times by authorized user")
