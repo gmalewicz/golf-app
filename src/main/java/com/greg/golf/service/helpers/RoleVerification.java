@@ -11,16 +11,6 @@ public class RoleVerification {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void verifyRole(String role, String errorTxt) throws UnauthorizedException {
-
-        if (!SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
-                .equals(role)) {
-
-            log.error(errorTxt);
-            throw new UnauthorizedException();
-        }
-    }
-
     public static void verifyPlayer(Long playerId, String errorTxt) throws UnauthorizedException {
 
         log.debug(playerId.toString());

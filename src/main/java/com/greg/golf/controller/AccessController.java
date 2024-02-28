@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -103,6 +104,7 @@ public class AccessController extends BaseController {
 	@Tag(name = "Access API")
 	@Operation(summary = "Administrative task: Reset password.")
 	@PatchMapping(value = "/rest/ResetPassword")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus resetPassword( @Valid
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerCredentialsDto playerCredentialsDto) {
 
@@ -176,6 +178,7 @@ public class AccessController extends BaseController {
 	@Tag(name = "Access API")
 	@Operation(summary = "Delete player")
 	@PostMapping(value = "/rest/DeletePlayer")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus deletePlayer(@Valid
 			@Parameter(description = "Player id", required = true) @RequestBody IdDto idDto) {
 

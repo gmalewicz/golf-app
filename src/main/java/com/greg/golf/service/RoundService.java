@@ -7,9 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.PlayerRepository;
-import com.greg.golf.service.helpers.RoleVerification;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -211,8 +210,6 @@ public class RoundService {
 
 	@Transactional
 	public void swapPlayer(Long oldPlayerId, Long newPlayerId, Long roundId) {
-
-		RoleVerification.verifyRole(Common.ADMIN, "Attempt to swap player in the round by unauthorized user");
 
 		// get data
 		Round round = roundRepository.findById(roundId).orElseThrow();

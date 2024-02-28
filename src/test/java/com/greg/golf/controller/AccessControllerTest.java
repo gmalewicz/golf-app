@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -146,6 +147,7 @@ class AccessControllerTest {
 
 	@DisplayName("Should reset password by privileged user with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void processPasswordByPrivilegedUserWhenValidInputThenReturns200() throws Exception {
 
 		var input = new PlayerCredentialsDto();
@@ -162,11 +164,6 @@ class AccessControllerTest {
 	@Test
 	void processAddPlayerOnBehalfWhenValidInputThenReturns200() throws Exception {
 
-		var input = new PlayerUpdateOnBehalfDto();
-		input.setNick("Test");
-		input.setSex(false);
-		input.setWhs(1.0F);
-
 		var output = new Player();
 		output.setNick("Test");
 		output.setSex(false);
@@ -181,9 +178,6 @@ class AccessControllerTest {
 	@DisplayName("Should attempt to refresh token without header with correct result")
 	@Test
 	void processAttemptRefreshTokenWithoutHeaderThenReturns200() throws Exception {
-
-		Player player = new Player();
-		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
 
 		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
 	}
@@ -218,6 +212,7 @@ class AccessControllerTest {
 
 	@DisplayName("Should delete with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void processDeletePlayerWhenValidInputThenReturns200() throws Exception {
 
 		var input = new PlayerDto();

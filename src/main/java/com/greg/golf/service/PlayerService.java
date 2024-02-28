@@ -3,7 +3,6 @@ package com.greg.golf.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import com.greg.golf.captcha.ICaptchaService;
 import com.greg.golf.configurationproperties.PlayerServiceConfig;
 import com.greg.golf.error.TooShortStringForSearchException;
@@ -20,16 +19,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.PlayerNickInUseException;
-import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
@@ -38,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Slf4j
-//@ConfigurationProperties(prefix = "player")
 @Service("playerService")
 @CacheConfig(cacheNames = { "player" })
 public class PlayerService {
@@ -132,8 +127,6 @@ public class PlayerService {
 	@CacheEvict
 	@Transactional
 	public void delete(Long id) {
-
-		RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete player by unauthorized user");
 
 		var player = new Player();
 		player.setId(id);
@@ -254,19 +247,12 @@ public class PlayerService {
 	@Transactional
 	public void resetPassword(Player player) {
 
-		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
-				.equals(Common.ADMIN)) {
-
-			if (player.getPassword() != null && !player.getPassword().equals("")) {
-				Player persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
-				persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-				playerRepository.save(persistedPlayer);
-			}
-
-		} else {
-			log.error("Attempt to reset password by unauthorized user");
-			throw new UnauthorizedException();
+		if (player.getPassword() != null && !player.getPassword().equals("")) {
+			Player persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
+			persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
+			playerRepository.save(persistedPlayer);
 		}
+
 	}
 
 	@Transactional(readOnly = true)
@@ -280,9 +266,6 @@ public class PlayerService {
 
 	@Transactional
 	public List<PlayerRoundCnt> getPlayerRoundCnt() {
-
-		RoleVerification.verifyRole(Common.ADMIN, "Attempt to get player statistic by unauthorized user");
-
 		return playerRepository.getPlayerRoundCnt();
 	}
 
