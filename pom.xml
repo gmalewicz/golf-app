@@ -151,6 +151,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.vladmihalcea/hibernate-types-60 -->
 		<dependency>
 			<groupId>com.vladmihalcea</groupId>

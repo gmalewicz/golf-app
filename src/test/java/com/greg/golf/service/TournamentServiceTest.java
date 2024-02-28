@@ -1108,7 +1108,18 @@ class TournamentServiceTest {
 	@Transactional
 	@Test
 	void attemptToUpdateTournamentPlayerHcpTest(@Autowired TournamentRepository tournamentRepository,
-										   @Autowired TournamentPlayerRepository tournamentPlayerRepository) {
+										   @Autowired TournamentPlayerRepository tournamentPlayerRepository,
+												@Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
 
 		var tournament = tournamentRepository.findAll().get(0);
 		var tournamentPlayer = new TournamentPlayer();

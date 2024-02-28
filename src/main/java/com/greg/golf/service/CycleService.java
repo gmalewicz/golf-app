@@ -4,11 +4,9 @@ import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
-import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
-import com.greg.golf.service.helpers.RoleVerification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -41,15 +39,11 @@ public class CycleService {
     @Transactional
     public Cycle addCycle(Cycle cycle) {
 
-        RoleVerification.verifyRole(Common.ADMIN, "Attempt to add cycle by unauthorized user");
-
         return cycleRepository.save(cycle);
     }
 
     @Transactional
     public CycleTournament addCycleTournament(CycleTournament cycleTournament, EagleResultDto[] eagleResultDto) {
-
-        RoleVerification.verifyRole(Common.ADMIN, "Attempt to add tournament to cycle by unauthorized user");
 
         // filter to exclude players with too high handicap
         eagleResultDto = Arrays.stream(eagleResultDto)
@@ -75,8 +69,6 @@ public class CycleService {
     @Modifying
     public void removeLastCycleTournament(Cycle cycle) {
 
-        RoleVerification.verifyRole(Common.ADMIN, "Attempt to remove tournament from cycle by unauthorized user");
-
         var tournaments = cycleTournamentRepository.findByCycleOrderById(cycle);
 
         if (!tournaments.isEmpty()) {
@@ -95,6 +87,7 @@ public class CycleService {
     }
 
     private List<CycleResult> removeTournamentFromResult(Cycle cycle, CycleTournament cycleTournament) {
+
         var results = cycleResultRepository.findByCycle(cycle);
 
         // first remove results
@@ -238,8 +231,6 @@ public class CycleService {
 
     public void closeCycle(Long cycleId) {
 
-        RoleVerification.verifyRole(Common.ADMIN, "Attempt to close cycle by unauthorized user");
-
         var cycle = cycleRepository.findById(cycleId).orElseThrow();
 
         // set close flag
@@ -249,8 +240,6 @@ public class CycleService {
     }
 
     public void deleteCycle(Long cycleId) {
-
-        RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete cycle by unauthorized user");
 
         cycleRepository.deleteById(cycleId);
     }

@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.springframework.security.test.context.support.WithMockUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -168,6 +170,7 @@ class CourseControllerMockTest {
 
 	@DisplayName("Delete course with valid input")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void deleteCourse_whenValidInput_thenReturns200() throws Exception {
 
 		mockMvc.perform(delete("/rest/Course/1")).andExpect(status().isOk());
@@ -175,6 +178,7 @@ class CourseControllerMockTest {
 
 	@DisplayName("Delete course with invalid id")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void deleteCourse_whenValidInput_thenReturns400_2() throws Exception {
 
 		doThrow(new IllegalArgumentException()).when(courseService).delete(1L);
@@ -220,6 +224,7 @@ class CourseControllerMockTest {
 	
 	@DisplayName("Move course to history")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void moveCourseToHistory_whenValidInput_thenReturns200() throws Exception {
 
 		doNothing().when(courseService).moveToHistoryCurse(1L);

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class CycleController extends BaseController {
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Adds cycle")
 	@PostMapping(value = "/rest/Cycle")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus addCycle(
 			@Parameter(description = "Cycle object", required = true) @RequestBody CycleDto cycleDto) {
 
@@ -47,6 +49,7 @@ public class CycleController extends BaseController {
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Adds cycle tournament")
 	@PostMapping(value = "/rest/CycleTournament")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus addCycleTournament(
 			@Parameter(description = "CycleTournament object", required = true) @RequestBody CycleTournamentDto cycleTournamentDto) {
 
@@ -88,6 +91,7 @@ public class CycleController extends BaseController {
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Close cycle. Further updates will not be possible.")
 	@PatchMapping(value = "/rest/CycleClose/{cycleId}")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus closeCycle(
 			@Parameter(description = "Cycle id to be closed", required = true) @PathVariable("cycleId") Long cycleId) {
 
@@ -102,6 +106,7 @@ public class CycleController extends BaseController {
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Deletes the last cycle tournament")
 	@PostMapping(value = "/rest/DeleteCycleTournament")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus deleteCycleTournament(
 			@Parameter(description = "Cycle object", required = true) @RequestBody CycleDto cycleDto) {
 
@@ -115,6 +120,7 @@ public class CycleController extends BaseController {
 	@Tag(name = "Cycle API")
 	@Operation(summary = "Deletes the cycle")
 	@DeleteMapping(value = "/rest/Cycle/{cycleId}")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus deleteCycle(
 			@Parameter(description = "Cycle id to be deleted", required = true) @PathVariable("cycleId") Long cycleId) {
 

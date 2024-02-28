@@ -36,7 +36,7 @@ import lombok.Setter;
 @Configuration
 @EnableCaching
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity( securedEnabled = true)
 public class WebSecurityConfiguration implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;

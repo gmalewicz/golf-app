@@ -70,6 +70,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			} catch (ExpiredJwtException e) {
 				log.info("JWT Token has expired for player: " + e.getClaims().getSubject());
+				response.setStatus(999);
 				jwtToken = processRefreshRequest(request, e, refreshToken);
 				if (jwtToken != null) {
 					userId = e.getClaims().getSubject();

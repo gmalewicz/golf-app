@@ -5,11 +5,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.greg.golf.error.TeeAlreadyExistsException;
-import com.greg.golf.service.helpers.RoleVerification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +17,7 @@ import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.FavouriteCourse;
 import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
-import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.TooShortStringForSearchException;
-import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.CourseRepository;
 import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.FavouriteCourseRepository;
@@ -32,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 
 @Slf4j
 @RequiredArgsConstructor
-//@ConfigurationProperties(prefix = "course")
 @Service("courseService")
 public class CourseService {
 
@@ -139,8 +134,6 @@ public class CourseService {
 	@Transactional
 	public void delete(Long id) {
 
-		RoleVerification.verifyRole(Common.ADMIN, "Attempt to delete course by unauthorized user");
-
 		courseRepository.deleteById(id);
 
 	}
@@ -172,18 +165,11 @@ public class CourseService {
 	@Transactional()
 	public void moveToHistoryCurse(Long courseId) {
 
-		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority()
-				.equals(Common.ADMIN)) {
-			// set historical flag for course
-			var course = courseRepository.findById(courseId).orElseThrow();
-			course.setHistorical(true);
-			courseRepository.save(course);
+		var course = courseRepository.findById(courseId).orElseThrow();
+		course.setHistorical(true);
+		courseRepository.save(course);
 
-			// remove course from favorites
-			favouriteCourseRepository.deleteByCourse(course);
-		} else {
-			log.error("Attempt to move course to history by unauthorized user");
-			throw new UnauthorizedException();
-		}
+		// remove course from favorites
+		favouriteCourseRepository.deleteByCourse(course);
 	}
 }
