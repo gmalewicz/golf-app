@@ -1,10 +1,14 @@
 package com.greg.golf.controller;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 import com.greg.golf.error.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +21,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(TooManyPlayersException.class)
@@ -124,8 +131,9 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(BadCredentialsException ex) {
-		
-		var response = new ApiErrorResponse("14", "Incorrect user name or password");
+
+		String message = getLocalizedMessage("error-14");
+		var response = new ApiErrorResponse("14", message);
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
 	
@@ -223,5 +231,11 @@ public class ApiExceptionHandler {
 
 		var response = new ApiErrorResponse("25", "Tee must be unique for a course.");
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	private String getLocalizedMessage(String translationKey)
+	{
+		Locale locale = LocaleContextHolder.getLocale();
+		return messageSource.getMessage(translationKey, null, locale);
 	}
 }
