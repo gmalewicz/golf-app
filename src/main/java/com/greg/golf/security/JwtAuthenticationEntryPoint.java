@@ -1,9 +1,7 @@
 package com.greg.golf.security;
 
-import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

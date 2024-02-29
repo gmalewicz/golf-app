@@ -177,7 +177,7 @@ public class CourseController extends BaseController {
 	@PostMapping(value = "/rest/MoveToHistoryCourse/{courseId}")
 	@Secured("ROLE_ADMIN")
 	public HttpStatus moveToHistoryCurse(
-			@Parameter(description = "Course id", example = "1", required = true) Long courseId) {
+			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("courseId") Long courseId) {
 
 		log.info("trying to move course to history");
 
