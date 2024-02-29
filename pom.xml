@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.6.0</version>
+	<version>3.6.1</version>
 	<name>golf</name>
-	<description>add tee endpoint</description>
+	<description>role security refactored</description>
 
 	<properties>
 		<java.version>17</java.version>
@@ -148,6 +148,12 @@
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${org.testcontainers.postgresql.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 

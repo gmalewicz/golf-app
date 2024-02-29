@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -192,6 +193,7 @@ public class RoundController extends BaseController {
 	@Tag(name = "Round API")
 	@Operation(summary = "Swap player in the round")
 	@PatchMapping(value = "/rest/SwapPlrRnd")
+	@Secured("ROLE_ADMIN")
 	public HttpStatus swapPlayerRnd( @Valid
 									 @Parameter(description = "Swap Player Round DTO object", required = true) @RequestBody SwapPlrRndDto playerUpdateDto) {
 

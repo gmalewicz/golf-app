@@ -18,10 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
@@ -30,7 +26,6 @@ import com.greg.golf.entity.Hole;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.TooShortStringForSearchException;
-import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -212,7 +207,7 @@ class CourseServiceTest {
 	@DisplayName("Add favourite course for player")
 	@Transactional
 	@Test
-	void addFavouruteCourseTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+	void addFavouriteCourseTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
 
 		Course course = new Course();
 		course.setId(1L);
@@ -270,13 +265,7 @@ class CourseServiceTest {
 	@Transactional
 	@Test
 	void moveCourseToHistoryTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
-		
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
-		
+
 		// first add the course to favorites
 		Course course = new Course();
 		course.setId(1L);
@@ -295,28 +284,7 @@ class CourseServiceTest {
 		//check if favorites are empty
 		assertEquals(0, favouriteCourseRepository.findAll().size());	
 	}
-	
-	@DisplayName("Should not move course to history by unauthorized user")
-	@Transactional
-	@Test
-	void moveCourseToHistoryByUnauthorizedUserTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
-		
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-		
-		// first add the course to favorites
-		Course course = new Course();
-		course.setId(1L);
-		courseService.addToFavourites(course, 1L);
 
-		// try to execute move operation - it shall throw exception
-		assertThrows(UnauthorizedException.class, () -> courseService.moveToHistoryCurse(1L));
-
-	}
-		
 	@AfterAll
 	public static void done() {
 

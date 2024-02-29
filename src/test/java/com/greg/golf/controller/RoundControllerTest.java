@@ -34,6 +34,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -277,6 +278,7 @@ class RoundControllerTest {
 
 	@DisplayName("Should swap players for round with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void swapPlayerForRoundRoundWhenValidInputThenReturns200() throws Exception {
 
 		var input = new SwapPlrRndDto();

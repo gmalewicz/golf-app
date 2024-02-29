@@ -4,7 +4,6 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.PlayerNickInUseException;
 import com.greg.golf.error.TooShortStringForSearchException;
-import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.service.helpers.GolfUser;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -75,45 +73,16 @@ class PlayerServiceTest {
 	@Test
 	void changePasswordSuccessTest(@Autowired AuthenticationManager authenticationManager) {
 
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
-		
 		player.setPassword("test");
 		playerService.resetPassword(player);
 		player = playerService.getPlayer(player.getId()).orElseThrow();
 		Assertions.assertDoesNotThrow(() -> authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), "test")));
 	}
 
-	@DisplayName("Unauthorized attempt to change password")
-	@Transactional
-	@Test
-	void changePasswordUnauthorizedTest() {
-
-		player.setPassword("test");
-		
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-		
-		assertThrows(UnauthorizedException.class, () -> playerService.resetPassword(player));
-
-	}
-	
 	@DisplayName("Attempt to change password for nonexistent user")
 	@Transactional
 	@Test
 	void changePasswordForNonexistentUserTest() {
-		
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-		
-		SecurityContextHolder.getContext().setAuthentication(
-			        new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
 
 		Player nonexistentPlayer = new Player();
 		nonexistentPlayer.setNick("unknown");
@@ -257,12 +226,6 @@ class PlayerServiceTest {
 	@Transactional
 	@Test
 	void deletePlayerTest(@Autowired PlayerRepository playerRepository) {
-
-		var authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-		SecurityContextHolder.getContext().setAuthentication(
-				new UsernamePasswordAuthenticationToken("authorized", "fake", authorities));
 
 		playerService.delete(1L);
 

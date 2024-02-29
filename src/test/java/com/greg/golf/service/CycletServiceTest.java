@@ -5,8 +5,6 @@ import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.entity.Player;
-import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
@@ -24,16 +22,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -81,43 +72,17 @@ class CycleServiceTest {
     @DisplayName("Should add the new cycle by authorized user")
     @Transactional
     @Test
-    void addCycleByAuthorizedUserTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+    void addCycleTest() {
 
         cycle = cycleService.addCycle(cycle);
 
         assertNotNull(cycle.getId());
     }
 
-    @DisplayName("Should not add the new cycle by unauthorized user")
-    @Transactional
-    @Test
-    void addCycleByUnauthorizedUserTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-
-        assertThrows(UnauthorizedException.class, () -> this.cycleService.addCycle(cycle));
-    }
-
     @DisplayName("Should try to delete tournament from empty cycle")
     @Transactional
     @Test
     void deleteTournamentFromEmptyCycleTest(@Autowired CycleRepository cycleRepository) {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
         cycleRepository.save(cycle);
 
@@ -130,12 +95,6 @@ class CycleServiceTest {
     void deleteTournamentFromCycleWithSingleTournamentTest(@Autowired CycleRepository cycleRepository,
                                                            @Autowired CycleTournamentRepository cycleTournamentRepository,
                                                            @Autowired CycleResultRepository cycleResultRepository) {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
         cycleRepository.save(cycle);
 
@@ -166,12 +125,6 @@ class CycleServiceTest {
     void deleteTournamentFromCycleWithTwoTournamentsTest(@Autowired CycleRepository cycleRepository,
                                                            @Autowired CycleTournamentRepository cycleTournamentRepository,
                                                            @Autowired CycleResultRepository cycleResultRepository) {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
         cycleRepository.save(cycle);
 
@@ -218,13 +171,7 @@ class CycleServiceTest {
             "true, 1, 11.0, 0",
             "false, 1, 11.0, 1",
     })
-    void addCycleTournamentByAuthorizedUserTest(boolean bestOf, int rounds, float whs, int bestRounds) {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+    void addCycleTournamentTest(boolean bestOf, int rounds, float whs, int bestRounds) {
 
         cycle.setBestRounds(bestRounds);
         cycle = cycleService.addCycle(cycle);
@@ -242,57 +189,15 @@ class CycleServiceTest {
         assertNotNull(cycleTournament.getId());
     }
 
-    @DisplayName("Should not add the cycle tournament by unauthorized user")
-    @Transactional
-    @Test
-    void addCycleTournamentByUnauthorizedUserTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-
-        cycle.setBestRounds(1);
-        cycle = cycleService.addCycle(cycle);
-
-        authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-
-        var cycleTournament = new CycleTournament();
-        cycleTournament.setName("Test cycle tournament");
-        cycleTournament.setBestOf(false);
-        cycleTournament.setRounds(1);
-        cycleTournament.setCycle(cycle);
-
-        eagleResultDto.setWhs(36.0F);
-
-        assertThrows(UnauthorizedException.class, () -> cycleService.addCycleTournament(cycleTournament, new EagleResultDto[]{eagleResultDto}));
-
-    }
-
-
     @DisplayName("Get all cycles")
     @Transactional
     @Test
     void getAllCyclesTest() {
 
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-
         cycleService.addCycle(cycle);
-        //cycle.setName("Test cycle 2");
-        //cycleService.addCycle(cycle);
 
         assertEquals(1, cycleService.findAllCycles().size());
         assertEquals("Test cycle", cycleService.findAllCycles().get(0).getName());
-        //assertEquals("Test cycle 2", cycleService.findAllCycles().get(0).getName());
 
     }
 
@@ -300,12 +205,6 @@ class CycleServiceTest {
     @Transactional
     @Test
     void getAllCycleTournamentTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
 
         cycle = cycleService.addCycle(cycle);
 
@@ -340,13 +239,7 @@ class CycleServiceTest {
     @DisplayName("Close cycle by authorized user")
     @Transactional
     @Test
-    void closeCycleByAuthorizedUserTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+    void closeCycleTest() {
 
         cycle = cycleService.addCycle(cycle);
 
@@ -358,38 +251,11 @@ class CycleServiceTest {
 
     }
 
-    @DisplayName("Attempt to close cycle by unauthorized user")
-    @Transactional
-    @Test
-    void attemptToCloseCycleByUnauthorizedUserTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-
-        Long cycleId = cycleService.addCycle(cycle).getId();
-
-        authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
-
-        assertThrows(UnauthorizedException.class, () -> this.cycleService.closeCycle(cycleId));
-    }
 
     @DisplayName("Should delete cycle by authorized user")
     @Transactional
     @Test
-    void deleteByAuthorizedUserTest() {
-
-        var authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(Common.ADMIN));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("unauthorized", "fake", authorities));
+    void deleteTest() {
 
         cycle = cycleService.addCycle(cycle);
 

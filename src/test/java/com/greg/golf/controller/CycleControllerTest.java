@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -95,6 +96,7 @@ class CycleControllerTest {
 
 	@DisplayName("Should add cycle with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void addCycleWhenValidInputThenReturns200() throws Exception {
 
 		var input = new CycleDto();
@@ -109,6 +111,7 @@ class CycleControllerTest {
 
 	@DisplayName("Should add cycle tournament with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void addCycleTournamentWhenValidInputThenReturns200() throws Exception {
 
 		var input = new CycleTournamentDto();
@@ -160,6 +163,7 @@ class CycleControllerTest {
 
 	@DisplayName("Should close cycle with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void closeCycleWithValidInputThenReturns200() throws Exception {
 
 		doNothing().when(cycleService).closeCycle(any());
@@ -169,6 +173,7 @@ class CycleControllerTest {
 
 	@DisplayName("Should delete cycle tournament with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void deleteCycleTournamentWhenValidInputThenReturns200() throws Exception {
 
 		var input = new CycleDto();
@@ -185,6 +190,7 @@ class CycleControllerTest {
 
 	@DisplayName("Should delete cycle with correct result")
 	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
 	void deleteCycleWhenValidInputThenReturns200() throws Exception {
 
 		doNothing().when(cycleService).deleteCycle(any());
