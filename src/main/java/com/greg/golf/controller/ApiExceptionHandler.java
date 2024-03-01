@@ -28,53 +28,62 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(TooManyPlayersException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooManyPlayersException ex) {
-		var response = new ApiErrorResponse("1", "Round cannot have more than 4 players");
+
+		String message = getLocalizedMessage("error-1", null);
+		var response = new ApiErrorResponse("1", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(PlayerAlreadyHasThatRoundException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerAlreadyHasThatRoundException ex) {
-		var response = new ApiErrorResponse("2", "Cannot save the same round for a player");
+
+		String message = getLocalizedMessage("error-2", null);
+		var response = new ApiErrorResponse("2", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(PlayerNickInUseException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerNickInUseException ex) {
-		var response = new ApiErrorResponse("3", "Player nick already used");
+		String message = getLocalizedMessage("error-3", null);
+		var response = new ApiErrorResponse("3", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(ConstraintViolationException ex) {
-		
-		var response = new ApiErrorResponse("4", "Bad request: constraint violation");
+
+		String message = getLocalizedMessage("error-4", null);
+		var response = new ApiErrorResponse("4", message);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(SendingMailFailureException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(SendingMailFailureException ex) {
-		
-		var response = new ApiErrorResponse("5", "Error sending email");
+
+		String message = getLocalizedMessage("error-5", null);
+		var response = new ApiErrorResponse("5", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 	
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(NoSuchElementException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(NoSuchElementException ex) {
-		
-		var response = new ApiErrorResponse("6", "Data not found");
+
+		String message = getLocalizedMessage("error-6", null);
+		var response = new ApiErrorResponse("6", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(TooFewHolesForTournamentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooFewHolesForTournamentException ex) {
-		
-		var response = new ApiErrorResponse("8", "18 holes must be played to be addded to tournament");
+
+		String message = getLocalizedMessage("error-8", null);
+		var response = new ApiErrorResponse("8", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 	
@@ -97,16 +106,18 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(UnauthorizedException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(UnauthorizedException ex) {
-		
-		var response = new ApiErrorResponse("11", "Authorization required to perform that operation");
+
+		String message = getLocalizedMessage("error-11", null);
+		var response = new ApiErrorResponse("11", message);
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(EntityNotFoundException ex) {
-		
-		var response = new ApiErrorResponse("12", "Data not found");
+
+		String message = getLocalizedMessage("error-12", null);
+		var response = new ApiErrorResponse("12", message);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -123,8 +134,9 @@ public class ApiExceptionHandler {
 	        errors.append(errorMessage);
 	        errors.append(" ");
 	    });
-		
-		var response = new ApiErrorResponse("13", "Data validation failed: " + errors);
+
+		String message = getLocalizedMessage("error-13", new Object[]{errors});
+		var response = new ApiErrorResponse("13", message);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -132,7 +144,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(BadCredentialsException ex) {
 
-		String message = getLocalizedMessage("error-14");
+		String message = getLocalizedMessage("error-14", null);
 		var response = new ApiErrorResponse("14", message);
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
@@ -140,32 +152,36 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(TooShortStringForSearchException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TooShortStringForSearchException ex) {
-		
-		var response = new ApiErrorResponse("15", "Too short string for search");
+
+		String message = getLocalizedMessage("error-15", null);
+		var response = new ApiErrorResponse("15", message);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(IllegalArgumentException ex) {
-		
-		var response = new ApiErrorResponse("16", "Incorrect parameter");
+
+		String message = getLocalizedMessage("error-16", null);
+		var response = new ApiErrorResponse("16", message);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(InvalidDataAccessApiUsageException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(InvalidDataAccessApiUsageException ex) {
-		
-		var response = new ApiErrorResponse("17", "Incorrect parameter");
+
+		String message = getLocalizedMessage("error-17", null);
+		var response = new ApiErrorResponse("17", message);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(ScoreCardUpdateException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(ScoreCardUpdateException ex) {
-		
-		var response = new ApiErrorResponse("18", "Unable to update scorecard");
+
+		String message = getLocalizedMessage("error-18", null);
+		var response = new ApiErrorResponse("18", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -173,7 +189,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(DeleteTournamentPlayerException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DeleteTournamentPlayerException ex) {
 
-		var response = new ApiErrorResponse("19", "Unable to delete player from tournament. Remove results first.");
+		String message = getLocalizedMessage("error-19", null);
+		var response = new ApiErrorResponse("19", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -181,7 +198,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(DuplicatePlayerInTournamentException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInTournamentException ex) {
 
-		var response = new ApiErrorResponse("20", "Player already added to the tournament.");
+		String message = getLocalizedMessage("error-20", null);
+		var response = new ApiErrorResponse("20", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -189,7 +207,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(DuplicatePlayerInLeagueException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicatePlayerInLeagueException ex) {
 
-		var response = new ApiErrorResponse("21", "Player already added to the league.");
+		String message = getLocalizedMessage("error-21", null);
+		var response = new ApiErrorResponse("21", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -197,7 +216,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(DuplicateMatchInLeagueException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicateMatchInLeagueException ex) {
 
-		var response = new ApiErrorResponse("22", "Match result already exists in the league.");
+		String message = getLocalizedMessage("error-22", null);
+		var response = new ApiErrorResponse("22", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -205,7 +225,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler( MatchResultForNotLeaguePleayerException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(MatchResultForNotLeaguePleayerException ex) {
 
-		var response = new ApiErrorResponse("23", "Match result cannot be added for player who is not part of the league.");
+		String message = getLocalizedMessage("error-23", null);
+		var response = new ApiErrorResponse("23", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -213,7 +234,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler( PlayerHasMatchException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(PlayerHasMatchException ex) {
 
-		var response = new ApiErrorResponse("24", "Player who played at least one match cannot be deleted.");
+		String message = getLocalizedMessage("error-24", null);
+		var response = new ApiErrorResponse("24", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -221,7 +243,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler( LeagueClosedException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(LeagueClosedException ex) {
 
-		var response = new ApiErrorResponse("24", "League must be opened.");
+		String message = getLocalizedMessage("error-25", null);
+		var response = new ApiErrorResponse("25", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -229,13 +252,14 @@ public class ApiExceptionHandler {
 	@ExceptionHandler( TeeAlreadyExistsException.class)
 	public ResponseEntity<ApiErrorResponse> handleApiException(TeeAlreadyExistsException ex) {
 
-		var response = new ApiErrorResponse("25", "Tee must be unique for a course.");
+		String message = getLocalizedMessage("error-26", null);
+		var response = new ApiErrorResponse("26", message);
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
-	private String getLocalizedMessage(String translationKey)
+	private String getLocalizedMessage(String translationKey, Object[] args)
 	{
 		Locale locale = LocaleContextHolder.getLocale();
-		return messageSource.getMessage(translationKey, null, locale);
+		return messageSource.getMessage(translationKey, args, locale);
 	}
 }
