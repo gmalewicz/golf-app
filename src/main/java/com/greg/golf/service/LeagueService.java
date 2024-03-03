@@ -124,7 +124,7 @@ public class LeagueService {
 
     }
 
-    public void addMatch(LeagueMatch leagueMatch) throws DuplicateMatchInLeagueException, MatchResultForNotLeaguePleayerException {
+    public void addMatch(LeagueMatch leagueMatch) throws DuplicateMatchInLeagueException, MatchResultForNotLeaguePlayerException {
 
         var league = leagueRepository.findById(leagueMatch.getLeague().getId()).orElseThrow();
 
@@ -146,7 +146,7 @@ public class LeagueService {
 
         if (leaguePlayerRepository.findByLeagueIdAndPlayerId(league.getId(), leagueMatch.getLooserId()).isEmpty() ||
                 leaguePlayerRepository.findByLeagueIdAndPlayerId(league.getId(), leagueMatch.getWinnerId()).isEmpty()) {
-            throw new MatchResultForNotLeaguePleayerException();
+            throw new MatchResultForNotLeaguePlayerException();
         }
 
         leagueMatchRepository.save(leagueMatch);

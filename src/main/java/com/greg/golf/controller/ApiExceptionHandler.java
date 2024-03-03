@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 import com.greg.golf.error.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -22,8 +21,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-	@Autowired
-	private MessageSource messageSource;
+	private final MessageSource messageSource;
+
+	public ApiExceptionHandler(MessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	@ExceptionHandler(TooManyPlayersException.class)
@@ -222,8 +224,8 @@ public class ApiExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-	@ExceptionHandler( MatchResultForNotLeaguePleayerException.class)
-	public ResponseEntity<ApiErrorResponse> handleApiException(MatchResultForNotLeaguePleayerException ex) {
+	@ExceptionHandler( MatchResultForNotLeaguePlayerException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(MatchResultForNotLeaguePlayerException ex) {
 
 		String message = getLocalizedMessage("error-23", null);
 		var response = new ApiErrorResponse("23", message);
