@@ -30,7 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +48,7 @@ import com.greg.golf.service.ScoreCardService;
 
 @Slf4j
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = RoundController.class)
+@SpringBootTest
 class RoundControllerTest {
 
 	@SuppressWarnings("unused")

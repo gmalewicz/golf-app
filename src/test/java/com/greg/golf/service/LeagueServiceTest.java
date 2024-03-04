@@ -521,7 +521,7 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("1", "fake", authorities));
 
-        assertThrows(MatchResultForNotLeaguePleayerException.class, () -> this.leagueService.addMatch(leagueMatch));
+        assertThrows(MatchResultForNotLeaguePlayerException.class, () -> this.leagueService.addMatch(leagueMatch));
     }
 
     @DisplayName("Should delete match")

@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import org.mockito.ArgumentCaptor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,21 +45,22 @@ import static org.mockito.BDDMockito.*;
 
 @Slf4j
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = CourseController.class)
+@SpringBootTest
 class CourseControllerMockTest {
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private CourseService courseService;
-
+	@SuppressWarnings("unused")
 	@MockBean
 	private PlayerService playerService;
-
+	@SuppressWarnings("unused")
 	@MockBean
 	private JwtRequestFilter jwtRequestFilter;
-
+	@SuppressWarnings("unused")
 	@MockBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
+	@SuppressWarnings("unused")
 	@MockBean
 	private ModelMapper modelMapper;
 
@@ -86,7 +86,8 @@ class CourseControllerMockTest {
 
 	private final MockMvc mockMvc;
 	private final ObjectMapper objectMapper;
-	
+
+
 	@Autowired
 	public CourseControllerMockTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;
@@ -132,7 +133,7 @@ class CourseControllerMockTest {
 		assertThat(stringCaptor.getValue()).isEqualTo("Test");
 	}
 
-	@DisplayName("Search for courses veryfying response")
+	@DisplayName("Search for courses verifying response")
 	@Test
 	void searchForCourses_whenValidInput_thenReturnsCourseList() throws Exception {
 
