@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.greg.golf.configurationproperties.TournamentServiceConfig;
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.DeleteTournamentPlayerException;
@@ -14,7 +15,7 @@ import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class TournamentService {
 
     private static final int TOURNAMENT_HOLES = 18;
+
+    private final TournamentServiceConfig tournamentServiceConfig;
 
     private final TournamentResultRepository tournamentResultRepository;
     private final TournamentRepository tournamentRepository;
@@ -88,9 +91,9 @@ public class TournamentService {
         tournamentRepository.save(tournamentResult.getTournament());
     }
 
-    @Transactional
-    public List<Tournament> findAllTournaments() {
-        return tournamentRepository.findAll(Sort.by(Sort.Direction.DESC, "endDate"));
+    @Transactional(readOnly = true)
+    public List<Tournament> findAllTournamentsPageable(Integer pageNo) {
+        return tournamentRepository.findAllByOrderByIdDesc(PageRequest.of(pageNo, tournamentServiceConfig.getPageSize()));
     }
 
     @Transactional
@@ -168,7 +171,7 @@ public class TournamentService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @EventListener
-    public void handleRoundEvent(RoundEvent roundEvent) {
+    public void handleRoundEvent(RoundEvent ignoredRoundEvent) {
         log.info("Handling round event... however tournament cannot be updated that way");
     }
 

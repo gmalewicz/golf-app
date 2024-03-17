@@ -99,8 +99,8 @@ class TournamentControllerTest {
 
 		var outputLst = new ArrayList<Tournament>();
 
-		when(tournamentService.findAllTournaments()).thenReturn(outputLst);
-		mockMvc.perform(get("/rest/Tournament")).andExpect(status().isOk());
+		when(tournamentService.findAllTournamentsPageable(any())).thenReturn(outputLst);
+		mockMvc.perform(get("/rest/Tournament/1")).andExpect(status().isOk());
 
 	}
 
