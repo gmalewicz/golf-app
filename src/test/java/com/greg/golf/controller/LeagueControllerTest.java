@@ -119,9 +119,9 @@ class LeagueControllerTest {
 
 		var outputLst = new ArrayList<League>();
 
-		when(leagueService.findAllLeagues()).thenReturn(outputLst);
+		when(leagueService.findAllLeaguesPageable(any())).thenReturn(outputLst);
 
-		mockMvc.perform(get("/rest/League")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/League/0")).andExpect(status().isOk());
 
 	}
 

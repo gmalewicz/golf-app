@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -46,11 +48,12 @@ public class LeagueController extends BaseController {
 
     @Tag(name = "League API")
     @Operation(summary = "Return all leagues")
-    @GetMapping(value = "/rest/League")
-    public List<LeagueDto> getLeagues() {
-        log.info("Requested list of leagues");
+    @GetMapping(value = "/rest/League/{pageId}")
+    public List<LeagueDto> getLeagues(
+            @Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") @NotNull @PositiveOrZero Integer pageId) {
 
-        return mapList(leagueService.findAllLeagues(), LeagueDto.class);
+        log.info("Requested list of leagues");
+        return mapList(leagueService.findAllLeaguesPageable(pageId), LeagueDto.class);
     }
 
     @Tag(name = "League API")

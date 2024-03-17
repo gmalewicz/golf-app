@@ -7,6 +7,7 @@ import com.greg.golf.entity.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,14 @@ public class TournamentController extends BaseController {
 	}
 
 	@Tag(name = "Tournament API")
-	@Operation(summary = "Return all tournaments")
-	@GetMapping(value = "/rest/Tournament")
-	public List<TournamentDto> getTournaments() {
-		log.info("Requested list of tournaments");
+	@Operation(summary = "Return tournaments")
+	@GetMapping(value = "/rest/Tournament/{pageId}")
+	public List<TournamentDto> getTournaments(
+			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") @NotNull @PositiveOrZero Integer pageId) {
 
-		return mapList(tournamentService.findAllTournaments(), TournamentDto.class);
+		log.info("Requested list of tournaments for page - " + pageId);
+
+		return mapList(tournamentService.findAllTournamentsPageable(pageId), TournamentDto.class);
 	}
 
 	@Tag(name = "Tournament API")

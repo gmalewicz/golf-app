@@ -70,6 +70,10 @@ player:
   tempPwd: welcome
   pageSize: 5
   minSearchLength: 3
+tournament:
+  pageSize: 10
+league:
+  pageSize: 10
 app:
   version: '@project.version@'
 

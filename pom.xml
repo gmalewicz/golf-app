@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>com.greg.golf</groupId>
 	<artifactId>golf-app</artifactId>
-	<version>3.6.2</version>
+	<version>3.6.3</version>
 	<name>golf</name>
-	<description>i18n for errors</description>
+	<description>pageable find for leagues and tournaments</description>
 
 	<properties>
 		<java.version>17</java.version>

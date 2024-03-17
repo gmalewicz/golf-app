@@ -1,5 +1,6 @@
 package com.greg.golf.service;
 
+import com.greg.golf.configurationproperties.LeagueServiceConfig;
 import com.greg.golf.entity.*;
 import com.greg.golf.error.*;
 import com.greg.golf.repository.LeagueMatchRepository;
@@ -9,7 +10,7 @@ import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.List;
 public class LeagueService {
 
     private static final String AUTHORIZATION_ERROR = "Attempt to add player by unauthorized user";
+
+    private final LeagueServiceConfig leagueServiceConfig;
 
     private final LeagueRepository leagueRepository;
 
@@ -36,9 +39,8 @@ public class LeagueService {
     }
 
     @Transactional(readOnly = true)
-    public List<League> findAllLeagues() {
-
-        return leagueRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    public List<League> findAllLeaguesPageable(Integer pageNo) {
+        return leagueRepository.findAllByOrderByIdDesc(PageRequest.of(pageNo, leagueServiceConfig.getPageSize()));
     }
 
     @Transactional

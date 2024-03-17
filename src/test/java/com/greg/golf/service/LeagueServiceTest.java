@@ -85,8 +85,8 @@ class LeagueServiceTest {
         league.setName("Test league");
         leagueService.addLeague(league);
 
-        assertEquals(1, leagueService.findAllLeagues().size());
-        assertEquals("Test league", leagueService.findAllLeagues().get(0).getName());
+        assertEquals(1, leagueService.findAllLeaguesPageable(0).size());
+        assertEquals("Test league", leagueService.findAllLeaguesPageable(0).get(0).getName());
 
     }
 
@@ -370,7 +370,7 @@ class LeagueServiceTest {
 
         this.leagueService.closeLeague(league.getId());
 
-        assertTrue(this.leagueService.findAllLeagues().get(0).getStatus());
+        assertTrue(this.leagueService.findAllLeaguesPageable(0).get(0).getStatus());
     }
 
     @DisplayName("Should not add match by unauthorized user")
@@ -669,7 +669,7 @@ class LeagueServiceTest {
 
         leagueService.deleteLeague(league.getId());
 
-        assertEquals(0, leagueService.findAllLeagues().size());
+        assertEquals(0, leagueService.findAllLeaguesPageable(0).size());
 
     }
 
