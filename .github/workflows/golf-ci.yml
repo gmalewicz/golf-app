@@ -45,7 +45,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    # only if it is not dependabot push
     - name: Build & analyze with SonarCloud
       if: ${{ github.actor != 'dependabot[bot]' }}
       run: gradle sonar
