@@ -35,7 +35,6 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
-    # only if it is not dependabot push
     - name: Build & analyze with SonarCloud
       if: ${{ github.actor != 'dependabot[bot]' }}
       run: gradle sonar
