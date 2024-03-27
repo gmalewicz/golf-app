@@ -19,9 +19,6 @@ jacoco {
     toolVersion = '0.8.11'
 }
 
-plugins.withType(JacocoPlugin) {
-    tasks["test"].finalizedBy 'jacocoTestReport'
-}
 
 jacocoTestReport {
     reports {
@@ -100,9 +97,6 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.springframework.security:spring-security-test'
 
-}
-
-dependencies {
     liquibaseRuntime 'org.liquibase:liquibase-core:4.24.0'
     liquibaseRuntime 'info.picocli:picocli:4.7.5'
     liquibaseRuntime 'org.yaml:snakeyaml:2.2'
@@ -114,7 +108,6 @@ dependencies {
     liquibaseRuntime 'com.vladmihalcea:hibernate-types-60:2.21.1'
     liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
 }
-apply plugin: "org.liquibase.gradle"
 
 configurations.implementation {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
@@ -140,6 +133,7 @@ test {
             excludeTestsMatching(project.property('excludeTests'))
         }
     }
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 sonar {
@@ -149,10 +143,10 @@ sonar {
         property 'sonar.host.url', 'https://sonarcloud.io'
         property 'sonar.java.source', '17'
         property 'sonar.sources', 'src/main/java,src/main/resources/templates'
-        property 'sonar.java.binaries', 'target/classes'
+        property 'sonar.java.binaries', 'build/classes'
         property 'sonar.sourceEncoding', 'UTF-8'
         property 'sonar.log.level', 'TRACE'
         property 'sonar.verbose', 'true'
-        property 'sonar.exclusions', '.git/**,.settings/**,target/**,.build'
+        property 'sonar.exclusions', '.git/**,.settings/**,build/**,.build'
     }
 }
