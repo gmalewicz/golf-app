@@ -50,13 +50,6 @@ jobs:
       if: ${{ github.actor != 'dependabot[bot]' }}
       run: gradle sonar
         -Dsonar.token=$SONAR_TOKEN
-       # -Dsonar.projectName=gmalewicz_golf-app
-       # -Dsonar.java.source=17
-       # -Dsonar.sources=src/main/java,src/main/resources/templates
-       # -Dsonar.java.binaries=target/classes
-       # -Dsonar.sourceEncoding=UTF-8
-       # -Dsonar.exclusions=.git/**,.settings/**,target/**
-       #   --file ./pom.xml
       env:
         google_recaptcha_key_site: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
         google_recaptcha_key_secret: ${{secrets.GOOGLE_RECAPTCHA_KEY_SECRET}}
