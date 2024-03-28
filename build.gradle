@@ -145,11 +145,9 @@ sonar {
         property 'sonar.sources', 'src/main/java,src/main/resources/templates'
         property 'sonar.java.binaries', 'build/classes'
         property 'sonar.sourceEncoding', 'UTF-8'
-        property 'sonar.log.level', 'TRACE'
-        property 'sonar.verbose', 'true'
         property 'sonar.exclusions', '.git/**,.settings/**,build/**,.build'
         property 'sonar.java.coveragePlugin', 'jacoco'
-        property 'sonar.coverage.jacoco.xmlReportPath', '${buildDir}/reports/jacoco/test/jacocoTestReport.xml'
+        property 'sonar.coverage.jacoco.xmlReportPath', 'build/reports/jacoco/test/jacocoTestReport.xml'
         property 'sonar.gradle.skipCompile', 'true'
     }
 }
