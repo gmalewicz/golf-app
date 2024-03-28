@@ -22,7 +22,7 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.required = false
+        xml.required = true
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
     }
@@ -138,7 +138,7 @@ test {
 
 sonar {
     properties {
-        property 'sonar.projectKey', 'gmalewicz_golf-app'
+        property 'sonar.projectKey', 'golf-app'
         property 'sonar.organization', 'gmalewicz'
         property 'sonar.host.url', 'https://sonarcloud.io'
         property 'sonar.java.source', '17'
@@ -148,5 +148,13 @@ sonar {
         property 'sonar.log.level', 'TRACE'
         property 'sonar.verbose', 'true'
         property 'sonar.exclusions', '.git/**,.settings/**,build/**,.build'
+        property 'sonar.java.coveragePlugin', 'jacoco'
+        property 'sonar.coverage.jacoco.xmlReportPath', '${buildDir}/reports/jacoco/test/jacocoTestReport.xml'
+        property 'sonar.gradle.skipCompile', 'true'
     }
+}
+
+tasks['sonar'].with {
+    dependsOn.clear()
+    dependsOn test
 }
