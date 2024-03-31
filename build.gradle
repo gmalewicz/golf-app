@@ -156,6 +156,5 @@ sonar {
 }
 
 tasks['sonar'].with {
-    dependsOn.clear()
-    dependsOn test
+    dependsOn build
 }
