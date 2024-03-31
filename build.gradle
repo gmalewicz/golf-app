@@ -15,10 +15,13 @@ application {
     mainClass.set('com.greg.golf.Golf')
 }
 
+tasks.named("jar") {
+    enabled = false
+}
+
 jacoco {
     toolVersion = '0.8.11'
 }
-
 
 jacocoTestReport {
     reports {
