@@ -71,7 +71,7 @@ jobs:
       if: always()
       run: |
         mkdir target
-        ls ./build/libs
+        ls ./build
         cp ./build/libs/golf-*.jar ./target/golf.jar
              
     - name: Set up version
