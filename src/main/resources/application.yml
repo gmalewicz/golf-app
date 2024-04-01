@@ -75,7 +75,7 @@ tournament:
 league:
   pageSize: 10
 app:
-  version: '@project.version@'
+  version: ${version}
 
 ---
 

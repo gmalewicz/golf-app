@@ -11,6 +11,12 @@ group = 'com.greg.golf'
 version = '3.6.4'
 description = 'DGNG backend application'
 
+processResources {
+    filesMatching("**/*.yml") {
+        expand project.properties
+    }
+}
+
 application {
     mainClass.set('com.greg.golf.Golf')
 }
