@@ -81,15 +81,15 @@ jobs:
       run: echo "VERSION=$($VERSION_EXP)" >> $GITHUB_ENV   
       
     - name: Install doctl
-      if: startsWith(github.ref, 'refs/tags/')
-      #if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
+      if: always()
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
       
     - name: Assemble image
-      #if: always()
-      if: startsWith(github.ref, 'refs/tags/')
+      if: always()
+      #if: startsWith(github.ref, 'refs/tags/')
       run: docker build -t $IMAGE:$VERSION -t $IMAGE:latest .
        
     - name: Publish image

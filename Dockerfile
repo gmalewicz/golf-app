@@ -3,7 +3,7 @@ FROM eclipse-temurin:17.0.4.1_1-jre-alpine
 LABEL maintainer="Grzegorz Malewicz"
 LABEL github="https://github.com/gmalewicz/golf-app"
 
-ARG APP=./target/golf-*.jar
+ARG APP=./target/golf*.jar
 
 RUN addgroup --system golf
 
