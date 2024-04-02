@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '3.2.2'
+    id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'application'
     id 'org.liquibase.gradle' version '2.2.1'
-    id 'org.sonarqube' version '4.4.1.3373'
+    id 'org.sonarqube' version '5.0.0.4638'
     id 'jacoco'
 }
 
@@ -108,11 +108,11 @@ dependencies {
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    liquibaseRuntime 'org.liquibase:liquibase-core:4.24.0'
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.27.0'
     liquibaseRuntime 'info.picocli:picocli:4.7.5'
     liquibaseRuntime 'org.yaml:snakeyaml:2.2'
     liquibaseRuntime 'javax.xml.bind:jaxb-api:2.3.1'
-    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.26.0'
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.27.0'
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
     liquibaseRuntime 'com.vladmihalcea:hibernate-types-60:2.21.1'
