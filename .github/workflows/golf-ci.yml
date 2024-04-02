@@ -71,7 +71,9 @@ jobs:
       #if: always()
       run: |
         mkdir target
+        echo start copying
         cp ./build/libs/golf-*.jar ./target/golf.jar
+        ls ./target
              
     - name: Set up version
       #if: always()
