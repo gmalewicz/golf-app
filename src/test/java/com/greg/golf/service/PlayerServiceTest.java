@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -30,6 +31,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
@@ -76,7 +78,7 @@ class PlayerServiceTest {
 		player.setPassword("test");
 		playerService.resetPassword(player);
 		player = playerService.getPlayer(player.getId()).orElseThrow();
-		Assertions.assertDoesNotThrow(() -> authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), "test")));
+		assertDoesNotThrow(() -> authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(player.getNick(), "test")));
 	}
 
 	@DisplayName("Attempt to change password for nonexistent user")
@@ -218,8 +220,8 @@ class PlayerServiceTest {
 
 		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
 
-		Assertions.assertDoesNotThrow(() -> playerService.generateJwtToken(userDetails));
-		Assertions.assertDoesNotThrow(() -> playerService.generateRefreshToken(userDetails));
+		assertDoesNotThrow(() -> playerService.generateJwtToken(userDetails));
+		assertDoesNotThrow(() -> playerService.generateRefreshToken(userDetails));
 	}
 
 	@DisplayName("Delete player test")
@@ -366,6 +368,30 @@ class PlayerServiceTest {
 		Assertions.assertEquals(1, retLst.size());
 
 	}
+
+
+	@DisplayName("Should update email by authorized user")
+	@Transactional
+	@Test
+	void updateEmailByAuthorizedUserTest() {
+
+		var authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
+
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken("1", "fake", authorities));
+
+		var playerEmail = new Player();
+		playerEmail.setId(1L);
+		playerEmail.setEmail("mail@test.com");
+
+		playerService.update(playerEmail);
+
+		assertDoesNotThrow(() -> {
+			Assertions.assertEquals("mail@test.com", playerService.getEmail(1L));
+		});
+	}
+
 
 	@AfterAll
 	public static void done(@Autowired PlayerRepository playerRepository) {

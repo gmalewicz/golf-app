@@ -6,24 +6,26 @@ import java.util.stream.Collectors;
 import com.greg.golf.configurationproperties.TournamentServiceConfig;
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.DeleteTournamentPlayerException;
-import com.greg.golf.error.DuplicatePlayerInTournamentException;
+import com.greg.golf.error.*;
 import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.greg.golf.error.TooFewHolesForTournamentException;
 import com.greg.golf.service.events.RoundEvent;
 
 import lombok.RequiredArgsConstructor;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Slf4j
 @Service("tournamentService")
@@ -42,6 +44,11 @@ public class TournamentService {
     private final TournamentRoundRepository tournamentRoundRepository;
     private final PlayerRepository playerRepository;
     private final TournamentPlayerRepository tournamentPlayerRepository;
+    private final TournamentNotificationRepository tournamentNotificationRepository;
+    private final EmailServiceImpl emailServiceImpl;
+    private final TemplateEngine templateEngine;
+    private final PlayerService playerService;
+
     @Lazy
     private final TournamentService self;
 
@@ -670,7 +677,7 @@ public class TournamentService {
     @Transactional
     public void addTeeTimes(Long tournamentId, TeeTimeParameters teeTimeParameters) {
 
-        if  (teeTimeParameters.getTeeTimes().size() == 0) {
+        if  (teeTimeParameters.getTeeTimes().isEmpty()) {
             return;
         }
         var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
@@ -704,5 +711,88 @@ public class TournamentService {
         tournament.setTeeTimeParameters(null);
         tournamentRepository.save(tournament);
 
+    }
+
+    @Transactional(readOnly = true)
+    public int processNotifications(Long tournamentId) throws GeneralException {
+
+        int sentNotifications = 0;
+
+        var notifications = tournamentNotificationRepository.findByTournamentId(tournamentId);
+
+        if (!notifications.isEmpty()) {
+
+            var receipients = new ArrayList<String>();
+
+            notifications.forEach(notification -> {
+
+                var email = playerService.getEmail(notification.getPlayerId());
+
+                if (email != null) {
+                    receipients.add(email);
+                }
+            });
+
+            if (!receipients.isEmpty()) {
+
+                var tournament = tournamentRepository.findById(tournamentId);
+
+                // only tournament owner can do it
+                RoleVerification.verifyPlayer(tournament.orElseThrow().getPlayer().getId(), "Attempt to process notifications by unauthorized user");
+
+                var context = new Context();
+                context.setVariable("tournamentName", tournament.orElseThrow().getName());
+                context.setVariable("results", tournament.orElseThrow().getTournamentResult());
+                String body = templateEngine.process("TournamentResultsTemplate.html", context);
+
+                try {
+                    emailServiceImpl.sendEmail(receipients.toArray(new String[receipients.size()]), "Tournament results updated - " + tournament.orElseThrow().getName(), body);
+                    sentNotifications++;
+                } catch (MessagingException e) {
+                    throw new GeneralException();
+                }
+            }
+        }
+        return sentNotifications;
+    }
+
+    @Transactional
+    public void addNotification(Long tournamentId) throws DuplicateNotificationException, MailNotSetException {
+
+        Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        log.info("trying to add notifications for tournament: " + tournamentId + " and player: " + playerId);
+
+        // check if player has defined email
+        var player = playerRepository.findById(playerId);
+        if (player.orElseThrow().getEmail() == null) {
+            throw new MailNotSetException();
+        }
+
+        // check if tournament is not closed
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+        if (tournament.getStatus() == Tournament.STATUS_OPEN) {
+
+            var tournamentNotification = new TournamentNotification();
+            tournamentNotification.setTournamentId(tournamentId);
+            tournamentNotification.setPlayerId(playerId);
+
+            try {
+                tournamentNotificationRepository.save(tournamentNotification);
+            } catch (Exception ex) {
+                throw  new DuplicateNotificationException();
+            }
+
+        }
+    }
+
+    @Transactional
+    public void removeNotification(Long tournamentId) {
+
+        Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        log.info("trying to remove notifications for tournament: " + tournamentId + " and player: " + playerId);
+
+        tournamentNotificationRepository.deleteByTournamentIdAndPlayerId(tournamentId, playerId);
     }
 }

@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import com.greg.golf.captcha.ICaptchaService;
 import com.greg.golf.configurationproperties.PlayerServiceConfig;
+import com.greg.golf.error.GeneralException;
 import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.repository.projection.PlayerRoundCnt;
 import com.greg.golf.security.JwtTokenUtil;
 import com.greg.golf.security.RefreshTokenUtil;
+import com.greg.golf.security.aes.StringUtility;
 import com.greg.golf.service.helpers.RoleVerification;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -203,9 +205,14 @@ public class PlayerService {
 			persistedPlayer.setWhs(player.getWhs());
 			log.info("Handicap changed by player");
 		}
-		if (player.getPassword() != null && !player.getPassword().equals("")) {
+		if (player.getPassword() != null && !player.getPassword().isEmpty()) {
 			persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
 			log.info("Password changed by player");
+		}
+
+		if (player.getEmail() != null && !player.getEmail().isEmpty()) {
+			persistedPlayer.setEmail(encryptEmail(player.getEmail()));
+			log.info("Email changed by player");
 		}
 
 		playerRepository.save(persistedPlayer);
@@ -247,7 +254,7 @@ public class PlayerService {
 	@Transactional
 	public void resetPassword(Player player) {
 
-		if (player.getPassword() != null && !player.getPassword().equals("")) {
+		if (player.getPassword() != null && !player.getPassword().isEmpty()) {
 			Player persistedPlayer = playerRepository.findPlayerByNick(player.getNick()).orElseThrow();
 			persistedPlayer.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
 			playerRepository.save(persistedPlayer);
@@ -278,5 +285,38 @@ public class PlayerService {
 
 		return playerRepository.findByNickContainingIgnoreCaseOrderByNickAsc(nick,
 				PageRequest.of(pageNo, playerServiceConfig.getPageSize()));
+	}
+
+	private String encryptEmail(String email) throws GeneralException {
+
+		String encryptedEmail = null;
+
+		if (email != null) {
+			try {
+				encryptedEmail = StringUtility.encryptString(email, playerServiceConfig.getEmailPwd());
+			} catch(Exception e) {
+				throw new GeneralException();
+			}
+		}
+
+		return encryptedEmail;
+	}
+
+	@Transactional(readOnly = true)
+	public String getEmail(Long id) throws GeneralException {
+
+		String decryptedEmail = null;
+
+		Player player = playerRepository.findById(id).orElseThrow();
+
+		if (player.getEmail() != null) {
+			try {
+				decryptedEmail = StringUtility.decryptString(player.getEmail(), playerServiceConfig.getEmailPwd());
+			} catch(Exception e) {
+				throw new GeneralException();
+			}
+		}
+
+		return decryptedEmail;
 	}
 }

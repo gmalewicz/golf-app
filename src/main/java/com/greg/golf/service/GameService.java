@@ -54,7 +54,7 @@ public class GameService {
 		String body = templateEngine.process("GameDetailsMailTemplate.html", context);
 		
 		
-		emailServiceImpl.sendEmail(gameSendData.getEmail(), "Game results", body);
+		emailServiceImpl.sendEmail(new String[] {gameSendData.getEmail()}, "Game results", body);
 	}
 
 }

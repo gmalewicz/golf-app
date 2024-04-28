@@ -5,10 +5,11 @@ plugins {
     id 'org.liquibase.gradle' version '2.2.1'
     id 'org.sonarqube' version '5.0.0.4638'
     id 'jacoco'
+    id 'idea'
 }
 
 group = 'com.greg.golf'
-version = '3.6.4'
+version = '3.6.5'
 description = 'DGNG backend application'
 
 processResources {
@@ -22,7 +23,7 @@ application {
 }
 
 tasks.named("jar") {
-    enabled = false
+    enabled = true
 }
 
 jacoco {
@@ -45,21 +46,24 @@ repositories {
     mavenCentral()
 }
 
+diffChangelog.dependsOn compileJava
+
+
 liquibase {
     activities {
         main {
-            changelogFile 'src/main/resources/db/dbChangeLog-dev.xml'
-            outputFile 'src/main/resources/db/liquibase-diffChangeLog.xml'
-            diffTypes 'tables,indexes'
+            changelogFile './src/main/resources/db/dbChangeLog-diff.xml'
+            driver 'org.postgresql.Driver'
             url 'jdbc:postgresql://localhost:5432/golf'
             referenceUrl 'hibernate:spring:com.greg.golf.entity?dialect=org.hibernate.dialect.PostgreSQLDialect'
+            referenceDriver 'liquibase.ext.hibernate.database.connection.HibernateDriver'
             if (project.hasProperty("jdbcUsername")) {
                 username project.getProperty('jdbcUsername')
             }
             if (project.hasProperty("jdbcPassword")) {
                 password project.getProperty('jdbcPassword')
             }
-            logLevel 'info'
+            logLevel 'debug'
             verbose 'true'
         }
     }
@@ -76,6 +80,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+
+
     implementation 'org.springframework:spring-websocket'
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.security:spring-security-messaging'
@@ -109,15 +116,17 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     liquibaseRuntime 'org.liquibase:liquibase-core:4.27.0'
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.27.0'
+    liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'info.picocli:picocli:4.7.5'
     liquibaseRuntime 'org.yaml:snakeyaml:2.2'
     liquibaseRuntime 'javax.xml.bind:jaxb-api:2.3.1'
-    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.27.0'
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
     liquibaseRuntime 'com.vladmihalcea:hibernate-types-60:2.21.1'
     liquibaseRuntime 'com.vladmihalcea:hibernate-types-60:2.21.1'
     liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    liquibaseRuntime sourceSets.main.output
 }
 
 configurations.implementation {

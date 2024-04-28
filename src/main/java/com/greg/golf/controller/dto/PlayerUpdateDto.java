@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,4 +27,8 @@ public class PlayerUpdateDto {
 	@Size(min = 1, max = 60, message = "Password must be between 1 and 60 characters")
 	@Schema(description = "Player password", example = "welcome", accessMode = WRITE_ONLY, minLength=1, maxLength=60)
 	protected String password;
+
+	@Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+	@Schema(description = "Player email", example = "welcome", accessMode = WRITE_ONLY)
+	protected String email;
 }

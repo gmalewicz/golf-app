@@ -259,6 +259,33 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(GeneralException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(GeneralException ex) {
+
+		String message = getLocalizedMessage("error-27", null);
+		var response = new ApiErrorResponse("27", message);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler(DuplicateNotificationException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(DuplicateNotificationException ex) {
+
+		String message = getLocalizedMessage("error-28", null);
+		var response = new ApiErrorResponse("28", message);
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler(MailNotSetException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(MailNotSetException ex) {
+
+		String message = getLocalizedMessage("error-29", null);
+		var response = new ApiErrorResponse("29", message);
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
 	private String getLocalizedMessage(String translationKey, Object[] args)
 	{
 		Locale locale = LocaleContextHolder.getLocale();

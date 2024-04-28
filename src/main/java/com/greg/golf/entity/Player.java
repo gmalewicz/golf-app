@@ -55,6 +55,11 @@ public class Player implements Comparable<Player> {
 	private Boolean modified;
 
 	@EqualsAndHashCode.Exclude
+
+	// encrypted optional email address
+	private String email;
+
+	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(cascade = { CascadeType.ALL })
 	@JoinTable(name = "player_round", joinColumns = { @JoinColumn(name = "player_id") }, inverseJoinColumns = {
