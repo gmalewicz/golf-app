@@ -9,9 +9,11 @@ import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.DeleteTournamentPlayerException;
 import com.greg.golf.error.DuplicatePlayerInTournamentException;
+import com.greg.golf.error.MailNotSetException;
 import com.greg.golf.error.UnauthorizedException;
 import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.security.aes.StringUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -33,6 +35,8 @@ import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
 @Slf4j
 @SpringBootTest
@@ -54,6 +58,9 @@ class TournamentServiceTest {
 	@SuppressWarnings("unused")
 	@Autowired
 	TournamentResultRepository tournamentResultRepository;
+
+	@MockBean
+	private EmailServiceImpl emailService;
 
 	private static Long roundId;
 
@@ -1308,6 +1315,148 @@ class TournamentServiceTest {
 		tournamentService.deleteTeeTimes(tournament.getId());
 
 		assertNull(tournamentService.getTeeTimes(tournament.getId()));
+	}
+
+	@DisplayName("Send notification")
+	@Transactional
+	@Test
+	void attemptToSendNotificationButPlayerNotProvidedEmailTest(@Autowired TournamentRepository tournamentRepository,
+									   @Autowired PlayerService playerService,
+									   @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(100);
+		tournamentResult.setStrokesBrutto(100);
+		tournamentResult.setStrokesNetto(100);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		var tournamentId = tournament.getId();
+
+		var tournamentNotification = new TournamentNotification();
+		tournamentNotification.setPlayerId(1L);
+		tournamentNotification.setTournamentId(tournamentId);
+		tournamentNotificationRepository.save(tournamentNotification);
+
+		assertEquals(0, tournamentService.processNotifications(tournamentId));
+	}
+
+	@DisplayName("Send notification")
+	@Transactional
+	@Test
+	void attemptToSendNotificationTest(@Autowired TournamentRepository tournamentRepository,
+																@Autowired PlayerService playerService,
+																@Autowired TournamentNotificationRepository tournamentNotificationRepository) {
+
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		player.setEmail("grzegorz.malewicz@gmail.com");
+		playerService.update(player);
+
+		var tournament = tournamentRepository.findAll().get(0);
+		var tournamentResult = new TournamentResult();
+		tournamentResult.setPlayedRounds(100);
+		tournamentResult.setStrokesBrutto(100);
+		tournamentResult.setStrokesNetto(100);
+		tournamentResult.setStbGross(0);
+		tournamentResult.setStbNet(0);
+		tournamentResult.setPlayer(player);
+		tournamentResult.setStrokeRounds(1);
+		tournamentResult.setTournament(tournament);
+		tournamentResultRepository.save(tournamentResult);
+
+		var tournamentId = tournament.getId();
+
+		var tournamentNotification = new TournamentNotification();
+		tournamentNotification.setPlayerId(1L);
+		tournamentNotification.setTournamentId(tournamentId);
+		tournamentNotificationRepository.save(tournamentNotification);
+
+		try {
+			doNothing().when(emailService).sendEmail(any(), any(), any());
+		} catch (Exception e) {
+			fail("Method emailService.sendMail throws exception");
+		}
+
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId));
+	}
+
+	@DisplayName("Add notification for closed tournament")
+	@Transactional
+	@Test
+	void attemptToAddNotificationForClosedTournamentTest(@Autowired TournamentRepository tournamentRepository,
+													     @Autowired PlayerService playerService,
+														 @Autowired PlayerRepository playerRepository,
+													     @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
+
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		try {
+			player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword"));
+		} catch (Exception e) {
+			fail("Should not throw any exception");
+		}
+		playerRepository.save(player);
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+
+		var tournament = tournamentRepository.findAll().get(0);
+		tournament.setStatus(Tournament.STATUS_CLOSE);
+		tournamentRepository.save(tournament);
+
+		tournamentService.addNotification(tournament.getId());
+
+		assertEquals(0, tournamentNotificationRepository.findAll().size());
+	}
+
+	@DisplayName("Add notification for opened tournament")
+	@Transactional
+	@Test
+	void attemptToAddNotificationForOpenedTournamentButNoEmailSetTest(@Autowired TournamentRepository tournamentRepository,
+														 @Autowired PlayerService playerService,
+														 @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
+
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+
+		var tournament = tournamentRepository.findAll().get(0);
+
+		Long id = tournament.getId();
+		assertThrows(MailNotSetException.class, () -> tournamentService.addNotification(id));
+
+		//tournamentService.addNotification(tournament.getId());
+
+
+		//assertEquals(1, tournamentNotificationRepository.findAll().size());
 	}
 
 	@AfterAll

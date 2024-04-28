@@ -213,12 +213,12 @@ public class TournamentController extends BaseController {
 	@PostMapping(value = "/rest/Tournament/TeeTime/{tournamentId}")
 	public HttpStatus addTeeTimes(
 			@Parameter(description = "Tournament id", example = "1", required = true)
-				@NotNull
-				@Positive
-				@PathVariable("tournamentId") Long tournamentId,
+			@NotNull
+			@Positive
+			@PathVariable("tournamentId") Long tournamentId,
 			@Parameter(description = "TeeTimeParameters object", required = true)
-				@RequestBody
-				@Valid TeeTimeParametersDto teeTimeParametersDto) {
+			@RequestBody
+			@Valid TeeTimeParametersDto teeTimeParametersDto) {
 
 		log.info("trying to add tee times for tournament: " + tournamentId);
 		tournamentService.addTeeTimes(tournamentId, modelMapper.map(teeTimeParametersDto, TeeTimeParameters.class));
@@ -253,4 +253,43 @@ public class TournamentController extends BaseController {
 		return HttpStatus.OK;
 	}
 
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Send email notification to subscribers")
+	@PostMapping(value = "/rest/Tournament/Notification/{tournamentId}")
+	public HttpStatus notifySubscribers(
+			@Parameter(description = "Tournament id", example = "1", required = true)
+			@NotNull
+			@Positive
+			@PathVariable("tournamentId") Long tournamentId) {
+
+		log.info("trying to send notifications for tournament: " + tournamentId);
+		tournamentService.processNotifications(tournamentId);
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Add notification to tournament")
+	@PostMapping(value = "/rest/Tournament/AddNotification/{tournamentId}")
+	public HttpStatus addNotification(
+			@Parameter(description = "Tournament id", example = "1", required = true)
+			@NotNull
+			@Positive
+			@PathVariable("tournamentId") Long tournamentId) {
+
+		tournamentService.addNotification(tournamentId);
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Removes notification from tournament")
+	@PostMapping(value = "/rest/Tournament/RemoveNotification/{tournamentId}")
+	public HttpStatus removeNotification(
+			@Parameter(description = "Tournament id", example = "1", required = true)
+			@NotNull
+			@Positive
+			@PathVariable("tournamentId") Long tournamentId) {
+
+		tournamentService.removeNotification(tournamentId);
+		return HttpStatus.OK;
+	}
 }

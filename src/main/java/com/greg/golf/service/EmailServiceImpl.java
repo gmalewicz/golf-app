@@ -13,7 +13,7 @@ public class EmailServiceImpl implements EmailService {
 
 	private final JavaMailSender javaMailSender;
 
-	public void sendEmail(String to, String title, String content) throws MessagingException {
+	public void sendEmail(String[] to, String title, String content) throws MessagingException {
 		var mail = javaMailSender.createMimeMessage();
 
 		var helper = new MimeMessageHelper(mail, true);

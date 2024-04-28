@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="1712155752645-24">
+		<addColumn tableName="player">
+			<column name="email" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1713274412010-24">
+		<createTable tableName="tournament_notification">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="notificationPK"/>
+			</column>
+			<column name="player_id" type="BIGINT"/>
+			<column name="tournament_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="1713274412010-25">
+		<createIndex indexName="tour_notification_player_id" tableName="tournament_notification" unique="true">
+			<column name="player_id"/>
+			<column name="tournament_id"/>
+		</createIndex>
+	</changeSet>
+</databaseChangeLog>

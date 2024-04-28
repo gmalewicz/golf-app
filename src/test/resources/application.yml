@@ -74,6 +74,7 @@ player:
   tempPwd: welcome
   pageSize: 5
   minSearchLength: 3
+  emailPwd: welcome
 tournament:
   pageSize: 10
 league:

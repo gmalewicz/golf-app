@@ -13,4 +13,6 @@ public class PlayerServiceConfig {
 	private Integer pageSize;
 
 	private Integer minSearchLength;
+
+	private String emailPwd;
 }

@@ -328,6 +328,26 @@ class TournamentControllerTest {
 		mockMvc.perform(delete("/rest/Tournament/TeeTime/1")).andExpect(status().isOk());
 	}
 
+	@DisplayName("Should process notification")
+	@Test
+	void processNotificationWhenValidInputThenReturns200() throws Exception {
+
+		when(tournamentService.processNotifications(any())).thenReturn(0);
+
+		mockMvc.perform(post("/rest/Tournament/Notification/1").contentType("application/json"))
+				.andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should add notification")
+	@Test
+	void addNotificationWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).addNotification(any());
+
+		mockMvc.perform(post("/rest/Tournament/AddNotification/1").contentType("application/json"))
+				.andExpect(status().isOk()).andReturn();
+	}
+
 	@AfterAll
 	public static void done() {
 
