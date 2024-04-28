@@ -348,6 +348,16 @@ class TournamentControllerTest {
 				.andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should remove notification")
+	@Test
+	void removeNotificationWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).removeNotification(any());
+
+		mockMvc.perform(post("/rest/Tournament/RemoveNotification/1").contentType("application/json"))
+				.andExpect(status().isOk()).andReturn();
+	}
+
 	@AfterAll
 	public static void done() {
 
