@@ -213,4 +213,13 @@ public class AccessController extends BaseController {
 
 		return mapList(playerService.searchForPlayer(playerNickDto.getNick(), playerNickDto.getPage()), PlayerDto.class);
 	}
+
+	@Tag(name = "Access API")
+	@Operation(summary = "Removes player email")
+	@PostMapping(value = "/rest/DeletePlayerEmail")
+	public HttpStatus deleteEmail() {
+
+		playerService.deleteEmail();
+		return HttpStatus.OK;
+	}
 }

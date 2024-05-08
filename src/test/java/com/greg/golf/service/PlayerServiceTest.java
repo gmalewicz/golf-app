@@ -393,6 +393,28 @@ class PlayerServiceTest {
 	}
 
 
+	@DisplayName("Delete email")
+	@Transactional
+	@Test
+	void deleteEmailTest(@Autowired PlayerRepository playerRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		player.setEmail("test");
+		playerRepository.save(player);
+		playerService.deleteEmail();
+
+		var newPlayer = playerRepository.findById(1L).orElseThrow();
+		Assertions.assertNull(newPlayer.getEmail());
+	}
+
 	@AfterAll
 	public static void done(@Autowired PlayerRepository playerRepository) {
 

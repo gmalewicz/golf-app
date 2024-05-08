@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -318,5 +319,17 @@ public class PlayerService {
 		}
 
 		return decryptedEmail;
+	}
+
+	@Transactional
+	public void deleteEmail() {
+
+		Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+		log.info("Trying to remove email for player: " + playerId);
+
+		var player = playerRepository.findById(playerId).orElseThrow();
+		player.setEmail(null);
+		playerRepository.save(player);
+
 	}
 }
