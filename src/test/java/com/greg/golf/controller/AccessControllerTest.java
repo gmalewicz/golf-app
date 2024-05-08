@@ -300,6 +300,16 @@ class AccessControllerTest {
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 
+	@DisplayName("Should remove email")
+	@Test
+	void removeEmailThenReturns200() throws Exception {
+
+		doNothing().when(playerService).deleteEmail();
+
+		mockMvc.perform(post("/rest/DeletePlayerEmail").contentType("application/json"))
+				.andExpect(status().isOk()).andReturn();
+	}
+
 	@AfterAll
 	public static void done() {
 

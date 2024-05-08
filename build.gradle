@@ -23,7 +23,7 @@ application {
 }
 
 tasks.named("jar") {
-    enabled = true
+    enabled = false
 }
 
 jacoco {
