@@ -67,8 +67,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Rename the file 
-      #if: startsWith(github.ref, 'refs/tags/')
-      if: always()
+      if: startsWith(github.ref, 'refs/tags/')
+      #if: always()
       run: |
         mkdir target
         echo start copying
