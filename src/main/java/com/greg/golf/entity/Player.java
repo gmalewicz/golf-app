@@ -59,6 +59,9 @@ public class Player implements Comparable<Player> {
 	// encrypted optional email address
 	private String email;
 
+	// refresh token
+	private String refresh;
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(cascade = { CascadeType.ALL })

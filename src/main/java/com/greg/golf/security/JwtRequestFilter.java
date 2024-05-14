@@ -148,11 +148,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			try {
 
 				Player player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject())).orElseThrow();
+				playerService.cacheEvict(player);
+				player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject())).orElseThrow();
 
 				UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<>());
 
-				// if positive generate the new JWT token and replace it in the request
+				// verify if token exists in database
+				// each time the token is used, it is replaced in database
+				if (player.getRefresh() == null || !player.getRefresh().equals(refreshToken)) {
+					log.error("Attempt to use refresh token the second time - player id: " + player.getId());
+					throw new RuntimeException("Attempt to use refresh token the second time");
+				}
 
+				// if positive generate the new JWT token and replace it in the request
 				if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
 
 					jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());

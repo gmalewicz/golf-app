@@ -101,7 +101,12 @@ public class PlayerService {
 	}
 
 	public String generateRefreshToken(GolfUserDetails userDetails) {
-		return refreshTokenUtil.generateToken(userDetails);
+
+		var refresh =refreshTokenUtil.generateToken(userDetails);
+		var player = userDetails.getPlayer();
+		player.setRefresh(refresh);
+		playerRepository.save(player);
+		return refresh;
 	}
 
 	@Transactional
