@@ -1,6 +1,7 @@
 package com.greg.golf.controller;
 
 import com.greg.golf.controller.dto.*;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import com.greg.golf.entity.Player;
 import com.greg.golf.service.PlayerService;
@@ -28,6 +30,10 @@ public class AccessController extends BaseController {
 
 	private static final String REFRESH_TOKEN = "refreshToken";
 
+	private static final String SAME_SITE_STRICT = "Strict";
+
+	private static final String PATH = "/";
+
 	private final PlayerService playerService;
 	private final JwtTokenUtil jwtTokenUtil;
 
@@ -45,12 +51,11 @@ public class AccessController extends BaseController {
 
 		log.info("trying to authenticate player: " + playerCredentialsDto.getNick() + " with password *****");
 
-		GolfUserDetails userDetails =playerService.authenticatePlayer(modelMapper.map(playerCredentialsDto, Player.class));
+		GolfUserDetails userDetails = playerService.authenticatePlayer(modelMapper.map(playerCredentialsDto, Player.class));
 
 		var responseHeaders = new HttpHeaders();
-		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-		responseHeaders.set("Jwt", playerService.generateJwtToken(userDetails));
-		responseHeaders.set("Refresh", playerService.generateRefreshToken(userDetails));
+
+		updateTokens(responseHeaders, userDetails.getPlayer().getId());
 
 		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders,
 				HttpStatus.OK);
@@ -139,39 +144,38 @@ public class AccessController extends BaseController {
 
 		var responseHeaders = new HttpHeaders();
 
-		if (request.getAttribute(REFRESH_TOKEN) != null) {
-
-			updateRefreshHeader(responseHeaders, id);
-		}
+		updateTokens(responseHeaders, id);
 
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
 	}
 
-	@SuppressWarnings("UnusedReturnValue")
-	@Tag(name = "Access API")
-	@Operation(summary = "Refresh player JWT on demand")
-	@GetMapping(value = "/rest/RefreshToken/{id}")
-	public ResponseEntity<String> refreshTokenOnDemand(HttpServletRequest request,
-											   @Parameter(required = true, description = "Id of the player") @PathVariable("id") Long id) {
-
-		log.debug("trying to refresh token on demand for player id: " + id);
-
-		var responseHeaders = new HttpHeaders();
-
-		updateRefreshHeader(responseHeaders, id);
-
-		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
-	}
-
-	private void updateRefreshHeader(HttpHeaders responseHeaders, Long id) {
+	private void updateTokens(HttpHeaders responseHeaders, Long id) {
 
 		final GolfUserDetails userDetails = playerService.loadUserById(id);
 
-		responseHeaders.set("Access-Control-Expose-Headers", "Jwt");
-		responseHeaders.set("Jwt",  playerService.generateJwtToken(userDetails));
-		// regenerate refresh token
-		responseHeaders.set("Refresh", playerService.generateRefreshToken(userDetails));
+		var accessToken = playerService.generateJwtToken(userDetails);
+		var refreshToken = playerService.generateRefreshToken(userDetails);
 
+		// both cookies lifetime has set to be equal the longer one
+		// set accessToken to cookie header
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+				.httpOnly(true)
+				.secure(true)
+				.sameSite(SAME_SITE_STRICT)
+				.path(PATH)
+				.maxAge(Common.REFRESH_TOKEN_LIFETIME)
+				.build();
+		responseHeaders.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+		// set accessToken to cookie header
+		ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken)
+				.httpOnly(true)
+				.secure(true)
+				.sameSite(SAME_SITE_STRICT)
+				.path(PATH)
+				.maxAge(Common.REFRESH_TOKEN_LIFETIME)
+				.build();
+		responseHeaders.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 	}
 
 

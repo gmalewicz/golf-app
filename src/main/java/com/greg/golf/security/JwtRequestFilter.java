@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -37,40 +38,59 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private static final String REFRESH = "Refresh";
 	private static final String REFRESH_TOKEN = "refreshToken";
+	private static final String ACCESS_TOKEN = "accessToken";
 
 	private static final String HCP_HEADER= "hcp";
 
 	private static final String SEX_HEADER= "sex";
+
+	private static final int ACCESS_TOKEN_ERROR= 999;
+	private static final int REFRESH_TOKEN_ERROR= 998;
 
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
 			throws ServletException, IOException {
 
+		// skip unsecured urls from processing
+		if (request.getRequestURI().contains("/rest/Authenticate") ||
+				(request.getRequestURI().contains("/rest/AddPlayer") && !request.getRequestURI().contains("/rest/AddPlayerOnBehalf")) ||
+						request.getRequestURI().contains("/actuator/") ||
+						request.getRequestURI().contains("/api/") ||
+				        request.getRequestURI().contains("/oauth2/")
+						) {
+			chain.doFilter(request, response);
+			return;
+		}
+
+		log.debug("Processing started");
+
 		String userId = null;
 		String jwtToken = null;
-		String requestTokenHeader = request.getHeader("Authorization");
-		String refreshToken = request.getHeader(REFRESH);
+		String refreshToken = null;
 
-		if (requestTokenHeader == null) {
-			jwtToken = request.getParameter("token");
+		if(request.getCookies() != null){
+			for(Cookie cookie: request.getCookies()){
+				if(cookie.getName().equals(ACCESS_TOKEN)){
+					jwtToken = cookie.getValue();
+				}
+				if(cookie.getName().equals(REFRESH_TOKEN)){
+					refreshToken = cookie.getValue();
+				}
+			}
 		}
-		log.debug("token: " + requestTokenHeader);
 
-		// JWT Token is in the form "Bearer token". Remove Bearer word and get
-		// only the Token
-		if (jwtToken == null && requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-			jwtToken = requestTokenHeader.substring(7);
-		}
+		log.debug("token from cookie: " + jwtToken);
+		log.debug("refresh token from cookie: " + refreshToken);
 
-		if (jwtToken != null) {
+		if (jwtToken != null || refreshToken != null) {
 
 			try {
 				userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
 
 			} catch (ExpiredJwtException e) {
 				log.info("JWT Token has expired for player: " + e.getClaims().getSubject());
-				response.setStatus(999);
+				response.setStatus(ACCESS_TOKEN_ERROR);
 				jwtToken = processRefreshRequest(request, e, refreshToken);
 				if (jwtToken != null) {
 					userId = e.getClaims().getSubject();
@@ -78,7 +98,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			} catch (Exception e) {
 				log.error("Unable to get JWT Token");
 			}
+		} else {
+			response.setStatus(REFRESH_TOKEN_ERROR);
 		}
+
 
 		// Once we get the token validate it.
 		validateToken(userId, request, response);

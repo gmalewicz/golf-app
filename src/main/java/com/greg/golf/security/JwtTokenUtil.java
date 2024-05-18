@@ -4,6 +4,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+
+import com.greg.golf.entity.helpers.Common;
 import org.springframework.stereotype.Component;
 
 import com.greg.golf.configurationproperties.JwtConfig;
@@ -23,8 +25,6 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -2550185165626007488L;
 
-	public static final long JWT_TOKEN_VALIDITY = (long) 60 * 60 * 8;
-
 	// while creating the token -
 	// 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID
 	// 2. Sign the JWT using the HS512 algorithm and secret key.
@@ -34,7 +34,7 @@ public class JwtTokenUtil extends TokenUtil implements Serializable {
 	protected String doGenerateToken(Map<String, Object> claims, String subject) {
 
 		return Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
-				.expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+				.expiration(new Date(System.currentTimeMillis() + Common.ACCESS_TOKEN_LIFETIME * 1000))
 				.signWith(getSigningKey(jwtConfig.getSecret())).compact();
 	}
 

@@ -742,7 +742,11 @@ public class TournamentService {
 
                 var context = new Context();
                 context.setVariable("tournamentName", tournament.orElseThrow().getName());
-                context.setVariable("results", tournament.orElseThrow().getTournamentResult());
+                context.setVariable("results",
+                        tournament.orElseThrow().getTournamentResult()
+                                .stream()
+                                .sorted(Comparator.comparingInt(TournamentResult::getStbNet).reversed())
+                                .collect(Collectors.toList()));
                 String body = templateEngine.process("TournamentResultsTemplate.html", context);
 
                 try {

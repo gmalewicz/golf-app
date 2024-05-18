@@ -23,4 +23,8 @@ public class Common {
 
 	public static  final int HOLE_GIVEN_UP = 16;
 
+
+	public static final long ACCESS_TOKEN_LIFETIME = 60 * 60 * 4;
+	public static final long REFRESH_TOKEN_LIFETIME = 60 * 60 * 24 * 7;
+
 }
