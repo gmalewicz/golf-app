@@ -47,8 +47,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private static final int ACCESS_TOKEN_ERROR= 999;
 	private static final int REFRESH_TOKEN_ERROR= 998;
 
-
-
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
 			throws ServletException, IOException {
@@ -61,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		log.debug("Processing started");
 
-		String userId = null;
+		String userId;
 		String jwtToken = null;
 		String refreshToken = null;
 
@@ -78,6 +76,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		log.debug("token from cookie: " + jwtToken);
 		log.debug("refresh token from cookie: " + refreshToken);
+
+		userId = getUserId(jwtToken, refreshToken, response, request);
+
+		// Once we get the token validate it.
+		validateToken(userId, request, response);
+
+		chain.doFilter(request, response);
+
+	}
+
+	private String getUserId(String jwtToken, String refreshToken, HttpServletResponse response, HttpServletRequest request) {
+
+		String userId = null;
 
 		if (jwtToken != null || refreshToken != null) {
 
@@ -97,13 +108,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		} else {
 			response.setStatus(REFRESH_TOKEN_ERROR);
 		}
-
-
-		// Once we get the token validate it.
-		validateToken(userId, request, response);
-
-		chain.doFilter(request, response);
-
+		return userId;
 	}
 
 	private void validateToken(String userId, HttpServletRequest request, HttpServletResponse response) {
