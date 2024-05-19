@@ -48,17 +48,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private static final int REFRESH_TOKEN_ERROR= 998;
 
 
+
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
+	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
 			throws ServletException, IOException {
 
 		// skip unsecured urls from processing
-		if (request.getRequestURI().contains("/rest/Authenticate") ||
-				(request.getRequestURI().contains("/rest/AddPlayer") && !request.getRequestURI().contains("/rest/AddPlayerOnBehalf")) ||
-						request.getRequestURI().contains("/actuator/") ||
-						request.getRequestURI().contains("/api/") ||
-				        request.getRequestURI().contains("/oauth2/")
-						) {
+		if (unsecuredUrls(request)) {
 			chain.doFilter(request, response);
 			return;
 		}
@@ -180,7 +176,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				// each time the token is used, it is replaced in database
 				if (player.getRefresh() == null || !player.getRefresh().equals(refreshToken)) {
 					log.error("Attempt to use refresh token the second time - player id: " + player.getId());
-					throw new RuntimeException("Attempt to use refresh token the second time");
+					throw new IllegalArgumentException("Attempt to use refresh token the second time");
 				}
 
 				// if positive generate the new JWT token and replace it in the request
@@ -196,4 +192,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		return jwtToken;
 	}
+
+	private boolean unsecuredUrls(HttpServletRequest request) {
+        return request.getRequestURI().contains("/rest/Authenticate") ||
+                (request.getRequestURI().contains("/rest/AddPlayer") && !request.getRequestURI().contains("/rest/AddPlayerOnBehalf")) ||
+                request.getRequestURI().contains("/actuator/") ||
+                request.getRequestURI().contains("/api/") ||
+                request.getRequestURI().contains("/oauth2/");
+    }
 }

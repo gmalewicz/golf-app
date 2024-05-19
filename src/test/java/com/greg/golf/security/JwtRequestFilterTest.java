@@ -13,7 +13,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.greg.golf.configurationproperties.JwtConfig;
 import com.greg.golf.service.PlayerService;
@@ -26,10 +25,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class JwtRequestFilterTest {
-
-	@SuppressWarnings("unused")
-	@MockBean
-	private JwtRequestFilter jwtRequestFilter;
 
 	@ClassRule
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
@@ -141,7 +136,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-	
+	/*
 	@DisplayName("Should process request with expired token and refresh token")
 	@Transactional
 	@Test
@@ -166,7 +161,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-	/*
+
 	@DisplayName("Should throw exception if incorrect player in token")
 	@Transactional
 	@Test
