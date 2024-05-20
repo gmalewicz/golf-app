@@ -61,12 +61,13 @@ class JwtRequestFilterTest {
 		SecurityContextHolder.getContext().setAuthentication(null);
 		log.debug("Set up before each completed");
 	}
-/*
-	@DisplayName("Should process request without token not throwing any exception")
+
+	@DisplayName("Should bypass filter in case of not secured URL")
 	@Transactional
 	@Test
-	void requestWithoutTokenTest() {
+	void requestDorNotSecuredURL() {
 
+		when(request.getRequestURI()).thenReturn("/rest/Authenticate");
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
 		try {
@@ -76,7 +77,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-*/
+
 	@DisplayName("Should process request with JWT token in cookie")
 	@Transactional
 	@Test
