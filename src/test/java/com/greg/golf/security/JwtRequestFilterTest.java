@@ -118,6 +118,29 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
+
+	@DisplayName("Should process request with invalid access cookie and valid refresh cookie")
+	@Transactional
+	@Test
+	void requestWithInvalidAccessValidRefreshTest() {
+
+		String refreshToken = refreshTokenUtil.generateToken("1");
+
+		Cookie access = new Cookie("accessToken", "invalid");
+		Cookie refresh = new Cookie("refreshToken", refreshToken);
+		when(request.getCookies()).thenReturn(new Cookie[]{access, refresh});
+		when(request.getRequestURI()).thenReturn("/test");
+
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+
+		try {
+
+			jwtRequestFilter.doFilter(request, response, filterChain);
+		} catch (Exception e) {
+			Assertions.fail("Should not have thrown any exception");
+		}
+	}
+
 /*
 	@DisplayName("Should process request with expired token")
 	@Transactional
