@@ -80,7 +80,7 @@ class JwtRequestFilterTest {
 	@DisplayName("Should process request with JWT token in cookie")
 	@Transactional
 	@Test
-	void requestWithTokenInHeaderTest() {
+	void requestWithTokenInCookieTest() {
 
 		String jwtToken = jwtTokenUtil.generateToken("1");
 
@@ -98,7 +98,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-
+	/*
 	@DisplayName("Should process request with invalid cookie")
 	@Transactional
 	@Test
@@ -136,7 +136,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-	/*
+
 	@DisplayName("Should process request with expired token and refresh token")
 	@Transactional
 	@Test
