@@ -65,7 +65,7 @@ class JwtRequestFilterTest {
 	@DisplayName("Should bypass filter in case of not secured URL")
 	@Transactional
 	@Test
-	void requestDorNotSecuredURL() {
+	void requestForNotSecuredURL() {
 
 		when(request.getRequestURI()).thenReturn("/rest/Authenticate");
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
@@ -99,8 +99,8 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-	/*
-	@DisplayName("Should process request with invalid cookie")
+
+	@DisplayName("Should process request with invalid access cookie")
 	@Transactional
 	@Test
 	void requestWithInvalidHeaderTest() {
@@ -118,7 +118,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-
+/*
 	@DisplayName("Should process request with expired token")
 	@Transactional
 	@Test
