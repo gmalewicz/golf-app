@@ -126,7 +126,7 @@ class JwtRequestFilterTest {
 
 		String refreshToken = refreshTokenUtil.generateToken("1");
 
-		Cookie access = new Cookie("accessToken", "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6IlJPTEVfQURNSU4sUk9MRV9QTEFZRVIiLCJzdWIiOiIxIiwiaWF0IjoxNzE1ODU1MDA1LCJleHAiOjE3MTU4ODM4MDV9.oCTLYg-KysMGy1nKgkMMZRncPxMt7ji-gSW_P8xjdRvdwuKvabunPk8v98tj9CuoKX6OIYXdNOJ81zAfkgsWsQ");
+		Cookie access = new Cookie("accessToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2Mjg2NDY2LCJleHAiOjE3MTYyODY0OTZ9.YkiszSNS94jXZaKIIC7Y_k1r-S7AxZTXgTgpIp-VyerIijAoIMkR360G_l-TSHHsJlJIEadWE-bdSPvqg7K3iA");
 		Cookie refresh = new Cookie("refreshToken", refreshToken);
 		when(request.getCookies()).thenReturn(new Cookie[]{access, refresh});
 		when(request.getRequestURI()).thenReturn("/test");
