@@ -131,6 +131,7 @@ class JwtRequestFilterTest {
 		String refreshToken = refreshTokenUtil.generateToken("1");
 		var player = playerRepository.findById(1L).orElseThrow();
 		player.setRefresh(refreshToken);
+		player.setModified(true);
 		playerRepository.save(player);
 
 		Cookie access = new Cookie("accessToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2Mjg2NDY2LCJleHAiOjE3MTYyODY0OTZ9.YkiszSNS94jXZaKIIC7Y_k1r-S7AxZTXgTgpIp-VyerIijAoIMkR360G_l-TSHHsJlJIEadWE-bdSPvqg7K3iA");
@@ -150,8 +151,6 @@ class JwtRequestFilterTest {
 
 	@AfterAll
 	public static void done() {
-
-		// favouriteCourseRepository.deleteAll();
 
 		log.info("Clean up completed");
 
