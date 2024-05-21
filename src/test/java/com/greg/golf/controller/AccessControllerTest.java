@@ -196,20 +196,6 @@ class AccessControllerTest {
 		mockMvc.perform(get("/rest/Refresh/1").requestAttr("refreshToken", "exists")).andExpect(status().isOk());
 	}
 
-	@DisplayName("Should refresh token on demand with correct result")
-	@Test
-	void processRefreshTokenOnDemandThenReturns200() throws Exception {
-
-		Player player = new Player();
-		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
-
-		when(playerService.loadUserById(any())).thenReturn(userDetails);
-		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
-		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
-
-		mockMvc.perform(get("/rest/RefreshToken/1")).andExpect(status().isOk());
-	}
-
 	@DisplayName("Should delete with correct result")
 	@Test
 	@WithMockUser(username="admin",roles={"USER","ADMIN"})

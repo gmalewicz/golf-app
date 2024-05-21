@@ -9,8 +9,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.6.5'
-description = 'DGNG backend application'
+version = '3.6.6'
+description = 'DGNG backend application - tokens in cookies'
 
 processResources {
     filesMatching("**/*.yml") {

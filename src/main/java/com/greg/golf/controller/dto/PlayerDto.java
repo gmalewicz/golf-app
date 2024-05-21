@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
+
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.*;
 
 @Getter
 @Setter
@@ -33,6 +32,10 @@ public class PlayerDto implements Comparable<PlayerDto> {
 	@ToString.Exclude
 	@Schema(description = "Player handicap", example = "38.5", accessMode = READ_WRITE, minimum="-5", maximum="54")
 	private Float whs;
+
+	@ToString.Exclude
+	@Schema(description = "Player role", example = "0", accessMode = READ_ONLY, minimum="0", maximum="1")
+	private Integer role;
 
 	@ToString.Exclude
 	@JsonProperty(value = "captcha", access = JsonProperty.Access.WRITE_ONLY)
