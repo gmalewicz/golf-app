@@ -3,6 +3,7 @@ package com.greg.golf.security;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.greg.golf.repository.PlayerRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -99,30 +100,11 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-/*
-	@DisplayName("Should process request with invalid access cookie")
+
+	@DisplayName("Should process request with expired access cookie and valid refresh cookie but refresh does not exists in db")
 	@Transactional
 	@Test
-	void requestWithInvalidHeaderTest() {
-
-		Cookie c = new Cookie("accessToken", "invalid");
-		when(request.getCookies()).thenReturn(new Cookie[]{c});
-		when(request.getRequestURI()).thenReturn("/test");
-
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
-
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-	}
-*/
-	@DisplayName("Should process request with expired access cookie and valid refresh cookie")
-	@Transactional
-	@Test
-	void requestWithExpiredAccessValidRefreshTest() {
+	void requestWithExpiredAccessValidRefreshNotInDbTest() {
 
 		String refreshToken = refreshTokenUtil.generateToken("1");
 
@@ -141,98 +123,20 @@ class JwtRequestFilterTest {
 		}
 	}
 
-/*
-	@DisplayName("Should process request with expired token")
+	@DisplayName("Should process request with expired access cookie and valid refresh cookie existing in db")
 	@Transactional
 	@Test
-	void requestWithExpiredTokenTest() {
+	void requestWithExpiredAccessValidRefreshTest(@Autowired PlayerRepository playerRepository) {
 
-		Cookie c = new Cookie("accessToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjIyNzQ3NDQ4LCJpYXQiOjE2MjI3MTg2NDh9.W5ZGbvT4pSr7lZBVuUBNhhuBSH0GC0LExwkvI29RU8rCOMPIjnOqWOO4wG56fzwy2McYnq7E0FkWdh-4sh0TVg");
-		when(request.getCookies()).thenReturn(new Cookie[]{c});
-		when(request.getRequestURI()).thenReturn("/test");
-
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
-
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-	}
-
-	@DisplayName("Should process request with expired token and refresh token")
-	@Transactional
-	@Test
-	void requestWithExpiredTokenAndRefreshTokenTest() {
-		
 		String refreshToken = refreshTokenUtil.generateToken("1");
-		
-		when(request.getRequestURI()).thenReturn("Refresh");
+		var player = playerRepository.findById(1L).orElseThrow();
+		player.setRefresh(refreshToken);
+		playerRepository.save(player);
 
-		when(request.getHeader("Authorization")).thenReturn(
-				"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjIyNzQ3NDQ4LCJpYXQiOjE2MjI3MTg2NDh9.W5ZGbvT4pSr7lZBVuUBNhhuBSH0GC0LExwkvI29RU8rCOMPIjnOqWOO4wG56fzwy2McYnq7E0FkWdh-4sh0TVg");
-
-		when(request.getHeader("Refresh")).thenReturn(refreshToken);
-		
-		
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
-
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-	}
-
-	@DisplayName("Should throw exception if incorrect player in token")
-	@Transactional
-	@Test
-	void requestWithTokenWithIncorrectUserTest() {
-
-		String jwtToken = jwtTokenUtil.generateToken("11");
-
-		when(request.getHeader("Authorization")).thenReturn("Bearer " + jwtToken);
-		
-
-		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
-
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-		
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
-		
-	}
-	
-	@DisplayName("Should process request with JWT token in parameter for non admin player")
-	@Transactional
-	@Test
-	void requestWithTokenInParameterForNonAdminTest(@Autowired PlayerRepository playerRepository) {
-
-		Player regularPlayer = new Player();
-		regularPlayer.setNick("RegularPlayer");
-		regularPlayer.setPassword("welcome");
-		regularPlayer.setRole(Common.ROLE_PLAYER_REGULAR);
-		regularPlayer.setWhs(10f);
-		regularPlayer.setSex(Common.PLAYER_SEX_MALE);
-		regularPlayer.setModified(false);
-		regularPlayer.setType(Common.TYPE_PLAYER_LOCAL);
-		playerRepository.save(regularPlayer);
-		
-		String jwtToken = jwtTokenUtil.generateToken(String.valueOf(regularPlayer.getId()));
-
-		when(request.getHeader("Authorization")).thenReturn(null);
-		when(request.getParameter("token")).thenReturn(jwtToken);
+		Cookie access = new Cookie("accessToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2Mjg2NDY2LCJleHAiOjE3MTYyODY0OTZ9.YkiszSNS94jXZaKIIC7Y_k1r-S7AxZTXgTgpIp-VyerIijAoIMkR360G_l-TSHHsJlJIEadWE-bdSPvqg7K3iA");
+		Cookie refresh = new Cookie("refreshToken", refreshToken);
+		when(request.getCookies()).thenReturn(new Cookie[]{access, refresh});
+		when(request.getRequestURI()).thenReturn("/Refresh");
 
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
@@ -243,7 +147,7 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-*/
+
 	@AfterAll
 	public static void done() {
 
