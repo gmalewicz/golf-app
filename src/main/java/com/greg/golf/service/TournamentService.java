@@ -70,7 +70,7 @@ public class TournamentService {
         RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament result by unauthorized user");
 
         // remove notifications
-        removeNotification(tournamentId);
+        self.removeNotification(tournamentId);
 
         tournament
             .getTournamentResult()
@@ -605,7 +605,7 @@ public class TournamentService {
         tournamentRepository.save(tournament);
 
         // remove notifications
-        removeNotification(tournamentId);
+        self.removeNotification(tournamentId);
     }
 
     @Transactional
@@ -728,7 +728,6 @@ public class TournamentService {
     public int processNotifications(Long tournamentId, Integer sort) throws GeneralException {
 
         int sentNotifications = 0;
-        List<TournamentResult> sortedResults = new ArrayList<>();
 
         var notifications = tournamentNotificationRepository.findByTournamentId(tournamentId);
 
@@ -752,49 +751,11 @@ public class TournamentService {
                 // only tournament owner can do it
                 RoleVerification.verifyPlayer(tournament.orElseThrow().getPlayer().getId(), "Attempt to process notifications by unauthorized user");
 
-                sortedResults = switch (sort) {
-                    case SORT_STB_NET -> tournament.orElseThrow().getTournamentResult()
-                            .stream()
-                            .sorted(Comparator.comparingInt(TournamentResult::getStbNet).reversed())
-                            .collect(Collectors.toList());
-                    case SORT_STB -> tournament.orElseThrow().getTournamentResult()
-                            .stream()
-                            .sorted(Comparator.comparingInt(TournamentResult::getStbGross).reversed())
-                            .collect(Collectors.toList());
-                    case SORT_STR -> tournament.orElseThrow().getTournamentResult()
-                            .stream()
-                            .sorted(Comparator.comparingInt(TournamentResult::getStrokesBrutto))
-                            .collect(Collectors.toList());
-                    case SORT_STR_NET -> tournament.orElseThrow().getTournamentResult()
-                            .stream()
-                            .sorted(Comparator.comparingInt(TournamentResult::getStrokesNetto))
-                            .collect(Collectors.toList());
-                    default -> sortedResults;
-                };
-
-                if (tournament.orElseThrow().getBestRounds() == Common.ALL_ROUNDS && (sort == SORT_STR || sort == SORT_STR_NET)) {
-                    sortedResults = sortedResults
-                            .stream()
-                            .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
-                            .collect(Collectors.toList());
-                } else if (tournament.orElseThrow().getBestRounds() != Common.ALL_ROUNDS && (sort == SORT_STR || sort == SORT_STR_NET)) {
-                    var resultsPlayedBestRounds  = sortedResults
-                            .stream()
-                            .filter(sr -> sr.getPlayedRounds() >= tournament.orElseThrow().getBestRounds())
-                            .toList();
-                    var resultsNotPlayedBestRounds = sortedResults
-                            .stream()
-                            .filter(sr -> sr.getPlayedRounds() < tournament.orElseThrow().getBestRounds())
-                            .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
-                            .toList();
-                    sortedResults.addAll(resultsPlayedBestRounds);
-                    sortedResults.addAll(resultsNotPlayedBestRounds);
-                }
+                List<TournamentResult> sortedResults = sortResults(tournament.orElseThrow(), sort);
 
                 var context = new Context();
                 context.setVariable("results", sortedResults);
                 context.setVariable("tournamentName", tournament.orElseThrow().getName());
-
 
                 String body = templateEngine.process("TournamentResultsTemplate.html", context);
 
@@ -807,6 +768,50 @@ public class TournamentService {
             }
         }
         return sentNotifications;
+    }
+
+    private List<TournamentResult> sortResults(Tournament tournament, Integer sort) {
+
+        List<TournamentResult> sortedResults = switch (sort) {
+            case SORT_STB_NET -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStbNet).reversed())
+                    .collect(Collectors.toList());
+            case SORT_STB -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStbGross).reversed())
+                    .collect(Collectors.toList());
+            case SORT_STR -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokesBrutto))
+                    .collect(Collectors.toList());
+            case SORT_STR_NET -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokesNetto))
+                    .collect(Collectors.toList());
+            default -> new ArrayList<>();
+        };
+
+        if (tournament.getBestRounds() == Common.ALL_ROUNDS && (sort == SORT_STR || sort == SORT_STR_NET)) {
+            sortedResults = sortedResults
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
+                    .collect(Collectors.toList());
+        } else if (tournament.getBestRounds() != Common.ALL_ROUNDS && (sort == SORT_STR || sort == SORT_STR_NET)) {
+            var resultsPlayedBestRounds  = sortedResults
+                    .stream()
+                    .filter(sr -> sr.getPlayedRounds() >= tournament.getBestRounds())
+                    .toList();
+            var resultsNotPlayedBestRounds = sortedResults
+                    .stream()
+                    .filter(sr -> sr.getPlayedRounds() < tournament.getBestRounds())
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
+                    .toList();
+            sortedResults.addAll(resultsPlayedBestRounds);
+            sortedResults.addAll(resultsNotPlayedBestRounds);
+        }
+
+        return sortedResults;
     }
 
     @Transactional

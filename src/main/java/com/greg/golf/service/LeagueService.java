@@ -9,6 +9,7 @@ import com.greg.golf.service.helpers.RoleVerification;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ import java.util.List;
 public class LeagueService {
 
     private static final String AUTHORIZATION_ERROR = "Attempt to add player by unauthorized user";
+
+    @Lazy
+    private final LeagueService self;
 
     private final LeagueServiceConfig leagueServiceConfig;
 
@@ -130,7 +134,7 @@ public class LeagueService {
         leagueRepository.save(league);
 
         //remove notifications
-        removeNotification(leagueId);
+        self.removeNotification(leagueId);
     }
 
     @Transactional
@@ -195,7 +199,7 @@ public class LeagueService {
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
         // remove notifications
-        removeNotification(leagueId);
+        self.removeNotification(leagueId);
 
         leagueRepository.delete(league);
 
