@@ -268,8 +268,6 @@ class TournamentServiceTest {
 		var course = courseRepository.findById(1L).orElseThrow();
 		var round = roundRepository.findAll().get(0);
 
-		//round.setCourse(course);
-
 		round.getCourse().setHoles(holeRepository.findByCourse(course));
 
 		round.getScoreCard().get(0).setStroke(20);
@@ -412,9 +410,9 @@ class TournamentServiceTest {
 		assertEquals(1L, tournamentRoundRepository.count());
 
 		Long tournamentId = tournament.getId();
-		Long roundId = round.getId();
+		Long rndId = round.getId();
 
-		tournamentService.addRound(tournamentId, roundId, true);
+		tournamentService.addRound(tournamentId, rndId, true);
 		assertEquals(1L, tournamentRoundRepository.count());
 	}
 
@@ -565,8 +563,6 @@ class TournamentServiceTest {
 		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-
-		//playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
 		tournamentService.addRound(tournament.getId(), round.getId(), true);
 
 		var round2 =  rounds.get(1);
@@ -1345,7 +1341,7 @@ class TournamentServiceTest {
 		tournamentNotification.setTournamentId(tournamentId);
 		tournamentNotificationRepository.save(tournamentNotification);
 
-		assertEquals(0, tournamentService.processNotifications(tournamentId));
+		assertEquals(0, tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
 	}
 
 	@DisplayName("Send notification")
@@ -1393,7 +1389,7 @@ class TournamentServiceTest {
 			fail("Method emailService.sendMail throws exception");
 		}
 
-		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
 	}
 
 	@DisplayName("Add notification for closed tournament")
@@ -1452,11 +1448,6 @@ class TournamentServiceTest {
 
 		Long id = tournament.getId();
 		assertThrows(MailNotSetException.class, () -> tournamentService.addNotification(id));
-
-		//tournamentService.addNotification(tournament.getId());
-
-
-		//assertEquals(1, tournamentNotificationRepository.findAll().size());
 	}
 
 	@AfterAll

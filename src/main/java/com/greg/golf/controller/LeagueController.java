@@ -3,6 +3,7 @@ package com.greg.golf.controller;
 import com.greg.golf.controller.dto.LeagueDto;
 import com.greg.golf.controller.dto.LeagueMatchDto;
 import com.greg.golf.controller.dto.LeaguePlayerDto;
+import com.greg.golf.controller.dto.LeagueResultDto;
 import com.greg.golf.entity.League;
 import com.greg.golf.entity.LeagueMatch;
 import com.greg.golf.entity.LeaguePlayer;
@@ -12,8 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -154,6 +154,50 @@ public class LeagueController extends BaseController {
 
         leagueService.deleteLeague(leagueId);
 
+        return HttpStatus.OK;
+    }
+
+    @Tag(name = "League API")
+    @Operation(summary = "Send email notification to subscribers")
+    @PostMapping(value = "/rest/League/Notification/{leagueId}")
+    public HttpStatus notifySubscribers(
+            @Parameter(description = "League id", example = "1", required = true)
+            @NotNull
+            @Positive
+            @Valid
+            @PathVariable("leagueId") Long leagueId,
+            @Parameter(description = "LeagueResults list", required = true) @RequestBody @Valid LeagueResultDto[] leagueResultsDto) {
+
+        log.info("trying to send notifications for league: " + leagueId);
+        leagueService.processNotifications(leagueId, leagueResultsDto);
+        return HttpStatus.OK;
+    }
+
+    @Tag(name = "League API")
+    @Operation(summary = "Add notification to league")
+    @PostMapping(value = "/rest/League/AddNotification/{leagueId}")
+    public HttpStatus addNotification(
+            @Parameter(description = "League id", example = "1", required = true)
+            @NotNull
+            @Positive
+            @Valid
+            @PathVariable("leagueId") Long leagueId) {
+
+        leagueService.addNotification(leagueId);
+        return HttpStatus.OK;
+    }
+
+    @Tag(name = "League API")
+    @Operation(summary = "Removes notification from league")
+    @PostMapping(value = "/rest/League/RemoveNotification/{leagueId}")
+    public HttpStatus removeNotification(
+            @Parameter(description = "League id", example = "1", required = true)
+            @NotNull
+            @Valid
+            @Positive
+            @PathVariable("leagueId") Long leagueId) {
+
+        leagueService.removeNotification(leagueId);
         return HttpStatus.OK;
     }
 }

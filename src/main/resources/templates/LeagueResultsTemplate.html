@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-<title>Tournament Result mail template</title>
+<title>League Result mail template</title>
 <meta charset="utf-8">
 <style>
 .tg {
@@ -49,30 +49,30 @@
 </head>
 <body>
 <h3>
-	<span th:text="${tournamentName}"></span>
+	<span th:text="${leagueName}"></span>
 </h3>
 	<table id="game-tbl" class="tg">
-		<caption>Tournament Results</caption>
+		<caption>League Results</caption>
 		<thead>
 			<tr>
 				<th scope="col">No.</th>
 				<th scope="col">Player</th>
-				<th scope="col">Stb Net</th>
-				<th scope="col">Stb</th>
-				<th scope="col">Strokes</th>
-				<th scope="col">Strokes Net</th>
-				<th scope="col">Played rounds</th>
+				<th scope="col">Big Points</th>
+				<th scope="col">Small Points</th>
+				<th scope="col">Matches</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr th:each="result, iterStat : ${results}">
 				<td><span th:text="${iterStat.count}"></span></td>
-				<td><span th:text="${result.player.nick}"></span></td>
-				<td><span th:text="${result.stbNet}"></span></td>
-				<td><span th:text="${result.stbGross}"></span></td>
-				<td><span th:text="${result.strokesBrutto}"></span></td>
-				<td><span th:text="${result.strokesNetto}"></span></td>
-				<td><span th:text="${result.playedRounds}"></span></td>
+				<td><span th:text="${result.nick}"></span></td>
+				<td><span th:text="${result.big}"></span></td>
+				<td><span th:text="${result.small}"></span></td>
+				<td>
+					<span th:text="${result.matchesPlayed}"></span>
+					<span>&#47;</span>
+					<span th:text="${#lists.size(results)}"></span>
+				</td>
 			</tr>
 		</tbody>
 	</table>

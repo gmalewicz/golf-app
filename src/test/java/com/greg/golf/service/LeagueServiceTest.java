@@ -294,8 +294,6 @@ class LeagueServiceTest {
         var players = new ArrayList<LeaguePlayer>();
         players.add(leaguePlayer);
         league.setLeaguePlayers(players);
-       // leaguePlayerRepository.save(leaguePlayer);
-        //leagueService.addLeague(league);
 
         var authorities = new ArrayList<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority(Common.PLAYER));

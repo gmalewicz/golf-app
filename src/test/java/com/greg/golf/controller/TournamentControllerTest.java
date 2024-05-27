@@ -332,9 +332,9 @@ class TournamentControllerTest {
 	@Test
 	void processNotificationWhenValidInputThenReturns200() throws Exception {
 
-		when(tournamentService.processNotifications(any())).thenReturn(0);
+		when(tournamentService.processNotifications(any(), any())).thenReturn(0);
 
-		mockMvc.perform(post("/rest/Tournament/Notification/1").contentType("application/json"))
+		mockMvc.perform(post("/rest/Tournament/Notification/1/1").contentType("application/json"))
 				.andExpect(status().isOk()).andReturn();
 	}
 

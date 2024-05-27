@@ -234,7 +234,6 @@ class OnlineRoundServiceTest {
 		
 		
 		onlineRoundRepository.save(onlineRound);
-		// onlineScoreCardRepository.save(onlineScoreCard);
 				
 		onlineRoundService.finalizeForOwner(1L);
 		
@@ -372,7 +371,6 @@ class OnlineRoundServiceTest {
 	@AfterAll
 	public static void done() {
 		
-		//onlineRoundRepository.deleteAll();
 		log.info("Clean up completed");
 
 	}

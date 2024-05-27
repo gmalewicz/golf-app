@@ -106,7 +106,6 @@ class LeagueControllerTest {
 
 		input.setPlayer(playerDto);
 
-		//when(modelMapper.map(any(), any())).thenReturn(null);
 		doNothing().when(leagueService).addLeague(any());
 
 		mockMvc.perform(post("/rest/League").contentType("application/json").characterEncoding("utf-8")

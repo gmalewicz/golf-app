@@ -5,9 +5,7 @@ import java.util.List;
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -255,15 +253,22 @@ public class TournamentController extends BaseController {
 
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Send email notification to subscribers")
-	@PostMapping(value = "/rest/Tournament/Notification/{tournamentId}")
+	@PostMapping(value = "/rest/Tournament/Notification/{tournamentId}/{sort}")
 	public HttpStatus notifySubscribers(
 			@Parameter(description = "Tournament id", example = "1", required = true)
 			@NotNull
 			@Positive
-			@PathVariable("tournamentId") Long tournamentId) {
+			@Valid
+			@PathVariable("tournamentId") Long tournamentId,
+			@Parameter(description = "sorting method", example = "1", required = true)
+			@NotNull
+			@Valid
+			@Min(1)
+			@Max(4)
+			@PathVariable("sort") Integer sort) {
 
-		log.info("trying to send notifications for tournament: " + tournamentId);
-		tournamentService.processNotifications(tournamentId);
+		log.info("trying to send notifications for tournament: " + tournamentId + " and sort method: " + sort);
+		tournamentService.processNotifications(tournamentId, sort);
 		return HttpStatus.OK;
 	}
 
