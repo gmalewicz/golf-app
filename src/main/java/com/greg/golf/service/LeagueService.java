@@ -206,7 +206,7 @@ public class LeagueService {
 
         int sentNotifications = 0;
 
-        var notifications =leagueNotificationRepository.findByLeagueId(leagueId);
+        var notifications = leagueNotificationRepository.findByLeagueId(leagueId);
 
         if (!notifications.isEmpty()) {
 
