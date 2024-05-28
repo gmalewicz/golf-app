@@ -70,7 +70,7 @@ public class TournamentService {
         RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament result by unauthorized user");
 
         // remove notifications
-        self.removeNotification(tournamentId);
+        tournamentNotificationRepository.deleteByTournamentId(tournamentId);
 
         tournament
             .getTournamentResult()
@@ -605,7 +605,7 @@ public class TournamentService {
         tournamentRepository.save(tournament);
 
         // remove notifications
-        self.removeNotification(tournamentId);
+        tournamentNotificationRepository.deleteByTournamentId(tournamentId);
     }
 
     @Transactional

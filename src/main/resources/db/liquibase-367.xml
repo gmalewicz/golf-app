@@ -12,4 +12,10 @@
 			<column name="player_id" type="BIGINT"/>
 		</createTable>
 	</changeSet>
+	<changeSet author="GMALEWICZ" id="1716542893286-25">
+		<createIndex indexName="league_notification_player_id" tableName="league_notification" unique="true">
+			<column name="player_id"/>
+			<column name="league_id"/>
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>

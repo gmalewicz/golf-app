@@ -11,5 +11,7 @@ public interface TournamentNotificationRepository extends JpaRepository<Tourname
 
     List<TournamentNotification> findByTournamentId(Long tournamentId);
 
-    void deleteByTournamentIdAndPlayerId(Long leagueId, Long playerId);
+    void deleteByTournamentIdAndPlayerId(Long tournamentId, Long playerId);
+
+    void deleteByTournamentId(Long tournamentId);
 }

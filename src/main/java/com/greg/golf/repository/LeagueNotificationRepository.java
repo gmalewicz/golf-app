@@ -12,4 +12,6 @@ public interface LeagueNotificationRepository extends JpaRepository<LeagueNotifi
     List<LeagueNotification> findByLeagueId(Long leagueId);
 
     void deleteByLeagueIdAndPlayerId(Long leagueId, Long playerId);
+
+    void deleteByLeagueId(Long leagueId);
 }

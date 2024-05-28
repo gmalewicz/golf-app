@@ -758,7 +758,11 @@ class LeagueServiceTest {
         leagueService.addNotification(league2.getId());
 
         assertEquals(1, leagueNotificationRepository.findAll().size());
+
+        //attempt to add notification the second time
+        assertThrows(DuplicateNotificationException.class, () -> leagueService.addNotification(league2.getId()));
     }
+
 
     @AfterAll
     public static void done() {
