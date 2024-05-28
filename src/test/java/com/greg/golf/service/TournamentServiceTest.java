@@ -1390,6 +1390,9 @@ class TournamentServiceTest {
 		}
 
 		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STR_NET));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STR));
 
 		try {
 			doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
@@ -1407,10 +1410,10 @@ class TournamentServiceTest {
 
 	}
 
-	@DisplayName("Add notification for closed tournament")
+	@DisplayName("Add notification for tournament")
 	@Transactional
 	@Test
-	void attemptToAddNotificationForClosedTournamentTest(@Autowired TournamentRepository tournamentRepository,
+	void attemptToAddNotificationTournamentTest(@Autowired TournamentRepository tournamentRepository,
 													     @Autowired PlayerService playerService,
 														 @Autowired PlayerRepository playerRepository,
 													     @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
@@ -1439,6 +1442,14 @@ class TournamentServiceTest {
 		tournamentService.addNotification(tournament.getId());
 
 		assertEquals(0, tournamentNotificationRepository.findAll().size());
+
+		tournament.setStatus(Tournament.STATUS_OPEN);
+		tournamentRepository.save(tournament);
+
+		tournamentService.addNotification(tournament.getId());
+
+		assertEquals(1, tournamentNotificationRepository.findAll().size());
+
 	}
 
 	@DisplayName("Add notification for opened tournament")
