@@ -33,7 +33,7 @@ import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @SpringBootTest
@@ -814,6 +814,15 @@ class LeagueServiceTest {
         }
 
         assertDoesNotThrow(() -> leagueService.processNotifications(league.getId(), new LeagueResultDto[]{leagueResultDto}));
+
+        try {
+            doThrow(GeneralException.class).when(emailService).sendEmail(any(), any(), any());
+        } catch (Exception e) {
+            fail("Method emailService.sendMail throws exception");
+        }
+
+        //attempt to add notification the second time
+        assertThrows(GeneralException.class, () -> leagueService.processNotifications(league.getId(), new LeagueResultDto[]{leagueResultDto}));
 
         //remove notification
         leagueService.removeNotification(league.getId());
