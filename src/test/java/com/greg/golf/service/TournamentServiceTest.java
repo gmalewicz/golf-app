@@ -7,13 +7,11 @@ import java.util.TreeSet;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.DeleteTournamentPlayerException;
-import com.greg.golf.error.DuplicatePlayerInTournamentException;
-import com.greg.golf.error.MailNotSetException;
-import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.error.*;
 import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.aes.StringUtility;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -37,6 +35,7 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 @Slf4j
 @SpringBootTest
@@ -59,6 +58,7 @@ class TournamentServiceTest {
 	@Autowired
 	TournamentResultRepository tournamentResultRepository;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private EmailServiceImpl emailService;
 
@@ -1390,6 +1390,21 @@ class TournamentServiceTest {
 		}
 
 		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
+
+		try {
+			doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
+		} catch (Exception e) {
+			fail("Method emailService.sendMail throws exception");
+		}
+
+		// verify if exception is caught
+		assertThrows(GeneralException.class, () -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
+
+		//remove notification
+		tournamentService.removeNotification(tournamentId);
+
+		assertEquals(0, tournamentNotificationRepository.findByTournamentId(tournamentId).size());
+
 	}
 
 	@DisplayName("Add notification for closed tournament")

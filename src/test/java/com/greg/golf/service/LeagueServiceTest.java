@@ -823,7 +823,7 @@ class LeagueServiceTest {
             fail("Method emailService.sendMail throws exception");
         }
 
-        //attempt to add notification the second time
+        // verify if exception is caught
         assertThrows(GeneralException.class, () -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
 
         //remove notification
