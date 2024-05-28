@@ -8,6 +8,7 @@ import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.aes.StringUtility;
 import com.greg.golf.util.GolfPostgresqlContainer;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -714,7 +715,7 @@ class LeagueServiceTest {
         league.setName("Test league");
         leagueService.addLeague(league);
 
-        var player = playerService.getPlayer(1L).orElseThrow();
+        player = playerService.getPlayer(1L).orElseThrow();
 
         UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 
@@ -745,7 +746,7 @@ class LeagueServiceTest {
         league.setName("Test league");
         leagueService.addLeague(league);
 
-        var player = playerService.getPlayer(1L).orElseThrow();
+        player = playerService.getPlayer(1L).orElseThrow();
         try {
             player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword"));
         } catch (Exception e) {
@@ -761,13 +762,13 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
 
-        var league2 = leagueRepository.findAll().get(0);
-        leagueService.addNotification(league2.getId());
+        var leagueId = leagueRepository.findAll().get(0).getId();
+        leagueService.addNotification(leagueId);
 
         assertEquals(1, leagueNotificationRepository.findAll().size());
 
         //attempt to add notification the second time
-        assertThrows(DuplicateNotificationException.class, () -> leagueService.addNotification(league2.getId()));
+        assertThrows(DuplicateNotificationException.class, () -> leagueService.addNotification(leagueId));
     }
 
     @DisplayName("Send notification test")
@@ -777,7 +778,7 @@ class LeagueServiceTest {
                                        @Autowired PlayerService playerService,
                                        @Autowired LeagueNotificationRepository leagueNotificationRepository) {
 
-        var player = playerService.getPlayer(1L).orElseThrow();
+        player = playerService.getPlayer(1L).orElseThrow();
 
         UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 
@@ -791,6 +792,7 @@ class LeagueServiceTest {
         league.setStatus(League.STATUS_OPEN);
         league.setName("Test league");
         leagueService.addLeague(league);
+        var leagueId = league.getId();
 
         var leagueResultDto = new LeagueResultDto();
         leagueResultDto.setNick("Test");
@@ -799,13 +801,13 @@ class LeagueServiceTest {
         leagueResultDto.setMatchesPlayed(1);
 
         // attempt to send notification but no notification is defined
-        assertEquals(0, leagueService.processNotifications(league.getId(), new LeagueResultDto[]{leagueResultDto}));
+        assertEquals(0, leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
 
         player.setEmail("grzegorz.malewicz@gmail.com");
         playerService.update(player);
 
         // create notification
-        leagueService.addNotification(league.getId());
+        leagueService.addNotification(leagueId);
 
         try {
             doNothing().when(emailService).sendEmail(any(), any(), any());
@@ -813,21 +815,21 @@ class LeagueServiceTest {
             fail("Method emailService.sendMail throws exception");
         }
 
-        assertDoesNotThrow(() -> leagueService.processNotifications(league.getId(), new LeagueResultDto[]{leagueResultDto}));
+        assertDoesNotThrow(() -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
 
         try {
-            doThrow(GeneralException.class).when(emailService).sendEmail(any(), any(), any());
+            doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
         } catch (Exception e) {
             fail("Method emailService.sendMail throws exception");
         }
 
         //attempt to add notification the second time
-        assertThrows(GeneralException.class, () -> leagueService.processNotifications(league.getId(), new LeagueResultDto[]{leagueResultDto}));
+        assertThrows(GeneralException.class, () -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
 
         //remove notification
-        leagueService.removeNotification(league.getId());
+        leagueService.removeNotification(leagueId);
 
-        assertEquals(0, leagueNotificationRepository.findByLeagueId(league.getId()).size());
+        assertEquals(0, leagueNotificationRepository.findByLeagueId(leagueId).size());
     }
 
     @AfterAll
