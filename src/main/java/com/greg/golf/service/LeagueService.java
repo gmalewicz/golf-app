@@ -1,18 +1,22 @@
 package com.greg.golf.service;
 
 import com.greg.golf.configurationproperties.LeagueServiceConfig;
+import com.greg.golf.controller.dto.LeagueResultDto;
 import com.greg.golf.entity.*;
 import com.greg.golf.error.*;
-import com.greg.golf.repository.LeagueMatchRepository;
-import com.greg.golf.repository.LeaguePlayerRepository;
-import com.greg.golf.repository.LeagueRepository;
-import com.greg.golf.repository.PlayerRepository;
+import com.greg.golf.repository.*;
 import com.greg.golf.service.helpers.RoleVerification;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -31,6 +35,14 @@ public class LeagueService {
     private final LeaguePlayerRepository leaguePlayerRepository;
 
     private final LeagueMatchRepository leagueMatchRepository;
+
+    private final LeagueNotificationRepository leagueNotificationRepository;
+
+    private final PlayerService playerService;
+
+    private final EmailServiceImpl emailServiceImpl;
+
+    private final TemplateEngine templateEngine;
 
     @Transactional
     public void addLeague(League league) {
@@ -116,6 +128,9 @@ public class LeagueService {
         // set close flag
         league.setStatus(League.STATUS_CLOSE);
         leagueRepository.save(league);
+
+        //remove notifications
+        leagueNotificationRepository.deleteByLeagueId(leagueId);
     }
 
     @Transactional
@@ -179,8 +194,94 @@ public class LeagueService {
         // only tournament owner can do it
         RoleVerification.verifyPlayer(league.getPlayer().getId(), AUTHORIZATION_ERROR);
 
+        // remove notifications
+        leagueNotificationRepository.deleteByLeagueId(leagueId);
+
         leagueRepository.delete(league);
 
     }
 
+    @Transactional(readOnly = true)
+    public int processNotifications(Long leagueId, LeagueResultDto[] leagueResultDto) throws GeneralException {
+
+        int sentNotifications = 0;
+
+        var notifications = leagueNotificationRepository.findByLeagueId(leagueId);
+
+        if (!notifications.isEmpty()) {
+
+            var recipients = new ArrayList<String>();
+
+            notifications.forEach(notification -> {
+
+                var email = playerService.getEmail(notification.getPlayerId());
+
+                if (email != null) {
+                    recipients.add(email);
+                }
+            });
+
+            if (!recipients.isEmpty()) {
+
+                var league = leagueRepository.findById(leagueId);
+
+                // only tournament owner can do it
+                RoleVerification.verifyPlayer(league.orElseThrow().getPlayer().getId(), "Attempt to process notifications by unauthorized user");
+
+                var context = new Context();
+                context.setVariable("results", leagueResultDto);
+                context.setVariable("leagueName", league.orElseThrow().getName());
+
+
+                String body = templateEngine.process("LeagueResultsTemplate.html", context);
+
+                try {
+                    emailServiceImpl.sendEmail(recipients.toArray(new String[0]), "Tournament results updated - " + league.orElseThrow().getName(), body);
+                    sentNotifications++;
+                } catch (MessagingException e) {
+                    throw new GeneralException();
+                }
+            }
+        }
+        return sentNotifications;
+    }
+
+    @Transactional
+    public void addNotification(Long leagueId) throws DuplicateNotificationException, MailNotSetException {
+
+        Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        log.info("trying to add notifications for league: " + leagueId + " and player: " + playerId);
+
+        // check if player has defined email
+        var player = playerRepository.findById(playerId);
+        if (player.orElseThrow().getEmail() == null) {
+            throw new MailNotSetException();
+        }
+
+        // check if tournament is not closed
+        var league = leagueRepository.findById(leagueId).orElseThrow();
+        if (league.getStatus() == League.STATUS_OPEN) {
+
+            var leagueNotification = new LeagueNotification();
+            leagueNotification.setLeagueId(leagueId);
+            leagueNotification.setPlayerId(playerId);
+
+            try {
+                leagueNotificationRepository.save(leagueNotification);
+            } catch (Exception ex) {
+                throw  new DuplicateNotificationException();
+            }
+        }
+    }
+
+    @Transactional
+    public void removeNotification(Long leagueId) {
+
+        Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        log.info("trying to remove notifications for league: " + leagueId + " and player: " + playerId);
+
+        leagueNotificationRepository.deleteByLeagueIdAndPlayerId(leagueId, playerId);
+    }
 }

@@ -123,8 +123,6 @@ class OnlineRoundService2Test {
 		
 		
 		onlineRoundRepository.deleteAll();
-		
-		//onlineRoundRepository.deleteAll();
 		log.info("Clean up completed");
 
 	}

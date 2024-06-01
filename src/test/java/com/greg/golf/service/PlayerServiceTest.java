@@ -99,11 +99,11 @@ class PlayerServiceTest {
 	@Test
 	void authenticateValidPlayerTest() {
 
-		Player player = new Player();
-		player.setNick("golfer");
-		player.setPassword("welcome");
+		Player plr = new Player();
+		plr.setNick("golfer");
+		plr.setPassword("welcome");
 
-		GolfUserDetails response = playerService.authenticatePlayer(player);
+		GolfUserDetails response = playerService.authenticatePlayer(plr);
 		Assertions.assertEquals(1L, response.getPlayer().getId());
 	}
 
@@ -112,11 +112,11 @@ class PlayerServiceTest {
 	@Test
 	void authenticateInvalidPasswordTest() {
 
-		Player player = new Player();
-		player.setNick("golfer");
-		player.setPassword("invalid");
+		Player plr = new Player();
+		plr.setNick("golfer");
+		plr.setPassword("invalid");
 
-		assertThrows(BadCredentialsException.class, () -> playerService.authenticatePlayer(player));
+		assertThrows(BadCredentialsException.class, () -> playerService.authenticatePlayer(plr));
 	}
 
 	@DisplayName("Process invalid username authentication")
@@ -124,19 +124,17 @@ class PlayerServiceTest {
 	@Test
 	void authenticateInvalidUserNameTest() {
 
-		Player player = new Player();
-		player.setNick("invalid");
-		player.setPassword("welcome");
+		Player plr = new Player();
+		plr.setNick("invalid");
+		plr.setPassword("welcome");
 
-		assertThrows(BadCredentialsException.class, () -> playerService.authenticatePlayer(player));
+		assertThrows(BadCredentialsException.class, () -> playerService.authenticatePlayer(plr));
 	}
 
 	@DisplayName("Update player handicap")
 	@Transactional
 	@Test
 	void updatePlayerWhsTest() {
-
-		var player = playerService.getPlayer(1L).orElseThrow();
 
 		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 
@@ -158,8 +156,6 @@ class PlayerServiceTest {
 	@Transactional
 	@Test
 	void updatePlayerPasswordTest() {
-
-		var player = playerService.getPlayer(1L).orElseThrow();
 
 		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 
@@ -184,15 +180,15 @@ class PlayerServiceTest {
 	@Test
 	void addPlayerOnBehalfTest() {
 
-		Player player = new Player();
-		player.setNick("test");
-		player.setPassword("welcome");
-		player.setWhs(10.0F);
-		player.setSex(Common.PLAYER_SEX_MALE);
+		Player plr = new Player();
+		plr.setNick("test");
+		plr.setPassword("welcome");
+		plr.setWhs(10.0F);
+		plr.setSex(Common.PLAYER_SEX_MALE);
 
-		player = playerService.addPlayerOnBehalf(player);
+		plr = playerService.addPlayerOnBehalf(plr);
 
-		Assertions.assertNotNull(player.getId(), "Player id should not be null");
+		Assertions.assertNotNull(plr.getId(), "Player id should not be null");
 	}
 
 	@DisplayName("Add player on behalf test which already exists")
@@ -200,13 +196,13 @@ class PlayerServiceTest {
 	@Test
 	void addPlayerOnBehalfWhichAlreadyExistsTest() {
 
-		Player player = new Player();
-		player.setNick("golfer");
-		player.setPassword("welcome");
-		player.setWhs(10.0F);
-		player.setSex(Common.PLAYER_SEX_MALE);
+		Player plr = new Player();
+		plr.setNick("golfer");
+		plr.setPassword("welcome");
+		plr.setWhs(10.0F);
+		plr.setSex(Common.PLAYER_SEX_MALE);
 
-		assertThrows(PlayerNickInUseException.class, () -> playerService.addPlayerOnBehalf(player));
+		assertThrows(PlayerNickInUseException.class, () -> playerService.addPlayerOnBehalf(plr));
 	}
 
 	@DisplayName("Generate tokens")
@@ -214,11 +210,11 @@ class PlayerServiceTest {
 	@Test
 	void generateTokensTest() {
 
-		Player player = new Player();
-		player.setRole(Common.ROLE_PLAYER_REGULAR);
-		player.setId(1L);
+		Player plr = new Player();
+		plr.setRole(Common.ROLE_PLAYER_REGULAR);
+		plr.setId(1L);
 
-		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
+		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), plr);
 
 		assertDoesNotThrow(() -> playerService.generateJwtToken(userDetails));
 		assertDoesNotThrow(() -> playerService.generateRefreshToken(userDetails));
@@ -249,12 +245,12 @@ class PlayerServiceTest {
 	@Test
 	void updatePlayerOnBehalfTest(@Autowired PlayerRepository playerRepository) {
 
-		Player player = new Player();
-		player.setId(1L);
-		player.setWhs(33.3F);
-		player.setNick("Test");
-		player.setSex(!Common.PLAYER_SEX_MALE);
-		playerService.updatePlayerOnBehalf(player, false);
+		Player plr = new Player();
+		plr.setId(1L);
+		plr.setWhs(33.3F);
+		plr.setNick("Test");
+		plr.setSex(!Common.PLAYER_SEX_MALE);
+		playerService.updatePlayerOnBehalf(plr, false);
 
 		Player persistedPlayer = playerRepository.findById(1L).orElseThrow();
 
@@ -397,8 +393,6 @@ class PlayerServiceTest {
 	@Transactional
 	@Test
 	void deleteEmailTest(@Autowired PlayerRepository playerRepository) {
-
-		var player = playerService.getPlayer(1L).orElseThrow();
 
 		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
 

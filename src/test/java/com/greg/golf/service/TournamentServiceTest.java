@@ -7,13 +7,11 @@ import java.util.TreeSet;
 
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
-import com.greg.golf.error.DeleteTournamentPlayerException;
-import com.greg.golf.error.DuplicatePlayerInTournamentException;
-import com.greg.golf.error.MailNotSetException;
-import com.greg.golf.error.UnauthorizedException;
+import com.greg.golf.error.*;
 import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.aes.StringUtility;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
@@ -37,6 +35,7 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 @Slf4j
 @SpringBootTest
@@ -59,6 +58,7 @@ class TournamentServiceTest {
 	@Autowired
 	TournamentResultRepository tournamentResultRepository;
 
+	@SuppressWarnings("unused")
 	@MockBean
 	private EmailServiceImpl emailService;
 
@@ -268,8 +268,6 @@ class TournamentServiceTest {
 		var course = courseRepository.findById(1L).orElseThrow();
 		var round = roundRepository.findAll().get(0);
 
-		//round.setCourse(course);
-
 		round.getCourse().setHoles(holeRepository.findByCourse(course));
 
 		round.getScoreCard().get(0).setStroke(20);
@@ -412,9 +410,9 @@ class TournamentServiceTest {
 		assertEquals(1L, tournamentRoundRepository.count());
 
 		Long tournamentId = tournament.getId();
-		Long roundId = round.getId();
+		Long rndId = round.getId();
 
-		tournamentService.addRound(tournamentId, roundId, true);
+		tournamentService.addRound(tournamentId, rndId, true);
 		assertEquals(1L, tournamentRoundRepository.count());
 	}
 
@@ -565,8 +563,6 @@ class TournamentServiceTest {
 		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-
-		//playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
 		tournamentService.addRound(tournament.getId(), round.getId(), true);
 
 		var round2 =  rounds.get(1);
@@ -1345,7 +1341,7 @@ class TournamentServiceTest {
 		tournamentNotification.setTournamentId(tournamentId);
 		tournamentNotificationRepository.save(tournamentNotification);
 
-		assertEquals(0, tournamentService.processNotifications(tournamentId));
+		assertEquals(0, tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
 	}
 
 	@DisplayName("Send notification")
@@ -1393,13 +1389,31 @@ class TournamentServiceTest {
 			fail("Method emailService.sendMail throws exception");
 		}
 
-		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STR_NET));
+		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STR));
+
+		try {
+			doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
+		} catch (Exception e) {
+			fail("Method emailService.sendMail throws exception");
+		}
+
+		// verify if exception is caught
+		assertThrows(GeneralException.class, () -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
+
+		//remove notification
+		tournamentService.removeNotification(tournamentId);
+
+		assertEquals(0, tournamentNotificationRepository.findByTournamentId(tournamentId).size());
+
 	}
 
-	@DisplayName("Add notification for closed tournament")
+	@DisplayName("Add notification for tournament")
 	@Transactional
 	@Test
-	void attemptToAddNotificationForClosedTournamentTest(@Autowired TournamentRepository tournamentRepository,
+	void attemptToAddNotificationTournamentTest(@Autowired TournamentRepository tournamentRepository,
 													     @Autowired PlayerService playerService,
 														 @Autowired PlayerRepository playerRepository,
 													     @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
@@ -1428,6 +1442,14 @@ class TournamentServiceTest {
 		tournamentService.addNotification(tournament.getId());
 
 		assertEquals(0, tournamentNotificationRepository.findAll().size());
+
+		tournament.setStatus(Tournament.STATUS_OPEN);
+		tournamentRepository.save(tournament);
+
+		tournamentService.addNotification(tournament.getId());
+
+		assertEquals(1, tournamentNotificationRepository.findAll().size());
+
 	}
 
 	@DisplayName("Add notification for opened tournament")
@@ -1452,11 +1474,6 @@ class TournamentServiceTest {
 
 		Long id = tournament.getId();
 		assertThrows(MailNotSetException.class, () -> tournamentService.addNotification(id));
-
-		//tournamentService.addNotification(tournament.getId());
-
-
-		//assertEquals(1, tournamentNotificationRepository.findAll().size());
 	}
 
 	@AfterAll

@@ -49,6 +49,11 @@ public class TournamentService {
     private final TemplateEngine templateEngine;
     private final PlayerService playerService;
 
+    public static final int SORT_STB_NET = 1;
+    public static final int SORT_STB = 2;
+    public static final int SORT_STR_NET = 3;
+    public static final int SORT_STR = 4;
+
     @Lazy
     private final TournamentService self;
 
@@ -63,6 +68,9 @@ public class TournamentService {
         // then verify if player is allowed to delete result
         // only tournament owner can do it
         RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament result by unauthorized user");
+
+        // remove notifications
+        tournamentNotificationRepository.deleteByTournamentId(tournamentId);
 
         tournament
             .getTournamentResult()
@@ -595,6 +603,9 @@ public class TournamentService {
         // set close flag
         tournament.setStatus(Tournament.STATUS_CLOSE);
         tournamentRepository.save(tournament);
+
+        // remove notifications
+        tournamentNotificationRepository.deleteByTournamentId(tournamentId);
     }
 
     @Transactional
@@ -714,7 +725,7 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = true)
-    public int processNotifications(Long tournamentId) throws GeneralException {
+    public int processNotifications(Long tournamentId, Integer sort) throws GeneralException {
 
         int sentNotifications = 0;
 
@@ -722,35 +733,34 @@ public class TournamentService {
 
         if (!notifications.isEmpty()) {
 
-            var receipients = new ArrayList<String>();
+            var recipients = new ArrayList<String>();
 
             notifications.forEach(notification -> {
 
                 var email = playerService.getEmail(notification.getPlayerId());
 
                 if (email != null) {
-                    receipients.add(email);
+                    recipients.add(email);
                 }
             });
 
-            if (!receipients.isEmpty()) {
+            if (!recipients.isEmpty()) {
 
                 var tournament = tournamentRepository.findById(tournamentId);
 
                 // only tournament owner can do it
                 RoleVerification.verifyPlayer(tournament.orElseThrow().getPlayer().getId(), "Attempt to process notifications by unauthorized user");
 
+                List<TournamentResult> sortedResults = sortResults(tournament.orElseThrow(), sort);
+
                 var context = new Context();
+                context.setVariable("results", sortedResults);
                 context.setVariable("tournamentName", tournament.orElseThrow().getName());
-                context.setVariable("results",
-                        tournament.orElseThrow().getTournamentResult()
-                                .stream()
-                                .sorted(Comparator.comparingInt(TournamentResult::getStbNet).reversed())
-                                .collect(Collectors.toList()));
+
                 String body = templateEngine.process("TournamentResultsTemplate.html", context);
 
                 try {
-                    emailServiceImpl.sendEmail(receipients.toArray(new String[receipients.size()]), "Tournament results updated - " + tournament.orElseThrow().getName(), body);
+                    emailServiceImpl.sendEmail(recipients.toArray(new String[0]), "Tournament results updated - " + tournament.orElseThrow().getName(), body);
                     sentNotifications++;
                 } catch (MessagingException e) {
                     throw new GeneralException();
@@ -758,6 +768,50 @@ public class TournamentService {
             }
         }
         return sentNotifications;
+    }
+
+    private List<TournamentResult> sortResults(Tournament tournament, Integer sort) {
+
+        List<TournamentResult> sortedResults = switch (sort) {
+            case SORT_STB_NET -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStbNet).reversed())
+                    .collect(Collectors.toList());
+            case SORT_STB -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStbGross).reversed())
+                    .collect(Collectors.toList());
+            case SORT_STR -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokesBrutto))
+                    .collect(Collectors.toList());
+            case SORT_STR_NET -> tournament.getTournamentResult()
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokesNetto))
+                    .collect(Collectors.toList());
+            default -> new ArrayList<>();
+        };
+
+        if (tournament.getBestRounds() == Common.ALL_ROUNDS && (sort == SORT_STR || sort == SORT_STR_NET)) {
+            sortedResults = sortedResults
+                    .stream()
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
+                    .collect(Collectors.toList());
+        } else if (tournament.getBestRounds() != Common.ALL_ROUNDS && (sort == SORT_STR || sort == SORT_STR_NET)) {
+            var resultsPlayedBestRounds  = sortedResults
+                    .stream()
+                    .filter(sr -> sr.getPlayedRounds() >= tournament.getBestRounds())
+                    .toList();
+            var resultsNotPlayedBestRounds = sortedResults
+                    .stream()
+                    .filter(sr -> sr.getPlayedRounds() < tournament.getBestRounds())
+                    .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
+                    .toList();
+            sortedResults.addAll(resultsPlayedBestRounds);
+            sortedResults.addAll(resultsNotPlayedBestRounds);
+        }
+
+        return sortedResults;
     }
 
     @Transactional

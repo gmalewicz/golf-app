@@ -27,7 +27,6 @@ class ApiExceptionHandlerTest {
 	@BeforeAll
 	public static void setup() {
 
-		//apiExceptionHandler = new ApiExceptionHandler(messageSource);
 		log.info("Set up completed");
 	}
 

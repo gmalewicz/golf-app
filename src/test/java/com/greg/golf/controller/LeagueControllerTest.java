@@ -1,10 +1,7 @@
 package com.greg.golf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.LeagueDto;
-import com.greg.golf.controller.dto.LeagueMatchDto;
-import com.greg.golf.controller.dto.LeaguePlayerDto;
-import com.greg.golf.controller.dto.PlayerDto;
+import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.League;
 import com.greg.golf.entity.LeagueMatch;
 import com.greg.golf.entity.LeaguePlayer;
@@ -106,7 +103,6 @@ class LeagueControllerTest {
 
 		input.setPlayer(playerDto);
 
-		//when(modelMapper.map(any(), any())).thenReturn(null);
 		doNothing().when(leagueService).addLeague(any());
 
 		mockMvc.perform(post("/rest/League").contentType("application/json").characterEncoding("utf-8")
@@ -221,6 +217,42 @@ class LeagueControllerTest {
 
 		doNothing().when(leagueService).deleteLeague(anyLong());
 		mockMvc.perform(delete("/rest/League/1")).andExpect(status().isOk());
+	}
+
+	@DisplayName("Should process notification")
+	@Test
+	void processNotificationWhenValidInputThenReturns200() throws Exception {
+
+		when(leagueService.processNotifications(any(), any())).thenReturn(0);
+
+		var input = new LeagueResultDto();
+		input.setNick("Test");
+		input.setBig(1);
+		input.setSmall(1);
+		input.setMatchesPlayed(1);
+
+		mockMvc.perform(post("/rest/League/Notification/1").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(new LeagueResultDto[]{input}))).andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should add notification")
+	@Test
+	void addNotificationWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(leagueService).addNotification(any());
+
+		mockMvc.perform(post("/rest/League/AddNotification/1").contentType("application/json"))
+				.andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should remove notification")
+	@Test
+	void removeNotificationWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(leagueService).removeNotification(any());
+
+		mockMvc.perform(post("/rest/League/RemoveNotification/1").contentType("application/json"))
+				.andExpect(status().isOk()).andReturn();
 	}
 
 	@AfterAll

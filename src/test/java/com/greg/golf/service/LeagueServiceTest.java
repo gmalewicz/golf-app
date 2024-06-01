@@ -1,13 +1,14 @@
 package com.greg.golf.service;
 
+import com.greg.golf.controller.dto.LeagueResultDto;
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.*;
-import com.greg.golf.repository.LeagueMatchRepository;
-import com.greg.golf.repository.LeaguePlayerRepository;
-import com.greg.golf.repository.LeagueRepository;
+import com.greg.golf.repository.*;
 import com.greg.golf.security.JwtRequestFilter;
+import com.greg.golf.security.aes.StringUtility;
 import com.greg.golf.util.GolfPostgresqlContainer;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
@@ -22,6 +23,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -30,6 +33,8 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @SpringBootTest
@@ -39,6 +44,10 @@ class LeagueServiceTest {
     @SuppressWarnings("unused")
     @MockBean
     private JwtRequestFilter jwtRequestFilter;
+
+    @SuppressWarnings("unused")
+    @MockBean
+    private EmailServiceImpl emailService;
 
     @ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
@@ -294,8 +303,6 @@ class LeagueServiceTest {
         var players = new ArrayList<LeaguePlayer>();
         players.add(leaguePlayer);
         league.setLeaguePlayers(players);
-       // leaguePlayerRepository.save(leaguePlayer);
-        //leagueService.addLeague(league);
 
         var authorities = new ArrayList<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority(Common.PLAYER));
@@ -693,6 +700,136 @@ class LeagueServiceTest {
         var leagueId = league.getId();
         assertThrows(UnauthorizedException.class, () -> this.leagueService.deleteLeague(leagueId));
 
+    }
+
+    @DisplayName("Add notification for opened league but player does not have mail set")
+    @Transactional
+    @Test
+    void attemptToAddNotificationForOpenedTournamentButNoEmailSetTest(@Autowired LeagueRepository leagueRepository,
+                                                                      @Autowired PlayerService playerService,
+                                                                      @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueService.addLeague(league);
+
+        player = playerService.getPlayer(1L).orElseThrow();
+
+        UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+                userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+
+        var league2 = leagueRepository.findAll().get(0);
+
+        Long id = league2.getId();
+        assertThrows(MailNotSetException.class, () -> leagueService.addNotification(id));
+    }
+
+    @DisplayName("Add notification for opened league")
+    @Transactional
+    @Test
+    void attemptToAddNotificationForOpenLeagueTest(@Autowired LeagueRepository leagueRepository,
+                                                         @Autowired PlayerService playerService,
+                                                         @Autowired PlayerRepository playerRepository,
+                                                         @Autowired LeagueNotificationRepository leagueNotificationRepository) {
+
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueService.addLeague(league);
+
+        player = playerService.getPlayer(1L).orElseThrow();
+        try {
+            player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword"));
+        } catch (Exception e) {
+            fail("Should not throw any exception");
+        }
+        playerRepository.save(player);
+
+        UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+                userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+
+        var leagueId = leagueRepository.findAll().get(0).getId();
+        leagueService.addNotification(leagueId);
+
+        assertEquals(1, leagueNotificationRepository.findAll().size());
+
+        //attempt to add notification the second time
+        assertThrows(DuplicateNotificationException.class, () -> leagueService.addNotification(leagueId));
+    }
+
+    @DisplayName("Send notification test")
+    @Transactional
+    @Test
+    void attemptToSendNotificationTest(@Autowired LeagueRepository LeagueRepository,
+                                       @Autowired PlayerService playerService,
+                                       @Autowired LeagueNotificationRepository leagueNotificationRepository) {
+
+        player = playerService.getPlayer(1L).orElseThrow();
+
+        UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+                userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+        var league = new League();
+        league.setPlayer(player);
+        league.setStatus(League.STATUS_OPEN);
+        league.setName("Test league");
+        leagueService.addLeague(league);
+        var leagueId = league.getId();
+
+        var leagueResultDto = new LeagueResultDto();
+        leagueResultDto.setNick("Test");
+        leagueResultDto.setBig(1);
+        leagueResultDto.setSmall(1);
+        leagueResultDto.setMatchesPlayed(1);
+
+        // attempt to send notification but no notification is defined
+        assertEquals(0, leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
+
+        player.setEmail("grzegorz.malewicz@gmail.com");
+        playerService.update(player);
+
+        // create notification
+        leagueService.addNotification(leagueId);
+
+        try {
+            doNothing().when(emailService).sendEmail(any(), any(), any());
+        } catch (Exception e) {
+            fail("Method emailService.sendMail throws exception");
+        }
+
+        assertDoesNotThrow(() -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
+
+        try {
+            doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
+        } catch (Exception e) {
+            fail("Method emailService.sendMail throws exception");
+        }
+
+        // verify if exception is caught
+        assertThrows(GeneralException.class, () -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
+
+        //remove notification
+        leagueService.removeNotification(leagueId);
+
+        assertEquals(0, leagueNotificationRepository.findByLeagueId(leagueId).size());
     }
 
     @AfterAll

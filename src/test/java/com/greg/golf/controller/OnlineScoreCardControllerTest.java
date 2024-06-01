@@ -43,6 +43,7 @@ import com.greg.golf.service.PlayerService;
 @WebMvcTest(controllers = OnlineScoreCardController.class)
 class OnlineScoreCardControllerTest {
 
+
 	@MockBean
 	private OnlineRoundService onlineRoundService;
 
@@ -208,8 +209,7 @@ class OnlineScoreCardControllerTest {
 		onlineScorecard.setStroke(3);
 		onlineScorecard.setOrId(1);
 		onlineScorecard.setId(1L);
-		
-		//when(modelMapper.map(Mockito.mock(OnlineScoreCardDto.class), OnlineScoreCard.class)).thenReturn(onlineScorecard);
+
 		when(modelMapper.map(any(),  any())).thenReturn(null);
 		when(onlineRoundService.saveOnlineScoreCard(any())).thenReturn(new OnlineScoreCard());
 		
