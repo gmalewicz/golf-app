@@ -70,4 +70,11 @@ public class OnlineScoreCard {
 	@Transient
 	private boolean syncRequired;
 
+	@EqualsAndHashCode.Exclude
+	@Column(name = "lat")
+	private Double lat;
+
+	@EqualsAndHashCode.Exclude
+	@Column(name = "lng")
+	private Double lng;
 }

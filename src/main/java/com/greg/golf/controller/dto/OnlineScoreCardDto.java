@@ -48,4 +48,10 @@ public class OnlineScoreCardDto {
 	@Pattern(regexp = "^(0\\d|1\\d|2[0-3]):[0-5]\\d$")
 	private String time;
 
+	@Schema(description = "latitude", example = "52.0728099", accessMode = READ_WRITE)
+	private Double lat;
+
+	@Schema(description = "longitude", example = "52.0728099", accessMode = READ_WRITE)
+	private Double lng;
+
 }
