@@ -807,6 +807,7 @@ public class TournamentService {
                     .filter(sr -> sr.getPlayedRounds() < tournament.getBestRounds())
                     .sorted(Comparator.comparingInt(TournamentResult::getStrokeRounds).reversed())
                     .toList();
+            sortedResults = new ArrayList<>();
             sortedResults.addAll(resultsPlayedBestRounds);
             sortedResults.addAll(resultsNotPlayedBestRounds);
         }

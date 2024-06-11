@@ -9,8 +9,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.6.8'
-description = 'DGNG backend application - google maps POC'
+version = '3.6.9'
+description = 'DGNG backend application - bug fixes'
 
 processResources {
     filesMatching("**/*.yml") {
