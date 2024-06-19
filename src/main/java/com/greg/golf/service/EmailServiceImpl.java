@@ -17,7 +17,7 @@ public class EmailServiceImpl implements EmailService {
 		var mail = javaMailSender.createMimeMessage();
 
 		var helper = new MimeMessageHelper(mail, true);
-		helper.setTo(to);
+		helper.setBcc(to);
 
 		helper.setSubject(title);
 		helper.setText(content, true);

@@ -760,8 +760,9 @@ public class TournamentService {
                 String body = templateEngine.process("TournamentResultsTemplate.html", context);
 
                 try {
+                    log.info("Number of notifications for sending: " + recipients.size());
                     emailServiceImpl.sendEmail(recipients.toArray(new String[0]), "Tournament results updated - " + tournament.orElseThrow().getName(), body);
-                    sentNotifications++;
+                    sentNotifications = recipients.size();
                 } catch (MessagingException e) {
                     throw new GeneralException();
                 }
