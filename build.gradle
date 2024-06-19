@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.6.9'
+version = '3.6.12'
 description = 'DGNG backend application - bug fixes'
 
 processResources {
