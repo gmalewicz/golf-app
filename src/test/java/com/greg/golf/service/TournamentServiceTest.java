@@ -130,6 +130,8 @@ class TournamentServiceTest {
 		tournament.setPlayer(player);
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setBestRounds(Common.ALL_ROUNDS);
+		tournament.setMaxPlayHcp(54);
+		tournament.setPlayHcpMultiplayer(1f);
 		tournamentRepository.save(tournament);
 
 		log.info("Set up completed");
@@ -215,7 +217,9 @@ class TournamentServiceTest {
 	@DisplayName("Calculate net and gross STB")
 	@Transactional
 	@Test
-	void calculateNetAndGrossSTBTest(@Autowired RoundRepository roundRepository, @Autowired PlayerService playerService) {
+	void calculateNetAndGrossSTBTest(@Autowired RoundRepository roundRepository,
+									 @Autowired PlayerService playerService,
+									 @Autowired TournamentRepository tournamentRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
 
@@ -230,8 +234,11 @@ class TournamentServiceTest {
 		tournamentResult.setTournament(tournamentService.findAllTournamentsPageable(0).get(0));
 		tournamentResultRepository.save(tournamentResult);
 
+		Tournament tournament = tournamentRepository.findAll().get(0);
+
+
 		var retRound = roundRepository.findAll().get(0);
-		tournamentService.updateSTB(tournamentResult, retRound, null, player, 38.4F);
+		tournamentService.updateSTB(tournamentResult, retRound, null, player, 38.4F, tournament);
 
 		log.info("STB net: " + tournamentResult.getStbNet());
 		log.info("STB gross: " + tournamentResult.getStbGross());
@@ -363,12 +370,16 @@ class TournamentServiceTest {
 	@DisplayName("Calculate net strokes")
 	@Transactional
 	@Test
-	void getNetStrokesTest(@Autowired PlayerService playerService, @Autowired RoundRepository roundRepository) {
+	void getNetStrokesTest(@Autowired PlayerService playerService,
+						   @Autowired RoundRepository roundRepository,
+						   @Autowired TournamentRepository tournamentRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
 		var round = roundRepository.findAll().get(0);
 
-		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null, 38.4F);
+		Tournament tournament = tournamentRepository.findAll().get(0);
+
+		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null, 38.4F, tournament);
 
 		Assertions.assertEquals(54, netStrokes);
 
@@ -377,12 +388,16 @@ class TournamentServiceTest {
 	@DisplayName("Calculate net strokes where net strokes is lower than 0")
 	@Transactional
 	@Test
-	void getNetStrokesLowerThan0Test(@Autowired PlayerService playerService, @Autowired RoundRepository roundRepository) {
+	void getNetStrokesLowerThan0Test(@Autowired PlayerService playerService,
+									 @Autowired RoundRepository roundRepository,
+									 @Autowired TournamentRepository tournamentRepository) {
 
 		var round = roundRepository.findAll().get(0);
 		var player = playerService.getPlayer(1L).orElseThrow();
 
-		var netStrokes = tournamentService.getNetStrokes(player, round, 22, null, 38.4F);
+		Tournament tournament = tournamentRepository.findAll().get(0);
+
+		var netStrokes = tournamentService.getNetStrokes(player, round, 22, null, 38.4F, tournament);
 
 		Assertions.assertEquals(0, netStrokes);
 
