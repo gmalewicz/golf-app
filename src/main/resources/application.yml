@@ -60,7 +60,7 @@ google:
       site: 6Lf-66YZAAAAAJc3serwf1iRoJg6PgTPJazkfNWD
       secret: replace_it 
 cors:
-  allowedOrigins: localhost:4200
+  allowedOrigins: dgng.pl
 round:
   pageSize: 5
 course:
