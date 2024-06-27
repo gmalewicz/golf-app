@@ -259,6 +259,8 @@ class TournamentServiceTest {
 		tournament.setName("Test Cup2");
 		tournament.setPlayer(player);
 		tournament.setBestRounds(1);
+		tournament.setPlayHcpMultiplayer(1F);
+		tournament.setMaxPlayHcp(54);
 		tournament = tournamentService.addTournament(tournament);
 
 		Assertions.assertNotNull(tournament.getId());

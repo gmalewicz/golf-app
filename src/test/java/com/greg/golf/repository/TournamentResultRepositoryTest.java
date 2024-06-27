@@ -16,9 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Tournament;
 import com.greg.golf.entity.TournamentResult;
-import com.greg.golf.repository.PlayerRepository;
-import com.greg.golf.repository.TournamentRepository;
-import com.greg.golf.repository.TournamentResultRepository;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
@@ -59,6 +56,8 @@ class TournamentResultRepositoryTest {
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);
+		tournament.setPlayHcpMultiplayer(1F);
+		tournament.setMaxPlayHcp(54);
 		tournament = tournamentRepository.save(tournament);
 		log.info("Set up completed");
 	}
