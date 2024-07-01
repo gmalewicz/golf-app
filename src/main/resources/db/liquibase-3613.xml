@@ -17,4 +17,12 @@
 			</column>
 		</addColumn>
 	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1719225168325-28">
+		<dropColumn tableName="online_score_card">
+			<column name="lng"/>
+		</dropColumn>
+		<dropColumn tableName="online_score_card">
+			<column name="lat"/>
+		</dropColumn>
+	</changeSet>
 </databaseChangeLog>
