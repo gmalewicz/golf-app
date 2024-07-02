@@ -49,6 +49,8 @@ public class TournamentService {
     private final TemplateEngine templateEngine;
     private final PlayerService playerService;
 
+
+    public static final int DEFAULT_PLAYING_MULTIPLIER = 1;
     public static final int SORT_STB_NET = 1;
     public static final int SORT_STB = 2;
     public static final int SORT_STR_NET = 3;
@@ -218,13 +220,13 @@ public class TournamentService {
                     tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
                     int grossStrokes = 0;
                     int netStrokes = 0;
-                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player, tournamentPlayers.get(player.getId()));
+                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player, tournamentPlayers.get(player.getId()), tournament);
                     // check if round is applicable for stroke statistic
                     boolean strokeApplicable = applicableForStroke(round, player);
                     if (strokeApplicable) {
                         tournamentResult.increaseStrokeRounds();
                         grossStrokes = getGrossStrokes(player, round);
-                        netStrokes = getNetStrokes(player, round, grossStrokes, playerRound, tournamentPlayers.get(player.getId()));
+                        netStrokes = getNetStrokes(player, round, grossStrokes, playerRound, tournamentPlayers.get(player.getId()), tournament);
                     }
                     tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
                     tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
@@ -247,7 +249,7 @@ public class TournamentService {
                     var tournamentResult = buildEmptyTournamentResult(player);
                     tournamentResult.setTournament(tournament);
                     // update stb results
-                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player, tournamentPlayers.get(player.getId()));
+                    List<Integer> stb = updateSTB(tournamentResult, round, playerRound, player, tournamentPlayers.get(player.getId()), tournament);
                     // check if round is applicable for stroke statistic
                     boolean strokeApplicable = applicableForStroke(round, player);
                     if (strokeApplicable) {
@@ -255,7 +257,7 @@ public class TournamentService {
                         // get gross and net strokes
                         tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
                         tournamentResult.setStrokesNetto(
-                                getNetStrokes(player, round, tournamentResult.getStrokesBrutto(), playerRound, tournamentPlayers.get(player.getId())));
+                                getNetStrokes(player, round, tournamentResult.getStrokesBrutto(), playerRound, tournamentPlayers.get(player.getId()), tournament));
                     } else {
                         tournamentResult.setStrokesBrutto(0);
                         tournamentResult.setStrokesNetto(0);
@@ -437,12 +439,13 @@ public class TournamentService {
 
     // calculate net strokes
     @Transactional
-    public int getNetStrokes(Player player, Round round, int grossStrokes, PlayerRound playerRound, Float playerHcp) {
+    public int getNetStrokes(Player player, Round round, int grossStrokes, PlayerRound playerRound, Float playerHcp, Tournament tournament) {
 
         // calculate course HCP
-        int courseHCP = getCourseHCP(playerRound, round, player, playerHcp);
+        int playingHCP = getCourseHCP(playerRound, round, player, playerHcp);
+        playingHCP = getPlayingHcp(tournament, playingHCP);
 
-        int netStrokes = grossStrokes - courseHCP;
+        int netStrokes = grossStrokes - playingHCP;
         if (netStrokes < 0) {
             netStrokes = 0;
         }
@@ -454,17 +457,18 @@ public class TournamentService {
     // returns STB net at index 0 and STB gross at index 1
     @Transactional
     public List<Integer> updateSTB(TournamentResult tournamentResult, Round round, PlayerRound playerRound,
-                                   Player player, Float playerHcp) {
+                                   Player player, Float playerHcp, Tournament tournament) {
 
         // create List of ret values
         List<Integer> retStb = new ArrayList<>();
 
         // calculate course HCP
-        int courseHCP = getCourseHCP(playerRound, round, player, playerHcp);
+        int playingHCP = getCourseHCP(playerRound, round, player, playerHcp);
+        playingHCP = getPlayingHcp(tournament, playingHCP);
 
         // calculate hole HCP for player
-        int hcpAll = (int) Math.floor((double) courseHCP / 18);
-        int hcpIncMaxHole = courseHCP - (hcpAll * 18);
+        int hcpAll = (int) Math.floor((double) playingHCP / 18);
+        int hcpIncMaxHole = playingHCP - (hcpAll * 18);
         log.debug("hcpAll " + hcpAll);
         log.debug("hcpIncMaxHole " + hcpIncMaxHole);
 
@@ -542,6 +546,25 @@ public class TournamentService {
         }
 
         return retRounds;
+    }
+
+    // use multiplier to calculate playing HCP
+    // put cap on playing hcp if required
+    private int getPlayingHcp(Tournament tournament, int courseHcp) {
+
+        int retPlayingHcp = courseHcp;
+
+        // first apply multiplier
+        if (tournament.getPlayHcpMultiplayer() != DEFAULT_PLAYING_MULTIPLIER) {
+            retPlayingHcp = Math.round(retPlayingHcp * tournament.getPlayHcpMultiplayer());
+        }
+
+        // then apply cap
+        if (retPlayingHcp > tournament.getMaxPlayHcp()) {
+            retPlayingHcp = tournament.getMaxPlayHcp();
+        }
+
+        return retPlayingHcp;
     }
 
     private int getCourseHCP(PlayerRound playerRound, Round round, Player player, Float playerHcp) {

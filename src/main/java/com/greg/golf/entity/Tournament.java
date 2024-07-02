@@ -46,6 +46,14 @@ public class Tournament {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	private Boolean status;
+
+	@Column(name = "play_hcp_multiplayer")
+	@NotNull
+	private Float playHcpMultiplayer;
+
+	@EqualsAndHashCode.Exclude
+	@Column(name = "max_play_hcp")
+	private Integer maxPlayHcp;
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
