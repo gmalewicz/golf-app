@@ -387,6 +387,27 @@ class TournamentServiceTest {
 
 	}
 
+	@DisplayName("Calculate net strokes with max playing hcp and cap")
+	@Transactional
+	@Test
+	void getNetStrokesMaxHcpAndCapTest(@Autowired PlayerService playerService,
+						   @Autowired RoundRepository roundRepository,
+						   @Autowired TournamentRepository tournamentRepository) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+		var round = roundRepository.findAll().get(0);
+
+		Tournament tournament = tournamentRepository.findAll().get(0);
+		tournament.setMaxPlayHcp(18);
+		tournament.setPlayHcpMultiplayer(0.75f);
+		tournamentRepository.save(tournament);
+
+		var netStrokes = tournamentService.getNetStrokes(player, round, 99, null, 38.4F, tournament);
+
+		Assertions.assertEquals(81, netStrokes);
+
+	}
+
 	@DisplayName("Calculate net strokes where net strokes is lower than 0")
 	@Transactional
 	@Test
