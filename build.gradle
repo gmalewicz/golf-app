@@ -125,7 +125,7 @@ dependencies {
     liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
     liquibaseRuntime 'com.vladmihalcea:hibernate-types-60:2.21.1'
     liquibaseRuntime 'com.vladmihalcea:hibernate-types-60:2.21.1'
-    liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
     liquibaseRuntime sourceSets.main.output
 }
 
