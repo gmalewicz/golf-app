@@ -5,7 +5,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,4 +40,15 @@ public class TournamentDto {
 
 	@Schema(description = "Tournament status: false - open, true - close", example = "false", accessMode = READ_ONLY)
 	private Boolean status;
+
+	@DecimalMin("0.5")
+	@DecimalMax("1")
+	@Schema(description = "Playing handicap multiplier", example = "0.5", accessMode = READ_WRITE, allowableValues = {
+			"0.5", "0.75", "1"})
+	private Float playHcpMultiplayer;
+
+	@Min(value = 0)
+	@Max(value = 54)
+	@Schema(description = "Max Playing handicap", example = "36", accessMode = READ_WRITE, minimum = "0", maximum = "54")
+	private Integer maxPlayHcp;
 }

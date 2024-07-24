@@ -15,12 +15,15 @@ public class LeagueMatch {
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@ToString.Exclude
 	@Column(name = "winner_id")
 	private Long winnerId;
+
 	@ToString.Exclude
 	@Column(name = "looser_id")
 	private Long looserId;
+
 	@EqualsAndHashCode.Exclude
 	@Column(name = "result")
 	private String result;

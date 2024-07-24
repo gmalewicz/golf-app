@@ -320,6 +320,8 @@ class RoundServiceTest {
 		tournament.setPlayer(round.getPlayer().iterator().next());
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);
+		tournament.setPlayHcpMultiplayer(1F);
+		tournament.setMaxPlayHcp(54);
 		tournamentRepository.save(tournament);
 
 		round = roundRepository.save(round);
