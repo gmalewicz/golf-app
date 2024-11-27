@@ -12,10 +12,7 @@ import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -41,8 +38,9 @@ class CycleServiceTest {
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
             .getInstance();
 
-    private static Cycle cycle;
-    private static EagleResultDto eagleResultDto;
+    private Cycle cycle;
+    private EagleResultDto eagleResultDto;
+    private static Player player;
 
     @Autowired
     private CycleService cycleService;
@@ -50,7 +48,13 @@ class CycleServiceTest {
     @BeforeAll
     public static void setup(@Autowired PlayerService playerService) {
 
-        Player player = playerService.getPlayer(1L).orElseThrow();
+        player = playerService.getPlayer(1L).orElseThrow();
+
+        log.info("Set up completed");
+    }
+
+    @BeforeEach
+    public void setupEachTest() {
 
         cycle = new Cycle();
         cycle.setName("Test cycle");
@@ -66,7 +70,7 @@ class CycleServiceTest {
         eagleResultDto.setFirstName("James");
 
 
-        log.info("Set up completed");
+        log.info("Set up each test completed");
     }
 
     @DisplayName("Should add the new cycle by authorized user")
