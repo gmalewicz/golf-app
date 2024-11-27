@@ -19,7 +19,7 @@ import com.greg.golf.entity.Tournament;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -29,7 +29,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 class TournamentRepositoryTest {
 
 	@SuppressWarnings("unused")
-	@MockBean
+	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
 	private static Player player;
