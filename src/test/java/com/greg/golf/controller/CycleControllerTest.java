@@ -23,7 +23,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -45,18 +44,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = CycleController.class)
 class CycleControllerTest {
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private PlayerService playerService;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private CycleService cycleService;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private ModelMapper modelMapper;
 

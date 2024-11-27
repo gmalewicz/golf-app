@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
-import com.greg.golf.controller.GameController;
 import com.greg.golf.controller.dto.GameDataDto;
 import com.greg.golf.controller.dto.GameDto;
 import com.greg.golf.controller.dto.PlayerDto;
@@ -129,7 +128,7 @@ class GameControllerTest {
 	@DisplayName("Get game")
 	@Transactional
 	@Test
-	void getGamesTest(@Autowired ModelMapper modelMapper, @Autowired GameService gameService) {
+	void getGamesTest(@Autowired GameService gameService) {
 		
 		Game game = new Game();
 		game.setPlayer(player);
