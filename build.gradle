@@ -9,8 +9,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.6.13'
-description = 'DGNG backend application - tournament playing hcp'
+version = '3.6.14'
+description = 'DGNG backend application - libraries update'
 
 processResources {
     filesMatching("**/*.yml") {
