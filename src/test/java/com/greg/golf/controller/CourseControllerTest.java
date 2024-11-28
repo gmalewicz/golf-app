@@ -11,7 +11,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 import com.greg.golf.controller.dto.CourseDto;
@@ -23,6 +22,7 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -33,7 +33,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 class CourseControllerTest {
 
 	@SuppressWarnings("unused")
-	@MockBean
+	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 	
 	@ClassRule

@@ -22,9 +22,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,37 +44,37 @@ import com.greg.golf.service.PlayerService;
 class OnlineScoreCardControllerTest {
 
 
-	@MockBean
+	@MockitoBean
 	private OnlineRoundService onlineRoundService;
 
-	@MockBean
+	@MockitoBean
 	private PlayerService playerService;
 
-	@MockBean
+	@MockitoBean
 	private UserService userService;
 
-	@MockBean
+	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
-	@MockBean
+	@MockitoBean
 	private PasswordEncoder bCryptPasswordEncoder;
 
-	@MockBean
+	@MockitoBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-	@MockBean
+	@MockitoBean
 	private ModelMapper modelMapper;
 
-	@MockBean
+	@MockitoBean
 	private SimpMessagingTemplate template;
 
-	@MockBean
+	@MockitoBean
 	private GolfOAuth2UserService golfOAuth2UserService;
 
-	@MockBean
+	@MockitoBean
 	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
 
-	@MockBean
+	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
 	private final MockMvc mockMvc;

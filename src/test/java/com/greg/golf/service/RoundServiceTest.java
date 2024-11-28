@@ -15,8 +15,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import com.greg.golf.entity.Course;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoundServiceTest {
 
 	@SuppressWarnings("unused")
-	@MockBean
+	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
 	@ClassRule
@@ -58,7 +58,7 @@ class RoundServiceTest {
 	private RoundService roundService;
 
 	@SuppressWarnings("unused")
-	@MockBean
+	@MockitoBean
 	private TournamentService mockTournamentService;
 
 	@BeforeAll
