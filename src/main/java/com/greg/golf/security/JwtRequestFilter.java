@@ -202,7 +202,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         return request.getRequestURI().contains("/rest/Authenticate") ||
                 (request.getRequestURI().contains("/rest/AddPlayer") && !request.getRequestURI().contains("/rest/AddPlayerOnBehalf")) ||
                 request.getRequestURI().contains("/actuator/") ||
-                request.getRequestURI().contains("/api/") ||
+                request.getRequestURI().contains("/api") ||
                 request.getRequestURI().contains("/oauth2/");
     }
 }
