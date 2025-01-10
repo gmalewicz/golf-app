@@ -21,14 +21,13 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
 import com.greg.golf.service.RoundService;
 import com.greg.golf.service.ScoreCardService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = { @Tag(name = "Round API") })
+//@OpenAPIDefinition(tags = { @Tag(name = "Round API") })
 public class RoundController extends BaseController {
 
 	private final RoundService roundService;

@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import com.greg.golf.entity.Player;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.helpers.GolfUserDetails;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +24,6 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = @Tag(name = "Access API"))
 public class AccessController extends BaseController {
 
 	private static final String REFRESH_TOKEN = "refreshToken";

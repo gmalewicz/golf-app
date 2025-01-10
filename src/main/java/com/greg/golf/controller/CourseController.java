@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.greg.golf.entity.Course;
 import com.greg.golf.service.CourseService;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @SuppressWarnings("unused")
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = @Tag(name = "Course API"))
 public class CourseController extends BaseController {
 
 	private final CourseService courseService;

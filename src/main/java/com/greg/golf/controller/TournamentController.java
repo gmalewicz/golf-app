@@ -14,14 +14,13 @@ import org.springframework.web.bind.annotation.*;
 
 import com.greg.golf.service.TournamentService;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = { @Tag(name = "Tournament API") })
+//@OpenAPIDefinition(tags = { @Tag(name = "Tournament API") })
 public class TournamentController extends BaseController {
 
 	private final TournamentService tournamentService;

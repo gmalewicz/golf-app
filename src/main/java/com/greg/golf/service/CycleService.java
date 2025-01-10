@@ -4,6 +4,7 @@ import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
@@ -39,6 +40,9 @@ public class CycleService {
     @Transactional
     public Cycle addCycle(Cycle cycle) {
 
+        if (cycle.getVersion() == null) {
+            cycle.setVersion(Common.CYCLE_VERSION_2024);
+        }
         return cycleRepository.save(cycle);
     }
 
