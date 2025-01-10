@@ -39,6 +39,11 @@ public class Cycle {
 	private Float maxWhs;
 
 	@EqualsAndHashCode.Exclude
+	@NotNull
+	@Column(name = "version")
+	private Integer version;
+
+	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)

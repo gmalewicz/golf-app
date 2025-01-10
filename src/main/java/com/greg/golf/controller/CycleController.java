@@ -6,7 +6,6 @@ import com.greg.golf.controller.dto.CycleTournamentDto;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.service.CycleService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +19,6 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = { @Tag(name = "Cycle API") })
 public class CycleController extends BaseController {
 
 	private final CycleService cycleService;

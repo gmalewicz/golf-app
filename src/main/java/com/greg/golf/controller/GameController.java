@@ -19,14 +19,12 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.error.SendingMailFailureException;
 
 import com.greg.golf.service.GameService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = @Tag(name = "Game API"))
 public class GameController extends BaseController {
 
 	private final GameService gameService;

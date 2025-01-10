@@ -48,7 +48,7 @@ public class OnlineScoreCardController extends BaseController {
 	@SendTo("/topic")
 	public OnlineScoreCardDto send(OnlineScoreCardDto onlineScoreCardDto) {
 
-		log.info("Received s -  " + onlineScoreCardDto);
+        log.info("Received s -  {}", onlineScoreCardDto);
 
 		var onlineScoreCard = modelMapper.map(onlineScoreCardDto, OnlineScoreCard.class);
 
@@ -119,8 +119,8 @@ public class OnlineScoreCardController extends BaseController {
 	@GetMapping(value = "/rest/Player/{nick}")
 	public PlayerDto getPlayer(
 			@Parameter(description = "nick", example = "player", required = true) @PathVariable("nick") String nick) {
-		
-		log.info("Requested player for nick: " + nick);
+
+        log.info("Requested player for nick: {}", nick);
 		var player = playerService.getPlayerForNick(nick);
 		if (player == null) {
 			return null;
@@ -136,20 +136,20 @@ public class OnlineScoreCardController extends BaseController {
 	public HttpStatus deleteOnlineRoundForOwner(
 			@Parameter(description = "Online round owner id", example = "1", required = true) @PathVariable Long ownerId) {
 
-		log.info("trying to delete online round for owner: " + ownerId);
+        log.info("trying to delete online round for owner: {}", ownerId);
 		onlineRoundService.deleteForOwner(ownerId);
 		return HttpStatus.OK;
 
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	@Tag(name = "Online scoreard API")
+	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Finalize online rounds for owner")
 	@PostMapping(value = "/rest/FinalizeOnlineOwnerRounds")
 	public HttpStatus finalizeOwnerOnlineRounds(
 			@Parameter(description = "Owner object", required = true) @RequestBody Long ownerId) {
 
-		log.info("trying to finalize online round for owner: " + ownerId);
+        log.info("trying to finalize online round for owner: {}", ownerId);
 
 		onlineRoundService.finalizeForOwner(ownerId);
 

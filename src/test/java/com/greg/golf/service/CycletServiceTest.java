@@ -61,6 +61,7 @@ class CycleServiceTest {
         cycle.setStatus(Cycle.STATUS_OPEN);
         cycle.setPlayer(player);
         cycle.setBestRounds(1);
+        cycle.setVersion(1);
         cycle.setMaxWhs(12.0F);
 
         eagleResultDto = new EagleResultDto();

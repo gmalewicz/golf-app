@@ -8,7 +8,6 @@ import com.greg.golf.entity.League;
 import com.greg.golf.entity.LeagueMatch;
 import com.greg.golf.entity.LeaguePlayer;
 import com.greg.golf.service.LeagueService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +22,6 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@OpenAPIDefinition(tags = { @Tag(name = "League API") })
 public class LeagueController extends BaseController {
 
     private final LeagueService leagueService;
