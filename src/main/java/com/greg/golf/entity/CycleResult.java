@@ -22,6 +22,7 @@ public class CycleResult {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JoinColumn(name = "cycle_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Cycle cycle;
 
@@ -44,6 +45,11 @@ public class CycleResult {
     @Min(value = 0, message = "Minimum player cycle result")
     @Column(name = "cycle_result")
     private Integer cycleScore;
+
+    @NotNull
+    @Min(value = 1, message = "Minimum series number")
+    @Column(name = "series")
+    private Integer series;
 
     @Transient
     private Float whs;

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
 
 @Getter
@@ -27,7 +28,12 @@ public class EagleResultDto {
     private Float whs;
 
     @NotNull
-    @Schema(description = "Round results stableford net", accessMode = WRITE_ONLY)
+    @Schema(description = "Round results Stableford net", accessMode = WRITE_ONLY)
     @JsonProperty(value = "r", access = JsonProperty.Access.WRITE_ONLY)
     private int[] r;
+
+    @NotNull
+    @Schema(description = "Series number. Two series are supported",
+            example = "1", minimum = "1", maximum = "2", accessMode = WRITE_ONLY)
+    private Integer series;
 }

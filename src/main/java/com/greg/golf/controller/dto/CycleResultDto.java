@@ -30,4 +30,9 @@ public class CycleResultDto {
 	@Schema(description = "Round results", accessMode = READ_ONLY)
 	@JsonProperty( value = "r", access = JsonProperty.Access.READ_ONLY)
 	private int[] results;
+
+	@NotNull
+	@Schema(description = "Series number. Two series are supported",
+			example = "1", minimum = "1", maximum = "2", accessMode = READ_ONLY)
+	private Integer series;
 }

@@ -21,16 +21,9 @@ public class Common {
 
 	public static final int ALL_ROUNDS = 0;
 
-	public static  final int HOLE_GIVEN_UP = 16;
+	public static final int HOLE_GIVEN_UP = 16;
 
 
 	public static final long ACCESS_TOKEN_LIFETIME = 60L * 60 * 4;
 	public static final long REFRESH_TOKEN_LIFETIME = 60L * 60 * 24 * 7;
-
-	// standard rule that was applicable for Royal Golf Club Wilanow in 2022,2023,2024
-	// rule is based on STB nett
-	public static final int CYCLE_VERSION_2024 = 0;
-	// standard rule that was applicable for Royal Golf Club Wilanow starting from  2025
-	// rule is based on grand prix approach for 16 best players in each hcp category
-	public static final int CYCLE_VERSION_2025 = 1;
 }

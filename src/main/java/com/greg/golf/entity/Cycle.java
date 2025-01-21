@@ -44,6 +44,11 @@ public class Cycle {
 	private Integer version;
 
 	@EqualsAndHashCode.Exclude
+	@NotNull
+	@Column(name = "series")
+	private Integer series;
+
+	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player_id", nullable = false)
@@ -51,6 +56,11 @@ public class Cycle {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "cycle")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "cycle" , orphanRemoval = true)
 	private List<CycleTournament> cycleTournaments;
+
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany( fetch = FetchType.LAZY, mappedBy = "cycle")
+	private List<CycleResult> cycleResults;
 }

@@ -5,10 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-
-
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.*;
 
 @Getter
 @Setter
@@ -36,4 +33,15 @@ public class CycleDto {
 	@NotNull
 	@Schema(description = "Maximum handicap", example = "38.5", accessMode = READ_WRITE, minimum="-5", maximum="54")
 	private Float maxWhs;
+
+	@NotNull
+	@Schema(description = "Series number. Two series are supported",
+			example = "1", minimum = "1", maximum = "2", accessMode = WRITE_ONLY)
+	private Integer series;
+
+	@NotNull
+	@Schema(description = "0 - standard rule that was applicable for Royal Golf Club Wilanów starting up to 2024. " +
+			"1- Rule is based on grand prix approach for 16 best players in each hcp category applicable for 2025",
+			example = "1", minimum = "0", maximum = "1", accessMode = WRITE_ONLY)
+	private Integer version;
 }
