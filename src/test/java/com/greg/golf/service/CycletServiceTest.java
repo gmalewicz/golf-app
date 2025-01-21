@@ -63,12 +63,14 @@ class CycleServiceTest {
         cycle.setBestRounds(1);
         cycle.setVersion(1);
         cycle.setMaxWhs(12.0F);
+        cycle.setSeries(1);
 
         eagleResultDto = new EagleResultDto();
         eagleResultDto.setR(new int[]{40, 0, 0, 0});
         eagleResultDto.setWhs(36.0F);
         eagleResultDto.setLastName("Bond");
         eagleResultDto.setFirstName("James");
+        eagleResultDto.setSeries(1);
 
 
         log.info("Set up each test completed");
@@ -117,6 +119,7 @@ class CycleServiceTest {
         cycleResult.setCycle(cycle);
         cycleResult.setCycleScore(40);
         cycleResult.setTotal(40);
+        cycleResult.setSeries(1);
         cycleResultRepository.save(cycleResult);
 
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
@@ -154,6 +157,7 @@ class CycleServiceTest {
         cycleResult.setCycle(cycle);
         cycleResult.setCycleScore(70);
         cycleResult.setTotal(70);
+        cycleResult.setSeries(1);
         cycleResultRepository.save(cycleResult);
 
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));

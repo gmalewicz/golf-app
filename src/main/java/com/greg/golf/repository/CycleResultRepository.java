@@ -15,7 +15,7 @@ public interface CycleResultRepository extends JpaRepository<CycleResult, Long> 
 
     List<CycleResult> findByCycle(Cycle cycle);
 
-    List<CycleResult> findByCycleOrderByCycleScoreDesc(Cycle cycle);
+    List<CycleResult> findByCycleOrderBySeriesAscCycleScoreDesc(Cycle cycle);
 
     @Modifying
     @Query(value = "DELETE FROM cycle_result c where c.cycle_id = :cycleId", nativeQuery = true)

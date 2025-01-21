@@ -4,7 +4,6 @@ import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
-import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
@@ -23,9 +22,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.groupingBy;
+
 @Slf4j
 @RequiredArgsConstructor
-//@ConfigurationProperties(prefix = "cycle")
 @Service("cycleService")
 public class CycleService {
 
@@ -40,9 +40,6 @@ public class CycleService {
     @Transactional
     public Cycle addCycle(Cycle cycle) {
 
-        if (cycle.getVersion() == null) {
-            cycle.setVersion(Common.CYCLE_VERSION_2024);
-        }
         return cycleRepository.save(cycle);
     }
 
@@ -124,44 +121,58 @@ public class CycleService {
 
     private List<CycleResult> addTournamentToCycleResult(List<CycleResult> cycleResults, List<CycleResult> tournamentResults) {
 
-        // initialize result size
-        var cycleResultSize = cycleResults.get(0).getResults().length;
+        var finalCycleResults = new ArrayList<CycleResult>();
 
-        //create map from cycle result where key is player id
-        var cycleResultMap = cycleResults.stream()
-                .collect(Collectors.toMap(CycleResult::getPlayerName, cycleResult -> cycleResult));
+        //split data by series
+        var seriesMap = tournamentResults.stream().collect(groupingBy(CycleResult::getSeries));
 
-        // update cycle results
-        tournamentResults.forEach(tournamentResult -> {
+        //do it for each series
+        seriesMap.forEach((series, tournamentResultsForSeries) -> {
 
-            //if player already exists
-            if (cycleResultMap.containsKey(tournamentResult.getPlayerName())) {
+            //select cycle results for proper series
+            var cycleResultsForSeries = cycleResults.stream()
+                    .filter(cycleResult -> cycleResult.getSeries().equals(series)).toList();
 
-                var cycleResult = cycleResultMap.get(tournamentResult.getPlayerName());
+            // initialize result size
+            var cycleResultSize = cycleResultsForSeries.get(0).getResults().length;
 
-                cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
-                        Arrays.stream(tournamentResult.getResults())).toArray());
-            // if that player played the first time in the tournament
-            } else {
+            //create map from cycle result where key is player id
+            var cycleResultMap = cycleResultsForSeries.stream()
+                    .collect(Collectors.toMap(CycleResult::getPlayerName, cycleResult -> cycleResult));
 
-                tournamentResult.setResults(IntStream.concat(Arrays.stream(new int[cycleResultSize]),
-                        Arrays.stream(tournamentResult.getResults())).toArray());
+            // update cycle results
+            tournamentResultsForSeries.forEach(tournamentResult -> {
 
-                cycleResultMap.put(tournamentResult.getPlayerName(), tournamentResult);
+                //if player already exists
+                if (cycleResultMap.containsKey(tournamentResult.getPlayerName())) {
 
-            }
-        });
+                    var cycleResult = cycleResultMap.get(tournamentResult.getPlayerName());
 
-        // update players who did not play that tournament
-        cycleResultMap.values()
-            .forEach(cycleResult -> {
+                    cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
+                            Arrays.stream(tournamentResult.getResults())).toArray());
+                    // if that player played the first time in the tournament
+                } else {
+
+                    tournamentResult.setResults(IntStream.concat(Arrays.stream(new int[cycleResultSize]),
+                            Arrays.stream(tournamentResult.getResults())).toArray());
+
+                    cycleResultMap.put(tournamentResult.getPlayerName(), tournamentResult);
+
+                }
+            });
+
+            // update players who did not play that tournament
+            cycleResultMap.values().forEach(cycleResult -> {
                 if (cycleResult.getResults().length == cycleResultSize) {
                     cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
                             Arrays.stream(new int[ROUNDS_PER_TOURNAMENT])).toArray());
                 }
             });
 
-        return new ArrayList<>(cycleResultMap.values());
+            finalCycleResults.addAll(cycleResultMap.values());
+        });
+
+        return finalCycleResults;
     }
 
 
@@ -173,6 +184,7 @@ public class CycleService {
                     cycleResult.setPlayerName(e.getLastName() + " " + e.getFirstName());
                     cycleResult.setResults(e.getR());
                     cycleResult.setWhs(e.getWhs());
+                    cycleResult.setSeries(e.getSeries());
 
                     return cycleResult;})
                 .toList();
@@ -230,7 +242,7 @@ public class CycleService {
     public List<CycleResult> findCycleResults(Long cycleId) {
         var cycle = new Cycle();
         cycle.setId(cycleId);
-        return cycleResultRepository.findByCycleOrderByCycleScoreDesc(cycle);
+        return cycleResultRepository.findByCycleOrderBySeriesAscCycleScoreDesc(cycle);
     }
 
     public void closeCycle(Long cycleId) {
@@ -243,8 +255,10 @@ public class CycleService {
 
     }
 
+    @Transactional
     public void deleteCycle(Long cycleId) {
 
+        cycleResultRepository.deleteForCycle(cycleId);
         cycleRepository.deleteById(cycleId);
     }
 
