@@ -21,9 +21,6 @@ class ApiExceptionHandlerTest {
 	@Autowired
 	private ApiExceptionHandler apiExceptionHandler;
 
-	public ApiExceptionHandlerTest() {
-	}
-
 	@BeforeAll
 	public static void setup() {
 

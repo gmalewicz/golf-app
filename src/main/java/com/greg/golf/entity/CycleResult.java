@@ -1,6 +1,7 @@
 package com.greg.golf.entity;
 
 import com.vladmihalcea.hibernate.type.array.IntArrayType;
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -51,7 +52,8 @@ public class CycleResult {
     @Column(name = "series")
     private Integer series;
 
-    @Transient
-    private Float whs;
-
+    @Type(StringArrayType.class)
+    @NotNull
+    @Column(name = "hcp")
+    private String[] hcp;
 }
