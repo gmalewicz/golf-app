@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.7.8'
-description = 'DGNG backend application - libraries update'
+version = '3.8.0'
+description = 'DGNG backend application - cycles 2025'
 
 processResources {
     filesMatching("**/*.yml") {

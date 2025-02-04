@@ -91,9 +91,16 @@ public class CycleService {
 
         var results = cycleResultRepository.findByCycle(cycle);
 
-        // first remove results
-        results.forEach(result -> result.setResults(Arrays.stream(result.getResults())
-                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray()));
+
+        results.forEach(result -> {
+            // first remove results
+            result.setResults(Arrays.stream(result.getResults())
+                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray());
+            result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1));
+        });
+
+        // second remove hcp
+        results.forEach(result -> result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1)));
 
         // then update totals
         return updCycleResultAndTotal(cycleTournament, results);
@@ -150,11 +157,21 @@ public class CycleService {
 
                     cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
                             Arrays.stream(tournamentResult.getResults())).toArray());
+
+                    var arrList = new ArrayList<>( Arrays.asList(cycleResult.getHcp()));
+                    arrList.add(tournamentResult.getHcp()[0]);
+                    cycleResult.setHcp(arrList.toArray(cycleResult.getHcp()));
+
                     // if that player played the first time in the tournament
                 } else {
 
                     tournamentResult.setResults(IntStream.concat(Arrays.stream(new int[cycleResultSize]),
                             Arrays.stream(tournamentResult.getResults())).toArray());
+
+                    var hcpArray = new String[cycleResultSize/ROUNDS_PER_TOURNAMENT + 1];
+                    Arrays.fill(hcpArray, "");
+                    hcpArray[hcpArray.length - 1] = tournamentResult.getHcp()[0];
+                    tournamentResult.setHcp(hcpArray);
 
                     cycleResultMap.put(tournamentResult.getPlayerName(), tournamentResult);
 
@@ -166,6 +183,11 @@ public class CycleService {
                 if (cycleResult.getResults().length == cycleResultSize) {
                     cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
                             Arrays.stream(new int[ROUNDS_PER_TOURNAMENT])).toArray());
+
+                    var arrList = new ArrayList<>( Arrays.asList(cycleResult.getHcp()));
+                    arrList.add("");
+                    cycleResult.setHcp(arrList.toArray(cycleResult.getHcp()));
+
                 }
             });
 
@@ -183,9 +205,8 @@ public class CycleService {
                     cycleResult.setCycle(cycleTournament.getCycle());
                     cycleResult.setPlayerName(e.getLastName() + " " + e.getFirstName());
                     cycleResult.setResults(e.getR());
-                    cycleResult.setWhs(e.getWhs());
+                    cycleResult.setHcp(new String[] {e.getWhs().toString()});
                     cycleResult.setSeries(e.getSeries());
-
                     return cycleResult;})
                 .toList();
 
