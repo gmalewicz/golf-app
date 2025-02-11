@@ -26,4 +26,6 @@ public class Common {
 
 	public static final long ACCESS_TOKEN_LIFETIME = 60L * 60 * 4;
 	public static final long REFRESH_TOKEN_LIFETIME = 60L * 60 * 24 * 7;
+
+	public static final int CYCLE_SERIES_STB = 0;
 }

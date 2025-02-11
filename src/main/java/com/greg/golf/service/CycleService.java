@@ -4,6 +4,7 @@ import com.greg.golf.controller.dto.EagleResultDto;
 import com.greg.golf.entity.Cycle;
 import com.greg.golf.entity.CycleResult;
 import com.greg.golf.entity.CycleTournament;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.repository.CycleRepository;
 import com.greg.golf.repository.CycleResultRepository;
 import com.greg.golf.repository.CycleTournamentRepository;
@@ -228,15 +229,28 @@ public class CycleService {
             });
         // otherwise, get best rounds from cycle results according to specified rule
         } else {
+
             cycleResults.forEach( cycleResult -> {
 
-                cycleResult.setCycleScore(
-                        Arrays.stream(cycleResult.getResults())
-                                .boxed()
-                                .sorted(Comparator.reverseOrder())
-                                .limit(cycleTournament.getCycle().getBestRounds())
-                                .reduce(0, Integer::sum)
-                );
+                if (cycleTournament.getCycle().getSeries() == Common.CYCLE_SERIES_STB) {
+
+                    cycleResult.setCycleScore(
+                            Arrays.stream(cycleResult.getResults())
+                                    .boxed()
+                                    .sorted(Comparator.reverseOrder())
+                                    .limit(cycleTournament.getCycle().getBestRounds())
+                                    .reduce(0, Integer::sum)
+                    );
+                } else {
+                    cycleResult.setCycleScore(
+                            Arrays.stream(cycleResult.getResults())
+                                    .boxed()
+                                    .filter(result -> result > 0)
+                                    .sorted(Comparator.naturalOrder())
+                                    .limit(cycleTournament.getCycle().getBestRounds())
+                                    .reduce(0, Integer::sum)
+                    );
+                }
                 cycleResult.setTotal(
                         Arrays.stream(cycleResult.getResults())
                                 .reduce(0, Integer::sum)
