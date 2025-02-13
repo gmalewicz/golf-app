@@ -18,7 +18,7 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.8.1'
+version = '3.8.2'
 description = 'DGNG backend application - cycles 2025'
 
 processResources {
