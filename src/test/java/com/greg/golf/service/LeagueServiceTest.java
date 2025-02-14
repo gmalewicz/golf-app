@@ -706,8 +706,7 @@ class LeagueServiceTest {
     @Transactional
     @Test
     void attemptToAddNotificationForOpenedTournamentButNoEmailSetTest(@Autowired LeagueRepository leagueRepository,
-                                                                      @Autowired PlayerService playerService,
-                                                                      @Autowired TournamentNotificationRepository tournamentNotificationRepository) {
+                                                                      @Autowired PlayerService playerService) {
 
         var league = new League();
         league.setPlayer(player);
@@ -774,8 +773,7 @@ class LeagueServiceTest {
     @DisplayName("Send notification test")
     @Transactional
     @Test
-    void attemptToSendNotificationTest(@Autowired LeagueRepository LeagueRepository,
-                                       @Autowired PlayerService playerService,
+    void attemptToSendNotificationTest(@Autowired PlayerService playerService,
                                        @Autowired LeagueNotificationRepository leagueNotificationRepository) {
 
         player = playerService.getPlayer(1L).orElseThrow();
