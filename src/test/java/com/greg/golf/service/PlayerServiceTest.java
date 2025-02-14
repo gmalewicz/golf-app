@@ -49,6 +49,7 @@ class PlayerServiceTest {
 	private static Player player;
 	private static Player admin;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private PlayerService playerService;
 
@@ -337,13 +338,13 @@ class PlayerServiceTest {
 		adminPlayer.setType(Common.TYPE_PLAYER_LOCAL);
 		playerRepository.save(adminPlayer);
 
-		Player player = new Player();
-		player.setNick("Test.Pl");
-		player.setPassword("welcome");
+		Player player2 = new Player();
+		player2.setNick("Test.Pl");
+		player2.setPassword("welcome");
 
-		player = playerRepository.findById(admin.getId()).orElseThrow();
+		player2 = playerRepository.findById(admin.getId()).orElseThrow();
 
-		Assertions.assertFalse(player.getModified());
+		Assertions.assertFalse(player2.getModified());
 
 	}
 
@@ -383,9 +384,9 @@ class PlayerServiceTest {
 
 		playerService.update(playerEmail);
 
-		assertDoesNotThrow(() -> {
-			Assertions.assertEquals("mail@test.com", playerService.getEmail(1L));
-		});
+		assertDoesNotThrow(() ->
+			Assertions.assertEquals("mail@test.com", playerService.getEmail(1L))
+		);
 	}
 
 
