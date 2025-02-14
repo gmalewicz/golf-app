@@ -13,7 +13,7 @@ import org.springframework.security.messaging.access.intercept.MessageMatcherDel
 @SuppressWarnings("unused")
 public class SocketSecurityConfig {
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "squid:S1452"})
 	@Bean
 	AuthorizationManager<Message<?>> authorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
 		messages
