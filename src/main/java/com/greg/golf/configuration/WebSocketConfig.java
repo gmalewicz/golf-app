@@ -83,16 +83,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		public void postSend(@NonNull Message message,
 							 @NonNull MessageChannel channel,
 							 boolean sent) {
-			log.debug( "postSend: "+message );
+            log.debug("postSend: {}", message);
 			outChannel = channel;
 		}
 	}
 
 	class InboundMessageInterceptor implements ChannelInterceptor {
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public Message<?> preSend(@NonNull Message message, @NonNull MessageChannel channel) {
-			log.debug("preSend: "+message );
+            log.debug("preSend: {}", message);
 			GenericMessage<?> genericMessage = (GenericMessage<?>)message;
 			MessageHeaders headers = genericMessage.getHeaders();
 			String simpSessionId = (String)headers.get( "simpSessionId" );
@@ -105,8 +106,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 				if( nativeHeaders != null ) {
 					List<String> receiptList = nativeHeaders.get( "receipt" );
 					if( receiptList != null ) {
-						String rid = receiptList.get(0);
-						log.debug("receipt requested: "+rid );
+						String rid = receiptList.getFirst();
+                        log.debug("receipt requested: {}", rid);
 						sendReceipt( rid, simpSessionId );
 					}
 				}

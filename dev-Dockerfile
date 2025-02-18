@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.4.1_1-jre-alpine
+FROM eclipse-temurin:21-alpine
 
 LABEL maintainer="Grzegorz Malewicz"
 LABEL github="https://github.com/gmalewicz/golf-app"
