@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.8.4'
-description = 'libraries updated'
+version = '3.8.5'
+description = 'java update'
 
 processResources {
     filesMatching("**/*.yml") {
