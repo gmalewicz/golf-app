@@ -125,7 +125,7 @@ dependencies {
     liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.31.1'
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'info.picocli:picocli:4.7.6'
-    liquibaseRuntime 'org.yaml:snakeyaml:2.3'
+    liquibaseRuntime 'org.yaml:snakeyaml:2.4'
     liquibaseRuntime 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
