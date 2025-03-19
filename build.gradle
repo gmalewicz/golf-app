@@ -18,7 +18,7 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.8.5'
+version = '3.8.6'
 description = 'java update'
 
 processResources {
