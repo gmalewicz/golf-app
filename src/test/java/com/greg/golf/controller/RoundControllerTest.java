@@ -22,8 +22,6 @@ import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -102,12 +100,6 @@ class RoundControllerTest {
 	public RoundControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;
 		this.objectMapper = objectMapper;
-	}
-
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
 	}
 
 	@DisplayName("Gets round for id")
@@ -292,12 +284,4 @@ class RoundControllerTest {
 		mockMvc.perform(patch("/rest/SwapPlrRnd").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }

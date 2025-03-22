@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.8.6'
-description = 'java update'
+version = '3.9.0'
+description = 'tournament modifications'
 
 processResources {
     filesMatching("**/*.yml") {
@@ -64,6 +64,7 @@ liquibase {
             changelogFile './src/main/resources/db/dbChangeLog-diff.xml'
             driver 'org.postgresql.Driver'
             url 'jdbc:postgresql://localhost:5432/golf'
+            excludeObjects 'cycle_result'
             referenceUrl 'hibernate:spring:com.greg.golf.entity?dialect=org.hibernate.dialect.PostgreSQLDialect'
             referenceDriver 'liquibase.ext.hibernate.database.connection.HibernateDriver'
             if (project.hasProperty("jdbcUsername")) {

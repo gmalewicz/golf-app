@@ -38,14 +38,16 @@ class TournamentResultRepositoryTest {
 
 	private static Tournament tournament;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private TournamentResultRepository tournamentResultRepository;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private PlayerRepository playerRepository;
 
 	@BeforeAll
-	public static void setup(@Autowired TournamentRepository tournamentRepository, @Autowired PlayerService ps) {
+	static void setup(@Autowired TournamentRepository tournamentRepository, @Autowired PlayerService ps) {
 		
 		Player player = ps.getPlayer(1L).orElseThrow();
 
@@ -58,6 +60,7 @@ class TournamentResultRepositoryTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setPlayHcpMultiplayer(1F);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(false);
 		tournament = tournamentRepository.save(tournament);
 		log.info("Set up completed");
 	}
@@ -177,7 +180,7 @@ class TournamentResultRepositoryTest {
 	}
 
 	@AfterAll
-	public static void done(@Autowired TournamentRepository tournamentRepository) {
+	static void done(@Autowired TournamentRepository tournamentRepository) {
 		tournamentRepository.deleteAll();
 		log.info("Clean up completed");
 

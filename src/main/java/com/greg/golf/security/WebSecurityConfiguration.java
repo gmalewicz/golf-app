@@ -30,6 +30,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
+@Getter
 @Slf4j
 @ConfigurationProperties(prefix = "cors")
 @Configuration
@@ -38,26 +40,21 @@ import lombok.Setter;
 @EnableMethodSecurity( securedEnabled = true)
 public class WebSecurityConfiguration implements WebMvcConfigurer {
 
-	@Getter @Setter private String allowedOrigins;
+	private String allowedOrigins;
 
-
-	private final PasswordEncoder passwordEncoder;
-
-	private final UserService userService;
-
-
-	@Autowired
+	@SuppressWarnings("unused")
+    @Autowired
 	public WebSecurityConfiguration(@Lazy PasswordEncoder passwordEncoder, @Lazy UserService userService) {
 
-		this.passwordEncoder = passwordEncoder;
-		this.userService = userService;
-	}
+    }
 
+	@SuppressWarnings("unused")
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
+	@SuppressWarnings("unused")
 	@Bean
 	public DefaultSecurityFilterChain filterChain(HttpSecurity httpSecurity,
 										   @Autowired JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
@@ -121,7 +118,7 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 	
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
-		log.info("Attempt to set allowed origins: " + allowedOrigins);
+        log.info("Attempt to set allowed origins: {}", allowedOrigins);
 			CorsRegistration cr = registry.addMapping("/**");
 			cr.allowedOrigins("http://" + this.getAllowedOrigins(), 
 						  "https://" + this.getAllowedOrigins(),

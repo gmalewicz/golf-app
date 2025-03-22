@@ -165,7 +165,7 @@ public class TournamentService {
             return null;
         }
 
-        return tournamentLst.get(0);
+        return tournamentLst.getFirst();
     }
 
     @Transactional
@@ -697,13 +697,19 @@ public class TournamentService {
     }
 
     @Transactional
-    public void updatePlayer(Long tournamentId, Long playerId, Float whs)  {
+    public void updatePlayerHcp(Long tournamentId, Long playerId, Float whs) throws HcpChangeNotAllowedException {
 
         var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         // only tournament owner can do it
         RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to update player handicap by unauthorized user");
 
         var tournamentPlayer = tournamentPlayerRepository.findByTournamentIdAndPlayerId(tournamentId, playerId).orElseThrow();
+
+        // verify if tournament allows for hcp modification
+        if (!tournament.getCanUpdateHcp()) {
+            throw new HcpChangeNotAllowedException();
+        }
+
         tournamentPlayer.setWhs(whs);
         tournamentPlayerRepository.save(tournamentPlayer);
     }

@@ -38,12 +38,15 @@ class OnlineRoundServiceTest {
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private OnlineRoundService onlineRoundService;
-	
+
+	@SuppressWarnings("unused")
 	@Autowired 
 	private OnlineRoundRepository onlineRoundRepository;
-	
+
+	@SuppressWarnings("unused")
 	@Autowired 
 	private OnlineScoreCardRepository onlineScoreCardRepository;
 	
@@ -52,7 +55,7 @@ class OnlineRoundServiceTest {
 	private static Player player;
 	
 	@BeforeAll
-	public static void setup() {
+	static void setup() {
 		
 		course = new Course();
 		course.setId(1L);
@@ -154,7 +157,7 @@ class OnlineRoundServiceTest {
 		onlineScoreCard.setStroke(2);
 		onlineRoundService.saveOnlineScoreCard(onlineScoreCard);
 		
-		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().getFirst().getStroke().intValue());
 	}
 	
 	@DisplayName("Get online rounds")
@@ -296,7 +299,7 @@ class OnlineRoundServiceTest {
 
 		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard2));
 
-		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().getFirst().getStroke().intValue());
 	}
 
 	@DisplayName("Attempt to sync online scorecard witch already exists")
@@ -365,16 +368,6 @@ class OnlineRoundServiceTest {
 		onlineRoundService.syncOnlineScoreCards(List.of(onlineScoreCard2));
 
 		Assertions.assertTrue(onlineScoreCard2.isSyncRequired());
-		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().get(0).getStroke().intValue());
+		Assertions.assertEquals(2, onlineScoreCardRepository.findAll().getFirst().getStroke().intValue());
 	}
-	
-	@AfterAll
-	public static void done() {
-		
-		log.info("Clean up completed");
-
-	}
-	
-	
-
 }

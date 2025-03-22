@@ -91,7 +91,7 @@ class AccessControllerTest {
 	}
 
 	@BeforeAll
-	public static void setup() {
+	static void setup() {
 		log.info("Set up completed");
 	}
 
@@ -297,7 +297,7 @@ class AccessControllerTest {
 	}
 
 	@AfterAll
-	public static void done() {
+	static void done() {
 
 		log.info("Clean up completed");
 

@@ -37,4 +37,5 @@
 	<include file="liquibase-3615.xml" relativeToChangelogFile="true"/>
 	<include file="liquibase-378.xml" relativeToChangelogFile="true"/>
 	<include file="liquibase-380.xml" relativeToChangelogFile="true"/>
+	<include file="liquibase-390.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -39,11 +39,12 @@ class OnlineRoundService2Test {
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private OnlineRoundService onlineRoundService;
 
     @BeforeAll
-	public static void setup(@Autowired OnlineRoundRepository onlineRoundRepository, @Autowired  OnlineScoreCardRepository onlineScoreCardRepository) {
+	static void setup(@Autowired OnlineRoundRepository onlineRoundRepository, @Autowired  OnlineScoreCardRepository onlineScoreCardRepository) {
 
         Course course = new Course();
 		course.setId(1L);
@@ -86,7 +87,7 @@ class OnlineRoundService2Test {
 		
 		Assertions.assertEquals(1, rounds.size());
 		
-		Assertions.assertEquals(1, rounds.get(0).getScoreCardAPI().size());
+		Assertions.assertEquals(1, rounds.getFirst().getScoreCardAPI().size());
 	}
 	
 	@DisplayName("Get online rounds for owner")
@@ -100,7 +101,7 @@ class OnlineRoundService2Test {
 		
 		Assertions.assertEquals(1, rounds.size());
 		
-		Assertions.assertEquals(1, rounds.get(0).getScoreCardAPI().size());
+		Assertions.assertEquals(1, rounds.getFirst().getScoreCardAPI().size());
 	}
 	
 	@DisplayName("Delete online rounds for owner")
@@ -116,17 +117,4 @@ class OnlineRoundService2Test {
 		Assertions.assertEquals(0, rounds.size());
 		
 	}
-	
-	
-	@AfterAll
-	public static void done(@Autowired OnlineRoundRepository onlineRoundRepository) {
-		
-		
-		onlineRoundRepository.deleteAll();
-		log.info("Clean up completed");
-
-	}
-	
-	
-
 }

@@ -36,11 +36,12 @@ class ScoreCardServiceTest {
 
 	private static Long roundId;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private ScoreCardService scoreCardService;
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
+	static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
 			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
@@ -93,7 +94,7 @@ class ScoreCardServiceTest {
 	}
 	
 	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository) {
+	static void done(@Autowired RoundRepository roundRepository) {
 
 		roundRepository.deleteAll();
 		log.info("Clean up completed");
