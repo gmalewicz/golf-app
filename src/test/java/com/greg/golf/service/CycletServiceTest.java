@@ -42,11 +42,12 @@ class CycleServiceTest {
     private EagleResultDto eagleResultDto;
     private static Player player;
 
+    @SuppressWarnings("unused")
     @Autowired
     private CycleService cycleService;
 
     @BeforeAll
-    public static void setup(@Autowired PlayerService playerService) {
+    static void setup(@Autowired PlayerService playerService) {
 
         player = playerService.getPlayer(1L).orElseThrow();
 
@@ -54,7 +55,7 @@ class CycleServiceTest {
     }
 
     @BeforeEach
-    public void setupEachTest() {
+    void setupEachTest() {
 
         cycle = new Cycle();
         cycle.setName("Test cycle");
@@ -163,9 +164,9 @@ class CycleServiceTest {
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
         var cycleResult2 = cycleResultRepository.findByCycle(cycle);
         assertEquals(1, cycleResult2.size());
-        assertEquals(4, cycleResult2.get(0).getResults().length);
-        assertEquals(40, cycleResult2.get(0).getCycleScore());
-        assertEquals(40, cycleResult2.get(0).getTotal());
+        assertEquals(4, cycleResult2.getFirst().getResults().length);
+        assertEquals(40, cycleResult2.getFirst().getCycleScore());
+        assertEquals(40, cycleResult2.getFirst().getTotal());
         assertEquals(1, cycleTournamentRepository.findByCycleOrderById(cycle).size());
     }
 
@@ -206,7 +207,7 @@ class CycleServiceTest {
         cycleService.addCycle(cycle);
 
         assertEquals(1, cycleService.findAllCycles().size());
-        assertEquals("Test cycle", cycleService.findAllCycles().get(0).getName());
+        assertEquals("Test cycle", cycleService.findAllCycles().getFirst().getName());
 
     }
 
@@ -256,7 +257,7 @@ class CycleServiceTest {
 
         cycleService.findAllCycles();
 
-        assertEquals(Cycle.STATUS_CLOSE, cycleService.findAllCycles().get(0).getStatus());
+        assertEquals(Cycle.STATUS_CLOSE, cycleService.findAllCycles().getFirst().getStatus());
 
     }
 
@@ -270,12 +271,4 @@ class CycleServiceTest {
 
         assertDoesNotThrow(() -> cycleService.deleteCycle(cycle.getId()));
     }
-
-    @AfterAll
-    public static void done() {
-
-        log.info("Clean up completed");
-
-    }
-
 }
