@@ -8,9 +8,7 @@ import com.greg.golf.error.TeeAlreadyExistsException;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +24,6 @@ import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.TooShortStringForSearchException;
 import com.greg.golf.repository.FavouriteCourseRepository;
-import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -48,13 +45,9 @@ class CourseServiceTest {
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private CourseService courseService;
-	
-	@BeforeAll
-	public static void setup(@Autowired PlayerRepository playerRepository) {
-		log.info("Set up completed");
-	}
 
 	@DisplayName("Add tee test")
 	@Transactional
@@ -161,7 +154,7 @@ class CourseServiceTest {
 	void getTeesTest() {
 
 		List<CourseTee> tees = courseService.getTees(1L);
-		assertTrue(tees.size() > 0);
+        assertFalse(tees.isEmpty());
 	}
 	
 	@DisplayName("Get tees no result")
@@ -207,7 +200,7 @@ class CourseServiceTest {
 	@DisplayName("Add favourite course for player")
 	@Transactional
 	@Test
-	void addFavouriteCourseTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+	void addFavouriteCourseTest() {
 
 		Course course = new Course();
 		course.setId(1L);
@@ -222,7 +215,7 @@ class CourseServiceTest {
 	@DisplayName("Delete favourite course")
 	@Transactional
 	@Test
-	void deleteFavouriteCourseTest(@Autowired FavouriteCourseRepository favouriteCourseRepository) {
+	void deleteFavouriteCourseTest() {
 
 		Course course = new Course();
 		course.setId(1L);
@@ -284,12 +277,4 @@ class CourseServiceTest {
 		//check if favorites are empty
 		assertEquals(0, favouriteCourseRepository.findAll().size());	
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }
