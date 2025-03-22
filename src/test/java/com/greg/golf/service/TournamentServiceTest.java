@@ -65,7 +65,7 @@ class TournamentServiceTest {
 	private static Long roundId;
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
+	static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
 			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository,
 			@Autowired TournamentRepository tournamentRepository) {
 
@@ -1558,7 +1558,7 @@ class TournamentServiceTest {
 	}
 
 	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository,
+	static void done(@Autowired RoundRepository roundRepository,
 			@Autowired TournamentRepository tournamentRepository, @Autowired TournamentResultRepository tr) {
 
 		roundRepository.deleteAll();
