@@ -48,13 +48,6 @@ class CourseControllerTest {
 		this.courseController = courseController;
 	}
 
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
-	}
-
-
 	@DisplayName("Gets list of holes for course")
 	@Transactional
 	@Test
@@ -164,12 +157,4 @@ class CourseControllerTest {
 		
 		Assertions.assertEquals(HttpStatus.OK, status);
 	}
-		
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }
