@@ -14,8 +14,6 @@ import com.greg.golf.service.UserService;
 import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -88,11 +86,6 @@ class AccessControllerTest {
 	public AccessControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;
 		this.objectMapper = objectMapper;
-	}
-
-	@BeforeAll
-	public static void setup() {
-		log.info("Set up completed");
 	}
 
 	@DisplayName("Should authenticate with correct result")
@@ -295,12 +288,4 @@ class AccessControllerTest {
 		mockMvc.perform(post("/rest/DeletePlayerEmail").contentType("application/json"))
 				.andExpect(status().isOk()).andReturn();
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }

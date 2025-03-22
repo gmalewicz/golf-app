@@ -21,12 +21,6 @@ class ApiExceptionHandlerTest {
 	@Autowired
 	private ApiExceptionHandler apiExceptionHandler;
 
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
-	}
-
 	@DisplayName("Should throw TooManyPlayersException")
 	@Test
 	void TooManyPlayersExceptionTest()  {
@@ -218,12 +212,4 @@ class ApiExceptionHandlerTest {
 		ResponseEntity<ApiErrorResponse>  response = apiExceptionHandler.handleApiException(new TeeAlreadyExistsException());
 		Assertions.assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response.getStatusCode());
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }

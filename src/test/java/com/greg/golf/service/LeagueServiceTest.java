@@ -11,7 +11,6 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,7 +59,7 @@ class LeagueServiceTest {
     private LeagueService leagueService;
 
     @BeforeAll
-    public static void setup(@Autowired PlayerService playerService) {
+    static void setup(@Autowired PlayerService playerService) {
 
         if (player == null) {
             player = playerService.getPlayer(1L).orElseThrow();
@@ -95,7 +94,7 @@ class LeagueServiceTest {
         leagueService.addLeague(league);
 
         assertEquals(1, leagueService.findAllLeaguesPageable(0).size());
-        assertEquals("Test league", leagueService.findAllLeaguesPageable(0).get(0).getName());
+        assertEquals("Test league", leagueService.findAllLeaguesPageable(0).getFirst().getName());
 
     }
 
@@ -377,7 +376,7 @@ class LeagueServiceTest {
 
         this.leagueService.closeLeague(league.getId());
 
-        assertTrue(this.leagueService.findAllLeaguesPageable(0).get(0).getStatus());
+        assertTrue(this.leagueService.findAllLeaguesPageable(0).getFirst().getStatus());
     }
 
     @DisplayName("Should not add match by unauthorized user")
@@ -724,7 +723,7 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
 
-        var league2 = leagueRepository.findAll().get(0);
+        var league2 = leagueRepository.findAll().getFirst();
 
         Long id = league2.getId();
         assertThrows(MailNotSetException.class, () -> leagueService.addNotification(id));
@@ -761,7 +760,7 @@ class LeagueServiceTest {
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
 
-        var leagueId = leagueRepository.findAll().get(0).getId();
+        var leagueId = leagueRepository.findAll().getFirst().getId();
         leagueService.addNotification(leagueId);
 
         assertEquals(1, leagueNotificationRepository.findAll().size());
@@ -829,12 +828,4 @@ class LeagueServiceTest {
 
         assertEquals(0, leagueNotificationRepository.findByLeagueId(leagueId).size());
     }
-
-    @AfterAll
-    public static void done() {
-
-        log.info("Clean up completed");
-
-    }
-
 }

@@ -14,8 +14,6 @@ import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.TournamentService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -85,12 +83,6 @@ class TournamentControllerTest {
 	public TournamentControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;
 		this.objectMapper = objectMapper;
-	}
-
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
 	}
 
 	@DisplayName("Should get all tournaments with correct result")
@@ -288,7 +280,7 @@ class TournamentControllerTest {
 		input.setTournamentId(1L);
 		input.setWhs(1F);
 
-		doNothing().when(tournamentService).updatePlayer(anyLong(), anyLong(), anyFloat());
+		doNothing().when(tournamentService).updatePlayerHcp(anyLong(), anyLong(), anyFloat());
 		mockMvc.perform(patch("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
@@ -356,12 +348,5 @@ class TournamentControllerTest {
 
 		mockMvc.perform(post("/rest/Tournament/RemoveNotification/1").contentType("application/json"))
 				.andExpect(status().isOk()).andReturn();
-	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
 	}
 }

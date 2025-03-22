@@ -200,7 +200,7 @@ public class TournamentController extends BaseController {
 
 		log.info("trying to update tournament player whs: " + tournamentPlayerDto);
 
-		tournamentService.updatePlayer(tournamentPlayerDto.getTournamentId(), tournamentPlayerDto.getPlayerId(), tournamentPlayerDto.getWhs());
+		tournamentService.updatePlayerHcp(tournamentPlayerDto.getTournamentId(), tournamentPlayerDto.getPlayerId(), tournamentPlayerDto.getWhs());
 
 		return HttpStatus.OK;
 	}

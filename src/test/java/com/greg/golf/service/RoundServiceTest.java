@@ -62,7 +62,7 @@ class RoundServiceTest {
 	private TournamentService mockTournamentService;
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
+	static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
 			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
@@ -322,6 +322,7 @@ class RoundServiceTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setPlayHcpMultiplayer(1F);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
 		tournamentRepository.save(tournament);
 
 		round = roundRepository.save(round);
@@ -394,7 +395,7 @@ class RoundServiceTest {
 		round = roundRepository.findById(roundId).orElseThrow();
 
 		Assertions.assertEquals(1, round.getScoreCard().size());
-		Assertions.assertEquals(6, round.getScoreCard().get(0).getStroke().intValue());
+		Assertions.assertEquals(6, round.getScoreCard().getFirst().getStroke().intValue());
 	}
 
 	@DisplayName("Try to update scorecard with more than 1 player")
@@ -581,7 +582,7 @@ class RoundServiceTest {
 		var retList = playerService.getPlayerRoundCnt();
 
 		Assertions.assertEquals(1, retList.size());
-		Assertions.assertEquals(1, retList.get(0).getRoundCnt());
+		Assertions.assertEquals(1, retList.getFirst().getRoundCnt());
 	}
 
 	@DisplayName("Swap players for round")
@@ -606,7 +607,7 @@ class RoundServiceTest {
 	}
 
 	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository) {
+	static void done(@Autowired RoundRepository roundRepository) {
 
 		roundRepository.deleteAll();
 		log.info("Clean up completed");

@@ -31,9 +31,11 @@ class JwtRequestFilterTest {
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
 			.getInstance();
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private PlayerService playerService;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	JwtConfig jwtConfig;
 
@@ -44,7 +46,7 @@ class JwtRequestFilterTest {
 	private static FilterChain filterChain;
 
 	@BeforeAll
-	public static void setup(@Autowired JwtConfig jwtConfig) {
+	static void setup(@Autowired JwtConfig jwtConfig) {
 
 		jwtTokenUtil = new JwtTokenUtil(jwtConfig);
 		refreshTokenUtil = new RefreshTokenUtil(jwtConfig);
@@ -56,7 +58,7 @@ class JwtRequestFilterTest {
 	}
 
 	@BeforeEach
-	public void setupBeforeEach() {
+	void setupBeforeEach() {
 
 		request = mock(HttpServletRequest.class);
 		SecurityContextHolder.getContext().setAuthentication(null);
@@ -148,12 +150,4 @@ class JwtRequestFilterTest {
 			Assertions.fail("Should not have thrown any exception");
 		}
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }

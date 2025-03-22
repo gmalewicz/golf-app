@@ -36,12 +36,13 @@ class TournamentRepositoryTest {
 
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
-	
+
+	@SuppressWarnings("unused")
 	@Autowired
 	private TournamentRepository tournamentRepository;
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService ps) {
+	static void setup(@Autowired PlayerService ps) {
 		
 		player = ps.getPlayer(1L).orElseThrow();
 	}
@@ -60,6 +61,7 @@ class TournamentRepositoryTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setPlayHcpMultiplayer(1F);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
 		tournament = tournamentRepository.save(tournament);
 		assertNotNull("Id should not be null", tournament.getId());
 	}
@@ -78,6 +80,7 @@ class TournamentRepositoryTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setPlayHcpMultiplayer(1F);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
 		tournament = tournamentRepository.save(tournament);
 		assertNotNull("Tournament should not be null", tournamentRepository.findById(tournament.getId()));
 	}
@@ -96,6 +99,7 @@ class TournamentRepositoryTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setPlayHcpMultiplayer(1F);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
 		tournament = tournamentRepository.save(tournament);
 		tournamentRepository.deleteById(tournament.getId());
 		assertTrue("Tournament should be null", tournamentRepository.findById(tournament.getId()).isEmpty());

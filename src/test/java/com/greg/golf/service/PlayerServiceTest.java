@@ -54,7 +54,7 @@ class PlayerServiceTest {
 	private PlayerService playerService;
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerRepository playerRepository) {
+	static void setup(@Autowired PlayerRepository playerRepository) {
 
 		player = playerRepository.findById(1L).orElseThrow();
 
@@ -411,7 +411,7 @@ class PlayerServiceTest {
 	}
 
 	@AfterAll
-	public static void done(@Autowired PlayerRepository playerRepository) {
+	static void done(@Autowired PlayerRepository playerRepository) {
 
 		playerRepository.delete(admin);
 		log.info("Clean up completed");
