@@ -61,7 +61,7 @@ class GameControllerTest {
 	}
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
+	static void setup(@Autowired PlayerService playerService, @Autowired CourseService courseService,
 			@Autowired RoundRepository roundRepository, @Autowired PlayerRoundRepository playerRoundRepository) {
 
 		player = playerService.getPlayer(1L).orElseThrow();
@@ -150,13 +150,13 @@ class GameControllerTest {
 		
 		List<GameDto> gameDtoLst =  this.gameController.getGames(1L);
 		
-		Assertions.assertEquals(1L, gameDtoLst.get(0).getGameId().longValue());
+		Assertions.assertEquals(1L, gameDtoLst.getFirst().getGameId().longValue());
 	}
 	
 
 	
 	@AfterAll
-	public static void done(@Autowired RoundRepository roundRepository) {
+	static void done(@Autowired RoundRepository roundRepository) {
 
 		roundRepository.deleteAll();
 

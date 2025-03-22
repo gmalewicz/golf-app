@@ -14,8 +14,6 @@ import com.greg.golf.service.LeagueService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -82,12 +80,6 @@ class LeagueControllerTest {
 	public LeagueControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;
 		this.objectMapper = objectMapper;
-	}
-
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
 	}
 
 	@DisplayName("Should add league with correct result")
@@ -254,12 +246,4 @@ class LeagueControllerTest {
 		mockMvc.perform(post("/rest/League/RemoveNotification/1").contentType("application/json"))
 				.andExpect(status().isOk()).andReturn();
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }
