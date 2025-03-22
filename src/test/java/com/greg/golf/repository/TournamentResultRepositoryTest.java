@@ -38,14 +38,16 @@ class TournamentResultRepositoryTest {
 
 	private static Tournament tournament;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private TournamentResultRepository tournamentResultRepository;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private PlayerRepository playerRepository;
 
 	@BeforeAll
-	public static void setup(@Autowired TournamentRepository tournamentRepository, @Autowired PlayerService ps) {
+	static void setup(@Autowired TournamentRepository tournamentRepository, @Autowired PlayerService ps) {
 		
 		Player player = ps.getPlayer(1L).orElseThrow();
 
@@ -66,7 +68,7 @@ class TournamentResultRepositoryTest {
 	@DisplayName("Add tournament result")
 	@Transactional
 	@Test
-	void addToturnmentResultTest() {
+	void addTournamentResultTest() {
 
 		TournamentResult tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(0);
@@ -90,7 +92,7 @@ class TournamentResultRepositoryTest {
 	@DisplayName("Get tournament result")
 	@Transactional
 	@Test
-	void getToturnmentResultById() {
+	void getTournamentResultById() {
 
 		TournamentResult tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(0);
@@ -136,7 +138,7 @@ class TournamentResultRepositoryTest {
 	@DisplayName("Delete tournament")
 	@Transactional
 	@Test
-	void deleteToturnmentById() {
+	void deleteTournamentById() {
 
 		TournamentResult tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(0);
@@ -161,7 +163,7 @@ class TournamentResultRepositoryTest {
 	@DisplayName("Find by player and tournament")
 	@Transactional
 	@Test
-	void getToturnmentResultByPlayerAndTournament() {
+	void getTournamentResultByPlayerAndTournament() {
 
 		TournamentResult tournamentResult = new TournamentResult();
 		tournamentResult.setPlayedRounds(0);
@@ -178,7 +180,7 @@ class TournamentResultRepositoryTest {
 	}
 
 	@AfterAll
-	public static void done(@Autowired TournamentRepository tournamentRepository) {
+	static void done(@Autowired TournamentRepository tournamentRepository) {
 		tournamentRepository.deleteAll();
 		log.info("Clean up completed");
 
