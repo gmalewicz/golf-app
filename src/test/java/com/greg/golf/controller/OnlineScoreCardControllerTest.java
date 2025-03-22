@@ -43,37 +43,47 @@ import com.greg.golf.service.PlayerService;
 @WebMvcTest(controllers = OnlineScoreCardController.class)
 class OnlineScoreCardControllerTest {
 
-
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private OnlineRoundService onlineRoundService;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private PlayerService playerService;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private UserService userService;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private PasswordEncoder bCryptPasswordEncoder;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private ModelMapper modelMapper;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private SimpMessagingTemplate template;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private GolfOAuth2UserService golfOAuth2UserService;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
 
+	@SuppressWarnings("unused")
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
@@ -84,12 +94,6 @@ class OnlineScoreCardControllerTest {
 	public OnlineScoreCardControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.mockMvc = mockMvc;
 		this.objectMapper = objectMapper;
-	}
-
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
 	}
 
 	@DisplayName("Should add online rounds with correct result")
@@ -236,12 +240,4 @@ class OnlineScoreCardControllerTest {
 				.content(objectMapper.writeValueAsString(inputLst))).andExpect(status().isOk()).andReturn();
 
 	}
-	
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }
