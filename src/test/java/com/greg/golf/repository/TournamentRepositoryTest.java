@@ -36,12 +36,13 @@ class TournamentRepositoryTest {
 
 	@ClassRule
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
-	
+
+	@SuppressWarnings("unused")
 	@Autowired
 	private TournamentRepository tournamentRepository;
 
 	@BeforeAll
-	public static void setup(@Autowired PlayerService ps) {
+	static void setup(@Autowired PlayerService ps) {
 		
 		player = ps.getPlayer(1L).orElseThrow();
 	}
