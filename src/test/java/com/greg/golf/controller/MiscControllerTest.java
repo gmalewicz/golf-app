@@ -8,8 +8,6 @@ import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -66,12 +64,6 @@ class MiscControllerTest {
 		this.mockMvc = mockMvc;
 	}
 
-	@BeforeAll
-	public static void setup() {
-
-		log.info("Set up completed");
-	}
-
 	@DisplayName("Should return version")
 	@Test
 	void getVersionThenReturns200() throws Exception {
@@ -79,12 +71,4 @@ class MiscControllerTest {
 		mockMvc.perform(get("/rest/Version")).andExpect(status().isOk());
 
 	}
-
-	@AfterAll
-	public static void done() {
-
-		log.info("Clean up completed");
-
-	}
-
 }
