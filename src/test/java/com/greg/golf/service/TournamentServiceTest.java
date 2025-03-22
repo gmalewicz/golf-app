@@ -131,6 +131,7 @@ class TournamentServiceTest {
 		tournament.setStatus(Tournament.STATUS_OPEN);
 		tournament.setBestRounds(Common.ALL_ROUNDS);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
 		tournament.setPlayHcpMultiplayer(1f);
 		tournamentRepository.save(tournament);
 
@@ -261,6 +262,7 @@ class TournamentServiceTest {
 		tournament.setBestRounds(1);
 		tournament.setPlayHcpMultiplayer(1F);
 		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
 		tournament = tournamentService.addTournament(tournament);
 
 		Assertions.assertNotNull(tournament.getId());
@@ -1148,8 +1150,49 @@ class TournamentServiceTest {
 	@DisplayName("Attempt to update tournament player handicap")
 	@Transactional
 	@Test
-	void attemptToUpdateTournamentPlayerHcpTest(@Autowired TournamentRepository tournamentRepository,
+	void attemptToUpdateTournamentPlayerHcpButTournamentIsClosedTest(@Autowired TournamentRepository tournamentRepository,
 										   @Autowired TournamentPlayerRepository tournamentPlayerRepository,
+												@Autowired PlayerService playerService) {
+
+		var player = playerService.getPlayer(1L).orElseThrow();
+
+		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+
+		var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+		var tournament = new Tournament();
+		tournament.setEndDate(new Date(1));
+		tournament.setStartDate(new Date(1));
+		tournament.setName("Test Cup");
+		tournament.setPlayer(player);
+		tournament.setStatus(Tournament.STATUS_CLOSE);
+		tournament.setBestRounds(Common.ALL_ROUNDS);
+		tournament.setMaxPlayHcp(54);
+		tournament.setCanUpdateHcp(true);
+		tournament.setPlayHcpMultiplayer(1f);
+		tournament = tournamentRepository.save(tournament);
+
+		var tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setPlayerId(1L);
+		tournamentPlayer.setTournamentId(tournament.getId());
+		tournamentPlayer.setNick("Test");
+		tournamentPlayer.setWhs(1F);
+		tournamentPlayerRepository.save(tournamentPlayer);
+
+		var tournamentId = tournament.getId();
+		var playerId = tournamentPlayer.getPlayerId();
+
+		assertThrows(HcpChangeNotAllowedException.class, () -> tournamentService.updatePlayerHcp(tournamentId, playerId, 2F));
+	}
+
+	@DisplayName("Attempt to update tournament player handicap")
+	@Transactional
+	@Test
+	void attemptToUpdateTournamentPlayerHcpTest(@Autowired TournamentRepository tournamentRepository,
+												@Autowired TournamentPlayerRepository tournamentPlayerRepository,
 												@Autowired PlayerService playerService) {
 
 		var player = playerService.getPlayer(1L).orElseThrow();
@@ -1170,7 +1213,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setWhs(1F);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
-		tournamentService.updatePlayer(tournamentPlayer.getTournamentId(), tournamentPlayer.getPlayerId(), 2F);
+		tournamentService.updatePlayerHcp(tournamentPlayer.getTournamentId(), tournamentPlayer.getPlayerId(), 2F);
 
 		assertEquals(2F, tournamentService.getTournamentPlayers(tournament.getId()).get(0).getWhs());
 	}

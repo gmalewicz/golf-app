@@ -51,4 +51,7 @@ public class TournamentDto {
 	@Max(value = 54)
 	@Schema(description = "Max Playing handicap", example = "36", accessMode = READ_WRITE, minimum = "0", maximum = "54")
 	private Integer maxPlayHcp;
+
+	@Schema(description = "Player HCP can be updated between rounds", example = "false", accessMode = READ_WRITE)
+	private Boolean canUpdateHcp;
 }

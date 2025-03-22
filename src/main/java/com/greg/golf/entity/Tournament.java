@@ -54,6 +54,11 @@ public class Tournament {
 	@EqualsAndHashCode.Exclude
 	@Column(name = "max_play_hcp")
 	private Integer maxPlayHcp;
+
+	@EqualsAndHashCode.Exclude
+	@Column(name = "can_update_hcp")
+	@NotNull
+	private Boolean canUpdateHcp;
 	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

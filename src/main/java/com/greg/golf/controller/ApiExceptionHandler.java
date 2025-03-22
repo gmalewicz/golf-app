@@ -286,6 +286,15 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	@ExceptionHandler(HcpChangeNotAllowedException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(HcpChangeNotAllowedException ex) {
+
+		String message = getLocalizedMessage("error-30", null);
+		var response = new ApiErrorResponse("30", message);
+		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
 	private String getLocalizedMessage(String translationKey, Object[] args)
 	{
 		Locale locale = LocaleContextHolder.getLocale();

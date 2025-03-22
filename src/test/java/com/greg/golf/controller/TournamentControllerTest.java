@@ -288,7 +288,7 @@ class TournamentControllerTest {
 		input.setTournamentId(1L);
 		input.setWhs(1F);
 
-		doNothing().when(tournamentService).updatePlayer(anyLong(), anyLong(), anyFloat());
+		doNothing().when(tournamentService).updatePlayerHcp(anyLong(), anyLong(), anyFloat());
 		mockMvc.perform(patch("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
