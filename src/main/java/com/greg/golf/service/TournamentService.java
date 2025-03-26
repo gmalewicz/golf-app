@@ -388,13 +388,12 @@ public class TournamentService {
     @Transactional
     public int getGrossStrokes(Player player, Round round) {
 
-        log.debug("player: " + player);
-        log.debug("round: " + round);
+        printDebugInfo(player, round);
 
         // calculate gross result
         int grossStrokes = round.getScoreCard().stream().filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()))
                 .mapToInt(ScoreCard::getStroke).sum();
-        log.debug("Calculated gross strokes: " + grossStrokes);
+        log.debug("Calculated gross strokes: {}", grossStrokes);
         return grossStrokes;
     }
 
@@ -415,8 +414,7 @@ public class TournamentService {
     @Transactional
     public int getCorrectedStrokes(Player player, Round round) {
 
-        log.debug("player: " + player);
-        log.debug("round: " + round);
+        printDebugInfo( player, round);
 
         List<Hole> holes = round.getCourse().getHoles();
 
@@ -433,7 +431,7 @@ public class TournamentService {
 
                 }).sum();
 
-        log.debug("Calculated corrected strokes: " + grossStrokes);
+        log.debug("Calculated corrected strokes: {}", grossStrokes);
         return grossStrokes;
     }
 
@@ -450,7 +448,7 @@ public class TournamentService {
             netStrokes = 0;
         }
 
-        log.debug("Calculated net strokes: " + netStrokes);
+        log.debug("Calculated net strokes: {}", netStrokes);
         return netStrokes;
     }
 
@@ -469,8 +467,8 @@ public class TournamentService {
         // calculate hole HCP for player
         int hcpAll = (int) Math.floor((double) playingHCP / 18);
         int hcpIncMaxHole = playingHCP - (hcpAll * 18);
-        log.debug("hcpAll " + hcpAll);
-        log.debug("hcpIncMaxHole " + hcpIncMaxHole);
+        log.debug("hcpAll {}", hcpAll);
+        log.debug("hcpIncMaxHole {}", hcpIncMaxHole);
 
         // fill all holes with hcpAll value or initialize it with 0 if hcpAll is 0
         round.getScoreCard().forEach(scoreCard -> scoreCard.setHcp(hcpAll));
@@ -493,7 +491,7 @@ public class TournamentService {
             if (scoreCard.getStbNet() < 0) {
                 scoreCard.setStbNet(0);
             }
-            log.debug(scoreCard.getHole() + " " + scoreCard.getStbNet());
+            log.debug("{} {}", scoreCard.getHole(), scoreCard.getStbNet());
             // update STB gross for each hole
             scoreCard.setStbGross(holes.get(scoreCard.getHole() - 1).getPar() - scoreCard.getStroke() + 2);
             if (scoreCard.getStbGross() < 0) {
@@ -536,7 +534,7 @@ public class TournamentService {
                                                 .map(PlayerRound::getPlayerId)
                                                 .toList())) {
 
-                    log.info("The round with non matching player found: round id " + r.getId() + " with number of players: " + r.getPlayer().size());
+                    log.info("The round with non matching player found: round id {} with number of players: {}", r.getId(), r.getPlayer().size());
 
                 } else {
 
@@ -580,10 +578,10 @@ public class TournamentService {
         int courseHCP = Math
                 .round(playerHcp * courseTee.getSr() / 113 + courseTee.getCr() - round.getCourse().getPar());
 
-        log.debug("Course SR: " + courseTee.getSr());
-        log.debug("Course CR: " + courseTee.getCr());
-        log.debug("Course Par: " + round.getCourse().getPar());
-        log.debug("Calculated course HCP: " + courseHCP);
+        log.debug("Course SR: {}", courseTee.getSr());
+        log.debug("Course CR: {}", courseTee.getCr());
+        log.debug("Course Par: {}", round.getCourse().getPar());
+        log.debug("Calculated course HCP: {}", courseHCP);
 
         return courseHCP;
     }
@@ -608,7 +606,7 @@ public class TournamentService {
             // calculate played holes
             int playedHoles = (int) round.getScoreCard().stream()
                     .filter(scoreCard -> scoreCard.getPlayer().getId().equals(player.getId()) && scoreCard.getStroke() > 0).count();
-            log.debug("Number of holes: " + playedHoles);
+            log.debug("Number of holes: {}", playedHoles);
             if (playedHoles != TOURNAMENT_HOLES) {
                 throw new TooFewHolesForTournamentException();
             }
@@ -792,7 +790,7 @@ public class TournamentService {
                 String body = templateEngine.process("TournamentResultsTemplate.html", context);
 
                 try {
-                    log.info("Number of notifications for sending: " + recipients.size());
+                    log.info("Number of notifications for sending: {}", recipients.size());
                     emailServiceImpl.sendEmail(recipients.toArray(new String[0]), "Tournament results updated - " + tournament.orElseThrow().getName(), body);
                     sentNotifications = recipients.size();
                 } catch (MessagingException e) {
@@ -853,7 +851,7 @@ public class TournamentService {
 
         Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        log.info("trying to add notifications for tournament: " + tournamentId + " and player: " + playerId);
+        log.info("trying to add notifications for tournament: {} and player: {}", tournamentId, playerId);
 
         // check if player has defined email
         var player = playerRepository.findById(playerId);
@@ -883,8 +881,14 @@ public class TournamentService {
 
         Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        log.info("trying to remove notifications for tournament: " + tournamentId + " and player: " + playerId);
+        log.info("trying to remove notifications for tournament: {} and player: {}", tournamentId, playerId);
 
         tournamentNotificationRepository.deleteByTournamentIdAndPlayerId(tournamentId, playerId);
     }
+
+    private void printDebugInfo(Player player, Round round) {
+        log.debug("player: {}", player);
+        log.debug("round: {}", round);
+    }
+
 }

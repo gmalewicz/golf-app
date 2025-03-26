@@ -45,6 +45,7 @@ public class GoogleResponse {
 			errorsMap.put("timeout-or-duplicate", TIMEOUT_OR_DUPLICATE);
 		}
 
+		@SuppressWarnings("unused")
 		@JsonCreator
 		public static ErrorCode forValue(final String value) {
 			return errorsMap.get(value.toLowerCase());

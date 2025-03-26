@@ -75,7 +75,7 @@ public class CycleService {
 
         if (!tournaments.isEmpty()) {
             // find the last tournament
-            var lstTournament = tournaments.get(tournaments.size() - 1);
+            var lstTournament = tournaments.getLast();
 
             // update results for cycle with more than 1 tournament otherwise delete all results
             if (tournaments.size() > 1) {
@@ -142,7 +142,7 @@ public class CycleService {
                     .filter(cycleResult -> cycleResult.getSeries().equals(series)).toList();
 
             // initialize result size
-            var cycleResultSize = cycleResultsForSeries.get(0).getResults().length;
+            var cycleResultSize = cycleResultsForSeries.getFirst().getResults().length;
 
             //create map from cycle result where key is player id
             var cycleResultMap = cycleResultsForSeries.stream()

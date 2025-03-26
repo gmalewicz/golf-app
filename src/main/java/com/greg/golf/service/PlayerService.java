@@ -70,7 +70,7 @@ public class PlayerService {
 		Player player = self.getPlayerForNick(nick);
 
 		if (player == null) {
-			log.info("Social media player not found: " + nick + " - adding the new player for " + firstName + " " + lastName);
+            log.info("Social media player not found: {} - adding the new player for {} {}", nick, firstName, lastName);
 
 			final var newPlayer = new Player();
 			newPlayer.setNick(nick);
@@ -82,10 +82,10 @@ public class PlayerService {
 			self.addPlayerOnBehalf(newPlayer);
 			newPlayerQuery = "&new_player=true";
 		} else {
-			log.debug("Player with such nick already exists: " + nick);
+            log.debug("Player with such nick already exists: {}", nick);
 			if (player.getType() != playerType) {
 				log.error("Attempt to log a player with different social media than registered");
-				log.error("Expected: " + player.getType() + " attempt with: " + playerType);
+                log.error("Expected: {} attempt with: {}", player.getType(), playerType);
 				return null;
 			}
 		}
@@ -167,14 +167,15 @@ public class PlayerService {
 
 			player.setModified(false);
 			playerRepository.save(player);
-			log.debug("Cleared modified flag for user " + playerName);
+            log.debug("Cleared modified flag for user {}", playerName);
 		}
 
-		log.info("Creating user details for " + playerName);
+		log.info("Creating user details for player name {}",  playerName);
 
 		return new GolfUser(player.getNick(), player.getPassword(), new ArrayList<>(), player);
 	}
 
+	@SuppressWarnings("unused")
 	@CacheEvict(value = "player", key = "#player.id")
 	public void cacheEvict(@NonNull Player player) {
 		log.debug("Cache evict called");
@@ -186,7 +187,7 @@ public class PlayerService {
 		Player player = playerRepository.findById(id)
 				.orElseThrow(() -> new UsernameNotFoundException("User " + id + " not found"));
 
-		log.info("Creating user details for " + id);
+        log.info("Creating user details for id  {}", id);
 
 		return new GolfUser(player.getNick(), player.getPassword(),	new ArrayList<>(), player);
 	}
@@ -251,9 +252,9 @@ public class PlayerService {
 		if (changed && !updateSocial) {
 			persistedPlayer.setModified(true);
 			playerRepository.save(persistedPlayer);
-			log.debug("player changes saved for " + persistedPlayer.getNick());
+            log.debug("player changes saved for {}", persistedPlayer.getNick());
 		} else {
-			log.warn("nothing to update for player " + persistedPlayer.getNick());
+            log.warn("nothing to update for player {}", persistedPlayer.getNick());
 		}
 	}
 
@@ -330,7 +331,7 @@ public class PlayerService {
 	public void deleteEmail() {
 
 		Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-		log.info("Trying to remove email for player: " + playerId);
+        log.info("Trying to remove email for player: {}", playerId);
 
 		var player = playerRepository.findById(playerId).orElseThrow();
 		player.setEmail(null);

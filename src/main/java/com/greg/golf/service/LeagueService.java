@@ -251,7 +251,7 @@ public class LeagueService {
 
         Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        log.info("trying to add notifications for league: " + leagueId + " and player: " + playerId);
+        log.info("trying to add notifications for league: {} and player: {}", leagueId, playerId);
 
         // check if player has defined email
         var player = playerRepository.findById(playerId);
@@ -280,7 +280,7 @@ public class LeagueService {
 
         Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        log.info("trying to remove notifications for league: " + leagueId + " and player: " + playerId);
+        log.info("trying to remove notifications for league: {} and player: {}", leagueId, playerId);
 
         leagueNotificationRepository.deleteByLeagueIdAndPlayerId(leagueId, playerId);
     }

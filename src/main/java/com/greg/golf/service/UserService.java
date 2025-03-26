@@ -27,7 +27,7 @@ public class UserService implements UserDetailsService {
 		Player player = playerRepository.findPlayerByNick(playerName)
 				.orElseThrow(() -> new UsernameNotFoundException("User " + playerName + " not found"));
 
-		log.info("Creating user details for " + playerName);
+        log.info("Creating user details for {}", playerName);
 
 		return new GolfUser(player.getNick(), player.getPassword(),	new ArrayList<>(), player);
 

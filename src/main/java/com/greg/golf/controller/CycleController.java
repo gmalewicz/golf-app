@@ -36,7 +36,7 @@ public class CycleController extends BaseController {
 	public HttpStatus addCycle(
 			@Parameter(description = "Cycle object", required = true) @RequestBody CycleDto cycleDto) {
 
-		log.info("trying to add cycle: " + cycleDto.getName());
+        log.info("trying to add cycle: {}", cycleDto.getName());
 
 		cycleService.addCycle(modelMapper.map(cycleDto, Cycle.class));
 
@@ -51,7 +51,7 @@ public class CycleController extends BaseController {
 	public HttpStatus addCycleTournament(
 			@Parameter(description = "CycleTournament object", required = true) @RequestBody CycleTournamentDto cycleTournamentDto) {
 
-		log.info("trying to add cycle tournament: " + cycleTournamentDto.getName());
+        log.info("trying to add cycle tournament: {}", cycleTournamentDto.getName());
 
 		cycleService.addCycleTournament(modelMapper.map(cycleTournamentDto, CycleTournament.class), cycleTournamentDto.getTournamentResult());
 
@@ -72,7 +72,7 @@ public class CycleController extends BaseController {
 	@GetMapping(value = "/rest/CycleTournament/{cycleId}")
 	public List<CycleTournamentDto> getCycleTournaments(
 			@Parameter(description = "Cycle id", example = "1", required = true) @PathVariable("cycleId") Long cycleId) {
-		log.info("Requested list of cycle tournaments for cycle: " + cycleId);
+        log.info("Requested list of cycle tournaments for cycle: {}", cycleId);
 		return mapList(cycleService.findAllCycleTournaments(cycleId), CycleTournamentDto.class);
 	}
 
@@ -81,7 +81,7 @@ public class CycleController extends BaseController {
 	@GetMapping(value = "/rest/CycleResult/{cycleId}")
 	public List<CycleResultDto> getCycleResults(
 			@Parameter(description = "Cycle id", example = "1", required = true) @PathVariable("cycleId") Long cycleId) {
-		log.info("Requested cycle results for cycle: " + cycleId);
+        log.info("Requested cycle results for cycle: {}", cycleId);
 		return mapList(cycleService.findCycleResults(cycleId), CycleResultDto.class);
 	}
 
@@ -93,7 +93,7 @@ public class CycleController extends BaseController {
 	public HttpStatus closeCycle(
 			@Parameter(description = "Cycle id to be closed", required = true) @PathVariable("cycleId") Long cycleId) {
 
-		log.info("trying to close cycle: " + cycleId);
+        log.info("trying to close cycle: {}", cycleId);
 
 		cycleService.closeCycle(cycleId);
 
@@ -108,7 +108,7 @@ public class CycleController extends BaseController {
 	public HttpStatus deleteCycleTournament(
 			@Parameter(description = "Cycle object", required = true) @RequestBody CycleDto cycleDto) {
 
-		log.info("trying to delete tournament for cycle: " + cycleDto.getName());
+        log.info("trying to delete tournament for cycle: {}", cycleDto.getName());
 
 		cycleService.removeLastCycleTournament(modelMapper.map(cycleDto, Cycle.class));
 
@@ -122,7 +122,7 @@ public class CycleController extends BaseController {
 	public HttpStatus deleteCycle(
 			@Parameter(description = "Cycle id to be deleted", required = true) @PathVariable("cycleId") Long cycleId) {
 
-		log.info("trying to delete cycle: " + cycleId);
+        log.info("trying to delete cycle: {}", cycleId);
 
 		cycleService.deleteCycle(cycleId);
 

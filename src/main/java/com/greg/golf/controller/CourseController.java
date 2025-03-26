@@ -52,7 +52,7 @@ public class CourseController extends BaseController {
 	public List<HoleDto> getHoles(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("id") Long id) {
 
-		log.info("Requested list of holes for Course id -  " + id);
+        log.info("Requested list of holes for Course id -  {}", id);
 
 		var searchCourse = new Course();
 		searchCourse.setId(id);
@@ -66,7 +66,7 @@ public class CourseController extends BaseController {
 	public List<CourseTeeDto> getTees(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable("id") Long id) {
 
-		log.info("Requested list of tees for Course id -  " + id);
+        log.info("Requested list of tees for Course id -  {}", id);
 
 		return mapList(courseService.getTees(id), CourseTeeDto.class);
 	}
@@ -78,7 +78,7 @@ public class CourseController extends BaseController {
 	public HttpStatus addCourse(
 			@Parameter(description = "Course object", required = true) @Valid @RequestBody CourseDto courseDto) {
 
-		log.info("trying to add course: " + courseDto);
+        log.info("trying to add course: {}", courseDto);
 
 		// copy data from dto to the entity object
 		var course = modelMapper.map(courseDto, Course.class);
@@ -96,7 +96,7 @@ public class CourseController extends BaseController {
 	public HttpStatus deleteCourse(
 			@Parameter(description = "Course id", example = "1", required = true) @PathVariable Long id) {
 
-		log.info("trying to delete course: " + id);
+        log.info("trying to delete course: {}", id);
 
 		courseService.delete(id);
 
@@ -125,7 +125,7 @@ public class CourseController extends BaseController {
 			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
 			@Parameter(description = "course object", required = true) @RequestBody CourseDto courseDto) {
 
-		log.info("trying add course to favourites for player: " + playerId);
+        log.info("trying add course to favourites for player: {}", playerId);
 
 		courseService.addToFavourites(modelMapper.map(courseDto, Course.class), playerId);
 
@@ -140,7 +140,7 @@ public class CourseController extends BaseController {
 			@Parameter(description = "player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
 			@Parameter(description = "course object", required = true) @RequestBody CourseDto courseDto) {
 
-		log.info("trying to delete course from favourites for player: " + playerId);
+        log.info("trying to delete course from favourites for player: {}", playerId);
 
 		courseService.deleteFromFavourites(modelMapper.map(courseDto, Course.class), playerId);
 
@@ -153,7 +153,7 @@ public class CourseController extends BaseController {
 	public List<CourseDto> searchForCourses(
 			@Valid @Parameter(description = "Course name object", required = true) @RequestBody CourseNameDto courseNameDto) {
 
-		log.info("Requested search for courses for name: " + courseNameDto.getName());
+        log.info("Requested search for courses for name: {}", courseNameDto.getName());
 
 		return mapList(courseService.searchForCourses(courseNameDto.getName()), CourseDto.class);
 	}
@@ -164,7 +164,7 @@ public class CourseController extends BaseController {
 	public List<CourseDto> getSortedCourses(
 			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") Integer pageId) {
 
-		log.info("Requested list of sorted courses for page id " + pageId);
+        log.info("Requested list of sorted courses for page id {}", pageId);
 
 		return mapList(courseService.getSortedCourses(pageId), CourseDto.class);
 	}
@@ -196,7 +196,7 @@ public class CourseController extends BaseController {
 				@Min(value = 1)
 				@PathVariable("courseId") Long courseId) {
 
-		log.info("trying to add tee: " + courseTeeDto.getTee() + " for sex: " + courseTeeDto.getSex() + " for course id: " + courseId);
+        log.info("trying to add tee: {} for sex: {} for course id: {}", courseTeeDto.getTee(), courseTeeDto.getSex(), courseId);
 
 		courseService.addTee(modelMapper.map(courseTeeDto, CourseTee.class), courseId);
 
