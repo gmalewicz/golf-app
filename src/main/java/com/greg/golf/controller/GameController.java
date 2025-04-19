@@ -40,7 +40,7 @@ public class GameController extends BaseController {
 	@PostMapping(value = "/rest/Game")
 	public HttpStatus addGame(@Parameter(description = "Game object", required = true) @RequestBody GameDto gameDto) {
 
-		log.info("trying to add course: " + gameDto);
+        log.info("trying to add course: {}", gameDto);
 
 		gameService.save(modelMapper.map(gameDto, Game.class));
 
@@ -53,7 +53,7 @@ public class GameController extends BaseController {
 	public List<GameDto> getGames(
 			@Parameter(description = "Player id", example = "1", required = true) @PathVariable("id") Long id) {
 
-		log.info("Requested list of games for Player id -  " + id);
+        log.info("Requested list of games for Player id -  {}", id);
 
 		var player = new Player();
 		player.setId(id);
@@ -68,12 +68,12 @@ public class GameController extends BaseController {
 	public HttpStatus sendGame(
 			@Parameter(description = "GameSendData object", required = true) @RequestBody com.greg.golf.controller.dto.GameSendData gameSendData) {
 
-		log.info("trying to send email with game details: " + gameSendData);
+        log.info("trying to send email with game details: {}", gameSendData);
 
 		try {
 			gameService.sendGameDetail(gameSendData);
 		} catch (MessagingException | NoSuchElementException e) {
-			log.error("Failed sending game data for: " + gameSendData.getEmail());
+            log.error("Failed sending game data for: {}", gameSendData.getEmail());
 			throw new SendingMailFailureException();
 		}
 

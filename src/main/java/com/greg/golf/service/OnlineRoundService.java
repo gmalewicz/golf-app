@@ -70,7 +70,7 @@ public class OnlineRoundService {
 		onlineScoreCard.setOnlineRound(onlineRound);
 
 		if (onlineScoreCard.isUpdate()) {
-			log.debug("Update of the score card executed: " + onlineScoreCard);
+            log.debug("Update of the score card executed: {}", onlineScoreCard);
 			var updatedScoreCard = onlineScoreCardRepository
 					.findByOnlineRoundAndHole(onlineScoreCard.getOnlineRound(), onlineScoreCard.getHole())
 					.orElseThrow();
@@ -80,7 +80,7 @@ public class OnlineRoundService {
 			return onlineScoreCardRepository.save(updatedScoreCard);
 		}
 
-		log.debug("Adding of the score card executed: " + onlineScoreCard);
+        log.debug("Adding of the score card executed: {}", onlineScoreCard);
 		return onlineScoreCardRepository.save(onlineScoreCard);
 	}
 
@@ -101,7 +101,7 @@ public class OnlineRoundService {
 				.findByOnlineRoundAndHole(onlineScoreCard.getOnlineRound(), onlineScoreCard.getHole());
 
 		if (updatedScoreCard.isEmpty()) {
-			log.info("Synchronization required for player id " + onlineScoreCard.getPlayer().getId() + " : hole " + onlineScoreCard.getHole());
+            log.info("Synchronization required for player id {} : hole {}", onlineScoreCard.getPlayer().getId(), onlineScoreCard.getHole());
 			onlineScoreCardRepository.save(onlineScoreCard);
 			onlineScoreCard.setSyncRequired(true);
 		} else {

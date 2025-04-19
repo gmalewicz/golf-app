@@ -39,7 +39,8 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 		this.reCaptchaAttemptService = reCaptchaAttemptService;
 		this.restTemplate = restTemplate;
 	}
-    
+
+    @SuppressWarnings("unused")
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
        // Do any additional configuration here

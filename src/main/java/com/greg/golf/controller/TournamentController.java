@@ -36,7 +36,7 @@ public class TournamentController extends BaseController {
 	public List<TournamentDto> getTournaments(
 			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") @NotNull @PositiveOrZero Integer pageId) {
 
-		log.info("Requested list of tournaments for page - " + pageId);
+        log.info("Requested list of tournaments for page - {}", pageId);
 
 		return mapList(tournamentService.findAllTournamentsPageable(pageId), TournamentDto.class);
 	}
@@ -69,7 +69,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
 			@Parameter(description = "Round object", required = true) @RequestBody LimitedRoundDto limitedRoundDto) {
 
-		log.info("trying to add round to tournament: " + limitedRoundDto);
+        log.info("trying to add round to tournament: {}", limitedRoundDto);
 		tournamentService.addRound(tournamentId, limitedRoundDto.getId(), true);
 		log.info("Round added");
 
@@ -83,7 +83,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus addTournament(
 			@Parameter(description = "Tournament object", required = true) @RequestBody @Valid TournamentDto tournamentDto) {
 
-		log.info("trying to add tournament: " + tournamentDto);
+        log.info("trying to add tournament: {}", tournamentDto);
 
 		tournamentService.addTournament(modelMapper.map(tournamentDto, Tournament.class));
 
@@ -107,7 +107,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
 			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
-		log.info("trying to add round on behalf to tournament: " + tournamentId + " and round: " + roundDto);
+        log.info("trying to add round on behalf to tournament: {} and round: {}", tournamentId, roundDto);
 		var tournamentRound = tournamentService.addRoundOnBehalf(tournamentId, modelMapper.map(roundDto, Round.class));
 		log.debug("Round added");
 
@@ -120,7 +120,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus deleteResult(
 			@Parameter(description = "Tournament result id", example = "1", required = true) @PathVariable("tournamentResultId") Long tournamentResultId) {
 
-		log.info("Delete result from tournament: " + tournamentResultId);
+        log.info("Delete result from tournament: {}", tournamentResultId);
 		tournamentService.deleteResult(tournamentResultId);
 
 		return HttpStatus.OK;
@@ -132,7 +132,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus closeTournament(
 			@Parameter(description = "Tournament id to be closed", required = true) @PathVariable("tournamentId") Long tournamentId) {
 
-		log.info("trying to close tournament: " + tournamentId);
+        log.info("trying to close tournament: {}", tournamentId);
 
 		tournamentService.closeTournament(tournamentId);
 
@@ -145,7 +145,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus deleteTournament(
 			@Parameter(description = "Tournament id to be deleted", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
 
-		log.info("Delete tournament: " + tournamentId);
+        log.info("Delete tournament: {}", tournamentId);
 		tournamentService.deleteTournament(tournamentId);
 
 		return HttpStatus.OK;
@@ -157,7 +157,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus addPlayer(
 			@Parameter(description = "TournamentPlayer object", required = true) @RequestBody @Valid TournamentPlayerDto tournamentPlayerDto) {
 
-		log.info("trying to add tournament player: " + tournamentPlayerDto);
+        log.info("trying to add tournament player: {}", tournamentPlayerDto);
 
 		tournamentService.addPlayer(modelMapper.map(tournamentPlayerDto, TournamentPlayer.class));
 
@@ -171,7 +171,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
 			@Parameter(description = "Player id", example = "1") @PathVariable(name = "playerId", required = false) Long playerId) {
 
-		log.info("Delete tournament player: " + playerId + " for tournament " + tournamentId);
+        log.info("Delete tournament player: {} for tournament {}", playerId, tournamentId);
 
 		if (playerId != null) {
 
@@ -188,7 +188,7 @@ public class TournamentController extends BaseController {
 	@GetMapping(value = "/rest/TournamentPlayer/{tournamentId}")
 	public List<TournamentPlayer> getTournamentPlayers(
 			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId) {
-		log.info("Requested player participating in tournament " + tournamentId);
+        log.info("Requested player participating in tournament {}", tournamentId);
 		return tournamentService.getTournamentPlayers(tournamentId);
 	}
 
@@ -198,7 +198,7 @@ public class TournamentController extends BaseController {
 	public HttpStatus updatePlayer(
 			@Parameter(description = "TournamentPlayer object", required = true) @RequestBody @Valid TournamentPlayerDto tournamentPlayerDto) {
 
-		log.info("trying to update tournament player whs: " + tournamentPlayerDto);
+        log.info("trying to update tournament player whs: {}", tournamentPlayerDto);
 
 		tournamentService.updatePlayerHcp(tournamentPlayerDto.getTournamentId(), tournamentPlayerDto.getPlayerId(), tournamentPlayerDto.getWhs());
 
@@ -217,7 +217,7 @@ public class TournamentController extends BaseController {
 			@RequestBody
 			@Valid TeeTimeParametersDto teeTimeParametersDto) {
 
-		log.info("trying to add tee times for tournament: " + tournamentId);
+        log.info("trying to add tee times for tournament: {}", tournamentId);
 		tournamentService.addTeeTimes(tournamentId, modelMapper.map(teeTimeParametersDto, TeeTimeParameters.class));
 		return HttpStatus.OK;
 	}
@@ -229,7 +229,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournament id", example = "1", required = true)
 			@PathVariable("tournamentId") @NotNull @Positive Long tournamentId) {
 
-		log.info("Requested tee times for tournament " + tournamentId);
+        log.info("Requested tee times for tournament {}", tournamentId);
 		var teeTimeParameters = tournamentService.getTeeTimes(tournamentId);
 		if (teeTimeParameters == null) {
 			return ResponseEntity.noContent().build();
@@ -245,7 +245,7 @@ public class TournamentController extends BaseController {
 			@Parameter(description = "Tournament id", example = "1", required = true)
 			@PathVariable("tournamentId") @NotNull @Positive Long tournamentId) {
 
-		log.info("Delete tee times for tournament " + tournamentId);
+        log.info("Delete tee times for tournament {}", tournamentId);
 		tournamentService.deleteTeeTimes(tournamentId);
 		return HttpStatus.OK;
 	}
@@ -266,7 +266,7 @@ public class TournamentController extends BaseController {
 			@Max(4)
 			@PathVariable("sort") Integer sort) {
 
-		log.info("trying to send notifications for tournament: " + tournamentId + " and sort method: " + sort);
+        log.info("trying to send notifications for tournament: {} and sort method: {}", tournamentId, sort);
 		tournamentService.processNotifications(tournamentId, sort);
 		return HttpStatus.OK;
 	}

@@ -49,7 +49,7 @@ public class RoundController extends BaseController {
 	public HttpStatus addRound(
 			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
-		log.info("Requested adding round for player id -  " + roundDto.getPlayer().first().getId());
+        log.info("Requested adding round for player id -  {}", roundDto.getPlayer().first().getId());
 		
 		roundService.saveRound(modelMapper.map(roundDto, Round.class));
 
@@ -62,7 +62,7 @@ public class RoundController extends BaseController {
 	public LimitedRoundWithPlayersDto getRound(
 			@Parameter(description = "Round identifier", required = true)  @PathVariable("roundId") Long roundId) {
 
-		log.info("Get round for id -  " + roundId);
+        log.info("Get round for id -  {}", roundId);
 
 		return modelMapper.map(roundService.getWithPlayers(roundId).orElseThrow(), LimitedRoundWithPlayersDto.class);
 	}
@@ -74,7 +74,7 @@ public class RoundController extends BaseController {
 			@Parameter(description = "Player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
 			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") Integer pageId) {
 
-		log.info("Requested list of round for Player id -  " + playerId + " and page id " + pageId);
+        log.info("Requested list of round for Player id -  {} and page id {}", playerId, pageId);
 
 		var player = new Player();
 		player.setId(playerId);
@@ -88,7 +88,7 @@ public class RoundController extends BaseController {
 	public List<LimitedRoundWithPlayersDto> getRecentRounds(
 			@Parameter(description = "Page id", example = "0", required = true) @PathVariable("pageId") Integer pageId) {
 
-		log.info("Requested list of recent rounds for page id " + pageId);
+        log.info("Requested list of recent rounds for page id {}", pageId);
 
 		return mapList(roundService.getRecentRounds(pageId), LimitedRoundWithPlayersDto.class);
 	}
@@ -99,7 +99,7 @@ public class RoundController extends BaseController {
 	public List<ScoreCardDto> getScoreCards(
 			@Parameter(description = "Round id", example = "1", required = true) @PathVariable("id") Long id) {
 
-		log.info("Requested list of scorecards for Round id -  " + id);
+        log.info("Requested list of scorecards for Round id -  {}", id);
 
 		var round = new Round();
 		round.setId(id);
@@ -115,11 +115,11 @@ public class RoundController extends BaseController {
 			@Parameter(description = "player id", example = "1", required = true) @PathVariable Long playerId,
 			@Parameter(description = "round id", example = "1", required = true) @PathVariable Long roundId) {
 
-		log.debug("trying to delete scorecard for round: " + roundId + " and player " + playerId);
+        log.debug("trying to delete scorecard for round: {} and player {}", roundId, playerId);
 
 		roundService.deleteScorecard(playerId, roundId);
 
-		log.info("scorecard deleted for round: " + roundId + " and player " + playerId);
+        log.info("scorecard deleted for round: {} and player {}", roundId, playerId);
 
 		return HttpStatus.OK;
 
@@ -132,11 +132,11 @@ public class RoundController extends BaseController {
 	public HttpStatus updateRound(
 			@Parameter(description = "Round object", required = true) @RequestBody RoundDto roundDto) {
 
-		log.debug("trying to update round: " + roundDto.getId());
+        log.debug("trying to update round: {}", roundDto.getId());
 
 		roundService.updateScoreCard(modelMapper.map(roundDto, Round.class));
 
-		log.info("round: " + roundDto.getId() + " updated");
+        log.info("round: {} updated", roundDto.getId());
 
 		return HttpStatus.OK;
 
@@ -149,7 +149,7 @@ public class RoundController extends BaseController {
 			@Parameter(description = "Player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
 			@Parameter(description = "Round id", example = "1", required = true) @PathVariable("roundId") Long roundId) {
 
-		log.info("Requested round details for Player id - " + playerId + " and round id " + roundId);
+        log.info("Requested round details for Player id - {} and round id {}", playerId, roundId);
 
 		return modelMapper.map(roundService.getForPlayerRoundDetails(playerId, roundId), PlayerRoundDto.class);
 	}
@@ -160,7 +160,7 @@ public class RoundController extends BaseController {
 	public List<PlayerRoundDto> getPlayersDetailsForRound(
 			@Parameter(description = "Round id", example = "1", required = true) @PathVariable("roundId") Long roundId) {
 
-		log.info("Requested players round details for round id " + roundId);
+        log.info("Requested players round details for round id {}", roundId);
 
 		return mapList(roundService.getByRoundId(roundId), PlayerRoundDto.class);
 	}
@@ -174,8 +174,7 @@ public class RoundController extends BaseController {
 
 		roundService.updateRoundWhs(roundWhsDto.getPlayerId(), roundWhsDto.getRoundId(), roundWhsDto.getWhs());
 
-		log.info("Round: " + roundWhsDto.getRoundId() + " for player " + roundWhsDto.getPlayerId() +
-				" updated with whs " + roundWhsDto.getWhs());
+        log.info("Round: {} for player {} updated with whs {}", roundWhsDto.getRoundId(), roundWhsDto.getPlayerId(), roundWhsDto.getWhs());
 
 		return HttpStatus.OK;
 	}
@@ -196,8 +195,7 @@ public class RoundController extends BaseController {
 	public HttpStatus swapPlayerRnd( @Valid
 									 @Parameter(description = "Swap Player Round DTO object", required = true) @RequestBody SwapPlrRndDto playerUpdateDto) {
 
-		log.info("trying to swap player id: " + playerUpdateDto.getOldPlrId() + " with new player id " +
-				playerUpdateDto.getNewPlrId() + " for round id: " + playerUpdateDto.getRoundId());
+        log.info("trying to swap player id: {} with new player id {} for round id: {}", playerUpdateDto.getOldPlrId(), playerUpdateDto.getNewPlrId(), playerUpdateDto.getRoundId());
 
 		roundService.swapPlayer(playerUpdateDto.getOldPlrId(), playerUpdateDto.getNewPlrId(), playerUpdateDto.getRoundId());
 

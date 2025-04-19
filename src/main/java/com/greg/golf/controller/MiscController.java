@@ -27,7 +27,7 @@ public class MiscController extends BaseController {
     @GetMapping(value = "/rest/Version")
     public ResponseEntity<VersionDto> getVersion(HttpServletRequest request) {
 
-        log.info("Getting backend version: " + version);
+        log.info("Getting backend version: {}", version);
 
         var versionDto = new VersionDto();
         versionDto.setVersion(version);

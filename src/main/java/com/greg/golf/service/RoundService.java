@@ -82,10 +82,10 @@ public class RoundService {
 			roundRepository.save(existingRound);
 			round.setId(existingRound.getId());
 			playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 
-														round.getCourse().getTees().get(0).getSr(),
-														round.getCourse().getTees().get(0).getCr(),
-														round.getCourse().getTees().get(0).getId(),
-														round.getCourse().getTees().get(0).getTeeType(),
+														round.getCourse().getTees().getFirst().getSr(),
+														round.getCourse().getTees().getFirst().getCr(),
+														round.getCourse().getTees().getFirst().getId(),
+														round.getCourse().getTees().getFirst().getTeeType(),
 														player.getId(), 
 														round.getId());
 		}, () -> {
@@ -93,10 +93,10 @@ public class RoundService {
 			round.getScoreCard().forEach(card -> card.setRound(round));
 			roundRepository.save(round);
 			playerRoundRepository.updatePlayerRoundInfo(player.getWhs(),
-													round.getCourse().getTees().get(0).getSr(),
-													round.getCourse().getTees().get(0).getCr(),
-								  					round.getCourse().getTees().get(0).getId(),
-								  					round.getCourse().getTees().get(0).getTeeType(),
+													round.getCourse().getTees().getFirst().getSr(),
+													round.getCourse().getTees().getFirst().getCr(),
+								  					round.getCourse().getTees().getFirst().getId(),
+								  					round.getCourse().getTees().getFirst().getTeeType(),
 								  					player.getId(), 
 								  					round.getId());
 		});
@@ -130,7 +130,7 @@ public class RoundService {
 
 		// check if player scorecard exists in that round
 		if (round.getPlayer().stream().noneMatch(p -> p.getId().equals(playerId))) {
-			log.warn("Player " + playerId + " not found in round " + roundId);
+            log.warn("Player {} not found in round {}", playerId, roundId);
 			throw new NoSuchElementException();
 		}
 
@@ -138,7 +138,7 @@ public class RoundService {
 
 		// check if only one player is in the round and if yes delete entire round
 		int playerCnt = round.getPlayer().size();
-		log.debug("Player cnt  is " + playerCnt);
+        log.debug("Player cnt  is {}", playerCnt);
 		if (playerCnt == 1) {
 			roundRepository.deleteById(roundId);
 			log.debug("Round deleted");
@@ -221,7 +221,7 @@ public class RoundService {
 				sc.setPlayer(newPlayer);
 			}
 		});
-		//update round (score cards)
+		//update round (scorecards)
 		roundRepository.save(round);
 
 		//update player round (player id)

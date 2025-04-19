@@ -37,7 +37,7 @@ public class LeagueController extends BaseController {
     public HttpStatus addLeague(
             @Parameter(description = "League object", required = true) @RequestBody @Valid LeagueDto leagueDto) {
 
-        log.info("trying to add league: " + leagueDto.getName());
+        log.info("trying to add league: {}", leagueDto.getName());
 
         leagueService.addLeague(modelMapper.map(leagueDto, League.class));
 
@@ -60,7 +60,7 @@ public class LeagueController extends BaseController {
     public HttpStatus addPlayer(
             @Parameter(description = "LeaguePlayer object", required = true) @RequestBody @Valid LeaguePlayerDto leaguePlayerDto) {
 
-        log.info("trying to add league player: " + leaguePlayerDto.getNick());
+        log.info("trying to add league player: {}", leaguePlayerDto.getNick());
 
         leagueService.addPlayer(modelMapper.map(leaguePlayerDto, LeaguePlayer.class));
 
@@ -74,7 +74,7 @@ public class LeagueController extends BaseController {
             @Parameter(description = "League id", example = "1", required = true) @PathVariable("leagueId") Long leagueId,
             @Parameter(description = "Player id", example = "1", required = true) @PathVariable(name = "playerId", required = false) Long playerId) {
 
-        log.info("Delete league player: " + playerId + " for league " + leagueId);
+        log.info("Delete league player: {} for league {}", playerId, leagueId);
 
         leagueService.deletePlayer(leagueId, playerId);
 
@@ -86,7 +86,7 @@ public class LeagueController extends BaseController {
     @GetMapping(value = "/rest/LeaguePlayer/{leagueId}")
     public List<LeaguePlayerDto> getLeaguePlayers(
             @Parameter(description = "League id", example = "1", required = true) @PathVariable("leagueId") Long leagueId) {
-        log.info("Requested player participating in league " + leagueId);
+        log.info("Requested player participating in league {}", leagueId);
         return mapList(leagueService.getLeaguePlayers(leagueId), LeaguePlayerDto.class);
     }
 
@@ -96,7 +96,7 @@ public class LeagueController extends BaseController {
     public HttpStatus closeLeague(
             @Parameter(description = "League id to be closed", required = true) @PathVariable("leagueId") Long leagueId) {
 
-        log.info("trying to close league: " + leagueId);
+        log.info("trying to close league: {}", leagueId);
 
         leagueService.closeLeague(leagueId);
 
@@ -108,7 +108,7 @@ public class LeagueController extends BaseController {
     @GetMapping(value = "/rest/LeagueMatch/{leagueId}")
     public List<LeagueMatchDto> getMatches(
             @Parameter(description = "League id", example = "1", required = true) @PathVariable("leagueId") Long leagueId) {
-        log.info("Requested matches for league " + leagueId);
+        log.info("Requested matches for league {}", leagueId);
 
         return mapList(leagueService.getMatches(leagueId), LeagueMatchDto.class);
 
@@ -120,7 +120,7 @@ public class LeagueController extends BaseController {
     public HttpStatus addMatch(
             @Parameter(description = "LeagueMatch object", required = true) @RequestBody @Valid LeagueMatchDto leagueMatchDto) {
 
-        log.info("trying to add match to league: " + leagueMatchDto);
+        log.info("trying to add match to league: {}", leagueMatchDto);
 
         leagueService.addMatch(modelMapper.map(leagueMatchDto, LeagueMatch.class));
 
@@ -135,7 +135,7 @@ public class LeagueController extends BaseController {
             @Parameter(description = "winner id", example = "1", required = true) @PathVariable("winnerId") Long winnerId,
             @Parameter(description = "looser id", example = "1", required = true) @PathVariable("looserId") Long looserId) {
 
-        log.info("Delete match for winner: " + winnerId + " and looser: " + looserId + " in league: " + leagueId);
+        log.info("Delete match for winner: {} and looser: {} in league: {}", winnerId, looserId, leagueId);
 
         leagueService.deleteMatch(leagueId, winnerId, looserId);
 
@@ -148,7 +148,7 @@ public class LeagueController extends BaseController {
     public HttpStatus deleteLeague(
             @Parameter(description = "league id", example = "1", required = true) @PathVariable("leagueId") Long leagueId) {
 
-        log.info("Delete league: " + leagueId);
+        log.info("Delete league: {}", leagueId);
 
         leagueService.deleteLeague(leagueId);
 
@@ -166,7 +166,7 @@ public class LeagueController extends BaseController {
             @PathVariable("leagueId") Long leagueId,
             @Parameter(description = "LeagueResults list", required = true) @RequestBody @Valid LeagueResultDto[] leagueResultsDto) {
 
-        log.info("trying to send notifications for league: " + leagueId);
+        log.info("trying to send notifications for league: {}", leagueId);
         leagueService.processNotifications(leagueId, leagueResultsDto);
         return HttpStatus.OK;
     }

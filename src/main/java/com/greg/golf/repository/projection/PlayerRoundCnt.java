@@ -1,5 +1,6 @@
 package com.greg.golf.repository.projection;
 
+@SuppressWarnings("unused")
 public interface PlayerRoundCnt {
 
     Long getId();

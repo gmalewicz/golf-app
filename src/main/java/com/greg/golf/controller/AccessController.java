@@ -47,7 +47,7 @@ public class AccessController extends BaseController {
 	public ResponseEntity<PlayerDto> authenticatePlayer( @Valid
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerCredentialsDto playerCredentialsDto) {
 
-		log.info("trying to authenticate player: " + playerCredentialsDto.getNick() + " with password *****");
+        log.info("trying to authenticate player: {} with password *****", playerCredentialsDto.getNick());
 
 		GolfUserDetails userDetails = playerService.authenticatePlayer(modelMapper.map(playerCredentialsDto, Player.class));
 
@@ -68,7 +68,7 @@ public class AccessController extends BaseController {
 
 		String userId = jwtTokenUtil.getUserIdFromToken(requestTokenHeader.substring(7));
 		GolfUserDetails userDetails = playerService.loadUserById(Long.valueOf(userId));
-		log.info("get data for social player : " + userDetails.getPlayer().getNick());
+        log.info("get data for social player : {}", userDetails.getPlayer().getNick());
 
 		var responseHeaders = new HttpHeaders();
 		responseHeaders.set("refresh", playerService.generateRefreshToken(userDetails));
@@ -83,7 +83,7 @@ public class AccessController extends BaseController {
 	public HttpStatus addPlayer(@Valid
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerRegistrationDto playerRegistrationDto) {
 
-		log.info("trying to add player: " + playerRegistrationDto.getNick());
+        log.info("trying to add player: {}", playerRegistrationDto.getNick());
 
 		playerService.addPlayer(modelMapper.map(playerRegistrationDto, Player.class));
 
@@ -96,7 +96,7 @@ public class AccessController extends BaseController {
 	public HttpStatus updatePlayer( @Valid
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerUpdateDto playerUpdateDto) {
 
-		log.info("trying to update player id: " + playerUpdateDto.getId());
+        log.info("trying to update player id: {}", playerUpdateDto.getId());
 
 		playerService.update(modelMapper.map(playerUpdateDto, Player.class));
 
@@ -111,7 +111,7 @@ public class AccessController extends BaseController {
 	public HttpStatus resetPassword( @Valid
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerCredentialsDto playerCredentialsDto) {
 
-		log.info("trying to reset the password for player: " + playerCredentialsDto.getNick());
+        log.info("trying to reset the password for player: {}", playerCredentialsDto.getNick());
 
 		playerService.resetPassword(modelMapper.map(playerCredentialsDto, Player.class));
 
@@ -124,7 +124,7 @@ public class AccessController extends BaseController {
 	public ResponseEntity<PlayerUpdateOnBehalfDto> addPlayerOnBehalf( @Valid
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerUpdateOnBehalfDto playerUpdateOnBehalfDto) {
 
-		log.info("trying to add player on behalf: " + playerUpdateOnBehalfDto.getNick() + " with temporary password");
+        log.info("trying to add player on behalf: {} with temporary password", playerUpdateOnBehalfDto.getNick());
 
 		Player player = playerService.addPlayerOnBehalf(modelMapper.map(playerUpdateOnBehalfDto, Player.class));
 
@@ -138,7 +138,7 @@ public class AccessController extends BaseController {
 	public ResponseEntity<String> refreshToken(HttpServletRequest request,
 			@Parameter(required = true, description = "Id of the player") @PathVariable("id") Long id) {
 
-		log.debug("trying to refresh token for player id: " + id);
+        log.debug("trying to refresh token for player id: {}", id);
 
 		var responseHeaders = new HttpHeaders();
 
@@ -184,7 +184,7 @@ public class AccessController extends BaseController {
 	public HttpStatus deletePlayer(@Valid
 			@Parameter(description = "Player id", required = true) @RequestBody IdDto idDto) {
 
-		log.info("trying to delete player with id: " + idDto.getId());
+        log.info("trying to delete player with id: {}", idDto.getId());
 
 		playerService.delete(idDto.getId());
 
@@ -197,7 +197,7 @@ public class AccessController extends BaseController {
 	public HttpStatus updatePlayerOnBehalf(
 			@Parameter(description = "Player DTO object", required = true) @RequestBody PlayerUpdateOnBehalfDto playerUpdateOnBehalfDto) {
 
-		log.info("trying to update player: " + playerUpdateOnBehalfDto.getNick() + " by admin or other player");
+        log.info("trying to update player: {} by admin or other player", playerUpdateOnBehalfDto.getNick());
 		boolean updateSocial = playerUpdateOnBehalfDto.getUpdateSocial() != null && playerUpdateOnBehalfDto.getUpdateSocial();
 
 		playerService.updatePlayerOnBehalf(modelMapper.map(playerUpdateOnBehalfDto, Player.class), updateSocial);
@@ -211,7 +211,7 @@ public class AccessController extends BaseController {
 	public List<PlayerDto> searchForPlayer(
 			@Valid @Parameter(description = "PlayerNick DTO object", required = true) @RequestBody PlayerNickDto playerNickDto) {
 
-		log.info("Requested search for player for nick starting with: " + playerNickDto.getNick());
+        log.info("Requested search for player for nick starting with: {}", playerNickDto.getNick());
 
 		return mapList(playerService.searchForPlayer(playerNickDto.getNick(), playerNickDto.getPage()), PlayerDto.class);
 	}
