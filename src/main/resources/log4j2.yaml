@@ -8,7 +8,7 @@ Configuration:
   Loggers:
     logger:
       - name: com.greg.golf
-        level: debug
+        level: info
         additivity: false
         AppenderRef:
           - ref: Console
@@ -17,4 +17,4 @@ Configuration:
       AppenderRef:
       - ref: Console
  #     - ref: File
-      level: debug
+      level: info
