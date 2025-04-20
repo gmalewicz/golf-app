@@ -93,7 +93,7 @@ spring:
   jpa:
     show_sql: true
   liquibase:
-    change-log: classpath:/db/dbChangeLog-prod.xml
+    change-log: classpath:/db/dbChangeLog-dev.xml
 oauth2:
   redirect: http://localhost:4200/login
 
