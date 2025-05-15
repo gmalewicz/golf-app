@@ -40,7 +40,7 @@ spring:
     hikari:
       connectionTimeout: 20000 
       maximumPoolSize: 5
-    url: jdbc:postgresql://localhost:5432/golf 
+    url: jdbc:postgresql://localhost:5432/golf
     username: golf_usr
     password: replace_it
   jpa:
@@ -96,6 +96,10 @@ spring:
     change-log: classpath:/db/dbChangeLog-dev.xml
 oauth2:
   redirect: http://localhost:4200/login
+management:
+  health:
+    mail:
+      enabled: false
 
 ---
 

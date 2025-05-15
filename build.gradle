@@ -8,18 +8,18 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '3.4.2'
+    id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'application'
-    id 'org.liquibase.gradle' version '3.0.1'
+    id 'org.liquibase.gradle' version '3.0.2'
     id 'org.sonarqube' version '6.0.1.5171'
     id 'jacoco'
     id 'idea'
 }
 
 group = 'com.greg.golf'
-version = '3.9.0'
-description = 'tournament modifications'
+version = '3.9.1'
+description = 'libraries update & remove mail server from health check'
 
 processResources {
     filesMatching("**/*.yml") {
@@ -96,9 +96,9 @@ dependencies {
     implementation 'org.springframework.security:spring-security-messaging'
     implementation 'org.postgresql:postgresql'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.5'
-    implementation 'com.google.guava:guava:33.4.0-jre'
+    implementation 'com.google.guava:guava:33.4.8-jre'
     implementation 'org.modelmapper:modelmapper:3.2.2'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     implementation 'org.liquibase:liquibase-core'
 
@@ -131,7 +131,7 @@ dependencies {
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
     liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.5'
-    liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
     liquibaseRuntime sourceSets.main.output
 }
 
