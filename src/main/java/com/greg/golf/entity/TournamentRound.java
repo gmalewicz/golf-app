@@ -56,4 +56,16 @@ public class TournamentRound {
 
 	@Column(name = "round_id")
 	private Integer roundId;
+
+	@NotNull
+	@Column(name = "playing_hcp")
+	private Integer playingHcp;
+
+	@NotNull
+	@Column(name = "hcp")
+	private Float hcp;
+
+	@NotNull
+	@Column(name = "course_hcp")
+	private Integer courseHcp;
 }
