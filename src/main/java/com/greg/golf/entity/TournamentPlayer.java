@@ -29,4 +29,7 @@ public class TournamentPlayer {
 	@EqualsAndHashCode.Exclude
 	@Column(name = "nick")
 	private String nick;
+
+	@EqualsAndHashCode.Exclude
+	private Boolean sex;
 }

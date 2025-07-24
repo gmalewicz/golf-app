@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.ToString;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.*;
 
@@ -34,4 +35,8 @@ public class TournamentPlayerDto {
 	@Size(min = 1, max = 20, message = "Nick must be between 1 and 20 characters")
 	@Schema(description = "Player nick name", example = "golfer", accessMode = READ_ONLY, maxLength=20)
 	private String nick;
+
+	@ToString.Exclude
+	@Schema(description = "Player sex: false - male, true - female", example = "false", accessMode = READ_ONLY)
+	private Boolean sex;
 }
