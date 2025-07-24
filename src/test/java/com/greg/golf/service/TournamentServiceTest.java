@@ -388,7 +388,7 @@ class TournamentServiceTest {
 		tournament.setPlayHcpMultiplayer(0.75f);
 		tournamentRepository.save(tournament);
 
-		var netStrokes = tournamentService.getNetStrokes(99, 45);
+		var netStrokes = tournamentService.getNetStrokes(99, 18);
 
 		Assertions.assertEquals(81, netStrokes);
 
