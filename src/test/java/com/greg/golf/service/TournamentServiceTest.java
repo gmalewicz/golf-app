@@ -235,7 +235,7 @@ class TournamentServiceTest {
 		tournamentResultRepository.save(tournamentResult);
 
 		var retRound = roundRepository.findAll().getFirst();
-		tournamentService.updateSTB(tournamentResult, retRound, player, 38);
+		tournamentService.updateSTB(tournamentResult, retRound, player, 45);
 
         log.info("STB net: {}", tournamentResult.getStbNet());
         log.info("STB gross: {}", tournamentResult.getStbGross());
@@ -372,7 +372,7 @@ class TournamentServiceTest {
 	@Test
 	void getNetStrokesTest() {
 
-		var netStrokes = tournamentService.getNetStrokes(99, 38);
+		var netStrokes = tournamentService.getNetStrokes(99, 45);
 
 		Assertions.assertEquals(54, netStrokes);
 
@@ -388,7 +388,7 @@ class TournamentServiceTest {
 		tournament.setPlayHcpMultiplayer(0.75f);
 		tournamentRepository.save(tournament);
 
-		var netStrokes = tournamentService.getNetStrokes(99, 38);
+		var netStrokes = tournamentService.getNetStrokes(99, 45);
 
 		Assertions.assertEquals(81, netStrokes);
 
@@ -399,7 +399,7 @@ class TournamentServiceTest {
 	@Test
 	void getNetStrokesLowerThan0Test() {
 
-		var netStrokes = tournamentService.getNetStrokes( 22, 38);
+		var netStrokes = tournamentService.getNetStrokes( 22, 45);
 
 		Assertions.assertEquals(0, netStrokes);
 
