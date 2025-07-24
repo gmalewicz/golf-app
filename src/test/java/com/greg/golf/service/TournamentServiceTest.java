@@ -420,6 +420,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 
 		tournamentPlayerRepository.save(tournamentPlayer);
 
@@ -447,6 +448,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 
 		tournamentPlayerRepository.save(tournamentPlayer);
 
@@ -472,6 +474,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 
 		tournamentPlayerRepository.save(tournamentPlayer);
 
@@ -499,6 +502,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 
 		tournamentPlayerRepository.save(tournamentPlayer);
 
@@ -527,6 +531,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		var tournamentResult = new TournamentResult();
@@ -568,6 +573,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		var tournamentResult = new TournamentResult();
@@ -630,6 +636,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		tournamentService.updateTournamentResult(round, tournament);
@@ -664,6 +671,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		tournamentService.addRound(tournament.getId(), round.getId(), true);
@@ -687,6 +695,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		tournamentService.updateTournamentResult(round, tournament);
@@ -711,7 +720,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
-
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
@@ -733,7 +742,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
-
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		roundRepository.deleteAll();
@@ -756,7 +765,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(2L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
-
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		var rndLst = tournamentService.getAllPossibleRoundsForTournament(tournament.getId());
@@ -781,7 +790,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setPlayerId(1L);
 		tournamentPlayer.setNick("golfer");
 		tournamentPlayer.setWhs(10.0F);
-
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		var round2 = new Round();
@@ -969,6 +978,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setTournamentId(tournament.getId());
 		tournamentPlayer.setNick("Test");
 		tournamentPlayer.setWhs(1F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		assertEquals(1, tournamentPlayerRepository.findAll().size());
@@ -1050,6 +1060,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setTournamentId(tournament.getId());
 		tournamentPlayer.setNick("Test");
 		tournamentPlayer.setWhs(1F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		assertEquals(1, tournamentPlayerRepository.findAll().size());
@@ -1119,6 +1130,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setTournamentId(tournament.getId());
 		tournamentPlayer.setNick("Test");
 		tournamentPlayer.setWhs(1F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		assertEquals(1, tournamentService.getTournamentPlayers(tournament.getId()).size());
@@ -1157,6 +1169,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setTournamentId(tournament.getId());
 		tournamentPlayer.setNick("Test");
 		tournamentPlayer.setWhs(1F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		var tournamentId = tournament.getId();
@@ -1188,6 +1201,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setTournamentId(tournament.getId());
 		tournamentPlayer.setNick("Test");
 		tournamentPlayer.setWhs(1F);
+		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
 		tournamentService.updatePlayerHcp(tournamentPlayer.getTournamentId(), tournamentPlayer.getPlayerId(), 2F);
