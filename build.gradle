@@ -130,7 +130,7 @@ dependencies {
     liquibaseRuntime 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
     liquibaseRuntime 'org.postgresql:postgresql'
     liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
-    liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.5'
+    liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.10.3'
     liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
     liquibaseRuntime sourceSets.main.output
 }
