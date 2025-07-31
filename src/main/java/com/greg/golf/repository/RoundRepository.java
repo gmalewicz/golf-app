@@ -22,7 +22,7 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 	 Optional<Round> findRoundByCourseAndRoundDate(Course course, Date roundDate);
 	 
 	 @EntityGraph(attributePaths = { "player"})
-	 List<Round> findByRoundDateBetween(Date startDate, Date endDate);
+	 List<Round> findByRoundDateBetweenOrderByRoundDateDesc(Date startDate, Date endDate);
 
 	 @EntityGraph(attributePaths = { "course"})
 	 List<Round> findByPlayerOrderByRoundDateDesc(Player player, Pageable pageable);

@@ -43,7 +43,7 @@ public class RoundService {
 
 	@Transactional(readOnly = true)
 	public List<Round> findByDates(Date startDate, Date endDate) {
-		return roundRepository.findByRoundDateBetween(startDate, endDate);
+		return roundRepository.findByRoundDateBetweenOrderByRoundDateDesc(startDate, endDate);
 	}
 
 	@Transactional 
