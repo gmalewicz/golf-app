@@ -64,13 +64,14 @@ public class TournamentController extends BaseController {
 	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Tournament API")
 	@Operation(summary = "Adds round to tournament")
-	@PostMapping(value = "/rest/TournamentRound/{tournamentId}")
+	@PostMapping(value = "/rest/TournamentRound/{tournamentId}/{playerId}")
 	public HttpStatus addRoundToTournament(
 			@Parameter(description = "Tournament id", example = "1", required = true) @PathVariable("tournamentId") Long tournamentId,
+			@Parameter(description = "Player id", example = "1", required = true) @PathVariable("playerId") Long playerId,
 			@Parameter(description = "Round object", required = true) @RequestBody LimitedRoundDto limitedRoundDto) {
 
-        log.info("trying to add round to tournament: {}", limitedRoundDto);
-		tournamentService.addRound(tournamentId, limitedRoundDto.getId(), true);
+        log.info("trying to add round {} to tournament id : {} and player id: {}", limitedRoundDto.getId(), tournamentId, playerId);
+		tournamentService.addRound(tournamentId, limitedRoundDto.getId(), playerId, true);
 		log.info("Round added");
 
 		return HttpStatus.OK;

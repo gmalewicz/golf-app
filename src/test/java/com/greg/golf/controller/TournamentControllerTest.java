@@ -125,7 +125,7 @@ class TournamentControllerTest {
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
-		mockMvc.perform(post("/rest/TournamentRound/1").contentType("application/json").characterEncoding("utf-8")
+		mockMvc.perform(post("/rest/TournamentRound/1/1").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 	}
 

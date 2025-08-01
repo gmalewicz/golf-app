@@ -424,13 +424,13 @@ class TournamentServiceTest {
 
 		tournamentPlayerRepository.save(tournamentPlayer);
 
-		tournamentService.addRound(tournament.getId(), round.getId(), true);
+		tournamentService.addRound(tournament.getId(), round.getId(), null,true);
 		assertEquals(1L, tournamentRoundRepository.count());
 
 		Long tournamentId = tournament.getId();
 		Long rndId = round.getId();
 
-		tournamentService.addRound(tournamentId, rndId, true);
+		tournamentService.addRound(tournamentId, rndId, null,true);
 		assertEquals(1L, tournamentRoundRepository.count());
 	}
 
@@ -454,7 +454,7 @@ class TournamentServiceTest {
 
 		log.info(round.getPlayer().iterator().next().getNick());
 
-		tournamentService.updateTournamentResult(round, tournament);
+		tournamentService.updateTournamentResult(round, tournament, null);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
 
@@ -480,7 +480,7 @@ class TournamentServiceTest {
 
 		round.getScoreCard().getFirst().setStroke(Common.HOLE_GIVEN_UP);
 		roundRepository.save(round);
-		tournamentService.updateTournamentResult(round, tournament);
+		tournamentService.updateTournamentResult(round, tournament, null);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(0, tr.getStrokesBrutto().intValue());
 
@@ -509,7 +509,7 @@ class TournamentServiceTest {
 
 		round.getScoreCard().getFirst().setStroke(Common.HOLE_GIVEN_UP);
 		roundRepository.save(round);
-		tournamentService.updateTournamentResult(round, tournament);
+		tournamentService.updateTournamentResult(round, tournament, null);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(0, tr.getStrokesBrutto().intValue());
 
@@ -544,7 +544,7 @@ class TournamentServiceTest {
 		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-		tournamentService.updateTournamentResult(round, tournament);
+		tournamentService.updateTournamentResult(round, tournament, null);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(190, tr.getStrokesBrutto().intValue());
 	}
@@ -586,10 +586,10 @@ class TournamentServiceTest {
 		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-		tournamentService.addRound(tournament.getId(), round.getId(), true);
+		tournamentService.addRound(tournament.getId(), round.getId(), null,true);
 
 		var round2 =  rounds.get(1);
-		tournamentService.addRound(tournament.getId(), round2.getId(), true);
+		tournamentService.addRound(tournament.getId(), round2.getId(), null,  true);
 
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
@@ -617,7 +617,7 @@ class TournamentServiceTest {
 		tournamentResult.setStrokeRounds(1);
 		tournamentResult.setTournament(tournament);
 		tournamentResultRepository.save(tournamentResult);
-		tournamentService.updateTournamentResult(redRound, tournament);
+		tournamentService.updateTournamentResult(redRound, tournament, null);
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(100, tr.getStrokesBrutto().intValue());
 	}
@@ -639,7 +639,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
-		tournamentService.updateTournamentResult(round, tournament);
+		tournamentService.updateTournamentResult(round, tournament, null);
 
 		// update the round which was already added to tournament
 		round.getScoreCard().getFirst().setStroke(15);
@@ -674,7 +674,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
-		tournamentService.addRound(tournament.getId(), round.getId(), true);
+		tournamentService.addRound(tournament.getId(), round.getId(), null, true);
 
 		var tr = tournamentResultRepository.findByTournament(tournament).orElseThrow();
 		Assertions.assertEquals(90, tr.getStrokesBrutto().intValue());
@@ -698,7 +698,7 @@ class TournamentServiceTest {
 		tournamentPlayer.setSex(false);
 		tournamentPlayerRepository.save(tournamentPlayer);
 
-		tournamentService.updateTournamentResult(round, tournament);
+		tournamentService.updateTournamentResult(round, tournament, null);
 
 		var roundResults = tournamentResultRepository.findAll().getFirst();
 

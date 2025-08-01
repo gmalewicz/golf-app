@@ -158,7 +158,7 @@ public class TournamentService {
         round = roundService.saveRound(round);
         entityManager.detach(round);
 
-        var tournamentLst = self.addRound(tournamentId, round.getId(), true);
+        var tournamentLst = self.addRound(tournamentId, round.getId(), null, true);
 
         //it must be one and only one result
         if (tournamentLst == null || tournamentLst.size() != 1) {
@@ -169,7 +169,7 @@ public class TournamentService {
     }
 
     @Transactional
-    public List<TournamentRound> addRound(Long tournamentId, Long roundId, boolean updateResults) {
+    public List<TournamentRound> addRound(Long tournamentId, Long roundId, Long playerId, boolean updateResults) {
 
         // first find the round in database
         var round = roundService.getWithPlayers(roundId).orElseThrow();
@@ -181,7 +181,7 @@ public class TournamentService {
 
         // update tournament result
         if (updateResults) {
-            return self.updateTournamentResult(round, tournament);
+            return self.updateTournamentResult(round, tournament, playerId);
         }
         return new ArrayList<>();
     }
@@ -193,7 +193,7 @@ public class TournamentService {
     }
 
     @Transactional
-    public List<TournamentRound> updateTournamentResult(Round round, Tournament tournament) {
+    public List<TournamentRound> updateTournamentResult(Round round, Tournament tournament, Long playerId) {
 
        var tournamentRoundLst = new ArrayList<TournamentRound>();
 
@@ -210,7 +210,8 @@ public class TournamentService {
 
             var playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 
-            if (playerRound.getTournamentId() == null && tournamentPlayers.containsKey(playerRound.getPlayerId())) {
+            if (playerRound.getTournamentId() == null &&
+                tournamentPlayers.containsKey(playerRound.getPlayerId()) && (playerId == null || playerId.equals(player.getId()))) {
 
                 Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
                         .findByPlayerAndTournament(player, tournament);
@@ -514,7 +515,7 @@ public class TournamentService {
         return retStb;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Round> getAllPossibleRoundsForTournament(Long tournamentId) {
 
         var retRounds = new ArrayList<Round>();
@@ -532,19 +533,23 @@ public class TournamentService {
 
             rounds.forEach(r -> {
 
-                if (Collections.disjoint(plrIdLst,
-                                         playerRoundRepository.findByRoundIdOrderByPlayerId(r.getId())
-                                                .orElseThrow()
-                                                .stream()
-                                                .filter(pr -> pr.getTournamentId() == null)
-                                                .map(PlayerRound::getPlayerId)
-                                                .toList())) {
+                var applicablePlayers = playerRoundRepository.findByRoundIdOrderByPlayerId(r.getId())
+                                                               .orElseThrow()
+                                                               .stream()
+                                                               .filter(pr -> pr.getTournamentId() == null)
+                                                               .map(PlayerRound::getPlayerId)
+                                                               .filter(plrIdLst::contains)
+                                                               .collect(Collectors.toSet());
 
-                    log.info("The round with non matching player found: round id {} with number of players: {}", r.getId(), r.getPlayer().size());
-
-                } else {
-
+                if (!applicablePlayers.isEmpty()) {
+                    var players = r.getPlayer()
+                                        .stream()
+                                        .filter(pl -> applicablePlayers.contains(pl.getId()))
+                                        .collect(Collectors.toSet());
+                    r.setPlayer(players);
                     retRounds.add(r);
+                } else {
+                    log.info("The round with non matching player found: round id {} with number of players: {}", r.getId(), r.getPlayer().size());
                 }
             });
         }
