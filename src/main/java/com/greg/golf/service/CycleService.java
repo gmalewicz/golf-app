@@ -232,7 +232,7 @@ public class CycleService {
 
             cycleResults.forEach( cycleResult -> {
 
-                if (cycleTournament.getCycle().getSeries() == Common.CYCLE_SERIES_STB) {
+                if (cycleResult.getSeries() == Common.CYCLE_SERIES_STB) {
 
                     cycleResult.setCycleScore(
                             Arrays.stream(cycleResult.getResults())
