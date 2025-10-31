@@ -26,8 +26,6 @@ class TournamentServiceDeleteTournamentRoundTest {
     private RoundService roundService;
     @Mock
     private PlayerRoundRepository playerRoundRepository;
-    //@Mock
-    //private TournamentRepository tournamentRepository;
 
     @Spy
     @InjectMocks
@@ -177,9 +175,6 @@ class TournamentServiceDeleteTournamentRoundTest {
 
             assertNotEquals(playedRoundsBefore, tournamentResult.getPlayedRounds(),
                     "Expected playedRounds to be updated by updateForBestRounds");
-
-
-            //verify(tournamentResultRepository, never()).save(tournamentResult);
 
             mockedRoleVerification.verify(() ->
                     RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to delete tournament round by unauthorized user"));

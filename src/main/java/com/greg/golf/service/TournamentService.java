@@ -65,7 +65,7 @@ public class TournamentService {
     @Transactional
     public void deleteTournament(Long tournamentId) {
 
-        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+        var tournament = self.tournamentRepository.findById(tournamentId).orElseThrow();
 
         // then verify if player is allowed to delete result
         // only tournament owner can do it
