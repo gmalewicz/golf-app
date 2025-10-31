@@ -65,7 +65,7 @@ public class TournamentService {
     @Transactional
     public void deleteTournament(Long tournamentId) {
 
-        var tournament = self.tournamentRepository.findById(tournamentId).orElseThrow();
+        var tournament = tournamentRepository.findById(tournamentId).orElseThrow();
 
         // then verify if player is allowed to delete result
         // only tournament owner can do it
@@ -94,7 +94,7 @@ public class TournamentService {
         RoleVerification.verifyPlayer(tournamentResult.getTournament().getPlayer().getId(), "Attempt to delete tournament round by unauthorized user");
 
         // first get tournament rounds
-        var tournamentRounds = getTournamentRoundsForResult(tournamentResultId);
+        var tournamentRounds = self.getTournamentRoundsForResult(tournamentResultId);
         // remove the round from tournament rounds
         var rstLst = tournamentRounds
                         .stream()
