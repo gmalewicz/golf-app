@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +27,8 @@ class TournamentServiceDeleteTournamentRoundTest {
     private RoundService roundService;
     @Mock
     private PlayerRoundRepository playerRoundRepository;
+    @Mock
+    TournamentService selfMock;
 
     @Spy
     @InjectMocks
@@ -43,7 +46,7 @@ class TournamentServiceDeleteTournamentRoundTest {
     private Player player;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchFieldException, IllegalAccessException {
         tournament = new Tournament();
         tournament.setId(10L);
         tournament.setBestRounds(3);
@@ -75,6 +78,11 @@ class TournamentServiceDeleteTournamentRoundTest {
         playerRound.setId(5L);
         playerRound.setPlayerId(player.getId());
         playerRound.setTournamentId(tournament.getId());
+
+        // Inject mocked self into the tournamentService self field
+        Field selfField = TournamentService.class.getDeclaredField("self");
+        selfField.setAccessible(true);
+        selfField.set(tournamentService, selfMock);
     }
 
     @Test
@@ -108,7 +116,7 @@ class TournamentServiceDeleteTournamentRoundTest {
         // Setup getTournamentRoundsForResult to return list with tournamentRound having roundId
         LinkedList<TournamentRound> rounds = new LinkedList<>();
         rounds.add(tournamentRound);
-        doReturn(rounds).when(tournamentService).getTournamentRoundsForResult(TOURNAMENT_RESULT_ID);
+        doReturn(rounds).when(selfMock).getTournamentRoundsForResult(TOURNAMENT_RESULT_ID);
 
         // Setup roundService to return playerRound when requested
         when(roundService.getForPlayerRoundDetails(player.getId(), ROUND_ID.longValue())).thenReturn(playerRound);
@@ -156,7 +164,7 @@ class TournamentServiceDeleteTournamentRoundTest {
 
         LinkedList<TournamentRound> rounds = new LinkedList<>();
         rounds.add(tournamentRound);
-        doReturn(rounds).when(tournamentService).getTournamentRoundsForResult(TOURNAMENT_RESULT_ID);
+        doReturn(rounds).when(selfMock).getTournamentRoundsForResult(TOURNAMENT_RESULT_ID);
 
         when(roundService.getForPlayerRoundDetails(player.getId(), ROUND_ID.longValue())).thenReturn(playerRound);
         when(playerRoundRepository.save(any(PlayerRound.class))).thenAnswer(invocation -> invocation.getArgument(0));
