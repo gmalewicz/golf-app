@@ -91,7 +91,7 @@ class TournamentServiceDeleteTournamentRoundTest {
         when(tournamentResultRepository.findById(TOURNAMENT_RESULT_ID)).thenReturn(Optional.of(tournamentResult));
 
         // Setup getTournamentRoundsForResult to return empty list (no rounds found)
-        doReturn(Collections.emptyList()).when(tournamentService).getTournamentRoundsForResult(TOURNAMENT_RESULT_ID);
+        doReturn(Collections.emptyList()).when(selfMock).getTournamentRoundsForResult(TOURNAMENT_RESULT_ID);
 
         // Mock static RoleVerification.verifyPlayer
         try (MockedStatic<RoleVerification> mockedRoleVerification = mockStatic(RoleVerification.class)) {
