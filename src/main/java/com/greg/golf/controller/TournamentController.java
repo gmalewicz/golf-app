@@ -116,12 +116,25 @@ public class TournamentController extends BaseController {
 	}
 
 	@Tag(name = "Tournament API")
-	@Operation(summary = "Delete result from tournament")
+	@Operation(summary = "Delete player round from tournament")
+	@DeleteMapping(value = "/rest/TournamentRounds/{tournamentResultId}/{roundId}")
+	public HttpStatus deleteRound(
+			@Parameter(description = "Tournament result id", example = "1", required = true) @PathVariable("tournamentResultId") Long tournamentResultId,
+			@Parameter(description = "Round id", example = "1", required = true) @PathVariable("roundId") Integer roundId) {
+
+        log.info("Delete tournament round for result id: {} and round id: {}", tournamentResultId, roundId);
+		tournamentService.deleteTournamentRound(tournamentResultId, roundId);
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Tournament API")
+	@Operation(summary = "Delete round from tournament")
 	@DeleteMapping(value = "/rest/TournamentResult/{tournamentResultId}")
 	public HttpStatus deleteResult(
 			@Parameter(description = "Tournament result id", example = "1", required = true) @PathVariable("tournamentResultId") Long tournamentResultId) {
 
-        log.info("Delete result from tournament: {}", tournamentResultId);
+		log.info("Delete result from tournament: {}", tournamentResultId);
 		tournamentService.deleteResult(tournamentResultId);
 
 		return HttpStatus.OK;
