@@ -103,8 +103,11 @@ class TournamentServiceDeleteTournamentRoundTest {
 
         tournament.setStatus(Tournament.STATUS_CLOSE);
 
+        Long resultId = tournamentResult.getId();
+        Integer roundId = tournamentRound.getRoundId();
+
         GeneralException exception = assertThrows(GeneralException.class, () ->
-                tournamentService.deleteTournamentRound(tournamentResult.getId(), tournamentRound.getRoundId())
+                tournamentService.deleteTournamentRound(resultId, roundId)
         );
 
         assertNotNull(exception);
