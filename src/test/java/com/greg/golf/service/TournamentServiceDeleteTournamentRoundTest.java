@@ -52,6 +52,7 @@ class TournamentServiceDeleteTournamentRoundTest {
         tournament.setBestRounds(3);
         tournament.setPlayer(new Player());
         tournament.getPlayer().setId(100L);
+        tournament.setStatus(Tournament.STATUS_OPEN);
 
         player = new Player();
         player.setId(200L);
@@ -181,7 +182,7 @@ class TournamentServiceDeleteTournamentRoundTest {
             verify(playerRoundRepository, times(1)).save(playerRound);
 
 
-            assertNotEquals(playedRoundsBefore, tournamentResult.getPlayedRounds(),
+            assertEquals(playedRoundsBefore, tournamentResult.getPlayedRounds(),
                     "Expected playedRounds to be updated by updateForBestRounds");
 
             mockedRoleVerification.verify(() ->

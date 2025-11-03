@@ -93,6 +93,11 @@ public class TournamentService {
         // only tournament owner can do it
         RoleVerification.verifyPlayer(tournamentResult.getTournament().getPlayer().getId(), "Attempt to delete tournament round by unauthorized user");
 
+        // verify if tournament is not closed
+        if (tournamentResult.getTournament().getStatus() == Tournament.STATUS_CLOSE) {
+            throw new GeneralException();
+        }
+
         // first get tournament rounds
         var tournamentRounds = self.getTournamentRoundsForResult(tournamentResultId);
         // remove the round from tournament rounds
@@ -113,9 +118,9 @@ public class TournamentService {
             playerRound.setTournamentId(null);
             playerRoundRepository.save(playerRound);
 
-            // recalculate tournament results
-            if (tournamentResult.getTournament().getBestRounds() == Common.ALL_ROUNDS ||
-                    tournamentResult.getPlayedRounds() >= tournamentResult.getTournament().getBestRounds() + 1) {
+            if (tournamentRounds.size() == 1) {
+                tournamentResultRepository.delete(tournamentResult);
+            } else if (tournamentResult.getTournament().getBestRounds() == Common.ALL_ROUNDS) {
                 // subtract from totals
                 tournamentResult.setStbGross(tournamentResult.getStbGross() - remTournamentRound.getStbGross());
                 tournamentResult.setStbNet(tournamentResult.getStbNet() - remTournamentRound.getStbNet());
@@ -125,12 +130,11 @@ public class TournamentService {
                 // and save
                 tournamentResultRepository.save(tournamentResult);
             } else {
+                tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() - 1);
                 updateForBestRounds(tournamentResult.getTournament(), tournamentResult);
             }
         }
     }
-
-
 
     @Transactional
     public void deleteResult(Long resultId) {
@@ -350,11 +354,7 @@ public class TournamentService {
         // get all rounds
         List<TournamentRound> tournamentRoundList =
                 tournamentRoundRepository.findByTournamentResultOrderByIdAsc(tournamentResult);
-        // skip processing if number of rounds is lower equal bestRounds
-        if (tournamentRoundList.size() <= tournament.getBestRounds()) {
-            log.debug("Skipping as number of rounds is lower or equals than number of best rounds");
-            return;
-        }
+
         log.debug("All checks done - beginning of updating tournament result");
 
         // calculate stb net - more the better
