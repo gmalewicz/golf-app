@@ -84,6 +84,57 @@ public class TournamentService {
         tournamentRepository.deleteById(tournamentId);
     }
 
+    @Transactional
+    public void deleteTournamentRound(Long tournamentResultId, Integer roundId) {
+
+        var tournamentResult = tournamentResultRepository.findById(tournamentResultId).orElseThrow();
+
+        // then verify if player is allowed to delete result
+        // only tournament owner can do it
+        RoleVerification.verifyPlayer(tournamentResult.getTournament().getPlayer().getId(), "Attempt to delete tournament round by unauthorized user");
+
+        // verify if tournament is not closed
+        if (tournamentResult.getTournament().getStatus() == Tournament.STATUS_CLOSE) {
+            throw new GeneralException();
+        }
+
+        // first get tournament rounds
+        var tournamentRounds = self.getTournamentRoundsForResult(tournamentResultId);
+        // remove the round from tournament rounds
+        var rstLst = tournamentRounds
+                        .stream()
+                        .filter(trs -> trs.getRoundId().equals(roundId))
+                        .toList();
+        // do only if there are results
+        if (!rstLst.isEmpty()) {
+
+            var remTournamentRound = rstLst.getFirst();
+
+            // delete tournament round
+            tournamentRoundRepository.delete(remTournamentRound);
+
+            // change the status of round not to belong to that tournament
+            var playerRound = roundService.getForPlayerRoundDetails(tournamentResult.getPlayer().getId(), roundId.longValue());
+            playerRound.setTournamentId(null);
+            playerRoundRepository.save(playerRound);
+
+            if (tournamentRounds.size() == 1) {
+                tournamentResultRepository.delete(tournamentResult);
+            } else if (tournamentResult.getTournament().getBestRounds() == Common.ALL_ROUNDS) {
+                // subtract from totals
+                tournamentResult.setStbGross(tournamentResult.getStbGross() - remTournamentRound.getStbGross());
+                tournamentResult.setStbNet(tournamentResult.getStbNet() - remTournamentRound.getStbNet());
+                tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() - remTournamentRound.getStrokesBrutto());
+                tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() - remTournamentRound.getStrokesNetto());
+                tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() - 1);
+                // and save
+                tournamentResultRepository.save(tournamentResult);
+            } else {
+                tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() - 1);
+                updateForBestRounds(tournamentResult.getTournament(), tournamentResult);
+            }
+        }
+    }
 
     @Transactional
     public void deleteResult(Long resultId) {
@@ -303,11 +354,7 @@ public class TournamentService {
         // get all rounds
         List<TournamentRound> tournamentRoundList =
                 tournamentRoundRepository.findByTournamentResultOrderByIdAsc(tournamentResult);
-        // skip processing if number of rounds is lower equal bestRounds
-        if (tournamentRoundList.size() <= tournament.getBestRounds()) {
-            log.debug("Skipping as number of rounds is lower or equals than number of best rounds");
-            return;
-        }
+
         log.debug("All checks done - beginning of updating tournament result");
 
         // calculate stb net - more the better

@@ -183,6 +183,15 @@ class TournamentControllerTest {
 		mockMvc.perform(delete("/rest/TournamentResult/1")).andExpect(status().isOk());
 	}
 
+	@DisplayName("Should delete player round from tournament")
+	@Test
+	void deletePlayerRoundFromTournamentWhenValidInputThenReturns200() throws Exception {
+
+		doNothing().when(tournamentService).deleteTournamentRound(anyLong(), anyInt());
+		mockMvc.perform(delete("/rest/TournamentRounds/1/1")).andExpect(status().isOk());
+	}
+
+
 	@DisplayName("Should close tournament with correct result")
 	@Test
 	void closeTournamentWithValidInputThenReturns200() throws Exception {
