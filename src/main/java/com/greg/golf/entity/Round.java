@@ -20,11 +20,11 @@ public class Round {
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@NotNull
-	@Column(name = "match_play")
-	private Boolean matchPlay;
-	
+	@Column(name = "format")
+	private Integer format;
+
 	@Column(name = "mp_format")
 	private Float mpFormat;
 

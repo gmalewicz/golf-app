@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="1766661033983-21">
+		<addColumn tableName="online_round">
+			<column name="format" type="INTEGER"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1766661033983-22">
+		<dropColumn tableName="online_round">
+			<column name="match_play"/>
+		</dropColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="1766661033983-23">
+		<addColumn tableName="round">
+			<column name="format" type="INTEGER" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ" id="1766661033983-24">
+		<update tableName="round">
+			<column name="format" valueNumeric="1"/>
+			<where>match_play = true</where>
+		</update>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1766661033983-25">
+		<dropColumn tableName="round">
+			<column name="match_play"/>
+		</dropColumn>
+	</changeSet>
+</databaseChangeLog>

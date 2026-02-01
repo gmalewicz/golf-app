@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
@@ -104,7 +105,7 @@ class OnlineScoreCardControllerTest {
 		input.setTeeTime("10:00");
 		input.setOwner(1L);
 		input.setFinalized(false);
-		input.setMatchPlay(false);
+		input.setFormat(Common.STROKE_PLAY_FORMAT);
 
 		var inputLst = new ArrayList<OnlineRoundDto>();
 		inputLst.add(input);
@@ -230,7 +231,7 @@ class OnlineScoreCardControllerTest {
 		input.setTeeTime("10:00");
 		input.setOwner(1L);
 		input.setFinalized(false);
-		input.setMatchPlay(false);
+		input.setFormat(Common.STROKE_PLAY_FORMAT);
 		var inputLst = new ArrayList<OnlineRoundDto>();
 		inputLst.add(input);
 

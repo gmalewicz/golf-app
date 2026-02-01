@@ -150,7 +150,8 @@ public class OnlineRoundService {
 		var players = new TreeSet<Player>();
 		players.add(onlineRound.getPlayer());
 		round.setPlayer(players);
-		round.setMatchPlay(onlineRound.getMatchPlay());
+		//TODO
+		round.setFormat(onlineRound.getFormat());
 		round.setMpFormat(onlineRound.getMpFormat());
 		var gc = new GregorianCalendar();
 		gc.setTime(onlineRound.getDate());

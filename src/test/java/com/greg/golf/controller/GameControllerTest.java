@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -73,7 +74,7 @@ class GameControllerTest {
 		SortedSet<Player> playerSet = new TreeSet<>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
-		round.setMatchPlay(false);
+		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		round.setRoundDate(new Date(1));
 		round.setScoreCard(new ArrayList<>());
 		ScoreCard scoreCard = new ScoreCard();

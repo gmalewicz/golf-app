@@ -43,11 +43,15 @@ public class OnlineRoundDto {
 	@Schema(description = "Number of penalties", example = "3", accessMode = READ_WRITE, minimum = "1", maximum = "15")
 	private Boolean penalties;
 
-	@Schema(description = "Match play identifier", example = "true", accessMode = READ_WRITE, allowableValues = {
-			"true", "false" })
-	private Boolean matchPlay;
-	
-	@Schema(description = "Match play allowance format", example = "0.5", accessMode = READ_WRITE, allowableValues = {
+	@Schema(description = "Supported formats: " +
+			"0 = stroke play, " +
+			"1 = match play, " +
+			"2 = four ball stroke play, " +
+			"3 = four ball stroke play",
+			example = "0", accessMode = READ_WRITE, allowableValues = {"0", "1", "2", "3"})
+	private Integer format;
+
+	@Schema(description = "Match play hcp multiplier", example = "0.5", accessMode = READ_WRITE, allowableValues = {
 			"0.5", "0.75", "0.9", "1"})
 	private Float mpFormat;
 

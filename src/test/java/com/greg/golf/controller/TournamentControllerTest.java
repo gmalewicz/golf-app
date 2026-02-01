@@ -3,6 +3,7 @@ package com.greg.golf.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.*;
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.error.DeleteTournamentPlayerException;
 import com.greg.golf.error.DuplicatePlayerInTournamentException;
@@ -162,7 +163,7 @@ class TournamentControllerTest {
 
 		var input = new RoundDto();
 		input.setId(1L);
-		input.setMatchPlay(false);
+		input.setFormat(Common.STROKE_PLAY_FORMAT);
 
 		var outputLst = new TournamentRound();
 

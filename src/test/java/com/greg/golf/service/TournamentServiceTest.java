@@ -80,7 +80,7 @@ class TournamentServiceTest {
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setRoundDate(new Date(1));
-		round.setMatchPlay(false);
+		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		round.setScoreCard(new ArrayList<>());
 
 		for (var i = 0; i < 18; i++) {
@@ -106,7 +106,7 @@ class TournamentServiceTest {
 		playerSet2.add(player);
 		round2.setPlayer(playerSet2);
 		round2.setRoundDate(new Date(3));
-		round2.setMatchPlay(false);
+		round2.setFormat(Common.STROKE_PLAY_FORMAT);
 		round2.setScoreCard(new ArrayList<>());
 		for (var i = 0; i < 18; i++) {
 			var scoreCard = new ScoreCard();
@@ -799,7 +799,7 @@ class TournamentServiceTest {
 		playerSet2.add(player);
 		round2.setPlayer(playerSet2);
 		round2.setRoundDate(new Date(4));
-		round2.setMatchPlay(false);
+		round2.setFormat(Common.STROKE_PLAY_FORMAT);
 		round2.setScoreCard(new ArrayList<>());
 		for (var i = 0; i < 18; i++) {
 			var scoreCard = new ScoreCard();

@@ -17,9 +17,13 @@ public class BaseRoundDto {
 	private Long id;
 
 	@NotNull
-	@Schema(description = "Match play identifier", example = "true", accessMode = READ_WRITE, allowableValues = {
-			"true", "false" })
-	private Boolean matchPlay;
+	@Schema(description = "Supported formats: " +
+			"0 = stroke play, " +
+			"1 = match play, " +
+			"2 = four ball stroke play, " +
+			"3 = four ball stroke play",
+			example = "0", accessMode = READ_WRITE, allowableValues = {"0", "1", "2", "3"})
+	private Integer format;
 
 	@Schema(description = "Match play allowance format", example = "0.5", accessMode = READ_ONLY, allowableValues = {
 			"0.5", "0.75", "0.9", "1" })
