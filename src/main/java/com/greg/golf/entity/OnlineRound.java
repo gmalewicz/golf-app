@@ -52,8 +52,8 @@ public class OnlineRound {
 
 	private Boolean penalties;
 
-	@Column(name = "match_play")
-	private Boolean matchPlay;
+	@Column(name = "format")
+	private Integer format;
 	
 	@Column(name = "mp_format")
 	private Float mpFormat;

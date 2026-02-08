@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import java.util.Date;
 import java.util.List;
 
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -61,7 +62,7 @@ class OnlineRoundService2Test {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 		
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();

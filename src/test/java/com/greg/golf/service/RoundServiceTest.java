@@ -74,7 +74,7 @@ class RoundServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
-		round.setMatchPlay(false);
+		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		var calendar = new GregorianCalendar();
 		calendar.set(2020, Calendar.JUNE, 12);
 		round.setRoundDate(calendar.getTime());
@@ -228,7 +228,7 @@ class RoundServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
+		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 		newRound.setScoreCard(new ArrayList<>());
 
@@ -255,7 +255,7 @@ class RoundServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
+		newRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 		newRound.setScoreCard(new ArrayList<>());
 
@@ -287,7 +287,7 @@ class RoundServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
+		newRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 
 		// create one scorecard and add it to the round
@@ -344,7 +344,7 @@ class RoundServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
+		newRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 
 		// create one scorecard and add it to the round
@@ -378,7 +378,7 @@ class RoundServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(round.getPlayer().iterator().next());
 		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
+		newRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 		newRound.setScoreCard(new ArrayList<>());
 		var scoreCard = new ScoreCard();
@@ -425,7 +425,7 @@ class RoundServiceTest {
 		playerSet.add(player);
 		playerSet.add(round.getPlayer().iterator().next());
 		newRound.setPlayer(playerSet);
-		newRound.setMatchPlay(false);
+		newRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 
 		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
@@ -442,7 +442,7 @@ class RoundServiceTest {
 		var newRound = new Round();
 		newRound.setId(round.getId());
 		newRound.setCourse(round.getCourse());
-		newRound.setMatchPlay(false);
+		newRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		newRound.setRoundDate(round.getRoundDate());
 
 		Assertions.assertThrows(ScoreCardUpdateException.class, () -> roundService.updateScoreCard(newRound));
@@ -510,7 +510,7 @@ class RoundServiceTest {
 	void addRoundTest(@Autowired RoundRepository roundRepository) {
 		
 		var round= new Round();
-		round.setMatchPlay(false);
+		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		var calendar = new GregorianCalendar();
 		calendar.set(2020, Calendar.JUNE, 12);
 		round.setRoundDate(calendar.getTime());

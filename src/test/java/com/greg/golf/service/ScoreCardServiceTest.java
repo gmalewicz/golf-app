@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TreeSet;
 
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -53,7 +54,7 @@ class ScoreCardServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
-		round.setMatchPlay(false);
+		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		var calendar = new GregorianCalendar();
 		calendar.set(2020, Calendar.JUNE, 12);
 		round.setRoundDate(calendar.getTime());

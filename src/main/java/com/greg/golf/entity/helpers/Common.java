@@ -28,4 +28,9 @@ public class Common {
 	public static final long REFRESH_TOKEN_LIFETIME = 60L * 60 * 24 * 7;
 
 	public static final int CYCLE_SERIES_STB = 1;
+
+	public static final int STROKE_PLAY_FORMAT = 0;
+	public static final int MATCH_PLAY_PLAY_FORMAT = 1;
+	public static final int FOUR_BALL_STROKE_PLAY_FORMAT = 2;
+	public static final int FOUR_BALL_MATCH_PLAY_FORMAT = 3;
 }

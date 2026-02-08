@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -89,7 +90,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 		
 		Assertions.assertEquals(1, onlineRoundRepository.findAll().size());
@@ -110,7 +111,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 		
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
@@ -139,7 +140,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 		
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
@@ -173,7 +174,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 		
 		Assertions.assertEquals(1, onlineRoundService.getOnlineRounds().size());
@@ -192,7 +193,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 		
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
@@ -220,7 +221,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
 		onlineScoreCard.setPlayer(player);
@@ -255,7 +256,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		List<OnlineRound> rounds = new ArrayList<>();
 		rounds.add(onlineRound);
 		
@@ -277,7 +278,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
@@ -315,7 +316,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 
 		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
@@ -354,7 +355,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setFinalized(false);
-		onlineRound.setMatchPlay(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
 
 		OnlineScoreCard onlineScoreCard2 = new OnlineScoreCard();
