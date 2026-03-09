@@ -61,7 +61,13 @@ public class OnlineRound {
 	@EqualsAndHashCode.Exclude
 	@Column(name = "nick2")
 	private String nick2;
-		
+
+	@Column(name = "team")
+	private Integer team;
+
+	@Column(name = "identifier")
+	private Integer identifier;
+
 	@NotNull
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)

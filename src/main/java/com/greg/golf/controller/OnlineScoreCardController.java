@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -79,7 +80,7 @@ public class OnlineScoreCardController extends BaseController {
 	@Operation(summary = "Adds online rounds")
 	@PostMapping(value = "/rest/OnlineRounds")
 	public List<OnlineRoundDto> addOnlineRounds(
-			@Parameter(description = "List of OnlineRound objects", required = true) @RequestBody List<OnlineRoundDto> onlineRounds) {
+			@Parameter(description = "List of OnlineRound objects", required = true) @RequestBody @Valid List<OnlineRoundDto> onlineRounds) {
 
 		log.info("trying to add onlineRounds");
 		List<OnlineRound> orLst = mapList(onlineRounds, OnlineRound.class);
@@ -90,7 +91,7 @@ public class OnlineScoreCardController extends BaseController {
 
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Return all online rounds")
-	@GetMapping(value = "/rest/OnlineRound")
+	@GetMapping(value = "/rest/OnlineRound/all")
 	public List<OnlineRoundDto> getOnlineRounds() {
 		log.info("Requested online rounds");
 		return mapList(onlineRoundService.getOnlineRounds(), OnlineRoundDto.class);
@@ -132,36 +133,36 @@ public class OnlineScoreCardController extends BaseController {
 	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Online scorecard API")
 	@Operation(summary = "Delete online round with given owner id.")
-	@DeleteMapping("/rest/OnlineRoundForOwner/{ownerId}")
-	public HttpStatus deleteOnlineRoundForOwner(
-			@Parameter(description = "Online round owner id", example = "1", required = true) @PathVariable Long ownerId) {
+	@DeleteMapping("/rest/OnlineRound/{identifier}")
+	public HttpStatus deleteOnlineRoundForIdentifier(
+			@Parameter(description = "Online round identifier", example = "1", required = true) @PathVariable Integer identifier) {
 
-        log.info("trying to delete online round for owner: {}", ownerId);
-		onlineRoundService.deleteForOwner(ownerId);
+        log.info("trying to delete online round with identifier: {}", identifier);
+		onlineRoundService.deleteForIdentifier(identifier);
 		return HttpStatus.OK;
 
 	}
 
 	@SuppressWarnings("SameReturnValue")
 	@Tag(name = "Online scorecard API")
-	@Operation(summary = "Finalize online rounds for owner")
-	@PostMapping(value = "/rest/FinalizeOnlineOwnerRounds")
-	public HttpStatus finalizeOwnerOnlineRounds(
-			@Parameter(description = "Owner object", required = true) @RequestBody Long ownerId) {
+	@Operation(summary = "Finalize online rounds for identifier")
+	@PostMapping(value = "/rest/OnlineRound")
+	public HttpStatus finalizeOnlineRounds(
+			@Parameter(description = "Identifier object", required = true) @RequestBody Integer identifier) {
 
-        log.info("trying to finalize online round for owner: {}", ownerId);
+        log.info("trying to finalize online round for identifier: {}", identifier);
 
-		onlineRoundService.finalizeForOwner(ownerId);
+		onlineRoundService.finalize(identifier);
 
 		return HttpStatus.OK;
 	}
 
 	@Tag(name = "Online scorecard API")
-	@Operation(summary = "Return online rounds for owner")
-	@GetMapping(value = "/rest/OnlineRoundOwner/{ownerId}")
-	public List<OnlineRoundDto> getOnlineRoundsOwner(
-			@Parameter(description = "Player (owner) id", example = "1", required = true) @PathVariable("ownerId") Long ownerId) {
-		log.info("Requested online rounds for owner");
-		return mapList(onlineRoundService.getOnlineRoundsForOwner(ownerId), OnlineRoundDto.class);
+	@Operation(summary = "Return online rounds for identifier")
+	@GetMapping(value = "/rest/OnlineRound/Identifier/{identifier}")
+	public List<OnlineRoundDto> getOnlineRoundsForIdentifier(
+			@Parameter(description = "Online round identifier", example = "1", required = true) @PathVariable("identifier") Integer identifier) {
+		log.info("Requested online rounds for identifier: {}", identifier);
+		return mapList(onlineRoundService.getOnlineRoundsForIdentifier(identifier), OnlineRoundDto.class);
 	}
 }

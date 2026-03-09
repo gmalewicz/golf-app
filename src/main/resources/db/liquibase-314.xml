@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	<changeSet author="GMALEWICZ (generated)" id="1770841809332-1">
+		<addColumn tableName="online_round">
+			<column name="identifier" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="GMALEWICZ (generated)" id="1770841809332-2">
+		<addColumn tableName="online_round">
+			<column name="team" type="INTEGER"/>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>
