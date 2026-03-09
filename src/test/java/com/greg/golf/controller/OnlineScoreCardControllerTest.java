@@ -1,8 +1,6 @@
 package com.greg.golf.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -166,33 +164,33 @@ class OnlineScoreCardControllerTest {
 
 	}
 	
-	@DisplayName("Should delete online round for owner id")
+	@DisplayName("Should delete online round for identifier")
 	@Test
-	void deleteOnlineRoundForOwnerThenReturns200() throws Exception {
+	void deleteOnlineRoundForIdentifierThenReturns200() throws Exception {
 		
-		doNothing().when(onlineRoundService).deleteForOwner(anyLong());
+		doNothing().when(onlineRoundService).deleteForIdentifier(anyInt());
 
-		mockMvc.perform(delete("/rest/OnlineRoundForOwner/1")).andExpect(status().isOk());
+		mockMvc.perform(delete("/rest/OnlineRound/1")).andExpect(status().isOk());
 
 	}
 	
-	@DisplayName("Should finalize online round for owner")
+	@DisplayName("Should finalize online round for identifier")
 	@Test
-	void finalizeOnlineRoundForOwnerThenReturns200() throws Exception {
+	void finalizeOnlineRoundForIdentifierThenReturns200() throws Exception {
 
 		var input = 1;
-		doNothing().when(onlineRoundService).finalizeForOwner(anyLong());
+		doNothing().when(onlineRoundService).finalize(anyInt());
 		
-		mockMvc.perform(post("/rest/FinalizeOnlineOwnerRounds").contentType("application/json").characterEncoding("utf-8")
+		mockMvc.perform(post("/rest/OnlineRound").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 
 	}
 	
-	@DisplayName("Should return online rounds for owner")
+	@DisplayName("Should return online rounds for identifier")
 	@Test
-	void getOnlineRoundForOwnerThenReturns200() throws Exception {
+	void getOnlineRoundForIdentifierThenReturns200() throws Exception {
 				
-		when(onlineRoundService.getOnlineRoundsForOwner(anyLong())).thenReturn(new ArrayList<>());
+		when(onlineRoundService.getOnlineRoundsForIdentifier(anyInt())).thenReturn(new ArrayList<>());
 
 		mockMvc.perform(get("/rest/OnlineRoundOwner/1")).andExpect(status().isOk());
 

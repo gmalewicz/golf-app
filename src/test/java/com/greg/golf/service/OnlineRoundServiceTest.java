@@ -220,6 +220,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		
@@ -239,7 +240,7 @@ class OnlineRoundServiceTest {
 		
 		onlineRoundRepository.save(onlineRound);
 				
-		onlineRoundService.finalizeForOwner(1L);
+		onlineRoundService.finalize(1);
 		
 		Assertions.assertEquals(1, roundRepository.findAll().size());
 	}
