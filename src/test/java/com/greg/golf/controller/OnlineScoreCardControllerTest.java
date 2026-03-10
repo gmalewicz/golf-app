@@ -1,8 +1,6 @@
 package com.greg.golf.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -12,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
@@ -29,8 +28,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.OnlineRoundDto;
-import com.greg.golf.controller.dto.OnlineScoreCardDto;
 import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.entity.OnlineScoreCard;
 import com.greg.golf.entity.Player;
@@ -103,8 +100,12 @@ class OnlineScoreCardControllerTest {
 
 		var input = new OnlineRoundDto();
 		input.setTeeTime("10:00");
+		input.setCourse(new CourseDto());
+		input.setPlayer(new PlayerDto());
 		input.setOwner(1L);
+		input.setIdentifier(1);
 		input.setFinalized(false);
+		input.setCourseTee(new CourseTeeDto());
 		input.setFormat(Common.STROKE_PLAY_FORMAT);
 
 		var inputLst = new ArrayList<OnlineRoundDto>();
@@ -125,7 +126,7 @@ class OnlineScoreCardControllerTest {
 		
 		when(onlineRoundService.getOnlineRounds()).thenReturn(outputLst);
 
-		mockMvc.perform(get("/rest/OnlineRound")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/OnlineRound/all")).andExpect(status().isOk());
 
 	}
 	
@@ -166,35 +167,35 @@ class OnlineScoreCardControllerTest {
 
 	}
 	
-	@DisplayName("Should delete online round for owner id")
+	@DisplayName("Should delete online round for identifier")
 	@Test
-	void deleteOnlineRoundForOwnerThenReturns200() throws Exception {
+	void deleteOnlineRoundForIdentifierThenReturns200() throws Exception {
 		
-		doNothing().when(onlineRoundService).deleteForOwner(anyLong());
+		doNothing().when(onlineRoundService).deleteForIdentifier(anyInt());
 
-		mockMvc.perform(delete("/rest/OnlineRoundForOwner/1")).andExpect(status().isOk());
+		mockMvc.perform(delete("/rest/OnlineRound/1")).andExpect(status().isOk());
 
 	}
 	
-	@DisplayName("Should finalize online round for owner")
+	@DisplayName("Should finalize online round for identifier")
 	@Test
-	void finalizeOnlineRoundForOwnerThenReturns200() throws Exception {
+	void finalizeOnlineRoundForIdentifierThenReturns200() throws Exception {
 
 		var input = 1;
-		doNothing().when(onlineRoundService).finalizeForOwner(anyLong());
+		doNothing().when(onlineRoundService).finish(anyInt());
 		
-		mockMvc.perform(post("/rest/FinalizeOnlineOwnerRounds").contentType("application/json").characterEncoding("utf-8")
+		mockMvc.perform(post("/rest/OnlineRound").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 
 	}
 	
-	@DisplayName("Should return online rounds for owner")
+	@DisplayName("Should return online rounds for identifier")
 	@Test
-	void getOnlineRoundForOwnerThenReturns200() throws Exception {
+	void getOnlineRoundForIdentifierThenReturns200() throws Exception {
 				
-		when(onlineRoundService.getOnlineRoundsForOwner(anyLong())).thenReturn(new ArrayList<>());
+		when(onlineRoundService.getOnlineRoundsForIdentifier(anyInt())).thenReturn(new ArrayList<>());
 
-		mockMvc.perform(get("/rest/OnlineRoundOwner/1")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/OnlineRound/Identifier/1")).andExpect(status().isOk());
 
 	}
 	

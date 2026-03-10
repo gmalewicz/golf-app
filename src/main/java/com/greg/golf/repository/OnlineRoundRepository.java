@@ -22,13 +22,8 @@ public interface OnlineRoundRepository extends JpaRepository<OnlineRound, Long> 
     @NonNull
     List<OnlineRound> findAll();
 
-
-	void deleteByOwnerAndFinalized(Long ownerId, Boolean finzalized);
+	void deleteByIdentifier(Integer identifier);
 	
 	@EntityGraph(attributePaths = {"scoreCard", "player", "course", "courseTee"})
-	List<OnlineRound> findByOwner(Long owner);
-	
-	@EntityGraph(attributePaths = {"scoreCard", "player", "course", "courseTee"})
-	List<OnlineRound> findByOwnerAndFinalized(Long owner, Boolean finalized);
-	
+	List<OnlineRound> findByIdentifier(Integer identifier);
 }

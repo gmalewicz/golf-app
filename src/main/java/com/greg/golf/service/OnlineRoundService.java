@@ -128,9 +128,9 @@ public class OnlineRoundService {
 	}
 
 	@Transactional
-	public void deleteForOwner(Long ownerId) {
+	public void deleteForIdentifier(Integer identifier) {
 
-		onlineRoundRepository.deleteByOwnerAndFinalized(ownerId, false);
+		onlineRoundRepository.deleteByIdentifier(identifier);
 
 	}
 
@@ -200,10 +200,10 @@ public class OnlineRoundService {
 	}
 
 	@Transactional
-	public void finalizeForOwner(Long ownerId) {
+	public void finish(Integer identifier) {
 
 		// get the online rounds from db
-		var onlineRounds = onlineRoundRepository.findByOwnerAndFinalized(ownerId, false);
+		var onlineRounds = onlineRoundRepository.findByIdentifier(identifier);
 
 		// for now, it is assumed that children are retrieved
 
@@ -230,9 +230,9 @@ public class OnlineRoundService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<OnlineRound> getOnlineRoundsForOwner(Long ownerId) {
+	public List<OnlineRound> getOnlineRoundsForIdentifier(Integer identifier) {
 
-		var onlineRounds = onlineRoundRepository.findByOwner(ownerId);
+		var onlineRounds = onlineRoundRepository.findByIdentifier(identifier);
 
 		onlineRounds.forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 

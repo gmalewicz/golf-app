@@ -61,6 +61,7 @@ class OnlineRoundService2Test {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -98,7 +99,7 @@ class OnlineRoundService2Test {
 		
 		
 		
-		List<OnlineRound> rounds = onlineRoundService.getOnlineRoundsForOwner(1L);
+		List<OnlineRound> rounds = onlineRoundService.getOnlineRoundsForIdentifier(1);
 		
 		Assertions.assertEquals(1, rounds.size());
 		
@@ -111,7 +112,7 @@ class OnlineRoundService2Test {
 	void deleteOnlineRoundsForOwnerTest() {
 		
 		
-		onlineRoundService.deleteForOwner(1L);
+		onlineRoundService.deleteForIdentifier(1);
 		
 		List<OnlineRound> rounds = onlineRoundService.getOnlineRounds();
 		
