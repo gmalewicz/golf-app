@@ -102,6 +102,7 @@ class OnlineScoreCardControllerTest {
 		var input = new OnlineRoundDto();
 		input.setTeeTime("10:00");
 		input.setOwner(1L);
+		input.setIdentifier(1);
 		input.setFinalized(false);
 		input.setFormat(Common.STROKE_PLAY_FORMAT);
 
