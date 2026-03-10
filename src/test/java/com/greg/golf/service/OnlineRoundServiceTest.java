@@ -89,6 +89,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -110,6 +111,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -139,6 +141,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -173,6 +176,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -192,6 +196,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -256,6 +261,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setPlayer(player);
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		List<OnlineRound> rounds = new ArrayList<>();
@@ -278,6 +284,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -316,6 +323,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);
@@ -355,6 +363,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setDate(new Date());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(1);
 		onlineRound.setFinalized(false);
 		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
 		onlineRoundRepository.save(onlineRound);

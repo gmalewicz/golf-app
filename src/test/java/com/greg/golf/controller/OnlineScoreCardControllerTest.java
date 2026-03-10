@@ -123,7 +123,7 @@ class OnlineScoreCardControllerTest {
 		
 		when(onlineRoundService.getOnlineRounds()).thenReturn(outputLst);
 
-		mockMvc.perform(get("/rest/OnlineRound")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/OnlineRound/all")).andExpect(status().isOk());
 
 	}
 	
@@ -192,7 +192,7 @@ class OnlineScoreCardControllerTest {
 				
 		when(onlineRoundService.getOnlineRoundsForIdentifier(anyInt())).thenReturn(new ArrayList<>());
 
-		mockMvc.perform(get("/rest/OnlineRoundOwner/1")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/OnlineRound/Identifier/1")).andExpect(status().isOk());
 
 	}
 	
