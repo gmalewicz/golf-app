@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
+import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
@@ -27,8 +28,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.controller.dto.OnlineRoundDto;
-import com.greg.golf.controller.dto.OnlineScoreCardDto;
 import com.greg.golf.entity.OnlineRound;
 import com.greg.golf.entity.OnlineScoreCard;
 import com.greg.golf.entity.Player;
@@ -101,9 +100,12 @@ class OnlineScoreCardControllerTest {
 
 		var input = new OnlineRoundDto();
 		input.setTeeTime("10:00");
+		input.setCourse(new CourseDto());
+		input.setPlayer(new PlayerDto());
 		input.setOwner(1L);
 		input.setIdentifier(1);
 		input.setFinalized(false);
+		input.setCourseTee(new CourseTeeDto());
 		input.setFormat(Common.STROKE_PLAY_FORMAT);
 
 		var inputLst = new ArrayList<OnlineRoundDto>();
