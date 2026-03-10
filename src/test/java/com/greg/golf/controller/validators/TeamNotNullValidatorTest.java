@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class TeamNotNullValidatorTest {
+class TeamNotNullValidatorTest {
 
     private TeamNotNullValidator validator;
     private ConstraintValidatorContext context;
