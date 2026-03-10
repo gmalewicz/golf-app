@@ -200,7 +200,7 @@ public class OnlineRoundService {
 	}
 
 	@Transactional
-	public void finalize(Integer identifier) {
+	public void finish(Integer identifier) {
 
 		// get the online rounds from db
 		var onlineRounds = onlineRoundRepository.findByIdentifier(identifier);

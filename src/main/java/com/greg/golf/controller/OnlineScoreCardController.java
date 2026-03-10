@@ -152,7 +152,7 @@ public class OnlineScoreCardController extends BaseController {
 
         log.info("trying to finalize online round for identifier: {}", identifier);
 
-		onlineRoundService.finalize(identifier);
+		onlineRoundService.finish(identifier);
 
 		return HttpStatus.OK;
 	}

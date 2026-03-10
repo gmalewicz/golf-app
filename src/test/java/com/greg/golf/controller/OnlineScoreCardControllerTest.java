@@ -182,7 +182,7 @@ class OnlineScoreCardControllerTest {
 	void finalizeOnlineRoundForIdentifierThenReturns200() throws Exception {
 
 		var input = 1;
-		doNothing().when(onlineRoundService).finalize(anyInt());
+		doNothing().when(onlineRoundService).finish(anyInt());
 		
 		mockMvc.perform(post("/rest/OnlineRound").contentType("application/json").characterEncoding("utf-8")
 				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();

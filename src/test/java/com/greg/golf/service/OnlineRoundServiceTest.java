@@ -245,7 +245,7 @@ class OnlineRoundServiceTest {
 		
 		onlineRoundRepository.save(onlineRound);
 				
-		onlineRoundService.finalize(1);
+		onlineRoundService.finish(1);
 		
 		Assertions.assertEquals(1, roundRepository.findAll().size());
 	}
