@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.13.0'
-description = 'remove single round from the tournament'
+version = '3.15.0'
+description = 'cycle 2026 rules'
 
 processResources {
     filesMatching("**/*.yml") {

@@ -97,11 +97,9 @@ public class CycleService {
             // first remove results
             result.setResults(Arrays.stream(result.getResults())
                 .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray());
+            // second remove hcp
             result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1));
         });
-
-        // second remove hcp
-        results.forEach(result -> result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1)));
 
         // then update totals
         return updCycleResultAndTotal(cycleTournament, results);
