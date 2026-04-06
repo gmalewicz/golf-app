@@ -1,7 +1,5 @@
 package com.greg.golf.entity;
 
-import io.hypersistence.utils.hibernate.type.array.IntArrayType;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Data
 @Entity
@@ -32,10 +31,10 @@ public class CycleResult {
     @Column(name = "player_name")
     private String playerName;
 
-    @Type(IntArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @NotNull
-    @Column(name = "results", columnDefinition = "int[]")
-    private int[] results;
+    @Column(name = "results", columnDefinition = "integer[]")
+    private Integer[] results;
 
     @NotNull
     @Min(value = 0, message = "Minimum total score")
@@ -52,7 +51,7 @@ public class CycleResult {
     @Column(name = "series")
     private Integer series;
 
-    @Type(StringArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @NotNull
     @Column(name = "hcp")
     private String[] hcp;

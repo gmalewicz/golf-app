@@ -3,35 +3,51 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath ('org.liquibase:liquibase-core:4.31.1')
+        classpath 'org.liquibase:liquibase-core:5.0.2'
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '3.5.7'
+    id 'org.springframework.boot' version '4.0.5'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'application'
-    id 'org.liquibase.gradle' version '3.0.2'
     id 'org.sonarqube' version '7.0.1.6134'
     id 'jacoco'
     id 'idea'
+    id 'org.liquibase.gradle' version '3.1.0'
 }
 
 group = 'com.greg.golf'
 version = '3.15.0'
 description = 'cycle 2026 rules'
 
-processResources {
-    filesMatching("**/*.yml") {
-        expand project.properties
+application {
+    mainClass = 'com.greg.golf.Golf'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:1.20.5"
     }
 }
 
-application {
-    mainClass.set('com.greg.golf.Golf')
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
-tasks.named("jar") {
+repositories {
+    mavenCentral()
+}
+
+processResources {
+    filesMatching('**/*.yml') {
+        expand(project.properties)
+    }
+}
+
+tasks.named('jar') {
     enabled = false
 }
 
@@ -47,39 +63,6 @@ jacocoTestReport {
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-}
-
-repositories {
-    mavenCentral()
-}
-
-diffChangelog.dependsOn compileJava
-
-
-liquibase {
-    activities {
-        main {
-            changelogFile './src/main/resources/db/dbChangeLog-diff.xml'
-            driver 'org.postgresql.Driver'
-            url 'jdbc:postgresql://localhost:5432/golf'
-            excludeObjects 'cycle_result'
-            referenceUrl 'hibernate:spring:com.greg.golf.entity?dialect=org.hibernate.dialect.PostgreSQLDialect'
-            referenceDriver 'liquibase.ext.hibernate.database.connection.HibernateDriver'
-            if (project.hasProperty("jdbcUsername")) {
-                username project.getProperty('jdbcUsername')
-            }
-            if (project.hasProperty("jdbcPassword")) {
-                password project.getProperty('jdbcPassword')
-            }
-            logLevel 'debug'
-            verbose 'true'
-        }
-    }
-}
-
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
@@ -87,62 +70,87 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
 
     implementation 'org.springframework:spring-websocket'
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.security:spring-security-messaging'
+
     implementation 'org.postgresql:postgresql'
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.11.0'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-73:3.15.2'
     implementation 'com.google.guava:guava:33.5.0-jre'
     implementation 'org.modelmapper:modelmapper:3.2.2'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-    implementation 'org.liquibase:liquibase-core'
-
-    compileOnly "org.projectlombok:lombok"
-
-    annotationProcessor "org.projectlombok:lombok"
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    testCompileOnly "org.projectlombok:lombok"
-
-    testAnnotationProcessor "org.projectlombok:lombok"
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
-    testImplementation 'net.bytebuddy:byte-buddy-agent:1.17.8'  // or latest version
+    testImplementation 'net.bytebuddy:byte-buddy-agent:1.17.8'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    liquibaseRuntime 'org.liquibase:liquibase-core:4.31.1'
-    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:4.31.1'
-    liquibaseRuntime 'org.postgresql:postgresql'
-    liquibaseRuntime 'info.picocli:picocli:4.7.7'
-    liquibaseRuntime 'org.yaml:snakeyaml:2.4'
-    liquibaseRuntime 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-    liquibaseRuntime 'org.postgresql:postgresql'
-    liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
-    liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.11.0'
-    liquibaseRuntime 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
     liquibaseRuntime sourceSets.main.output
+    liquibaseRuntime 'org.liquibase:liquibase-core:5.0.2'
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:5.0.2'
+    liquibaseRuntime 'info.picocli:picocli:4.7.6'
+    liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.15.2'
 }
 
-configurations.implementation {
-    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+configurations {
+    implementation {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    testImplementation {
+        exclude group: 'org.springframework.boot', module: 'junit'
+    }
+
+    liquibaseRuntime {
+        extendsFrom configurations.implementation, configurations.runtimeOnly
+        exclude group: 'io.hypersistence', module: 'hypersistence-utils-hibernate-73'
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.hibernate.orm') {
+                details.useVersion '6.6.47.Final'
+                details.because 'liquibase-hibernate6:5.0.2 is not yet compatible with Hibernate 7'
+            }
+        }
+    }
 }
 
-configurations.testImplementation {
-    exclude group: 'org.springframework.boot', module: 'junit'
+liquibase {
+    activities {
+        main {
+            changelogFile 'src/main/resources/liquibase-diffChangeLog.xml'
+            url 'jdbc:postgresql://localhost:5432/golf'
+            if (project.hasProperty("jdbcUsername")) {
+                username project.getProperty('jdbcUsername')
+            }
+            if (project.hasProperty("jdbcPassword")) {
+                password project.getProperty('jdbcPassword')
+            }
+            driver 'org.postgresql.Driver'
+            referenceUrl 'hibernate:spring:com.greg.golf.entity?dialect=org.hibernate.dialect.PostgreSQLDialect'
+            referenceDriver 'liquibase.ext.hibernate.database.connection.HibernateDriver'
+        }
+    }
+    runList = project.ext.has('runList') ? project.ext.runList : 'main'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -155,22 +163,13 @@ tasks.withType(Javadoc).configureEach {
 
 test {
     doFirst {
-        def byteBuddyAgentJar = configurations.testRuntimeClasspath.find { it.name.contains("byte-buddy-agent") }
-        if (byteBuddyAgentJar != null) {
-            jvmArgs += "-javaagent:${byteBuddyAgentJar}"
-        } else {
-            println "WARNING: byte-buddy-agent jar not found in test runtime classpath!"
+        def agent = configurations.testRuntimeClasspath.find { it.name.contains('byte-buddy-agent') }
+        if (agent != null) {
+            jvmArgs += "-javaagent:${agent}"
         }
     }
     useJUnitPlatform()
-
-    filter {
-        // com.greg.golf.service.AssPlayerTest
-        if (project.hasProperty('excludeTests')) {
-            excludeTestsMatching(project.property('excludeTests'))
-        }
-    }
-    finalizedBy jacocoTestReport // report is always generated after tests run
+    finalizedBy jacocoTestReport
 }
 
 sonar {
@@ -178,17 +177,18 @@ sonar {
         property 'sonar.projectKey', 'golf-app'
         property 'sonar.organization', 'gmalewicz'
         property 'sonar.host.url', 'https://sonarcloud.io'
-        property 'sonar.java.source', '17'
+        property 'sonar.java.source', '21'
         property 'sonar.sources', 'src/main/java,src/main/resources/templates'
         property 'sonar.java.binaries', 'build/classes'
         property 'sonar.sourceEncoding', 'UTF-8'
         property 'sonar.exclusions', '.git/**,.settings/**,build/**,.build'
         property 'sonar.java.coveragePlugin', 'jacoco'
-        property 'sonar.coverage.jacoco.xmlReportPath', 'build/reports/jacoco/test/jacocoTestReport.xml'
+        property 'sonar.coverage.jacoco.xmlReportPath',
+                'build/reports/jacoco/test/jacocoTestReport.xml'
         property 'sonar.gradle.skipCompile', 'true'
     }
 }
 
-tasks['sonar'].with {
+tasks.named('sonar') {
     dependsOn build
 }
