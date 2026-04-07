@@ -1,4 +1,7 @@
 spring:
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: false
   security:
     oauth2:
       client:
@@ -25,7 +28,7 @@ spring:
   profiles:
     active: "dev"
   mail:
-    test-connection: false  
+    test-connection: false
     host: smtp.gmail.com
     port: 587
     username: replace_it
@@ -38,13 +41,13 @@ spring:
             enable: true
   datasource:
     hikari:
-      connectionTimeout: 20000 
+      connectionTimeout: 20000
       maximumPoolSize: 5
     url: jdbc:postgresql://localhost:5432/golf
     username: golf_usr
     password: replace_it
   jpa:
-    open-in-view: true  
+    open-in-view: true
     show_sql: true
 jwt:
   secret: golfBackendSecretLongEnoughPassword123456789012345678901234567890
@@ -53,12 +56,12 @@ springdoc:
   swagger-ui:
     path: /api/swagger-ui.html
   api-docs:
-    path: /api  
+    path: /api
 google:
   recaptcha:
     key:
       site: 6Lf-66YZAAAAAJc3serwf1iRoJg6PgTPJazkfNWD
-      secret: replace_it 
+      secret: replace_it
 cors:
   allowedOrigins: dgng.pl
 round:
@@ -77,6 +80,9 @@ league:
   pageSize: 10
 app:
   version: ${version}
+logging:
+  level:
+    org.springframework.web.servlet.handler.HandlerMappingIntrospector: ERROR
 
 ---
 
@@ -84,12 +90,12 @@ spring:
   config:
     activate:
       on-profile: dev
-  mail: 
+  mail:
     properties:
-     mail:
-      debug: true
+      mail:
+        debug: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/golf 
+    url: jdbc:postgresql://localhost:5432/golf
   jpa:
     show_sql: true
   liquibase:
@@ -115,7 +121,7 @@ spring:
             client-id: 5404652492885471
             redirect-uri: https://dgng.pl/login/oauth2/code/facebook
   datasource:
-    url: jdbc:postgresql://10.156.0.3:5432/golf 
+    url: jdbc:postgresql://10.156.0.3:5432/golf
   jpa:
     show_sql: false
   liquibase:
@@ -123,4 +129,3 @@ spring:
 oauth2:
   redirect: https://dgng.pl/login
 
-        
