@@ -99,7 +99,7 @@ dependencies {
     implementation 'com.google.guava:guava:33.5.0-jre'
     implementation 'org.modelmapper:modelmapper:3.2.2'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
     implementation 'org.liquibase:liquibase-core'
 
     compileOnly "org.projectlombok:lombok"
@@ -107,8 +107,8 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok"
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
