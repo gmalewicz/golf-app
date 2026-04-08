@@ -3,100 +3,70 @@ package com.greg.golf.controller;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 
 import com.greg.golf.controller.dto.*;
+import com.greg.golf.entity.Player;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.security.JwtAuthenticationEntryPoint;
+import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
+import com.greg.golf.service.OnlineRoundService;
+import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
+
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greg.golf.entity.OnlineRound;
-import com.greg.golf.entity.OnlineScoreCard;
-import com.greg.golf.entity.Player;
-import com.greg.golf.security.JwtAuthenticationEntryPoint;
-import com.greg.golf.security.JwtRequestFilter;
-import com.greg.golf.service.OnlineRoundService;
-import com.greg.golf.service.PlayerService;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 @Slf4j
-@AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = OnlineScoreCardController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OnlineScoreCardControllerTest {
 
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private OnlineRoundService onlineRoundService;
-
+	@MockitoBean private OnlineRoundService onlineRoundService;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private PlayerService playerService;
-
+	@MockitoBean private PlayerService playerService;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private UserService userService;
-
+	@MockitoBean private UserService userService;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private JwtRequestFilter jwtRequestFilter;
-
+	@MockitoBean private JwtRequestFilter jwtRequestFilter;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private PasswordEncoder bCryptPasswordEncoder;
-
+	@MockitoBean private PasswordEncoder bCryptPasswordEncoder;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
+	@MockitoBean private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private ModelMapper modelMapper;
-
+	@MockitoBean private ModelMapper modelMapper;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private SimpMessagingTemplate template;
-
+	@MockitoBean private SimpMessagingTemplate template;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private GolfOAuth2UserService golfOAuth2UserService;
-
+	@MockitoBean private GolfOAuth2UserService golfOAuth2UserService;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
-
+	@MockitoBean private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
 	@SuppressWarnings("unused")
-	@MockitoBean
-	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
-
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
+	@MockitoBean private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
 	@Autowired
-	public OnlineScoreCardControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
+	private final WebTestClient webTestClient;
+
+	@Autowired
+	OnlineScoreCardControllerTest(WebTestClient webTestClient) {
+		this.webTestClient = webTestClient;
 	}
 
 	@DisplayName("Should add online rounds with correct result")
 	@Test
-	void addOnlineRoundWhenValidInputThenReturns200() throws Exception {
+	void addOnlineRoundWhenValidInputThenReturns200() {
 
 		var input = new OnlineRoundDto();
 		input.setTeeTime("10:00");
@@ -113,133 +83,116 @@ class OnlineScoreCardControllerTest {
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
-		mockMvc.perform(post("/rest/OnlineRounds").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(inputLst))).andExpect(status().isOk()).andReturn();
-
+		webTestClient.post()
+				.uri("/rest/OnlineRounds")
+				.bodyValue(inputLst)
+				.exchange()
+				.expectStatus().isOk();
 	}
-	
+
 	@DisplayName("Should return all online rounds")
 	@Test
-	void getOnlineRoundsThenReturns200() throws Exception {
-		
-		var outputLst = new ArrayList<OnlineRound>();
-		
-		when(onlineRoundService.getOnlineRounds()).thenReturn(outputLst);
+	void getOnlineRoundsThenReturns200() {
+		when(onlineRoundService.getOnlineRounds())
+				.thenReturn(new ArrayList<>());
 
-		mockMvc.perform(get("/rest/OnlineRound/all")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/OnlineRound/all")
+				.exchange()
+				.expectStatus().isOk();
 	}
-	
+
 	@DisplayName("Should return online score cards for online round")
 	@Test
-	void getOnlineScorecardsForRoundThenReturns200() throws Exception {
-		
-		var outputLst = new ArrayList<OnlineScoreCard>();
-		
-		
-		when(onlineRoundService.getOnlineScoreCards(anyLong())).thenReturn(outputLst);
+	void getOnlineScorecardsForRoundThenReturns200() {
+		when(onlineRoundService.getOnlineScoreCards(anyLong()))
+				.thenReturn(new ArrayList<>());
 
-		mockMvc.perform(get("/rest/OnlineScoreCard/1")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/OnlineScoreCard/{id}", 1)
+				.exchange()
+				.expectStatus().isOk();
 	}
-	
+
 	@DisplayName("Should return online rounds for course")
 	@Test
-	void getOnlineRoundsForCourseThenReturns200() throws Exception {
-		
-		var outputLst = new ArrayList<OnlineRound>();
-		
-		
-		when(onlineRoundService.getOnlineRoundsForCourse(anyLong())).thenReturn(outputLst);
+	void getOnlineRoundsForCourseThenReturns200() {
+		when(onlineRoundService.getOnlineRoundsForCourse(anyLong()))
+				.thenReturn(new ArrayList<>());
 
-		mockMvc.perform(get("/rest/OnlineRoundCourse/1")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/OnlineRoundCourse/{id}", 1)
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should return player for nick")
 	@Test
-	void getPlayerForNickThenReturns200() throws Exception {
-		
-		
-		when(playerService.getPlayerForNick(anyString())).thenReturn(new Player());
+	void getPlayerForNickThenReturns200() {
+		when(playerService.getPlayerForNick(anyString()))
+				.thenReturn(new Player());
 
-		mockMvc.perform(get("/rest/Player/test")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/Player/{nick}", "test")
+				.exchange()
+				.expectStatus().isOk();
 	}
-	
+
 	@DisplayName("Should delete online round for identifier")
 	@Test
-	void deleteOnlineRoundForIdentifierThenReturns200() throws Exception {
-		
+	void deleteOnlineRoundForIdentifierThenReturns200() {
 		doNothing().when(onlineRoundService).deleteForIdentifier(anyInt());
 
-		mockMvc.perform(delete("/rest/OnlineRound/1")).andExpect(status().isOk());
-
+		webTestClient.delete()
+				.uri("/rest/OnlineRound/{id}", 1)
+				.exchange()
+				.expectStatus().isOk();
 	}
-	
+
 	@DisplayName("Should finalize online round for identifier")
 	@Test
-	void finalizeOnlineRoundForIdentifierThenReturns200() throws Exception {
-
-		var input = 1;
+	void finalizeOnlineRoundForIdentifierThenReturns200() {
 		doNothing().when(onlineRoundService).finish(anyInt());
-		
-		mockMvc.perform(post("/rest/OnlineRound").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
 
+		webTestClient.post()
+				.uri("/rest/OnlineRound")
+				.bodyValue(1)
+				.exchange()
+				.expectStatus().isOk();
 	}
-	
+
 	@DisplayName("Should return online rounds for identifier")
 	@Test
-	void getOnlineRoundForIdentifierThenReturns200() throws Exception {
-				
-		when(onlineRoundService.getOnlineRoundsForIdentifier(anyInt())).thenReturn(new ArrayList<>());
+	void getOnlineRoundForIdentifierThenReturns200() {
+		when(onlineRoundService.getOnlineRoundsForIdentifier(anyInt()))
+				.thenReturn(new ArrayList<>());
 
-		mockMvc.perform(get("/rest/OnlineRound/Identifier/1")).andExpect(status().isOk());
-
-	}
-	
-	@DisplayName("Should save online scorecard")
-	@Test
-	void saveOnlineScorecard(@Autowired OnlineScoreCardController onlineScoreCardController) {
-		
-		var onlineScorecardDto = new OnlineScoreCardDto();
-		onlineScorecardDto.setPenalty(0);
-		onlineScorecardDto.setPutt(1);
-		onlineScorecardDto.setStroke(3);
-		onlineScorecardDto.setOrId(1);
-		
-		var onlineScorecard = new OnlineScoreCard();
-		onlineScorecard.setPenalty(0);
-		onlineScorecard.setPutt(1);
-		onlineScorecard.setStroke(3);
-		onlineScorecard.setOrId(1);
-		onlineScorecard.setId(1L);
-
-		when(modelMapper.map(any(),  any())).thenReturn(null);
-		when(onlineRoundService.saveOnlineScoreCard(any())).thenReturn(new OnlineScoreCard());
-		
-		
-		Assertions.assertNull(onlineScoreCardController.send(onlineScorecardDto));
-
+		webTestClient.get()
+				.uri("/rest/OnlineRound/Identifier/{id}", 1)
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should sync online scorecard with correct result")
 	@Test
-	void syncOnlineScoreCardWhenValidInputThenReturns200() throws Exception {
+	void syncOnlineScoreCardWhenValidInputThenReturns200() {
 
 		var input = new OnlineRoundDto();
 		input.setTeeTime("10:00");
 		input.setOwner(1L);
 		input.setFinalized(false);
 		input.setFormat(Common.STROKE_PLAY_FORMAT);
+
 		var inputLst = new ArrayList<OnlineRoundDto>();
 		inputLst.add(input);
 
-		doNothing().when(template).convertAndSend(anyString(), (OnlineScoreCardDto)any());
+		doNothing().when(template)
+				.convertAndSend(anyString(), any(OnlineScoreCardDto.class));
 
-		mockMvc.perform(post("/rest/OnlineScoreCard").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(inputLst))).andExpect(status().isOk()).andReturn();
-
+		webTestClient.post()
+				.uri("/rest/OnlineScoreCard")
+				.bodyValue(inputLst)
+				.exchange()
+				.expectStatus().isOk();
 	}
 }

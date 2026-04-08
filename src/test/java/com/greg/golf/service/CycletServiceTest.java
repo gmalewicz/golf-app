@@ -114,7 +114,7 @@ class CycleServiceTest {
         cycleTournamentRepository.save(cycleTournament);
 
         var cycleResult = new CycleResult();
-        cycleResult.setResults(new int[]{40, 0, 0, 0});
+        cycleResult.setResults(new Integer[]{40, 0, 0, 0});
         cycleResult.setHcp(new String[]{"36.0"});
         cycleResult.setPlayerName("James Bond");
         cycleResult.setCycle(cycle);
@@ -152,7 +152,7 @@ class CycleServiceTest {
         cycleTournamentRepository.save(cycleTournament2);
 
         var cycleResult = new CycleResult();
-        cycleResult.setResults(new int[]{40, 0, 0, 0, 30, 0, 0, 0});
+        cycleResult.setResults(new Integer[]{40, 0, 0, 0, 30, 0, 0, 0});
         cycleResult.setHcp(new String[]{"36.0", "36.0"});
         cycleResult.setPlayerName("James Bond");
         cycleResult.setCycle(cycle);

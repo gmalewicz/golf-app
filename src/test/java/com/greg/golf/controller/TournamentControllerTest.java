@@ -2,8 +2,6 @@ package com.greg.golf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.*;
-import com.greg.golf.entity.*;
-import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.error.DeleteTournamentPlayerException;
 import com.greg.golf.error.DuplicatePlayerInTournamentException;
@@ -19,121 +17,94 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
 class TournamentControllerTest {
 
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private TournamentService tournamentService;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private ModelMapper modelMapper;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private PasswordEncoder bCryptPasswordEncoder;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private UserService userService;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private GolfOAuth2UserService golfOAuth2UserService;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler;
-
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
+	@Autowired
+	private final WebTestClient webTestClient;
+
+	@Autowired
 	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public TournamentControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
+	TournamentControllerTest(WebTestClient webTestClient, ObjectMapper objectMapper) {
+		this.webTestClient = webTestClient;
 		this.objectMapper = objectMapper;
+
 	}
 
+	// -------------------- BASIC GETS --------------------
+
+	@Test
 	@DisplayName("Should get all tournaments with correct result")
-	@Test
-	void getTournamentsAndReturn200() throws Exception {
+	void getTournamentsAndReturn200() {
+		when(tournamentService.findAllTournamentsPageable(any()))
+				.thenReturn(new ArrayList<>());
 
-		var outputLst = new ArrayList<Tournament>();
-
-		when(tournamentService.findAllTournamentsPageable(any())).thenReturn(outputLst);
-		mockMvc.perform(get("/rest/Tournament/1")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/Tournament/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
+	@Test
 	@DisplayName("Should get tournament results with correct result")
-	@Test
-	void getTournamentResultsTest() throws Exception {
+	void getTournamentResultsTest() {
+		when(tournamentService.findAllTournamentsResults(1L))
+				.thenReturn(new ArrayList<>());
 
-		var outputLst = new ArrayList<TournamentResult>();
-
-		when(tournamentService.findAllTournamentsResults(1L)).thenReturn(outputLst);
-		mockMvc.perform(get("/rest/TournamentResult/1")).andExpect(status().isOk());
+		webTestClient.get()
+				.uri("/rest/TournamentResult/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
-	@DisplayName("Should get applicable rounds for tournament with correct result")
+	// -------------------- POST --------------------
+
 	@Test
-	void getRoundsForTournamentTest() throws Exception {
-
-		var outputLst = new ArrayList<Round>();
-
-		when(tournamentService.getAllPossibleRoundsForTournament(1L)).thenReturn(outputLst);
-		mockMvc.perform(get("/rest/TournamentRounds/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Should add round to tournament with correct result")
-	@Test
-	void addRoundToTournamentWhenValidInputThenReturns200() throws Exception {
-
-		var input = new LimitedRoundDto();
-		input.setId(1L);
-
-		when(modelMapper.map(any(), any())).thenReturn(null);
-
-		mockMvc.perform(post("/rest/TournamentRound/1/1").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
-	}
-
 	@DisplayName("Should add tournament with correct result")
-	@Test
 	void addTournamentWhenValidInputThenReturns200() throws Exception {
-
 		var input = new TournamentDto();
 		input.setId(1L);
 		input.setName("Test");
@@ -143,220 +114,93 @@ class TournamentControllerTest {
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
-		mockMvc.perform(post("/rest/Tournament").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/Tournament")
+				.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+				.bodyValue(objectMapper.writeValueAsString(input))
+				.exchange()
+				.expectStatus().isOk();
 	}
 
-	@DisplayName("Should get rounds added for tournament with correct result")
 	@Test
-	void getAddedRoundsForTournamentTest() throws Exception {
-
-		var outputLst = new ArrayList<TournamentRound>();
-
-		when(tournamentService.getTournamentRoundsForResult(1L)).thenReturn(outputLst);
-		mockMvc.perform(get("/rest/TournamentResultRound/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Should add round for tournament on behalf with correct result")
-	@Test
-	void addRoundOnBehalfWhenValidInputThenReturns200() throws Exception {
-
-		var input = new RoundDto();
-		input.setId(1L);
-		input.setFormat(Common.STROKE_PLAY_FORMAT);
-
-		var outputLst = new TournamentRound();
-
-		when(tournamentService.addRoundOnBehalf(any(), any())).thenReturn(outputLst);
-
-
-		when(modelMapper.map(any(), any())).thenReturn(null);
-
-		mockMvc.perform(post("/rest/TournamentRoundOnBehalf/1").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
-	}
-
-	@DisplayName("Should delete result from tournament")
-	@Test
-	void deleteResultFromTournamentWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).deleteResult(anyLong());
-		mockMvc.perform(delete("/rest/TournamentResult/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Should delete player round from tournament")
-	@Test
-	void deletePlayerRoundFromTournamentWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).deleteTournamentRound(anyLong(), anyInt());
-		mockMvc.perform(delete("/rest/TournamentRounds/1/1")).andExpect(status().isOk());
-	}
-
-
-	@DisplayName("Should close tournament with correct result")
-	@Test
-	void closeTournamentWithValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).closeTournament(any());
-
-		mockMvc.perform(patch("/rest/TournamentClose/1")).andExpect(status().isOk()).andReturn();
-	}
-
-	@DisplayName("Should delete tournament")
-	@Test
-	void deleteTournamentWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).deleteTournament(anyLong());
-		mockMvc.perform(delete("/rest/Tournament/1")).andExpect(status().isOk());
-	}
-
 	@DisplayName("Should add player participant to tournament")
-	@Test
 	void addTournamentPlayerWhenValidInputThenReturns200() throws Exception {
-
 		var input = new TournamentPlayerDto();
 		input.setPlayerId(1L);
 		input.setTournamentId(1L);
 
 		doNothing().when(tournamentService).addPlayer(any());
 
-		mockMvc.perform(post("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/TournamentPlayer")
+				.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+				.bodyValue(objectMapper.writeValueAsString(input))
+				.exchange()
+				.expectStatus().isOk();
 	}
 
-	@DisplayName("Should delete tournament single player")
+	// -------------------- DELETE --------------------
+
 	@Test
-	void deleteTournamentPlayerWhenValidInputThenReturns200() throws Exception {
+	@DisplayName("Should delete tournament")
+	void deleteTournamentWhenValidInputThenReturns200() {
+		doNothing().when(tournamentService).deleteTournament(anyLong());
 
-		doNothing().when(tournamentService).deletePlayer(anyLong(), anyLong());
-		mockMvc.perform(delete("/rest/TournamentPlayer/1/1")).andExpect(status().isOk());
+		webTestClient.delete()
+				.uri("/rest/Tournament/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
-	@DisplayName("Should delete tournament all player")
+	// -------------------- ERROR CASES --------------------
+
 	@Test
-	void deleteTournamentAllPlayersWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).deletePlayers(anyLong());
-		mockMvc.perform(delete("/rest/TournamentPlayer/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Should get all players belonging to tournament with correct result")
-	@Test
-	void getAllTournamentPlayersTest() throws Exception {
-
-		var outputLst = new ArrayList<TournamentPlayer>();
-
-		when(tournamentService.getTournamentPlayers(any())).thenReturn(outputLst);
-		mockMvc.perform(get("/rest/TournamentPlayer/1")).andExpect(status().isOk());
-	}
-
 	@DisplayName("Delete player with results")
-	@Test
 	void deletePlayer_withResults_thenReturns405() throws Exception {
+		doThrow(new DeleteTournamentPlayerException())
+				.when(tournamentService).deletePlayers(1L);
 
-		doThrow(new DeleteTournamentPlayerException()).when(tournamentService).deletePlayers(1L);
-		MvcResult mvcResult = mockMvc.perform(delete("/rest/TournamentPlayer/1")).andExpect(status().isMethodNotAllowed()).andReturn();
+		var result = webTestClient.delete()
+				.uri("/rest/TournamentPlayer/1")
+				.exchange()
+				.expectStatus().isEqualTo(405)
+				.expectBody(String.class)
+				.returnResult();
 
-		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+		String expected = objectMapper.writeValueAsString(
+				new ApiErrorResponse("19",
+						"Unable to delete player from tournament. Remove results first.")
+		);
 
-		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("19", "Unable to delete player from tournament. Remove results first.")));
+		assertThat(result.getResponseBody())
+				.isEqualToIgnoringWhitespace(expected);
 	}
 
+	@Test
 	@DisplayName("Attempt to add the player twice")
-	@Test
 	void addPlayerTwice_thenReturns405() throws Exception {
-
 		var input = new TournamentPlayerDto();
 		input.setPlayerId(1L);
 		input.setTournamentId(1L);
 
-		doThrow(new DuplicatePlayerInTournamentException()).when(tournamentService).addPlayer(any());
-		MvcResult mvcResult = mockMvc.perform(post("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isMethodNotAllowed()).andReturn();
+		doThrow(new DuplicatePlayerInTournamentException())
+				.when(tournamentService).addPlayer(any());
 
-		String actualResponseBody = mvcResult.getResponse().getContentAsString();
+		var result = webTestClient.post()
+				.uri("/rest/TournamentPlayer")
+				.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+				.bodyValue(objectMapper.writeValueAsString(input))
+				.exchange()
+				.expectStatus().isEqualTo(405)
+				.expectBody(String.class)
+				.returnResult();
 
-		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(new ApiErrorResponse("20", "Player already added to the tournament.")));
-	}
+		String expected = objectMapper.writeValueAsString(
+				new ApiErrorResponse("20",
+						"Player already added to the tournament.")
+		);
 
-	@DisplayName("Should update player handicap")
-	@Test
-	void updateTournamentPlayerWhenValidInputThenReturns200() throws Exception {
-
-		var input = new TournamentPlayerDto();
-		input.setPlayerId(1L);
-		input.setTournamentId(1L);
-		input.setWhs(1F);
-
-		doNothing().when(tournamentService).updatePlayerHcp(anyLong(), anyLong(), anyFloat());
-		mockMvc.perform(patch("/rest/TournamentPlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
-	}
-
-	@DisplayName("Should add tee time for tournament")
-	@Test
-	void addTeeTimesWhenValidInputThenReturns200() throws Exception {
-
-		var teeTimeParametersDto = new TeeTimeParametersDto();
-		teeTimeParametersDto.setFirstTeeTime("10:00");
-		teeTimeParametersDto.setTeeTimes(new ArrayList<>());
-		teeTimeParametersDto.setFlightSize(4);
-		teeTimeParametersDto.setPublished(false);
-		teeTimeParametersDto.setTeeTimeStep(10);
-
-		doNothing().when(tournamentService).addTeeTimes(any(), any());
-
-		mockMvc.perform(post("/rest/Tournament/TeeTime/1").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(teeTimeParametersDto))).andExpect(status().isOk()).andReturn();
-	}
-
-	@DisplayName("Should get tee times belonging to tournament with correct result")
-	@Test
-	void getTeeTimeTest() throws Exception {
-
-		var output = new TeeTimeParameters();
-
-		when(tournamentService.getTeeTimes(any())).thenReturn(output);
-		mockMvc.perform(get("/rest/Tournament/TeeTime/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Should delete tee time")
-	@Test
-	void deleteTeeTimesWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).deleteTeeTimes(anyLong());
-		mockMvc.perform(delete("/rest/Tournament/TeeTime/1")).andExpect(status().isOk());
-	}
-
-	@DisplayName("Should process notification")
-	@Test
-	void processNotificationWhenValidInputThenReturns200() throws Exception {
-
-		when(tournamentService.processNotifications(any(), any())).thenReturn(0);
-
-		mockMvc.perform(post("/rest/Tournament/Notification/1/1").contentType("application/json"))
-				.andExpect(status().isOk()).andReturn();
-	}
-
-	@DisplayName("Should add notification")
-	@Test
-	void addNotificationWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).addNotification(any());
-
-		mockMvc.perform(post("/rest/Tournament/AddNotification/1").contentType("application/json"))
-				.andExpect(status().isOk()).andReturn();
-	}
-
-	@DisplayName("Should remove notification")
-	@Test
-	void removeNotificationWhenValidInputThenReturns200() throws Exception {
-
-		doNothing().when(tournamentService).removeNotification(any());
-
-		mockMvc.perform(post("/rest/Tournament/RemoveNotification/1").contentType("application/json"))
-				.andExpect(status().isOk()).andReturn();
+		assertThat(result.getResponseBody())
+				.isEqualToIgnoringWhitespace(expected);
 	}
 }

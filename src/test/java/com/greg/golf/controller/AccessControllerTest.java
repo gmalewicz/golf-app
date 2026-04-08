@@ -1,6 +1,5 @@
 package com.greg.golf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.Player;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
@@ -18,12 +17,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
 
@@ -31,12 +30,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = AccessController.class)
+@SpringBootTest
 class AccessControllerTest {
 
 	@SuppressWarnings("unused")
@@ -79,18 +75,16 @@ class AccessControllerTest {
 	@MockitoBean
 	private JwtTokenUtil jwtTokenUtil;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
+	private final WebTestClient webTestClient;
 
 	@Autowired
-	public AccessControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
+	public AccessControllerTest(WebTestClient webTestClient) {
+		this.webTestClient = webTestClient;
 	}
 
 	@DisplayName("Should authenticate with correct result")
 	@Test
-	void processAuthenticationWhenValidInputThenReturns200() throws Exception {
+	void processAuthenticationWhenValidInputThenReturns200() {
 
 		var input = new PlayerCredentialsDto();
 		input.setNick("Test");
@@ -103,13 +97,17 @@ class AccessControllerTest {
 		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
 		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-		mockMvc.perform(post("/rest/Authenticate").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/Authenticate")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should add player with correct result")
 	@Test
-	void processAddPlayerWhenValidInputThenReturns200() throws Exception {
+	void processAddPlayerWhenValidInputThenReturns200() {
 
 		var input = new PlayerRegistrationDto();
 		input.setNick("Test");
@@ -120,13 +118,18 @@ class AccessControllerTest {
 
 		doNothing().when(playerService).addPlayer(any());
 
-		mockMvc.perform(post("/rest/AddPlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/AddPlayer")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should update player with correct result")
 	@Test
-	void processUpdatePlayerWhenValidInputThenReturns200() throws Exception {
+	void processUpdatePlayerWhenValidInputThenReturns200() {
 
 		var input = new PlayerUpdateDto();
 		input.setId(1L);
@@ -134,14 +137,19 @@ class AccessControllerTest {
 
 		when(playerService.update(any())).thenReturn(null);
 
-		mockMvc.perform(patch("/rest/PatchPlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.patch()
+				.uri("/rest/PatchPlayer")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should reset password by privileged user with correct result")
 	@Test
 	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void processPasswordByPrivilegedUserWhenValidInputThenReturns200() throws Exception {
+	void processPasswordByPrivilegedUserWhenValidInputThenReturns200() {
 
 		var input = new PlayerCredentialsDto();
 		input.setNick("Test");
@@ -149,13 +157,18 @@ class AccessControllerTest {
 
 		doNothing().when(playerService).resetPassword(any());
 
-		mockMvc.perform(patch("/rest/ResetPassword").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.patch()
+				.uri("/rest/ResetPassword")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should add player on behalf with correct result")
 	@Test
-	void processAddPlayerOnBehalfWhenValidInputThenReturns200() throws Exception {
+	void processAddPlayerOnBehalfWhenValidInputThenReturns200() {
 
 		var output = new Player();
 		output.setNick("Test");
@@ -164,20 +177,29 @@ class AccessControllerTest {
 
 		when(playerService.addPlayerOnBehalf(any())).thenReturn(output);
 
-		mockMvc.perform(post("/rest/AddPlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(output))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/AddPlayerOnBehalf")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(output)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should attempt to refresh token without header with correct result")
 	@Test
-	void processAttemptRefreshTokenWithoutHeaderThenReturns200() throws Exception {
+	void processAttemptRefreshTokenWithoutHeaderThenReturns200() {
 
-		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
+		webTestClient.get()
+				.uri("/rest/Refresh/1")
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should refresh token with correct result")
 	@Test
-	void processRefreshTokenThenReturns200() throws Exception {
+	void processRefreshTokenThenReturns200() {
 
 		Player player = new Player();
 		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
@@ -186,13 +208,18 @@ class AccessControllerTest {
 		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
 		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-		mockMvc.perform(get("/rest/Refresh/1").requestAttr("refreshToken", "exists")).andExpect(status().isOk());
+		webTestClient.get()
+				.uri("/rest/Refresh/1")
+				.attribute("refreshToken", "exists")
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should delete with correct result")
 	@Test
 	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void processDeletePlayerWhenValidInputThenReturns200() throws Exception {
+	void processDeletePlayerWhenValidInputThenReturns200() {
 
 		var input = new PlayerDto();
 		input.setNick("Test");
@@ -200,13 +227,18 @@ class AccessControllerTest {
 
 		doNothing().when(playerService).delete(any());
 
-		mockMvc.perform(post("/rest/DeletePlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/DeletePlayer")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should update player on behalf with correct result")
 	@Test
-	void processUpdatePlayerOnBehalfWhenValidInputThenReturns200() throws Exception {
+	void processUpdatePlayerOnBehalfWhenValidInputThenReturns200() {
 
 		var input = new PlayerDto();
 		input.setNick("Test");
@@ -214,13 +246,18 @@ class AccessControllerTest {
 
 		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
 
-		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.patch()
+				.uri("/rest/UpdatePlayerOnBehalf")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should update player on behalf with social media flag set and correct result")
 	@Test
-	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetWhenValidInputThenReturns200() throws Exception {
+	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetWhenValidInputThenReturns200() {
 
 		var input = new PlayerDto();
 		input.setNick("Test");
@@ -229,13 +266,18 @@ class AccessControllerTest {
 
 		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
 
-		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.patch()
+				.uri("/rest/UpdatePlayerOnBehalf")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should update player on behalf with social media flag set false and correct result")
 	@Test
-	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetFalseWhenValidInputThenReturns200() throws Exception {
+	void processUpdatePlayerOnBehalfWithSocialMediaFlagSetFalseWhenValidInputThenReturns200() {
 
 		var input = new PlayerDto();
 		input.setNick("Test");
@@ -244,13 +286,18 @@ class AccessControllerTest {
 
 		doNothing().when(playerService).updatePlayerOnBehalf(any(), anyBoolean());
 
-		mockMvc.perform(patch("/rest/UpdatePlayerOnBehalf").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.patch()
+				.uri("/rest/UpdatePlayerOnBehalf")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should request social media player data")
 	@Test
-	void requestSocialMediaPlayerDataWhenValidInputThenReturns200() throws Exception {
+	void requestSocialMediaPlayerDataWhenValidInputThenReturns200() {
 
 		Player player = new Player();
 		player.setNick("test");
@@ -260,12 +307,17 @@ class AccessControllerTest {
 		when(playerService.loadUserById(any())).thenReturn(gu);
 		when(playerService.generateRefreshToken(any())).thenReturn("1");
 
-		mockMvc.perform(get("/rest/GetSocialPlayer").header("Authorization","Bearer 1234")).andExpect(status().isOk());
+		webTestClient.get()
+				.uri("/rest/GetSocialPlayer")
+				.header("Authorization","Bearer 1234")
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should search for player with correct result")
 	@Test
-	void searchForPlayerWhenValidInputThenReturns200() throws Exception {
+	void searchForPlayerWhenValidInputThenReturns200() {
 
 		var input = new PlayerNickDto();
 		input.setNick("Test");
@@ -275,17 +327,25 @@ class AccessControllerTest {
 
 		when(playerService.searchForPlayer(any(), any())).thenReturn(output);
 
-		mockMvc.perform(post("/rest/SearchForPlayer").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/SearchForPlayer")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 
 	@DisplayName("Should remove email")
 	@Test
-	void removeEmailThenReturns200() throws Exception {
+	void removeEmailThenReturns200() {
 
 		doNothing().when(playerService).deleteEmail();
 
-		mockMvc.perform(post("/rest/DeletePlayerEmail").contentType("application/json"))
-				.andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/DeletePlayerEmail")
+				.exchange()
+				.expectStatus()
+				.isOk();
 	}
 }

@@ -99,7 +99,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
@@ -118,9 +119,7 @@ configurations {
     implementation {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
-    testImplementation {
-        exclude group: 'org.springframework.boot', module: 'junit'
-    }
+
 
     liquibaseRuntime {
         extendsFrom configurations.implementation, configurations.runtimeOnly

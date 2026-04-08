@@ -12,27 +12,27 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 @Slf4j
-@AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = MiscController.class)
+@SpringBootTest
 class MiscControllerTest {
+
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private PlayerService playerService;
+
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
+
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private ModelMapper modelMapper;
@@ -57,18 +57,20 @@ class MiscControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
+	private final WebTestClient webTestClient;
 
 	@Autowired
-	public MiscControllerTest(MockMvc mockMvc) {
-		this.mockMvc = mockMvc;
+	MiscControllerTest(WebTestClient webTestClient) {
+		this.webTestClient = webTestClient;
 	}
 
 	@DisplayName("Should return version")
 	@Test
-	void getVersionThenReturns200() throws Exception {
-
-		mockMvc.perform(get("/rest/Version")).andExpect(status().isOk());
-
+	void getVersionThenReturns200() {
+		webTestClient
+				.get()
+				.uri("/rest/Version")
+				.exchange()
+				.expectStatus().isOk();
 	}
 }

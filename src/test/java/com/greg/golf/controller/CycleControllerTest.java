@@ -1,11 +1,8 @@
 package com.greg.golf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.CycleDto;
 import com.greg.golf.controller.dto.CycleTournamentDto;
 import com.greg.golf.entity.Cycle;
-import com.greg.golf.entity.CycleResult;
-import com.greg.golf.entity.CycleTournament;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
@@ -19,27 +16,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 @Slf4j
-@AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = CycleController.class)
+@SpringBootTest
 class CycleControllerTest {
 
 	@SuppressWarnings("unused")
@@ -82,19 +72,18 @@ class CycleControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
+	@Autowired
+	private final WebTestClient webTestClient;
 
 	@Autowired
-	public CycleControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
+	public CycleControllerTest(WebTestClient webTestClient) {
+		this.webTestClient = webTestClient;
 	}
 
 	@DisplayName("Should add cycle with correct result")
 	@Test
-	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void addCycleWhenValidInputThenReturns200() throws Exception {
+	@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+	void addCycleWhenValidInputThenReturns200() {
 
 		var input = new CycleDto();
 		input.setName("Test cycle");
@@ -102,14 +91,18 @@ class CycleControllerTest {
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
-		mockMvc.perform(post("/rest/Cycle").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/Cycle")
+				.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should add cycle tournament with correct result")
 	@Test
-	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void addCycleTournamentWhenValidInputThenReturns200() throws Exception {
+	@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+	void addCycleTournamentWhenValidInputThenReturns200() {
 
 		var input = new CycleTournamentDto();
 		input.setName("Test cycle tournament");
@@ -118,60 +111,69 @@ class CycleControllerTest {
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
-		mockMvc.perform(post("/rest/CycleTournament").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/CycleTournament")
+				.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should return all cycles")
 	@Test
-	void getCyclesThenReturns200() throws Exception {
+	void getCyclesThenReturns200() {
 
-		var outputLst = new ArrayList<Cycle>();
+		when(cycleService.findAllCycles()).thenReturn(new ArrayList<>());
 
-		when(cycleService.findAllCycles()).thenReturn(outputLst);
-
-		mockMvc.perform(get("/rest/Cycle")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/Cycle")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should return all cycle tournaments")
 	@Test
-	void getCycleTournamentsThenReturns200() throws Exception {
+	void getCycleTournamentsThenReturns200() {
 
-		var outputLst = new ArrayList<CycleTournament>();
+		when(cycleService.findAllCycleTournaments(1L))
+				.thenReturn(new ArrayList<>());
 
-		when(cycleService.findAllCycleTournaments(1L)).thenReturn(outputLst);
-
-		mockMvc.perform(get("/rest/CycleTournament/1")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/CycleTournament/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should return cycle results")
 	@Test
-	void getCycleResultsThenReturns200() throws Exception {
+	void getCycleResultsThenReturns200() {
 
-		var outputLst = new ArrayList<CycleResult>();
+		when(cycleService.findCycleResults(1L))
+				.thenReturn(new ArrayList<>());
 
-		when(cycleService.findCycleResults(1L)).thenReturn(outputLst);
-
-		mockMvc.perform(get("/rest/CycleResult/1")).andExpect(status().isOk());
-
+		webTestClient.get()
+				.uri("/rest/CycleResult/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should close cycle with correct result")
 	@Test
-	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void closeCycleWithValidInputThenReturns200() throws Exception {
+	@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+	void closeCycleWithValidInputThenReturns200() {
 
 		doNothing().when(cycleService).closeCycle(any());
 
-		mockMvc.perform(patch("/rest/CycleClose/1")).andExpect(status().isOk()).andReturn();
+		webTestClient.patch()
+				.uri("/rest/CycleClose/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should delete cycle tournament with correct result")
 	@Test
-	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void deleteCycleTournamentWhenValidInputThenReturns200() throws Exception {
+	@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+	void deleteCycleTournamentWhenValidInputThenReturns200() {
 
 		var input = new CycleDto();
 		input.setName("Test cycle tournament");
@@ -181,16 +183,24 @@ class CycleControllerTest {
 
 		when(modelMapper.map(any(), any())).thenReturn(null);
 
-		mockMvc.perform(post("/rest/DeleteCycleTournament").contentType("application/json").characterEncoding("utf-8")
-				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk()).andReturn();
+		webTestClient.post()
+				.uri("/rest/DeleteCycleTournament")
+				.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+				.bodyValue(input)
+				.exchange()
+				.expectStatus().isOk();
 	}
 
 	@DisplayName("Should delete cycle with correct result")
 	@Test
-	@WithMockUser(username="admin",roles={"USER","ADMIN"})
-	void deleteCycleWhenValidInputThenReturns200() throws Exception {
+	@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+	void deleteCycleWhenValidInputThenReturns200() {
 
 		doNothing().when(cycleService).deleteCycle(any());
-		mockMvc.perform(delete("/rest/Cycle/1")).andExpect(status().isOk()).andReturn();
+
+		webTestClient.delete()
+				.uri("/rest/Cycle/1")
+				.exchange()
+				.expectStatus().isOk();
 	}
 }

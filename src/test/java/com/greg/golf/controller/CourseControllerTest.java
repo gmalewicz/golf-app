@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -23,13 +22,11 @@ import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 class CourseControllerTest {
 
 	@SuppressWarnings("unused")
