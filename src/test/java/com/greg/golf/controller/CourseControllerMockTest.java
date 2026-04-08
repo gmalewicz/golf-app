@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -155,7 +155,7 @@ class CourseControllerMockTest {
 
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
 
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
 				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
@@ -209,7 +209,7 @@ class CourseControllerMockTest {
 		
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
 
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
 				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
