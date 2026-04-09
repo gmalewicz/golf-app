@@ -89,14 +89,13 @@ class AccessControllerTest {
 	@MockitoBean
 	private JwtTokenUtil jwtTokenUtil;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public AccessControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	@SuppressWarnings("unused")
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@DisplayName("Should authenticate with correct result")
 	@Test

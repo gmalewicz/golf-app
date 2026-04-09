@@ -82,15 +82,13 @@ class CourseControllerMockTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public CourseControllerMockTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	@SuppressWarnings("unused")
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@DisplayName("Search for courses with valid input")
 	@Test
