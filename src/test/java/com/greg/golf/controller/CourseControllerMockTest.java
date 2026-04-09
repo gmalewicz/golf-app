@@ -38,12 +38,14 @@ import com.greg.golf.security.JwtRequestFilter;
 
 import com.greg.golf.service.CourseService;
 import com.greg.golf.service.PlayerService;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.mockito.BDDMockito.*;
 
 @Slf4j
 @AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
+@Testcontainers
 class CourseControllerMockTest {
 
 	@SuppressWarnings("unused")
@@ -82,14 +84,11 @@ class CourseControllerMockTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public CourseControllerMockTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Search for courses with valid input")
 	@Test

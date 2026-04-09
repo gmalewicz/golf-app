@@ -42,8 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @Testcontainers
-//@Import(TestCacheConfig.class)
-
 class AccessControllerTest {
 
 	@Container
@@ -89,10 +87,11 @@ class AccessControllerTest {
 	@MockitoBean
 	private JwtTokenUtil jwtTokenUtil;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private MockMvc mockMvc;
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Should authenticate with correct result")
 	@Test
