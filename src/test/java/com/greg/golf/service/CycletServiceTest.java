@@ -11,11 +11,12 @@ import com.greg.golf.repository.CycleTournamentRepository;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,13 +29,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@Testcontainers
 class CycleServiceTest {
 
     @SuppressWarnings("unused")
     @MockitoBean
     private JwtRequestFilter jwtRequestFilter;
 
-    @ClassRule
+    @Container
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
             .getInstance();
 

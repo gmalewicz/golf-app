@@ -7,9 +7,10 @@ import java.util.List;
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,13 +31,14 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 @Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@Testcontainers
 class OnlineRoundServiceTest {
 
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
-	@ClassRule
+	@Container
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	@SuppressWarnings("unused")

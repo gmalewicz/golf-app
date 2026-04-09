@@ -13,12 +13,12 @@ import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.aes.StringUtility;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +28,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
@@ -38,15 +40,17 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 @Slf4j
+@EnableCaching
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@Testcontainers
 class TournamentServiceTest {
 
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private JwtRequestFilter jwtRequestFilter;
 
-	@ClassRule
+	@Container
 	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
 			.getInstance();
 
