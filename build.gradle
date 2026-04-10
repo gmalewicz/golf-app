@@ -125,7 +125,7 @@ configurations {
     }
 
     liquibaseRuntime {
-        extendsFrom configurations.implementation, configurations.runtimeOnly
+        extendsFrom configurations.runtimeClasspath
         exclude group: 'io.hypersistence', module: 'hypersistence-utils-hibernate-73'
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             if (details.requested.group == 'org.hibernate.orm') {
