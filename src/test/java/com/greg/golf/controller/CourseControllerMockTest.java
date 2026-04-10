@@ -34,7 +34,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.greg.golf.entity.Course;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
@@ -42,8 +44,6 @@ import com.greg.golf.security.JwtRequestFilter;
 
 import com.greg.golf.service.CourseService;
 import com.greg.golf.service.PlayerService;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import static org.mockito.BDDMockito.*;
 
 @Slf4j
@@ -92,8 +92,9 @@ class CourseControllerMockTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	private final ObjectMapper objectMapper = new ObjectMapper()
-			.configure(com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+	private final ObjectMapper objectMapper = JsonMapper.builder()
+			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+			.build();
 
 	@DisplayName("Search for courses with valid input")
 	@Test
