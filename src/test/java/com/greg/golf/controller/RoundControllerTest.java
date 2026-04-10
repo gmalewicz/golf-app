@@ -27,8 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -44,9 +45,13 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.RoundService;
 import com.greg.golf.service.ScoreCardService;
 
+import com.greg.golf.configuration.MessageSourceConfig;
+import com.greg.golf.util.CacheConfig;
+
 @Slf4j
+@WebMvcTest(RoundController.class)
+@Import({CacheConfig.class, ApiExceptionHandler.class, MessageSourceConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-@SpringBootTest
 class RoundControllerTest {
 
 	@SuppressWarnings("unused")
@@ -93,14 +98,11 @@ class RoundControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public RoundControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Gets round for id")
 	@Test
@@ -191,9 +193,7 @@ class RoundControllerTest {
 	@Test
 	void updateRoundThenReturns200() throws Exception {
 
-		var roundCapture = ArgumentCaptor.forClass(Round.class);
-	
-		doNothing().when(roundService).updateScoreCard(roundCapture.capture());
+		doNothing().when(roundService).updateScoreCard(any());
 
 		String str = "{\"matchPlay\":false,\"roundDate\":\"2020/06/12 06:59\",\"course\":{\"id\":1,\"tees\":[{\"id\":1}]},\"player\":[{\"id\":1,\"whs\":32.1}],\"scoreCard\":[{\"hole\":1,\"stroke\":5,\"pats\":0,\"penalty\":0}]}";
 

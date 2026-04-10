@@ -5,7 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.boot.test.context.SpringBootTest;
+
+import com.greg.golf.configuration.MessageSourceConfig;
+import com.greg.golf.util.CacheConfig;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
@@ -22,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,7 +34,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.greg.golf.entity.Course;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
@@ -38,12 +44,12 @@ import com.greg.golf.security.JwtRequestFilter;
 
 import com.greg.golf.service.CourseService;
 import com.greg.golf.service.PlayerService;
-
 import static org.mockito.BDDMockito.*;
 
 @Slf4j
+@WebMvcTest(CourseController.class)
+@Import({CacheConfig.class, ApiExceptionHandler.class, MessageSourceConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-@SpringBootTest
 class CourseControllerMockTest {
 
 	@SuppressWarnings("unused")
@@ -82,15 +88,13 @@ class CourseControllerMockTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public CourseControllerMockTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = JsonMapper.builder()
+			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+			.build();
 
 	@DisplayName("Search for courses with valid input")
 	@Test
@@ -155,10 +159,10 @@ class CourseControllerMockTest {
 
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
 
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(List.of(courseDto)));
 	}
 
 	@DisplayName("Delete course with valid input")
@@ -209,10 +213,10 @@ class CourseControllerMockTest {
 		
 		String actualResponseBody = mvcResult.getResponse().getContentAsString();
 
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(List.of(courseDto)));
 	}
 	
 	@DisplayName("Move course to history")

@@ -13,13 +13,15 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
 import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
+import com.greg.golf.util.CacheConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,8 +37,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@WebMvcTest(AccessController.class)
+@Import(CacheConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = AccessController.class)
 class AccessControllerTest {
 
 	@SuppressWarnings("unused")
@@ -79,14 +82,11 @@ class AccessControllerTest {
 	@MockitoBean
 	private JwtTokenUtil jwtTokenUtil;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public AccessControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Should authenticate with correct result")
 	@Test

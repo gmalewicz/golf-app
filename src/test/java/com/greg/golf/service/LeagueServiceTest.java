@@ -10,11 +10,12 @@ import com.greg.golf.security.aes.StringUtility;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.*;
 @Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@Testcontainers
 class LeagueServiceTest {
 
     @SuppressWarnings("unused")
@@ -48,7 +50,7 @@ class LeagueServiceTest {
     @MockitoBean
     private EmailServiceImpl emailService;
 
-    @ClassRule
+    @Container
     public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
             .getInstance();
 

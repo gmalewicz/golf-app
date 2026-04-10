@@ -7,13 +7,15 @@ import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
+import com.greg.golf.util.CacheConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,8 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@WebMvcTest(MiscController.class)
+@Import(CacheConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = MiscController.class)
 class MiscControllerTest {
 	@SuppressWarnings("unused")
 	@MockitoBean
@@ -57,12 +60,9 @@ class MiscControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public MiscControllerTest(MockMvc mockMvc) {
-		this.mockMvc = mockMvc;
-	}
+	private MockMvc mockMvc;
 
 	@DisplayName("Should return version")
 	@Test

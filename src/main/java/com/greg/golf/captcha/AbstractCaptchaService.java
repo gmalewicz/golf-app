@@ -7,13 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 
 import com.greg.golf.error.ReCaptchaInvalidException;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @ConfigurationProperties(prefix = "cors")
@@ -42,9 +41,8 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
     @SuppressWarnings("unused")
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-       // Do any additional configuration here
-       return builder.build();
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
     
     @Override

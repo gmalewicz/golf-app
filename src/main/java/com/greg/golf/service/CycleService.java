@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -96,7 +97,7 @@ public class CycleService {
         results.forEach(result -> {
             // first remove results
             result.setResults(Arrays.stream(result.getResults())
-                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray());
+                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray(Integer[]::new));
             // second remove hcp
             result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1));
         });
@@ -154,8 +155,8 @@ public class CycleService {
 
                     var cycleResult = cycleResultMap.get(tournamentResult.getPlayerName());
 
-                    cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
-                            Arrays.stream(tournamentResult.getResults())).toArray());
+                    cycleResult.setResults(Stream.concat(Arrays.stream(cycleResult.getResults()),
+                            Arrays.stream(tournamentResult.getResults())).toArray(Integer[]::new));
 
                     var arrList = new ArrayList<>( Arrays.asList(cycleResult.getHcp()));
                     arrList.add(tournamentResult.getHcp()[0]);
@@ -165,7 +166,8 @@ public class CycleService {
                 } else {
 
                     tournamentResult.setResults(IntStream.concat(Arrays.stream(new int[cycleResultSize]),
-                            Arrays.stream(tournamentResult.getResults())).toArray());
+                            Arrays.stream(tournamentResult.getResults()).mapToInt(Integer::intValue)).boxed()
+                            .toArray(Integer[]::new));
 
                     var hcpArray = new String[cycleResultSize/ROUNDS_PER_TOURNAMENT + 1];
                     Arrays.fill(hcpArray, "");
@@ -180,8 +182,8 @@ public class CycleService {
             // update players who did not play that tournament
             cycleResultMap.values().forEach(cycleResult -> {
                 if (cycleResult.getResults().length == cycleResultSize) {
-                    cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()),
-                            Arrays.stream(new int[ROUNDS_PER_TOURNAMENT])).toArray());
+                    cycleResult.setResults(IntStream.concat(Arrays.stream(cycleResult.getResults()).mapToInt(Integer::intValue),
+                            Arrays.stream(new int[ROUNDS_PER_TOURNAMENT])).boxed().toArray(Integer[]::new));
 
                     var arrList = new ArrayList<>( Arrays.asList(cycleResult.getHcp()));
                     arrList.add("");
@@ -203,7 +205,7 @@ public class CycleService {
                     var cycleResult = new CycleResult();
                     cycleResult.setCycle(cycleTournament.getCycle());
                     cycleResult.setPlayerName(e.getLastName() + " " + e.getFirstName());
-                    cycleResult.setResults(e.getR());
+                    cycleResult.setResults(Arrays.stream(e.getR()).boxed().toArray(Integer[]::new));
                     cycleResult.setHcp(new String[] {e.getWhs().toString()});
                     cycleResult.setSeries(e.getSeries());
                     return cycleResult;})
@@ -234,7 +236,6 @@ public class CycleService {
 
                     cycleResult.setCycleScore(
                             Arrays.stream(cycleResult.getResults())
-                                    .boxed()
                                     .sorted(Comparator.reverseOrder())
                                     .limit(cycleTournament.getCycle().getBestRounds())
                                     .reduce(0, Integer::sum)
@@ -242,7 +243,6 @@ public class CycleService {
                 } else {
                     cycleResult.setCycleScore(
                             Arrays.stream(cycleResult.getResults())
-                                    .boxed()
                                     .filter(result -> result > 0)
                                     .sorted(Comparator.naturalOrder())
                                     .limit(cycleTournament.getCycle().getBestRounds())
