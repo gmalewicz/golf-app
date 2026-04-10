@@ -5,21 +5,33 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @Slf4j
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ApiExceptionHandlerTest {
 
-	@Autowired
+	@Mock
+	private MessageSource messageSource;
+
 	private ApiExceptionHandler apiExceptionHandler;
+
+	@BeforeEach
+	void setUp() {
+		Mockito.lenient().when(messageSource.getMessage(Mockito.anyString(), Mockito.any(), Mockito.any(Locale.class))).thenReturn("");
+		apiExceptionHandler = new ApiExceptionHandler(messageSource);
+	}
 
 	@DisplayName("Should throw TooManyPlayersException")
 	@Test

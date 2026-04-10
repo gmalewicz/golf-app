@@ -7,6 +7,7 @@ import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.error.ApiErrorResponse;
 import com.greg.golf.error.DeleteTournamentPlayerException;
 import com.greg.golf.error.DuplicatePlayerInTournamentException;
+import com.greg.golf.configuration.MessageSourceConfig;
 import com.greg.golf.security.JwtAuthenticationEntryPoint;
 import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
@@ -14,6 +15,7 @@ import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.TournamentService;
 import com.greg.golf.service.UserService;
+import com.greg.golf.util.CacheConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,8 +41,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@WebMvcTest(TournamentController.class)
+@Import({CacheConfig.class, ApiExceptionHandler.class, MessageSourceConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-@SpringBootTest
 class TournamentControllerTest {
 
 	@SuppressWarnings("unused")
@@ -77,14 +82,11 @@ class TournamentControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public TournamentControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Should get all tournaments with correct result")
 	@Test

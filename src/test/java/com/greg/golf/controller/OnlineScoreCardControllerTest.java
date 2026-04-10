@@ -16,12 +16,14 @@ import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.UserService;
+import com.greg.golf.util.CacheConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -37,8 +39,9 @@ import com.greg.golf.service.OnlineRoundService;
 import com.greg.golf.service.PlayerService;
 
 @Slf4j
+@WebMvcTest(OnlineScoreCardController.class)
+@Import(CacheConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = OnlineScoreCardController.class)
 class OnlineScoreCardControllerTest {
 
 	@SuppressWarnings("unused")
@@ -85,14 +88,11 @@ class OnlineScoreCardControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public OnlineScoreCardControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Should add online rounds with correct result")
 	@Test

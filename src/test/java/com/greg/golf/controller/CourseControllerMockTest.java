@@ -5,7 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.boot.test.context.SpringBootTest;
+
+import com.greg.golf.configuration.MessageSourceConfig;
+import com.greg.golf.util.CacheConfig;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
@@ -43,9 +47,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.mockito.BDDMockito.*;
 
 @Slf4j
+@WebMvcTest(CourseController.class)
+@Import({CacheConfig.class, ApiExceptionHandler.class, MessageSourceConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-@SpringBootTest
-@Testcontainers
 class CourseControllerMockTest {
 
 	@SuppressWarnings("unused")
@@ -88,7 +92,8 @@ class CourseControllerMockTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper()
+			.configure(com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 
 	@DisplayName("Search for courses with valid input")
 	@Test
@@ -156,7 +161,7 @@ class CourseControllerMockTest {
 		objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(List.of(courseDto)));
 	}
 
 	@DisplayName("Delete course with valid input")
@@ -210,7 +215,7 @@ class CourseControllerMockTest {
 		objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
 
 		assertThat(actualResponseBody)
-				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(retVal));
+				.isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(List.of(courseDto)));
 	}
 	
 	@DisplayName("Move course to history")

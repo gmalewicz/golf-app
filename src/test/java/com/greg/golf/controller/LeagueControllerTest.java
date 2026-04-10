@@ -13,6 +13,7 @@ import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.LeagueService;
 import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
+import com.greg.golf.util.CacheConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,8 +36,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@WebMvcTest(LeagueController.class)
+@Import(CacheConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(controllers = LeagueController.class)
 class LeagueControllerTest {
 	@SuppressWarnings("unused")
 	@MockitoBean
@@ -73,14 +76,11 @@ class LeagueControllerTest {
 	@MockitoBean
 	private GolfAuthenticationFailureHandler golfAuthenticationFailureHandler;
 
-	private final MockMvc mockMvc;
-	private final ObjectMapper objectMapper;
-
+	@SuppressWarnings("unused")
 	@Autowired
-	public LeagueControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-		this.mockMvc = mockMvc;
-		this.objectMapper = objectMapper;
-	}
+	private MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("Should add league with correct result")
 	@Test

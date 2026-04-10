@@ -13,21 +13,19 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.service.UserService;
 import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
-import com.greg.golf.util.GolfPostgresqlContainer;
+import com.greg.golf.util.CacheConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.ArrayList;
 
@@ -39,13 +37,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@SpringBootTest
+@WebMvcTest(AccessController.class)
+@Import(CacheConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Testcontainers
 class AccessControllerTest {
-
-	@Container
-	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	@SuppressWarnings("unused")
 	@MockitoBean
