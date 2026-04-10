@@ -96,8 +96,8 @@ public class CycleService {
 
         results.forEach(result -> {
             // first remove results
-            result.setResults((Integer[]) Arrays.stream(result.getResults())
-                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray());
+            result.setResults(Arrays.stream(result.getResults())
+                .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray(Integer[]::new));
             // second remove hcp
             result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1));
         });
