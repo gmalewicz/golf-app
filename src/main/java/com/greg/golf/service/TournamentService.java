@@ -48,6 +48,7 @@ public class TournamentService {
     private final EmailServiceImpl emailServiceImpl;
     private final TemplateEngine templateEngine;
     private final PlayerService playerService;
+    private final CourseTeeRepository courseTeeRepository;
 
 
     public static final int DEFAULT_PLAYING_MULTIPLIER = 1;
@@ -291,10 +292,13 @@ public class TournamentService {
                     // save entity
                     tournamentResultRepository.save(tournamentResult);
 
+                    String tee = playerRound.getTeeId() != null
+                            ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
+                            : null;
                     tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
                             getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
                             tournamentResult, strokeApplicable, round.getId(), playingHCP,
-                            tournamentPlayers.get(player.getId()), courseHCP));
+                            tournamentPlayers.get(player.getId()), courseHCP, tee));
 
                     // here needs to be an update of TournamentResults in case if number of added rounds is greater
                     // than bestRounds assuming that bestRounds is not 0
@@ -328,10 +332,13 @@ public class TournamentService {
                     // save entity
                     tournamentResultRepository.save(tournamentResult);
 
+                    String tee = playerRound.getTeeId() != null
+                            ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
+                            : null;
                     tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
                             tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
                             round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId(), playingHCP,
-                            tournamentPlayers.get(player.getId()), courseHCP));
+                            tournamentPlayers.get(player.getId()), courseHCP, tee));
 
                 });
 
@@ -408,7 +415,7 @@ public class TournamentService {
     @Transactional
     public TournamentRound addTournamentRound(int stbGross, int stbNet, int strokesGross, int strokesNet, float scrDiff,
                                               String courseName, TournamentResult tournamentResult, boolean strokeApplicable,
-                                              long roundId, int playingHCP, float hcp, int courseHcp) {
+                                              long roundId, int playingHCP, float hcp, int courseHcp, String tee) {
 
         var tournamentRound = new TournamentRound();
         tournamentRound.setCourseName(courseName);
@@ -423,6 +430,7 @@ public class TournamentService {
         tournamentRound.setPlayingHcp(playingHCP);
         tournamentRound.setHcp(hcp);
         tournamentRound.setCourseHcp(courseHcp);
+        tournamentRound.setTee(tee);
 
         tournamentRound = tournamentRoundRepository.save(tournamentRound);
 
@@ -908,7 +916,7 @@ public class TournamentService {
     @Transactional
     public void addNotification(Long tournamentId) throws DuplicateNotificationException, MailNotSetException {
 
-        Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Long playerId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
 
         log.info("trying to add notifications for tournament: {} and player: {}", tournamentId, playerId);
 
@@ -938,7 +946,7 @@ public class TournamentService {
     @Transactional
     public void removeNotification(Long tournamentId) {
 
-        Long playerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Long playerId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
 
         log.info("trying to remove notifications for tournament: {} and player: {}", tournamentId, playerId);
 

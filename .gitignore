@@ -46,3 +46,7 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+dep-output.txt
+.gitignore
+qodana.yaml
+dep2.txt

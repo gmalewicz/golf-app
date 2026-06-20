@@ -1,0 +1,3 @@
+| ID    | Description                                                                                                                                                                                                  |
+|-------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| CR-01 | Endpoint GET /rest/TournamentResultRound/{resultId} shall return also field tee (string). It shall be added when record in database is created. It can be null, to cover old records in production database. |

@@ -68,4 +68,7 @@ public class TournamentRound {
 	@NotNull
 	@Column(name = "course_hcp")
 	private Integer courseHcp;
+
+	@Column(name = "tee")
+	private String tee;
 }
