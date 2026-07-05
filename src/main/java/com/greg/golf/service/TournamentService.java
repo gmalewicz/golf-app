@@ -301,13 +301,13 @@ public class TournamentService {
         int courseHCP = getCourseHCP(playerRound, round, player, tournamentPlayers.get(player.getId()));
         int playingHCP = getPlayingHcp(tournament, courseHCP);
 
-        List<Integer> stb = updateSTB(tournamentResult, round, player, playingHCP);
+        List<Integer> stb = self.updateSTB(tournamentResult, round, player, playingHCP);
         // check if round is applicable for stroke statistic
-        boolean strokeApplicable = applicableForStroke(round, player);
+        boolean strokeApplicable = self.applicableForStroke(round, player);
         if (strokeApplicable) {
             tournamentResult.increaseStrokeRounds();
-            grossStrokes = getGrossStrokes(player, round);
-            netStrokes = getNetStrokes(grossStrokes, playingHCP);
+            grossStrokes = self.getGrossStrokes(player, round);
+            netStrokes = self.getNetStrokes(grossStrokes, playingHCP);
         }
         tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
         tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
@@ -318,8 +318,8 @@ public class TournamentService {
         String tee = playerRound.getTeeId() != null
                 ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
                 : null;
-        TournamentRound tournamentRound = addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
-                getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
+        TournamentRound tournamentRound = self.addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
+                self.getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
                 tournamentResult, strokeApplicable, round.getId(), playingHCP,
                 tournamentPlayers.get(player.getId()), courseHCP, tee);
 
@@ -342,14 +342,14 @@ public class TournamentService {
         int playingHCP = getPlayingHcp(tournament, courseHCP);
 
         // update stb result
-        List<Integer> stb = updateSTB(tournamentResult, round, player, playingHCP);
+        List<Integer> stb = self.updateSTB(tournamentResult, round, player, playingHCP);
         // check if round is applicable for stroke statistic
-        boolean strokeApplicable = applicableForStroke(round, player);
+        boolean strokeApplicable = self.applicableForStroke(round, player);
         if (strokeApplicable) {
             tournamentResult.increaseStrokeRounds();
             // get gross and net strokes
-            tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
-            tournamentResult.setStrokesNetto(getNetStrokes(tournamentResult.getStrokesBrutto(), playingHCP));
+            tournamentResult.setStrokesBrutto(self.getGrossStrokes(player, round));
+            tournamentResult.setStrokesNetto(self.getNetStrokes(tournamentResult.getStrokesBrutto(), playingHCP));
         } else {
             tournamentResult.setStrokesBrutto(0);
             tournamentResult.setStrokesNetto(0);
@@ -360,8 +360,8 @@ public class TournamentService {
         String tee = playerRound.getTeeId() != null
                 ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
                 : null;
-        return addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
-                tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
+        return self.addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
+                tournamentResult.getStrokesNetto(), self.getScoreDifferential(playerRound, round, player),
                 round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId(), playingHCP,
                 tournamentPlayers.get(player.getId()), courseHCP, tee);
     }
