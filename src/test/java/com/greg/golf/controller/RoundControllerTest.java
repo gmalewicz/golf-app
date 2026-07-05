@@ -200,6 +200,18 @@ class RoundControllerTest {
 		mockMvc.perform(patch("/rest/ScoreCard").contentType("application/json").characterEncoding("utf-8").content(str))
 				.andExpect(status().isOk()).andReturn();
 	}
+
+	@DisplayName("Update scorecard with teeId with success")
+	@Test
+	void updateRoundWithTeeIdThenReturns200() throws Exception {
+
+		doNothing().when(roundService).updateScoreCard(any());
+
+		String str = "{\"matchPlay\":false,\"roundDate\":\"2020/06/12 06:59\",\"course\":{\"id\":1,\"tees\":[{\"id\":1}]},\"player\":[{\"id\":1,\"whs\":32.1}],\"scoreCard\":[{\"hole\":1,\"stroke\":5,\"pats\":0,\"penalty\":0}],\"teeId\":2}";
+
+		mockMvc.perform(patch("/rest/ScoreCard").contentType("application/json").characterEncoding("utf-8").content(str))
+				.andExpect(status().isOk()).andReturn();
+	}
 	
 	@DisplayName("Get data for handicap calculation for a player")
 	@Test

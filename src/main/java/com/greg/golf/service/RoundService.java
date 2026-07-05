@@ -22,6 +22,7 @@ import com.greg.golf.entity.ScoreCard;
 import com.greg.golf.error.PlayerAlreadyHasThatRoundException;
 import com.greg.golf.error.ScoreCardUpdateException;
 import com.greg.golf.error.TooManyPlayersException;
+import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 
@@ -36,6 +37,7 @@ public class RoundService {
 	private final RoundRepository roundRepository;
 	private final PlayerRoundRepository playerRoundRepository;
 	private final PlayerRepository playerRepository;
+	private final CourseTeeRepository courseTeeRepository;
 	
 	public Optional<Round> getWithPlayers (Long id) {
 		return roundRepository.findById(id);
@@ -188,6 +190,12 @@ public class RoundService {
 		round.getScoreCard().addAll(updRound.getScoreCard());
 
 		roundRepository.save(round);
+
+		if (updRound.getTeeId() != null) {
+			var courseTee = courseTeeRepository.findById(updRound.getTeeId()).orElseThrow();
+			playerRoundRepository.updatePlayerRoundTeeId(updRound.getTeeId(), courseTee.getCr(), courseTee.getSr(), player.getId(), updRound.getId());
+		}
+
 		log.debug("Score card updated");
 	}
 
