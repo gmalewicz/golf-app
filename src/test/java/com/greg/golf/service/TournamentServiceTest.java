@@ -327,6 +327,7 @@ class TournamentServiceTest {
 		tournamentResult.setPlayer(player);
 		tournamentResult.setTournament(tournamentService.findAllTournamentsPageable(0).getFirst());
 		tournamentResultRepository.save(tournamentResult);
+		assertNotNull(tournamentResult.getId());
 	}
 
 	@DisplayName("Get all tournaments where all rounds are counted")
@@ -1451,22 +1452,14 @@ class TournamentServiceTest {
 		tournamentNotification.setTournamentId(tournamentId);
 		tournamentNotificationRepository.save(tournamentNotification);
 
-		try {
-			doNothing().when(emailService).sendEmail(any(), any(), any());
-		} catch (Exception e) {
-			fail("Method emailService.sendMail throws exception");
-		}
+		assertDoesNotThrow(() -> doNothing().when(emailService).sendEmail(any(), any(), any()));
 
 		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
 		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB));
 		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STR_NET));
 		assertDoesNotThrow(() -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STR));
 
-		try {
-			doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
-		} catch (Exception e) {
-			fail("Method emailService.sendMail throws exception");
-		}
+		assertDoesNotThrow(() -> doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any()));
 
 		// verify if exception is caught
 		assertThrows(GeneralException.class, () -> tournamentService.processNotifications(tournamentId, TournamentService.SORT_STB_NET));
@@ -1488,11 +1481,7 @@ class TournamentServiceTest {
 
 
 		var player = playerService.getPlayer(1L).orElseThrow();
-		try {
-			player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword"));
-		} catch (Exception e) {
-			fail("Should not throw any exception");
-		}
+		assertDoesNotThrow(() -> player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword")));
 		playerRepository.save(player);
 
 		UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());

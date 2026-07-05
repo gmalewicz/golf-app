@@ -2,6 +2,7 @@ package com.greg.golf.service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 import com.greg.golf.configurationproperties.TournamentServiceConfig;
 import com.greg.golf.entity.*;
@@ -247,9 +248,9 @@ public class TournamentService {
     @Transactional
     public List<TournamentRound> updateTournamentResult(Round round, Tournament tournament, Long playerId) {
 
-       var tournamentRoundLst = new ArrayList<TournamentRound>();
+        var tournamentRoundLst = new ArrayList<TournamentRound>();
 
-       var tournamentPlayers = tournamentPlayerRepository
+        var tournamentPlayers = tournamentPlayerRepository
                                 .findByTournamentId(tournament.getId())
                                 .stream()
                                 .collect(Collectors.toMap(TournamentPlayer::getPlayerId, TournamentPlayer::getWhs));
@@ -258,97 +259,111 @@ public class TournamentService {
         verifyRoundCorrectness(round);
 
         // iterate through round players and check if they already added
-        round.getPlayer().forEach(player -> {
+        for (var player : round.getPlayer()) {
 
             var playerRound = roundService.getForPlayerRoundDetails(player.getId(), round.getId());
 
             if (playerRound.getTournamentId() == null &&
-                tournamentPlayers.containsKey(playerRound.getPlayerId()) && (playerId == null || playerId.equals(player.getId()))) {
+                tournamentPlayers.containsKey(playerRound.getPlayerId()) &&
+                (playerId == null || playerId.equals(player.getId()))) {
 
                 Optional<TournamentResult> tournamentResultOpt = tournamentResultRepository
                         .findByPlayerAndTournament(player, tournament);
-                tournamentResultOpt.ifPresentOrElse(tournamentResult -> {
-                    log.debug("Attempting to update tournament result");
 
-                    tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
-                    int grossStrokes = 0;
-                    int netStrokes = 0;
-
-                    // calculate course HCP
-                    int courseHCP = getCourseHCP(playerRound, round, player, tournamentPlayers.get(player.getId()));
-                    int playingHCP = getPlayingHcp(tournament, courseHCP);
-
-                    List<Integer> stb = updateSTB(tournamentResult, round,  player, playingHCP);
-                    // check if round is applicable for stroke statistic
-                    boolean strokeApplicable = applicableForStroke(round, player);
-                    if (strokeApplicable) {
-                        tournamentResult.increaseStrokeRounds();
-                        grossStrokes = getGrossStrokes(player, round);
-                        netStrokes = getNetStrokes(grossStrokes, playingHCP);
-                    }
-                    tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
-                    tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
-
-                    // save entity
-                    tournamentResultRepository.save(tournamentResult);
-
-                    String tee = playerRound.getTeeId() != null
-                            ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
-                            : null;
-                    tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
-                            getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
-                            tournamentResult, strokeApplicable, round.getId(), playingHCP,
-                            tournamentPlayers.get(player.getId()), courseHCP, tee));
-
-                    // here needs to be an update of TournamentResults in case if number of added rounds is greater
-                    // than bestRounds assuming that bestRounds is not 0
-                    updateForBestRounds(tournament, tournamentResult);
-
-
-                }, () -> {
-                    log.debug("Attempting to add the new round to tournament result");
-                    // if it is the first record to be added to result than create it
-                    var tournamentResult = buildEmptyTournamentResult(player);
-                    tournamentResult.setTournament(tournament);
-
-                    // calculate course HCP
-                    int courseHCP = getCourseHCP(playerRound, round, player, tournamentPlayers.get(player.getId()));
-                    int playingHCP = getPlayingHcp(tournament, courseHCP);
-
-                    // update stb result
-                    List<Integer> stb = updateSTB(tournamentResult, round,  player, playingHCP);
-                    // check if round is applicable for stroke statistic
-                    boolean strokeApplicable = applicableForStroke(round, player);
-                    if (strokeApplicable) {
-                        tournamentResult.increaseStrokeRounds();
-                        // get gross and net strokes
-                        tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
-                        tournamentResult.setStrokesNetto(
-                                getNetStrokes(tournamentResult.getStrokesBrutto(), playingHCP));
-                    } else {
-                        tournamentResult.setStrokesBrutto(0);
-                        tournamentResult.setStrokesNetto(0);
-                    }
-                    // save entity
-                    tournamentResultRepository.save(tournamentResult);
-
-                    String tee = playerRound.getTeeId() != null
-                            ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
-                            : null;
-                    tournamentRoundLst.add(addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
-                            tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
-                            round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId(), playingHCP,
-                            tournamentPlayers.get(player.getId()), courseHCP, tee));
-
-                });
+                if (tournamentResultOpt.isPresent()) {
+                    tournamentRoundLst.add(processExistingTournamentResult(
+                            tournamentResultOpt.get(), playerRound, round, player, tournament, tournamentPlayers));
+                } else {
+                    tournamentRoundLst.add(processNewTournamentResult(
+                            player, tournament, playerRound, round, tournamentPlayers));
+                }
 
                 // set tournament id in player_round
                 playerRound.setTournamentId(tournament.getId());
                 playerRoundRepository.save(playerRound);
             }
-        });
+        }
 
         return tournamentRoundLst;
+    }
+
+    private TournamentRound processExistingTournamentResult(TournamentResult tournamentResult,
+            PlayerRound playerRound, Round round, Player player, Tournament tournament,
+            Map<Long, Float> tournamentPlayers) {
+
+        log.debug("Attempting to update tournament result");
+
+        tournamentResult.setPlayedRounds(tournamentResult.getPlayedRounds() + 1);
+        int grossStrokes = 0;
+        int netStrokes = 0;
+
+        // calculate course HCP
+        int courseHCP = getCourseHCP(playerRound, round, player, tournamentPlayers.get(player.getId()));
+        int playingHCP = getPlayingHcp(tournament, courseHCP);
+
+        List<Integer> stb = updateSTB(tournamentResult, round, player, playingHCP);
+        // check if round is applicable for stroke statistic
+        boolean strokeApplicable = applicableForStroke(round, player);
+        if (strokeApplicable) {
+            tournamentResult.increaseStrokeRounds();
+            grossStrokes = getGrossStrokes(player, round);
+            netStrokes = getNetStrokes(grossStrokes, playingHCP);
+        }
+        tournamentResult.setStrokesBrutto(tournamentResult.getStrokesBrutto() + grossStrokes);
+        tournamentResult.setStrokesNetto(tournamentResult.getStrokesNetto() + netStrokes);
+
+        // save entity
+        tournamentResultRepository.save(tournamentResult);
+
+        String tee = playerRound.getTeeId() != null
+                ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
+                : null;
+        TournamentRound tournamentRound = addTournamentRound(stb.get(1), stb.get(0), grossStrokes, netStrokes,
+                getScoreDifferential(playerRound, round, player), round.getCourse().getName(),
+                tournamentResult, strokeApplicable, round.getId(), playingHCP,
+                tournamentPlayers.get(player.getId()), courseHCP, tee);
+
+        // update TournamentResults in case the number of added rounds is greater than bestRounds
+        updateForBestRounds(tournament, tournamentResult);
+
+        return tournamentRound;
+    }
+
+    private TournamentRound processNewTournamentResult(Player player, Tournament tournament,
+            PlayerRound playerRound, Round round, Map<Long, Float> tournamentPlayers) {
+
+        log.debug("Attempting to add the new round to tournament result");
+        // if it is the first record to be added to result then create it
+        var tournamentResult = buildEmptyTournamentResult(player);
+        tournamentResult.setTournament(tournament);
+
+        // calculate course HCP
+        int courseHCP = getCourseHCP(playerRound, round, player, tournamentPlayers.get(player.getId()));
+        int playingHCP = getPlayingHcp(tournament, courseHCP);
+
+        // update stb result
+        List<Integer> stb = updateSTB(tournamentResult, round, player, playingHCP);
+        // check if round is applicable for stroke statistic
+        boolean strokeApplicable = applicableForStroke(round, player);
+        if (strokeApplicable) {
+            tournamentResult.increaseStrokeRounds();
+            // get gross and net strokes
+            tournamentResult.setStrokesBrutto(getGrossStrokes(player, round));
+            tournamentResult.setStrokesNetto(getNetStrokes(tournamentResult.getStrokesBrutto(), playingHCP));
+        } else {
+            tournamentResult.setStrokesBrutto(0);
+            tournamentResult.setStrokesNetto(0);
+        }
+        // save entity
+        tournamentResultRepository.save(tournamentResult);
+
+        String tee = playerRound.getTeeId() != null
+                ? courseTeeRepository.findById(playerRound.getTeeId()).map(CourseTee::getTee).orElse(null)
+                : null;
+        return addTournamentRound(stb.get(1), stb.get(0), tournamentResult.getStrokesBrutto(),
+                tournamentResult.getStrokesNetto(), getScoreDifferential(playerRound, round, player),
+                round.getCourse().getName(), tournamentResult, strokeApplicable, round.getId(), playingHCP,
+                tournamentPlayers.get(player.getId()), courseHCP, tee);
     }
 
     private void updateForBestRounds(Tournament tournament, TournamentResult tournamentResult) {

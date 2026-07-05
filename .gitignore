@@ -29,6 +29,9 @@ build/
 
 ### VS Code ###
 .vscode/
+.github/agents/
+.github/prompts/
+.github/skills/
 /classpath
 /derby.log
 /src/main/resources/liquibase-diffChangeLog.xml
@@ -50,3 +53,4 @@ dep-output.txt
 .gitignore
 qodana.yaml
 dep2.txt
+sonar_issues.json
