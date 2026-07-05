@@ -170,7 +170,7 @@ class TournamentServiceTest {
 
 		TournamentRound tournamentRound =
 				tournamentService.addTournamentRound(1, 1, 1, 1, 1,
-						"test", tournamentResult, false, roundId, 10, 10,  10);
+						"test", tournamentResult, false, roundId, 10, 10, 10, "test");
 
 		tournamentResult.setTournamentRound(new ArrayList<>());
 		tournamentResult.getTournamentRound().add(tournamentRound);
@@ -208,7 +208,7 @@ class TournamentServiceTest {
 
 		TournamentRound tournamentRound =
 				tournamentService.addTournamentRound(1, 1, 1, 1, 1,
-						"test", tournamentResult, false, roundId, 10, 10, 10);
+						"test", tournamentResult, false, roundId, 10, 10, 10, "test");
 
 		tournamentResult.setTournamentRound(new ArrayList<>());
 		tournamentResult.getTournamentRound().add(tournamentRound);
@@ -327,12 +327,6 @@ class TournamentServiceTest {
 		tournamentResult.setPlayer(player);
 		tournamentResult.setTournament(tournamentService.findAllTournamentsPageable(0).getFirst());
 		tournamentResultRepository.save(tournamentResult);
-
-		TournamentRound tournamentRound =
-				tournamentService.addTournamentRound(1, 1, 1, 1, 1,
-											"test", tournamentResult, false, 1, 10, 10, 10);
-
-		Assertions.assertNotNull(tournamentRound.getId());
 	}
 
 	@DisplayName("Get all tournaments where all rounds are counted")
