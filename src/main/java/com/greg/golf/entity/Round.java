@@ -51,4 +51,7 @@ public class Round {
 	@ToString.Exclude
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
 	private List<ScoreCard> scoreCard = new ArrayList<>();
+
+	@Transient
+	private Long teeId;
 }
