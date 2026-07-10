@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.16.0'
-description = 'springboot 4 migration'
+version = '3.17.0'
+description = 'CR-03'
 
 application {
     mainClass = 'com.greg.golf.Golf'
