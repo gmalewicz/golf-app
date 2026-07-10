@@ -54,4 +54,7 @@ public class Round {
 
 	@Transient
 	private Long teeId;
+
+	@Transient
+	private Integer team;
 }

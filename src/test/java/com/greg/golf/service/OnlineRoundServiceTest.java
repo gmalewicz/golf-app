@@ -25,6 +25,7 @@ import com.greg.golf.entity.OnlineScoreCard;
 import com.greg.golf.entity.Player;
 import com.greg.golf.repository.OnlineRoundRepository;
 import com.greg.golf.repository.OnlineScoreCardRepository;
+import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
@@ -251,7 +252,49 @@ class OnlineRoundServiceTest {
 		
 		Assertions.assertEquals(1, roundRepository.findAll().size());
 	}
-	
+
+	@DisplayName("Finalize online round with team saves team to player round")
+	@Transactional
+	@Test
+	void finalizeOwnerRoundWithTeamIdTest(@Autowired RoundRepository roundRepository,
+										  @Autowired PlayerRoundRepository playerRoundRepository) {
+
+		OnlineRound onlineRound = new OnlineRound();
+		onlineRound.setCourse(course);
+		onlineRound.setCourseTee(courseTee);
+		onlineRound.setPlayer(player);
+		onlineRound.setDate(new Date());
+		onlineRound.setTeeTime("10:00");
+		onlineRound.setOwner(player.getId());
+		onlineRound.setIdentifier(2);
+		onlineRound.setFinalized(false);
+		onlineRound.setFormat(Common.STROKE_PLAY_FORMAT);
+		onlineRound.setTeam(3);
+
+		OnlineScoreCard onlineScoreCard = new OnlineScoreCard();
+		onlineScoreCard.setPlayer(player);
+		onlineScoreCard.setHole(1);
+		onlineScoreCard.setOnlineRound(onlineRound);
+		onlineScoreCard.setStroke(1);
+		onlineScoreCard.setPutt(0);
+		onlineScoreCard.setPenalty(0);
+		onlineScoreCard.setUpdate(false);
+		onlineScoreCard.setTime("10:00");
+
+		onlineRound.setScoreCard(new ArrayList<>());
+		onlineRound.getScoreCard().add(onlineScoreCard);
+
+		onlineRoundRepository.save(onlineRound);
+
+		onlineRoundService.finish(2);
+
+		var rounds = roundRepository.findAll();
+		Assertions.assertEquals(1, rounds.size());
+		var playerRound = playerRoundRepository.getForPlayerAndRound(player.getId(), rounds.getFirst().getId());
+		Assertions.assertTrue(playerRound.isPresent());
+		Assertions.assertEquals(3, playerRound.get().getTeam());
+	}
+
 	@DisplayName("Save online rounds")
 	@Transactional
 	@Test

@@ -37,4 +37,7 @@ public class PlayerRound {
 
 	@Column(name = "tee_type")
 	private Integer teeType;
+
+	@Column(name = "team")
+	private Integer team;
 }
