@@ -18,13 +18,14 @@ public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> 
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Modifying
-	@Query("UPDATE PlayerRound pr SET pr.whs = :whs, pr.teeId = :teeId, pr.sr = :sr, pr.cr = :cr, pr.teeType = :teeType where pr.playerId = :playerId AND pr.roundId = :roundId")
+	@Query("UPDATE PlayerRound pr SET pr.whs = :whs, pr.teeId = :teeId, pr.sr = :sr, pr.cr = :cr, pr.teeType = :teeType, pr.team = :team where pr.playerId = :playerId AND pr.roundId = :roundId")
 	void updatePlayerRoundInfo(@Param("whs") Float whs,
 							  @Param("sr") Integer sr,
 							  @Param("cr") Float cr,
-							  @Param("teeId") Long teeId,  
+							  @Param("teeId") Long teeId,
 							  @Param("teeType") Integer teeType,
-							  @Param("playerId") Long playerId, 
+							  @Param("team") Integer team,
+							  @Param("playerId") Long playerId,
 							  @Param("roundId") Long roundId);
 	
 	
@@ -56,5 +57,6 @@ public interface PlayerRoundRepository extends JpaRepository<PlayerRound, Long> 
 								@Param("sr") Integer sr,
 								@Param("playerId") Long playerId,
 								@Param("roundId") Long roundId);
+
 
 }

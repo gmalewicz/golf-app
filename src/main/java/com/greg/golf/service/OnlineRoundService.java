@@ -196,6 +196,8 @@ public class OnlineRoundService {
 
 		round.setScoreCard(scoreCards);
 
+		round.setTeam(onlineRound.getTeam());
+
 		roundService.saveRound(round);
 	}
 

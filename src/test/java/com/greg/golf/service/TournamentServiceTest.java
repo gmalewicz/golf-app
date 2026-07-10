@@ -101,7 +101,7 @@ class TournamentServiceTest {
 		round = roundRepository.save(round);
 		roundId = round.getId();
 
-		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round.getId());
+		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, null, player.getId(), round.getId());
 
 		// create the next round
 		var round2 = new Round();
@@ -125,7 +125,7 @@ class TournamentServiceTest {
 		}
 		roundRepository.save(round2);
 
-		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, player.getId(), round2.getId());
+		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, null, player.getId(), round2.getId());
 
 		var tournament = new Tournament();
 		tournament.setEndDate(new Date(1));

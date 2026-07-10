@@ -1,5 +1,6 @@
 package com.greg.golf.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.Getter;
@@ -28,4 +29,8 @@ public class PlayerRoundDto {
 
 	@Schema(description = "Tee type: 0 - 18 holes, 1 - first 9, 2 - second 9", example = "0", accessMode = READ_ONLY, minimum = "1", maximum = "2")
 	private Integer teeType;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Schema(description = "Team assignment: 1 - team 1, 2 - team 2. Absent if not assigned.", example = "1", accessMode = READ_ONLY, allowableValues = {"1", "2"})
+	private Integer team;
 }

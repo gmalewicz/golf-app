@@ -79,7 +79,7 @@ class ScoreCardServiceTest {
 		round.getScoreCard().add(scoreCard);
 		round = roundRepository.save(round);
 		roundId = round.getId();
-		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 1, 1F, 2L, 1, player.getId(), round.getId());
+		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 1, 1F, 2L, 1, null, player.getId(), round.getId());
 
 		log.info("Set up completed");
 	}

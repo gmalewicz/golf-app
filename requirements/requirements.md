@@ -2,3 +2,4 @@
 |-------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | CR-01 | Endpoint GET /rest/TournamentResultRound/{resultId} shall return also field tee (string). It shall be added when record in database is created. It can be null, to cover old records in production database. |
 | CR-02 | Endpoint PATCH rest/ScoreCard should accept optional teeId (Long) field. If provided application shall update teeId for that round for that player. |
+| CR-03 | Finalization of online round shall save optional field teamId to player round table. |

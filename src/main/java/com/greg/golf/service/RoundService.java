@@ -83,12 +83,13 @@ public class RoundService {
 			existingRound.getScoreCard().addAll(round.getScoreCard());
 			roundRepository.save(existingRound);
 			round.setId(existingRound.getId());
-			playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 
+			playerRoundRepository.updatePlayerRoundInfo(player.getWhs(),
 														round.getCourse().getTees().getFirst().getSr(),
 														round.getCourse().getTees().getFirst().getCr(),
 														round.getCourse().getTees().getFirst().getId(),
 														round.getCourse().getTees().getFirst().getTeeType(),
-														player.getId(), 
+														round.getTeam(),
+														player.getId(),
 														round.getId());
 		}, () -> {
 			log.debug("trying to add not matching round");
@@ -97,10 +98,11 @@ public class RoundService {
 			playerRoundRepository.updatePlayerRoundInfo(player.getWhs(),
 													round.getCourse().getTees().getFirst().getSr(),
 													round.getCourse().getTees().getFirst().getCr(),
-								  					round.getCourse().getTees().getFirst().getId(),
-								  					round.getCourse().getTees().getFirst().getTeeType(),
-								  					player.getId(), 
-								  					round.getId());
+														round.getCourse().getTees().getFirst().getId(),
+														round.getCourse().getTees().getFirst().getTeeType(),
+														round.getTeam(),
+														player.getId(),
+														round.getId());
 		});
 
 		return round;
