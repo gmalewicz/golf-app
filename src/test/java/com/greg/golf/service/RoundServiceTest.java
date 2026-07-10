@@ -36,6 +36,11 @@ import com.greg.golf.repository.RoundRepository;
 import com.greg.golf.repository.TournamentRepository;
 import com.greg.golf.service.events.RoundEvent;
 import com.greg.golf.util.GolfPostgresqlContainer;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -391,6 +396,11 @@ class RoundServiceTest {
 		scoreCard.setRound(round);
 		scoreCard.setStroke(6);
 		newRound.getScoreCard().add(scoreCard);
+		// set up security context
+		var requestPlayer = round.getPlayer().iterator().next();
+		UserDetails userDetails = new User(requestPlayer.getId().toString(), requestPlayer.getPassword(), new ArrayList<SimpleGrantedAuthority>());
+		var auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(auth);
 		// update the scorecard
 		roundService.updateScoreCard(newRound);
 
