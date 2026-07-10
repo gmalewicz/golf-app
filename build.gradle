@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.17.0'
-description = 'CR-03'
+version = '3.18.0'
+description = 'add checks to editRound to protect backend'
 
 application {
     mainClass = 'com.greg.golf.Golf'
