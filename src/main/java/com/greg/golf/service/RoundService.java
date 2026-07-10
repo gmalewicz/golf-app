@@ -25,6 +25,8 @@ import com.greg.golf.error.TooManyPlayersException;
 import com.greg.golf.repository.CourseTeeRepository;
 import com.greg.golf.repository.PlayerRoundRepository;
 import com.greg.golf.repository.RoundRepository;
+import com.greg.golf.repository.TournamentRepository;
+import com.greg.golf.service.helpers.RoleVerification;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +40,7 @@ public class RoundService {
 	private final PlayerRoundRepository playerRoundRepository;
 	private final PlayerRepository playerRepository;
 	private final CourseTeeRepository courseTeeRepository;
+	private final TournamentRepository tournamentRepository;
 	
 	public Optional<Round> getWithPlayers (Long id) {
 		return roundRepository.findById(id);
@@ -172,22 +175,34 @@ public class RoundService {
 		var round = roundRepository.findById(updRound.getId()).orElseThrow();
 		
 		// verify if round contains one and only one player
-		// also update the round which was assigned for tournament is not allowed
 		if (updRound.getPlayer() == null || updRound.getPlayer().size() != 1) {
 			throw new ScoreCardUpdateException();
 		}
+
+		// get first player from set to check tournament membership
+		var requestPlayer = updRound.getPlayer().iterator().next();
+
+		// check if the round belongs to a tournament via player_round
+		var playerRound = playerRoundRepository.getForPlayerAndRound(requestPlayer.getId(), updRound.getId()).orElseThrow();
+
+		if (playerRound.getTournamentId() == null) {
+			// round not in tournament: only the round owner (the player themselves) may update
+			RoleVerification.verifyPlayer(requestPlayer.getId(), "Attempt to update score card by unauthorized user");
+		} else {
+			// round belongs to a tournament: only the tournament owner may update
+			var tournament = tournamentRepository.findById(playerRound.getTournamentId()).orElseThrow();
+			RoleVerification.verifyPlayer(tournament.getPlayer().getId(), "Attempt to update tournament score card by unauthorized user");
+		}
 		
-		// get first player from set
-		var player = updRound.getPlayer().iterator().next();
 		// remove scorecard object that matching player from round
 		round.getScoreCard().removeAll((round.getScoreCard()
 				.stream()
-				.filter(sc -> sc.getPlayer().getId().equals(player.getId()))
+				.filter(sc -> sc.getPlayer().getId().equals(requestPlayer.getId()))
 				.toList()));
 
 		updRound.getScoreCard().forEach(sc -> {
 			sc.setRound(updRound);
-			sc.setPlayer(player);
+			sc.setPlayer(requestPlayer);
 		});
 		round.getScoreCard().addAll(updRound.getScoreCard());
 
@@ -195,7 +210,7 @@ public class RoundService {
 
 		if (updRound.getTeeId() != null) {
 			var courseTee = courseTeeRepository.findById(updRound.getTeeId()).orElseThrow();
-			playerRoundRepository.updatePlayerRoundTeeId(updRound.getTeeId(), courseTee.getCr(), courseTee.getSr(), player.getId(), updRound.getId());
+			playerRoundRepository.updatePlayerRoundTeeId(updRound.getTeeId(), courseTee.getCr(), courseTee.getSr(), requestPlayer.getId(), updRound.getId());
 		}
 
 		log.debug("Score card updated");

@@ -33,4 +33,8 @@ public class PlayerRoundDto {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@Schema(description = "Team assignment: 1 - team 1, 2 - team 2. Absent if not assigned.", example = "1", accessMode = READ_ONLY, allowableValues = {"1", "2"})
 	private Integer team;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Schema(description = "Tournament identifier", example = "5", accessMode = READ_ONLY)
+	private Long tournamentId;
 }
