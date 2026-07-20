@@ -39,13 +39,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	private static final String REFRESH = "Refresh";
 	private static final String REFRESH_TOKEN = "refreshToken";
 	private static final String ACCESS_TOKEN = "accessToken";
+	public static final String VERIFIED_USER_ID = "verifiedUserId";
 
-	private static final String HCP_HEADER= "hcp";
+	private static final String HCP_HEADER = "hcp";
+	private static final String SEX_HEADER = "sex";
 
-	private static final String SEX_HEADER= "sex";
-
-	private static final int ACCESS_TOKEN_ERROR= 999;
-	private static final int REFRESH_TOKEN_ERROR= 998;
+	// RFC 6750 — standard Bearer error codes delivered via WWW-Authenticate header
+	private static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
+	// access token expired but a refresh token is present — client should call /rest/Refresh
+	static final String TOKEN_EXPIRED_VALUE = "Bearer error=\"token_expired\"";
+	// no usable token at all / refresh also expired — client must re-authenticate
+	static final String INVALID_TOKEN_VALUE = "Bearer error=\"invalid_token\"";
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
@@ -92,12 +96,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		if (jwtToken != null || refreshToken != null) {
 
+			if (jwtToken == null) {
+				// Only a refresh cookie is present — no access token to validate.
+				// Treat as expired so the client is directed to call /rest/Refresh.
+				log.info("No access token cookie present; only refresh token available");
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setHeader(WWW_AUTHENTICATE_HEADER, TOKEN_EXPIRED_VALUE);
+				return null;
+			}
+
 			try {
 				userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
 
 			} catch (ExpiredJwtException e) {
 				log.info("JWT Token has expired for player: " + e.getClaims().getSubject());
-				response.setStatus(ACCESS_TOKEN_ERROR);
+				// Signal the client to call /rest/Refresh using the standard 401 + WWW-Authenticate
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setHeader(WWW_AUTHENTICATE_HEADER, TOKEN_EXPIRED_VALUE);
 				jwtToken = processRefreshRequest(request, e, refreshToken);
 				if (jwtToken != null) {
 					userId = e.getClaims().getSubject();
@@ -106,7 +121,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				log.error("Unable to get JWT Token");
 			}
 		} else {
-			response.setStatus(REFRESH_TOKEN_ERROR);
+			// No cookies at all — session is dead, client must log in again
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
 		}
 		return userId;
 	}
@@ -189,6 +206,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 					jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());
 					request.setAttribute(REFRESH_TOKEN, jwtToken);
+					// store the verified player id so the controller can assert the path variable matches
+					request.setAttribute(VERIFIED_USER_ID, player.getId());
 				}
 			} catch (Exception ex) {
 				log.info("Refresh token expired or not available: " + ex.getClass());
