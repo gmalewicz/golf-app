@@ -402,4 +402,58 @@ class CycleServiceTest {
         assertEquals(0, results.getFirst().getOldPlace(),
                 "oldPlace should be reset to 0 after tournament deletion");
     }
+
+    @DisplayName("Should compute stroke play oldPlace using the achieved/not-achieved ordering")
+    @Transactional
+    @Test
+    void strokePlayOldPlaceRespectsBestRoundsPartitionTest() {
+
+        // stroke play (series 2): lower strokes are better; require 3 best rounds
+        cycle.setBestRounds(3);
+        cycle.setSeries(2);
+        cycle = cycleService.addCycle(cycle);
+
+        // Tournament 1: Alpha 10, Beta 20 (both played 1 round -> not achieved)
+        addStrokePlayTournament("T1", strokePlayPlayer("Alpha", "A", 10),
+                strokePlayPlayer("Beta", "B", 20));
+
+        // Tournament 2: Alpha 10, Beta 20 (both played 2 rounds -> still not achieved)
+        addStrokePlayTournament("T2", strokePlayPlayer("Alpha", "A", 10),
+                strokePlayPlayer("Beta", "B", 20));
+
+        // Tournament 3: only Beta plays 5 (Beta played 3 -> achieved, Alpha still played 2)
+        addStrokePlayTournament("T3", strokePlayPlayer("Beta", "B", 5));
+
+        // Before Tournament 4 the standings are: Beta (achieved) rank 1, Alpha (not achieved) rank 2,
+        // even though Alpha has fewer cumulative strokes. This is the case the fix must honour.
+        // Tournament 4: only Alpha plays 5 (Alpha played 3 -> achieved)
+        addStrokePlayTournament("T4", strokePlayPlayer("Alpha", "A", 5));
+
+        var results = cycleService.findCycleResults(cycle.getId());
+        var alpha = results.stream().filter(r -> r.getPlayerName().contains("Alpha")).findFirst().orElseThrow();
+        var beta  = results.stream().filter(r -> r.getPlayerName().contains("Beta")).findFirst().orElseThrow();
+
+        // Before T4: Beta was displayed first (achieved), Alpha second (not achieved)
+        assertEquals(1, beta.getOldPlace(), "Beta was displayed in position 1 before the last tournament");
+        assertEquals(2, alpha.getOldPlace(), "Alpha was displayed in position 2 before the last tournament");
+    }
+
+    private EagleResultDto strokePlayPlayer(String lastName, String firstName, int strokes) {
+        var dto = new EagleResultDto();
+        dto.setR(new int[]{strokes, 0, 0, 0});
+        dto.setWhs(11.0F);
+        dto.setLastName(lastName);
+        dto.setFirstName(firstName);
+        dto.setSeries(2);
+        return dto;
+    }
+
+    private void addStrokePlayTournament(String name, EagleResultDto... players) {
+        var tournament = new CycleTournament();
+        tournament.setName(name);
+        tournament.setBestOf(false);
+        tournament.setRounds(1);
+        tournament.setCycle(cycle);
+        cycleService.addCycleTournament(tournament, players);
+    }
 }

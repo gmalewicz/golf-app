@@ -121,8 +121,8 @@ public class CycleService {
 
         } else {
             // capture rank per series before merging the new tournament
-            // sorted by cycleScore descending (same ordering as the query)
-            var oldPlaceMap = computePlaceMap(cycleResults);
+            // using the same ordering the UI applies for each series
+            var oldPlaceMap = computePlaceMap(cycleResults, cycleTournament.getCycle().getBestRounds());
 
             List<CycleResult> newTournament = prepareTournament(cycleTournament, eagleResultDto);
             cycleResults = addTournamentToCycleResult(cycleResults, newTournament);
@@ -136,28 +136,56 @@ public class CycleService {
     }
 
     /**
-     * Computes a map of "series:playerName" -> 1-based rank (by cycleScore descending)
-     * from the current results before a new tournament is added.
+     * Computes a map of "series:playerName" -> 1-based rank from the current results
+     * before a new tournament is added. The ranking mirrors the ordering the UI uses
+     * to display each series so that oldPlace reflects the previously shown position.
+     *
+     * <ul>
+     *     <li>Stableford (series 1): higher cycleScore is better (descending).</li>
+     *     <li>Stroke play (series 2): players who reached the required number of best
+     *     rounds come first, ordered by strokes ascending; the remaining players follow,
+     *     ordered by rounds played descending and then strokes ascending.</li>
+     * </ul>
      */
-    private java.util.Map<String, Integer> computePlaceMap(List<CycleResult> cycleResults) {
+    private java.util.Map<String, Integer> computePlaceMap(List<CycleResult> cycleResults, int bestRounds) {
         var placeMap = new java.util.HashMap<String, Integer>();
         // group by series
         cycleResults.stream()
             .collect(groupingBy(CycleResult::getSeries))
             .forEach((series, resultsForSeries) -> {
-                // series 2 is stroke play: lower score is better (ascending)
-                // series 1 is stableford: higher score is better (descending)
-                Comparator<CycleResult> comparator = series == 2
-                    ? Comparator.comparingInt(CycleResult::getCycleScore)
-                    : Comparator.comparingInt(CycleResult::getCycleScore).reversed();
-                var sorted = resultsForSeries.stream()
-                    .sorted(comparator)
-                    .toList();
+                List<CycleResult> sorted;
+                if (series == Common.CYCLE_SERIES_STB) {
+                    // stableford: higher score is better (descending)
+                    sorted = resultsForSeries.stream()
+                        .sorted(Comparator.comparingInt(CycleResult::getCycleScore).reversed())
+                        .toList();
+                } else {
+                    // stroke play: mirror the UI's two-tier ordering
+                    var achieved = resultsForSeries.stream()
+                        .filter(r -> playedRounds(r) >= bestRounds)
+                        .sorted(Comparator.comparingInt(CycleResult::getCycleScore))
+                        .toList();
+                    var notAchieved = resultsForSeries.stream()
+                        .filter(r -> playedRounds(r) < bestRounds)
+                        .sorted(Comparator.comparingInt(CycleService::playedRounds).reversed()
+                                .thenComparingInt(CycleResult::getCycleScore))
+                        .toList();
+                    sorted = Stream.concat(achieved.stream(), notAchieved.stream()).toList();
+                }
                 for (int i = 0; i < sorted.size(); i++) {
                     placeMap.put(series + ":" + sorted.get(i).getPlayerName(), i + 1);
                 }
             });
         return placeMap;
+    }
+
+    /**
+     * Counts the number of rounds a player actually played (scores greater than zero).
+     */
+    private static int playedRounds(CycleResult cycleResult) {
+        return (int) Arrays.stream(cycleResult.getResults())
+                .filter(result -> result > 0)
+                .count();
     }
 
     private List<CycleResult> addTournamentToCycleResult(List<CycleResult> cycleResults, List<CycleResult> tournamentResults) {
