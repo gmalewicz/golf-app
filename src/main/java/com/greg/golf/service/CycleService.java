@@ -93,13 +93,14 @@ public class CycleService {
 
         var results = cycleResultRepository.findByCycle(cycle);
 
-
         results.forEach(result -> {
             // first remove results
             result.setResults(Arrays.stream(result.getResults())
                 .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray(Integer[]::new));
             // second remove hcp
             result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1));
+            // reset old place after deletion
+            result.setOldPlace(0);
         });
 
         // then update totals
@@ -115,15 +116,43 @@ public class CycleService {
         // if not process initial insert, if yes process update
         if (cycleResults.isEmpty()) {
             cycleResults = prepareTournament(cycleTournament, eagleResultDto);
+            // first tournament: oldPlace = 0 for all players
+            cycleResults.forEach(r -> r.setOldPlace(0));
 
         } else {
-            List<CycleResult> newTournament = prepareTournament(cycleTournament, eagleResultDto);
-            cycleResults = addTournamentToCycleResult( cycleResults,  newTournament);
+            // capture rank per series before merging the new tournament
+            // sorted by cycleScore descending (same ordering as the query)
+            var oldPlaceMap = computePlaceMap(cycleResults);
 
+            List<CycleResult> newTournament = prepareTournament(cycleTournament, eagleResultDto);
+            cycleResults = addTournamentToCycleResult(cycleResults, newTournament);
+
+            // apply captured old places; new players (not yet in the map) get 0
+            cycleResults.forEach(r -> r.setOldPlace(oldPlaceMap.getOrDefault(r.getSeries() + ":" + r.getPlayerName(), 0)));
         }
 
         // update total and cycle result
         cycleResultRepository.saveAll(updCycleResultAndTotal(cycleTournament, cycleResults));
+    }
+
+    /**
+     * Computes a map of "series:playerName" -> 1-based rank (by cycleScore descending)
+     * from the current results before a new tournament is added.
+     */
+    private java.util.Map<String, Integer> computePlaceMap(List<CycleResult> cycleResults) {
+        var placeMap = new java.util.HashMap<String, Integer>();
+        // group by series
+        cycleResults.stream()
+            .collect(groupingBy(CycleResult::getSeries))
+            .forEach((series, resultsForSeries) -> {
+                var sorted = resultsForSeries.stream()
+                    .sorted(Comparator.comparingInt(CycleResult::getCycleScore).reversed())
+                    .toList();
+                for (int i = 0; i < sorted.size(); i++) {
+                    placeMap.put(series + ":" + sorted.get(i).getPlayerName(), i + 1);
+                }
+            });
+        return placeMap;
     }
 
     private List<CycleResult> addTournamentToCycleResult(List<CycleResult> cycleResults, List<CycleResult> tournamentResults) {

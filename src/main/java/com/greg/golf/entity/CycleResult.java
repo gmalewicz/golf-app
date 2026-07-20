@@ -55,4 +55,7 @@ public class CycleResult {
     @NotNull
     @Column(name = "hcp")
     private String[] hcp;
+
+    @Column(name = "old_place")
+    private Integer oldPlace;
 }

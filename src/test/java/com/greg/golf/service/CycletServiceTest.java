@@ -273,4 +273,133 @@ class CycleServiceTest {
 
         assertDoesNotThrow(() -> cycleService.deleteCycle(cycle.getId()));
     }
+
+    @DisplayName("Should set oldPlace=0 for all players when first tournament is added")
+    @Transactional
+    @Test
+    void addFirstTournamentSetsOldPlaceZeroTest() {
+
+        cycle = cycleService.addCycle(cycle);
+
+        var cycleTournament = new CycleTournament();
+        cycleTournament.setName("First tournament");
+        cycleTournament.setBestOf(false);
+        cycleTournament.setRounds(1);
+        cycleTournament.setCycle(cycle);
+
+        cycleService.addCycleTournament(cycleTournament, new EagleResultDto[]{eagleResultDto});
+
+        var results = cycleService.findCycleResults(cycle.getId());
+        assertFalse(results.isEmpty());
+        results.forEach(r -> assertEquals(0, r.getOldPlace(),
+                "oldPlace should be 0 for every player after the first tournament"));
+    }
+
+    @DisplayName("Should record previous place when second tournament is added")
+    @Transactional
+    @Test
+    void addSecondTournamentSetsOldPlaceTest() {
+
+        cycle.setBestRounds(0);
+        cycle = cycleService.addCycle(cycle);
+
+        // first tournament: player 1 scores 40, player 2 scores 30
+        var t1 = new CycleTournament();
+        t1.setName("Tournament 1");
+        t1.setBestOf(false);
+        t1.setRounds(1);
+        t1.setCycle(cycle);
+
+        var player2 = new EagleResultDto();
+        player2.setR(new int[]{30, 0, 0, 0});
+        player2.setWhs(11.0F);
+        player2.setLastName("Doe");
+        player2.setFirstName("John");
+        player2.setSeries(1);
+
+        cycleService.addCycleTournament(t1, new EagleResultDto[]{eagleResultDto, player2});
+
+        // after first tournament: Bond rank=1 (40pts), Doe rank=2 (30pts)
+        var afterFirst = cycleService.findCycleResults(cycle.getId());
+        afterFirst.forEach(r -> assertEquals(0, r.getOldPlace(),
+                "oldPlace should be 0 after the first tournament"));
+
+        // second tournament: player 2 scores 50, player 1 scores 10
+        var t2 = new CycleTournament();
+        t2.setName("Tournament 2");
+        t2.setBestOf(false);
+        t2.setRounds(1);
+        t2.setCycle(cycle);
+
+        var bondT2 = new EagleResultDto();
+        bondT2.setR(new int[]{10, 0, 0, 0});
+        bondT2.setWhs(11.0F);
+        bondT2.setLastName("Bond");
+        bondT2.setFirstName("James");
+        bondT2.setSeries(1);
+
+        var doeT2 = new EagleResultDto();
+        doeT2.setR(new int[]{50, 0, 0, 0});
+        doeT2.setWhs(11.0F);
+        doeT2.setLastName("Doe");
+        doeT2.setFirstName("John");
+        doeT2.setSeries(1);
+
+        cycleService.addCycleTournament(t2, new EagleResultDto[]{bondT2, doeT2});
+
+        // after second tournament results are sorted by cycleScore DESC: Doe=80, Bond=50
+        var afterSecond = cycleService.findCycleResults(cycle.getId());
+        assertEquals(2, afterSecond.size());
+
+        // find each player by name
+        var bondResult = afterSecond.stream().filter(r -> r.getPlayerName().contains("Bond")).findFirst().orElseThrow();
+        var doeResult  = afterSecond.stream().filter(r -> r.getPlayerName().contains("Doe")).findFirst().orElseThrow();
+
+        // Bond was rank 1 before second tournament
+        assertEquals(1, bondResult.getOldPlace(), "Bond should have oldPlace=1");
+        // Doe was rank 2 before second tournament
+        assertEquals(2, doeResult.getOldPlace(), "Doe should have oldPlace=2");
+    }
+
+    @DisplayName("Should set oldPlace=0 for all players after tournament deletion")
+    @Transactional
+    @Test
+    void deleteTournamentResetsOldPlaceTest(@Autowired CycleRepository cycleRepository,
+                                            @Autowired CycleTournamentRepository cycleTournamentRepository,
+                                            @Autowired CycleResultRepository cycleResultRepository) {
+
+        cycleRepository.save(cycle);
+
+        var t1 = new CycleTournament();
+        t1.setName("Tournament A");
+        t1.setBestOf(false);
+        t1.setRounds(1);
+        t1.setCycle(cycle);
+        cycleTournamentRepository.save(t1);
+
+        var t2 = new CycleTournament();
+        t2.setName("Tournament B");
+        t2.setBestOf(false);
+        t2.setRounds(1);
+        t2.setCycle(cycle);
+        cycleTournamentRepository.save(t2);
+
+        var cr = new CycleResult();
+        cr.setResults(new Integer[]{40, 0, 0, 0, 30, 0, 0, 0});
+        cr.setHcp(new String[]{"11.0", "11.0"});
+        cr.setPlayerName("James Bond");
+        cr.setCycle(cycle);
+        cr.setCycleScore(70);
+        cr.setTotal(70);
+        cr.setSeries(1);
+        cr.setOldPlace(1);
+        cycleResultRepository.save(cr);
+
+        cycleService.removeLastCycleTournament(cycle);
+
+        var results = cycleResultRepository.findByCycle(cycle);
+        assertEquals(1, results.size());
+        assertEquals(0, results.getFirst().getOldPlace(),
+                "oldPlace should be reset to 0 after tournament deletion");
+    }
 }
