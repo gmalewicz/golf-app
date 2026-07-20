@@ -145,8 +145,13 @@ public class CycleService {
         cycleResults.stream()
             .collect(groupingBy(CycleResult::getSeries))
             .forEach((series, resultsForSeries) -> {
+                // series 2 is stroke play: lower score is better (ascending)
+                // series 1 is stableford: higher score is better (descending)
+                Comparator<CycleResult> comparator = series == 2
+                    ? Comparator.comparingInt(CycleResult::getCycleScore)
+                    : Comparator.comparingInt(CycleResult::getCycleScore).reversed();
                 var sorted = resultsForSeries.stream()
-                    .sorted(Comparator.comparingInt(CycleResult::getCycleScore).reversed())
+                    .sorted(comparator)
                     .toList();
                 for (int i = 0; i < sorted.size(); i++) {
                     placeMap.put(series + ":" + sorted.get(i).getPlayerName(), i + 1);
