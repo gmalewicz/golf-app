@@ -2,6 +2,7 @@ package com.greg.golf.controller;
 
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.helpers.Common;
+import com.greg.golf.security.JwtRequestFilter;
 import com.greg.golf.security.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -68,10 +69,13 @@ public class AccessController extends BaseController {
 
 		String userId = jwtTokenUtil.getUserIdFromToken(requestTokenHeader.substring(7));
 		GolfUserDetails userDetails = playerService.loadUserById(Long.valueOf(userId));
-        log.info("get data for social player : {}", userDetails.getPlayer().getNick());
+		log.info("get data for social player : {}", userDetails.getPlayer().getNick());
 
 		var responseHeaders = new HttpHeaders();
-		responseHeaders.set("refresh", playerService.generateRefreshToken(userDetails));
+		// Issue both tokens as secure HttpOnly cookies (same as the standard login flow).
+		// Previously the refresh token was sent as a plain response header, which is
+		// readable by JavaScript and undermines XSS protection.
+		updateTokens(responseHeaders, userDetails.getPlayer().getId());
 
 		return new ResponseEntity<>(modelMapper.map(userDetails.getPlayer(), PlayerDto.class), responseHeaders, HttpStatus.OK);
 	}
@@ -140,6 +144,14 @@ public class AccessController extends BaseController {
 
         log.debug("trying to refresh token for player id: {}", id);
 
+		// Verify the path variable matches the player confirmed by the refresh token in the filter.
+		// This prevents an attacker from supplying an arbitrary id to obtain tokens for another user.
+		Long verifiedId = (Long) request.getAttribute(JwtRequestFilter.VERIFIED_USER_ID);
+		if (verifiedId == null || !verifiedId.equals(id)) {
+			log.error("Refresh id mismatch: requested={}, verified={}", id, verifiedId);
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+
 		var responseHeaders = new HttpHeaders();
 
 		updateTokens(responseHeaders, id);
@@ -154,18 +166,17 @@ public class AccessController extends BaseController {
 		var accessToken = playerService.generateJwtToken(userDetails);
 		var refreshToken = playerService.generateRefreshToken(userDetails);
 
-		// both cookies lifetime has set to be equal the longer one
-		// set accessToken to cookie header
+		// set accessToken cookie — expires together with the JWT inside it (4 hours)
 		ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
 				.httpOnly(true)
 				.secure(true)
 				.sameSite(SAME_SITE_STRICT)
 				.path(PATH)
-				.maxAge(Common.REFRESH_TOKEN_LIFETIME)
+				.maxAge(Common.ACCESS_TOKEN_LIFETIME)
 				.build();
 		responseHeaders.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		// set accessToken to cookie header
+		// set refreshToken cookie — longer lifetime to allow silent renewal (7 days)
 		ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken)
 				.httpOnly(true)
 				.secure(true)

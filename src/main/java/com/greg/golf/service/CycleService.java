@@ -93,13 +93,14 @@ public class CycleService {
 
         var results = cycleResultRepository.findByCycle(cycle);
 
-
         results.forEach(result -> {
             // first remove results
             result.setResults(Arrays.stream(result.getResults())
                 .limit(result.getResults().length - (long)ROUNDS_PER_TOURNAMENT).toArray(Integer[]::new));
             // second remove hcp
             result.setHcp(Arrays.copyOf(result.getHcp(), result.getHcp().length - 1));
+            // reset old place after deletion
+            result.setOldPlace(0);
         });
 
         // then update totals
@@ -115,15 +116,76 @@ public class CycleService {
         // if not process initial insert, if yes process update
         if (cycleResults.isEmpty()) {
             cycleResults = prepareTournament(cycleTournament, eagleResultDto);
+            // first tournament: oldPlace = 0 for all players
+            cycleResults.forEach(r -> r.setOldPlace(0));
 
         } else {
-            List<CycleResult> newTournament = prepareTournament(cycleTournament, eagleResultDto);
-            cycleResults = addTournamentToCycleResult( cycleResults,  newTournament);
+            // capture rank per series before merging the new tournament
+            // using the same ordering the UI applies for each series
+            var oldPlaceMap = computePlaceMap(cycleResults, cycleTournament.getCycle().getBestRounds());
 
+            List<CycleResult> newTournament = prepareTournament(cycleTournament, eagleResultDto);
+            cycleResults = addTournamentToCycleResult(cycleResults, newTournament);
+
+            // apply captured old places; new players (not yet in the map) get 0
+            cycleResults.forEach(r -> r.setOldPlace(oldPlaceMap.getOrDefault(r.getSeries() + ":" + r.getPlayerName(), 0)));
         }
 
         // update total and cycle result
         cycleResultRepository.saveAll(updCycleResultAndTotal(cycleTournament, cycleResults));
+    }
+
+    /**
+     * Computes a map of "series:playerName" -> 1-based rank from the current results
+     * before a new tournament is added. The ranking mirrors the ordering the UI uses
+     * to display each series so that oldPlace reflects the previously shown position.
+     *
+     * <ul>
+     *     <li>Stableford (series 1): higher cycleScore is better (descending).</li>
+     *     <li>Stroke play (series 2): players who reached the required number of best
+     *     rounds come first, ordered by strokes ascending; the remaining players follow,
+     *     ordered by rounds played descending and then strokes ascending.</li>
+     * </ul>
+     */
+    private java.util.Map<String, Integer> computePlaceMap(List<CycleResult> cycleResults, int bestRounds) {
+        var placeMap = new java.util.HashMap<String, Integer>();
+        // group by series
+        cycleResults.stream()
+            .collect(groupingBy(CycleResult::getSeries))
+            .forEach((series, resultsForSeries) -> {
+                List<CycleResult> sorted;
+                if (series == Common.CYCLE_SERIES_STB) {
+                    // stableford: higher score is better (descending)
+                    sorted = resultsForSeries.stream()
+                        .sorted(Comparator.comparingInt(CycleResult::getCycleScore).reversed())
+                        .toList();
+                } else {
+                    // stroke play: mirror the UI's two-tier ordering
+                    var achieved = resultsForSeries.stream()
+                        .filter(r -> playedRounds(r) >= bestRounds)
+                        .sorted(Comparator.comparingInt(CycleResult::getCycleScore))
+                        .toList();
+                    var notAchieved = resultsForSeries.stream()
+                        .filter(r -> playedRounds(r) < bestRounds)
+                        .sorted(Comparator.comparingInt(CycleService::playedRounds).reversed()
+                                .thenComparingInt(CycleResult::getCycleScore))
+                        .toList();
+                    sorted = Stream.concat(achieved.stream(), notAchieved.stream()).toList();
+                }
+                for (int i = 0; i < sorted.size(); i++) {
+                    placeMap.put(series + ":" + sorted.get(i).getPlayerName(), i + 1);
+                }
+            });
+        return placeMap;
+    }
+
+    /**
+     * Counts the number of rounds a player actually played (scores greater than zero).
+     */
+    private static int playedRounds(CycleResult cycleResult) {
+        return (int) Arrays.stream(cycleResult.getResults())
+                .filter(result -> result > 0)
+                .count();
     }
 
     private List<CycleResult> addTournamentToCycleResult(List<CycleResult> cycleResults, List<CycleResult> tournamentResults) {

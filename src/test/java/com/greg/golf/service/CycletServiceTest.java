@@ -70,7 +70,7 @@ class CycleServiceTest {
 
         eagleResultDto = new EagleResultDto();
         eagleResultDto.setR(new int[]{40, 0, 0, 0});
-        eagleResultDto.setWhs(36.0F);
+        eagleResultDto.setWhs(11.0F);
         eagleResultDto.setLastName("Bond");
         eagleResultDto.setFirstName("James");
         eagleResultDto.setSeries(1);
@@ -123,6 +123,7 @@ class CycleServiceTest {
         cycleResult.setCycleScore(40);
         cycleResult.setTotal(40);
         cycleResult.setSeries(1);
+        cycleResult.setOldPlace(0);
         cycleResultRepository.save(cycleResult);
 
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
@@ -161,6 +162,7 @@ class CycleServiceTest {
         cycleResult.setCycleScore(70);
         cycleResult.setTotal(70);
         cycleResult.setSeries(1);
+        cycleResult.setOldPlace(0);
         cycleResultRepository.save(cycleResult);
 
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
@@ -272,5 +274,188 @@ class CycleServiceTest {
         cycle = cycleService.addCycle(cycle);
 
         assertDoesNotThrow(() -> cycleService.deleteCycle(cycle.getId()));
+    }
+
+    @DisplayName("Should set oldPlace=0 for all players when first tournament is added")
+    @Transactional
+    @Test
+    void addFirstTournamentSetsOldPlaceZeroTest() {
+
+        cycle = cycleService.addCycle(cycle);
+
+        var cycleTournament = new CycleTournament();
+        cycleTournament.setName("First tournament");
+        cycleTournament.setBestOf(false);
+        cycleTournament.setRounds(1);
+        cycleTournament.setCycle(cycle);
+
+        cycleService.addCycleTournament(cycleTournament, new EagleResultDto[]{eagleResultDto});
+
+        var results = cycleService.findCycleResults(cycle.getId());
+        assertFalse(results.isEmpty());
+        results.forEach(r -> assertEquals(0, r.getOldPlace(),
+                "oldPlace should be 0 for every player after the first tournament"));
+    }
+
+    @DisplayName("Should record previous place when second tournament is added")
+    @Transactional
+    @Test
+    void addSecondTournamentSetsOldPlaceTest() {
+
+        cycle.setBestRounds(0);
+        cycle = cycleService.addCycle(cycle);
+
+        // first tournament: player 1 scores 40, player 2 scores 30
+        var t1 = new CycleTournament();
+        t1.setName("Tournament 1");
+        t1.setBestOf(false);
+        t1.setRounds(1);
+        t1.setCycle(cycle);
+
+        var player2 = new EagleResultDto();
+        player2.setR(new int[]{30, 0, 0, 0});
+        player2.setWhs(11.0F);
+        player2.setLastName("Doe");
+        player2.setFirstName("John");
+        player2.setSeries(1);
+
+        cycleService.addCycleTournament(t1, new EagleResultDto[]{eagleResultDto, player2});
+
+        // after first tournament: Bond rank=1 (40pts), Doe rank=2 (30pts)
+        var afterFirst = cycleService.findCycleResults(cycle.getId());
+        afterFirst.forEach(r -> assertEquals(0, r.getOldPlace(),
+                "oldPlace should be 0 after the first tournament"));
+
+        // second tournament: player 2 scores 50, player 1 scores 10
+        var t2 = new CycleTournament();
+        t2.setName("Tournament 2");
+        t2.setBestOf(false);
+        t2.setRounds(1);
+        t2.setCycle(cycle);
+
+        var bondT2 = new EagleResultDto();
+        bondT2.setR(new int[]{10, 0, 0, 0});
+        bondT2.setWhs(11.0F);
+        bondT2.setLastName("Bond");
+        bondT2.setFirstName("James");
+        bondT2.setSeries(1);
+
+        var doeT2 = new EagleResultDto();
+        doeT2.setR(new int[]{50, 0, 0, 0});
+        doeT2.setWhs(11.0F);
+        doeT2.setLastName("Doe");
+        doeT2.setFirstName("John");
+        doeT2.setSeries(1);
+
+        cycleService.addCycleTournament(t2, new EagleResultDto[]{bondT2, doeT2});
+
+        // after second tournament results are sorted by cycleScore DESC: Doe=80, Bond=50
+        var afterSecond = cycleService.findCycleResults(cycle.getId());
+        assertEquals(2, afterSecond.size());
+
+        // find each player by name
+        var bondResult = afterSecond.stream().filter(r -> r.getPlayerName().contains("Bond")).findFirst().orElseThrow();
+        var doeResult  = afterSecond.stream().filter(r -> r.getPlayerName().contains("Doe")).findFirst().orElseThrow();
+
+        // Bond was rank 1 before second tournament
+        assertEquals(1, bondResult.getOldPlace(), "Bond should have oldPlace=1");
+        // Doe was rank 2 before second tournament
+        assertEquals(2, doeResult.getOldPlace(), "Doe should have oldPlace=2");
+    }
+
+    @DisplayName("Should set oldPlace=0 for all players after tournament deletion")
+    @Transactional
+    @Test
+    void deleteTournamentResetsOldPlaceTest(@Autowired CycleRepository cycleRepository,
+                                            @Autowired CycleTournamentRepository cycleTournamentRepository,
+                                            @Autowired CycleResultRepository cycleResultRepository) {
+
+        cycleRepository.save(cycle);
+
+        var t1 = new CycleTournament();
+        t1.setName("Tournament A");
+        t1.setBestOf(false);
+        t1.setRounds(1);
+        t1.setCycle(cycle);
+        cycleTournamentRepository.save(t1);
+
+        var t2 = new CycleTournament();
+        t2.setName("Tournament B");
+        t2.setBestOf(false);
+        t2.setRounds(1);
+        t2.setCycle(cycle);
+        cycleTournamentRepository.save(t2);
+
+        var cr = new CycleResult();
+        cr.setResults(new Integer[]{40, 0, 0, 0, 30, 0, 0, 0});
+        cr.setHcp(new String[]{"11.0", "11.0"});
+        cr.setPlayerName("James Bond");
+        cr.setCycle(cycle);
+        cr.setCycleScore(70);
+        cr.setTotal(70);
+        cr.setSeries(1);
+        cr.setOldPlace(1);
+        cycleResultRepository.save(cr);
+
+        cycleService.removeLastCycleTournament(cycle);
+
+        var results = cycleResultRepository.findByCycle(cycle);
+        assertEquals(1, results.size());
+        assertEquals(0, results.getFirst().getOldPlace(),
+                "oldPlace should be reset to 0 after tournament deletion");
+    }
+
+    @DisplayName("Should compute stroke play oldPlace using the achieved/not-achieved ordering")
+    @Transactional
+    @Test
+    void strokePlayOldPlaceRespectsBestRoundsPartitionTest() {
+
+        // stroke play (series 2): lower strokes are better; require 3 best rounds
+        cycle.setBestRounds(3);
+        cycle.setSeries(2);
+        cycle = cycleService.addCycle(cycle);
+
+        // Tournament 1: Alpha 10, Beta 20 (both played 1 round -> not achieved)
+        addStrokePlayTournament("Tour1", strokePlayPlayer("Alpha", "A", 10),
+                strokePlayPlayer("Beta", "B", 20));
+
+        // Tournament 2: Alpha 10, Beta 20 (both played 2 rounds -> still not achieved)
+        addStrokePlayTournament("Tour2", strokePlayPlayer("Alpha", "A", 10),
+                strokePlayPlayer("Beta", "B", 20));
+
+        // Tournament 3: only Beta plays 5 (Beta played 3 -> achieved, Alpha still played 2)
+        addStrokePlayTournament("Tour3", strokePlayPlayer("Beta", "B", 5));
+
+        // Before Tournament 4 the standings are: Beta (achieved) rank 1, Alpha (not achieved) rank 2,
+        // even though Alpha has fewer cumulative strokes. This is the case the fix must honour.
+        // Tournament 4: only Alpha plays 5 (Alpha played 3 -> achieved)
+        addStrokePlayTournament("Tour4", strokePlayPlayer("Alpha", "A", 5));
+
+        var results = cycleService.findCycleResults(cycle.getId());
+        var alpha = results.stream().filter(r -> r.getPlayerName().contains("Alpha")).findFirst().orElseThrow();
+        var beta  = results.stream().filter(r -> r.getPlayerName().contains("Beta")).findFirst().orElseThrow();
+
+        // Before T4: Beta was displayed first (achieved), Alpha second (not achieved)
+        assertEquals(1, beta.getOldPlace(), "Beta was displayed in position 1 before the last tournament");
+        assertEquals(2, alpha.getOldPlace(), "Alpha was displayed in position 2 before the last tournament");
+    }
+
+    private EagleResultDto strokePlayPlayer(String lastName, String firstName, int strokes) {
+        var dto = new EagleResultDto();
+        dto.setR(new int[]{strokes, 0, 0, 0});
+        dto.setWhs(11.0F);
+        dto.setLastName(lastName);
+        dto.setFirstName(firstName);
+        dto.setSeries(2);
+        return dto;
+    }
+
+    private void addStrokePlayTournament(String name, EagleResultDto... players) {
+        var tournament = new CycleTournament();
+        tournament.setName(name);
+        tournament.setBestOf(false);
+        tournament.setRounds(1);
+        tournament.setCycle(cycle);
+        cycleService.addCycleTournament(tournament, players);
     }
 }

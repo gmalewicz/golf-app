@@ -40,4 +40,8 @@ public class CycleResultDto {
 	@Schema(description = "Hcp per round", accessMode = READ_ONLY)
 	@JsonProperty( value = "hcp", access = JsonProperty.Access.READ_ONLY)
 	private String[] hcp;
+
+	@Schema(description = "Player place before the last tournament was added. 0 means first tournament or after deletion.", accessMode = READ_ONLY)
+	@JsonProperty(value = "oldPlace", access = JsonProperty.Access.READ_ONLY)
+	private Integer oldPlace;
 }

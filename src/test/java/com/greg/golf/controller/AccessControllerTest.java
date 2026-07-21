@@ -168,11 +168,11 @@ class AccessControllerTest {
 				.content(objectMapper.writeValueAsString(output))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Should attempt to refresh token without header with correct result")
+	@DisplayName("Should return 403 when refresh attempted without verified token attribute")
 	@Test
-	void processAttemptRefreshTokenWithoutHeaderThenReturns200() throws Exception {
+	void processAttemptRefreshTokenWithoutHeaderThenReturns403() throws Exception {
 
-		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isForbidden());
 	}
 
 	@DisplayName("Should refresh token with correct result")
@@ -180,13 +180,16 @@ class AccessControllerTest {
 	void processRefreshTokenThenReturns200() throws Exception {
 
 		Player player = new Player();
+		player.setId(1L);
 		GolfUserDetails userDetails = new GolfUser("test", "welcome", new ArrayList<>(), player);
 
 		when(playerService.loadUserById(any())).thenReturn(userDetails);
 		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
 		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-		mockMvc.perform(get("/rest/Refresh/1").requestAttr("refreshToken", "exists")).andExpect(status().isOk());
+		mockMvc.perform(get("/rest/Refresh/1")
+				.requestAttr(JwtRequestFilter.VERIFIED_USER_ID, 1L))
+				.andExpect(status().isOk());
 	}
 
 	@DisplayName("Should delete with correct result")
@@ -254,11 +257,13 @@ class AccessControllerTest {
 
 		Player player = new Player();
 		player.setNick("test");
+		player.setId(1L);
 		GolfUserDetails gu = new GolfUser("test", "test", new ArrayList<>(), player);
 
 		when(jwtTokenUtil.getUserIdFromToken(any())).thenReturn("1");
 		when(playerService.loadUserById(any())).thenReturn(gu);
-		when(playerService.generateRefreshToken(any())).thenReturn("1");
+		when(playerService.generateJwtToken(any())).thenReturn("jwtToken");
+		when(playerService.generateRefreshToken(any())).thenReturn("refreshToken");
 
 		mockMvc.perform(get("/rest/GetSocialPlayer").header("Authorization","Bearer 1234")).andExpect(status().isOk());
 	}
