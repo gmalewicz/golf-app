@@ -248,7 +248,7 @@ public class CycleService {
                             Arrays.stream(new int[ROUNDS_PER_TOURNAMENT])).boxed().toArray(Integer[]::new));
 
                     var arrList = new ArrayList<>( Arrays.asList(cycleResult.getHcp()));
-                    arrList.add("");
+                    arrList.add(cycleResult.getHcp()[cycleResult.getHcp().length - 1]);
                     cycleResult.setHcp(arrList.toArray(cycleResult.getHcp()));
 
                 }
