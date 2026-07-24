@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.20.0'
-description = 'add checks to editRound to protect backend'
+version = '3.20.2'
+description = 'refresh token fixes'
 
 application {
     mainClass = 'com.greg.golf.Golf'
