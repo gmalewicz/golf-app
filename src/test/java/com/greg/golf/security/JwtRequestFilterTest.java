@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -151,5 +152,36 @@ class JwtRequestFilterTest {
 		} catch (Exception e) {
 			Assertions.fail("Should not have thrown any exception");
 		}
+	}
+
+	@DisplayName("Should renew token on refresh when only the refresh cookie is present (access cookie expired and dropped)")
+	@Transactional
+	@Test
+	void requestRefreshWithOnlyRefreshCookieTest(@Autowired PlayerRepository playerRepository) {
+
+		String refreshToken = refreshTokenUtil.generateToken("1");
+		var player = playerRepository.findById(1L).orElseThrow();
+		player.setRefresh(refreshToken);
+		playerRepository.save(player);
+
+		// No access token cookie at all — it shares the access token lifetime and has been
+		// deleted by the browser. Only the longer-lived refresh cookie remains.
+		Cookie refresh = new Cookie("refreshToken", refreshToken);
+		when(request.getCookies()).thenReturn(new Cookie[]{refresh});
+		when(request.getRequestURI()).thenReturn("/rest/Refresh/1");
+
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+
+		try {
+
+			jwtRequestFilter.doFilter(request, response, filterChain);
+		} catch (Exception e) {
+			Assertions.fail("Should not have thrown any exception");
+		}
+
+		// the refresh must be authorized: the verified id is exposed to the controller
+		// and the security context is populated so the endpoint is reachable
+		Mockito.verify(request).setAttribute(JwtRequestFilter.VERIFIED_USER_ID, 1L);
+		Assertions.assertNotNull(SecurityContextHolder.getContext().getAuthentication());
 	}
 }

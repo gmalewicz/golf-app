@@ -92,6 +92,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private String getUserId(String jwtToken, String refreshToken, HttpServletResponse response, HttpServletRequest request) {
 
+		// A refresh request is authorized purely on the strength of the refresh token cookie.
+		// It must NOT depend on the access token: the access token JWT and its cookie share the
+		// same lifetime, so by the time renewal is needed the access token is usually already gone.
+		if (request.getRequestURI().contains(REFRESH)) {
+			return handleRefreshRequest(refreshToken, response, request);
+		}
+
 		String userId = null;
 
 		if (jwtToken != null || refreshToken != null) {
@@ -113,10 +120,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				// Signal the client to call /rest/Refresh using the standard 401 + WWW-Authenticate
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.setHeader(WWW_AUTHENTICATE_HEADER, TOKEN_EXPIRED_VALUE);
-				jwtToken = processRefreshRequest(request, e, refreshToken);
-				if (jwtToken != null) {
-					userId = e.getClaims().getSubject();
-				}
 			} catch (Exception e) {
 				log.error("Unable to get JWT Token");
 			}
@@ -177,44 +180,63 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		}
 	}
 
-	private String processRefreshRequest(HttpServletRequest request, ExpiredJwtException e, String refreshToken) {
+	// Authorizes a /rest/Refresh request based solely on the refresh token cookie.
+	// Returns the verified player id (so the caller can establish the security context)
+	// or null after setting the appropriate 401 response when the refresh cannot proceed.
+	private String handleRefreshRequest(String refreshToken, HttpServletResponse response, HttpServletRequest request) {
 
-		String jwtToken = null;
-
-		// verify if it is refresh request
-		if (request.getRequestURI().contains(REFRESH)) {
-
-			log.info("Start generating renewed token");
-
-			try {
-
-				Player player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject())).orElseThrow();
-				playerService.cacheEvict(player);
-				player = playerService.getPlayer(Long.valueOf(e.getClaims().getSubject())).orElseThrow();
-
-				UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<>());
-
-				// verify if token exists in database
-				// each time the token is used, it is replaced in database
-				if (player.getRefresh() == null || !player.getRefresh().equals(refreshToken)) {
-					log.error("Attempt to use refresh token the second time - player id: " + player.getId());
-					throw new IllegalArgumentException("Attempt to use refresh token the second time");
-				}
-
-				// if positive generate the new JWT token and replace it in the request
-				if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
-
-					jwtToken = jwtTokenUtil.generateToken(userDetails.getUsername());
-					request.setAttribute(REFRESH_TOKEN, jwtToken);
-					// store the verified player id so the controller can assert the path variable matches
-					request.setAttribute(VERIFIED_USER_ID, player.getId());
-				}
-			} catch (Exception ex) {
-				log.info("Refresh token expired or not available: " + ex.getClass());
-			}
+		if (refreshToken == null) {
+			// No refresh cookie — the session is dead, the client must log in again.
+			log.info("Refresh requested but no refresh token cookie present");
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
+			return null;
 		}
 
-		return jwtToken;
+		log.info("Start generating renewed token");
+
+		try {
+
+			String userId = refreshTokenUtil.getUserIdFromToken(refreshToken);
+
+			Player player = playerService.getPlayer(Long.valueOf(userId)).orElseThrow();
+			playerService.cacheEvict(player);
+			player = playerService.getPlayer(Long.valueOf(userId)).orElseThrow();
+
+			UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<>());
+
+			// verify the presented refresh token is the one currently stored for the player;
+			// each use rotates it in the database, so an old token indicates a replay attempt
+			if (player.getRefresh() == null || !player.getRefresh().equals(refreshToken)) {
+				log.error("Attempt to reuse an old refresh token - player id: " + player.getId());
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
+				return null;
+			}
+
+			if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
+				// store the verified player id so the controller can assert the path variable matches
+				request.setAttribute(VERIFIED_USER_ID, player.getId());
+				return userId;
+			}
+
+			// refresh token itself is expired — force re-authentication
+			log.info("Refresh token expired for player id: " + player.getId());
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
+			return null;
+
+		} catch (ExpiredJwtException e) {
+			log.info("Refresh token expired");
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
+			return null;
+		} catch (Exception e) {
+			log.info("Unable to process refresh request: " + e.getClass());
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
+			return null;
+		}
 	}
 
 	private boolean unsecuredUrls(HttpServletRequest request) {
