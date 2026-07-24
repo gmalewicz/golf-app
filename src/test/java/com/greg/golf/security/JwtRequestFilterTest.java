@@ -1,9 +1,16 @@
 package com.greg.golf.security;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.greg.golf.repository.PlayerRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @Slf4j
 @SpringBootTest
@@ -76,12 +86,7 @@ class JwtRequestFilterTest {
 		when(request.getRequestURI()).thenReturn("/rest/Authenticate");
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
 	}
 
 	@DisplayName("Should process request with JWT token in cookie")
@@ -98,12 +103,7 @@ class JwtRequestFilterTest {
 
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
 	}
 
 	@DisplayName("Should process request with expired access cookie and valid refresh cookie but refresh does not exists in db")
@@ -120,12 +120,7 @@ class JwtRequestFilterTest {
 
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
 	}
 
 	@DisplayName("Should process request with expired access cookie and valid refresh cookie existing in db")
@@ -146,12 +141,7 @@ class JwtRequestFilterTest {
 
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
 	}
 
 	@DisplayName("Should renew token on refresh when only the refresh cookie is present (access cookie expired and dropped)")
@@ -172,16 +162,57 @@ class JwtRequestFilterTest {
 
 		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
 
-		try {
-
-			jwtRequestFilter.doFilter(request, response, filterChain);
-		} catch (Exception e) {
-			Assertions.fail("Should not have thrown any exception");
-		}
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
 
 		// the refresh must be authorized: the verified id is exposed to the controller
 		// and the security context is populated so the endpoint is reachable
-		Mockito.verify(request).setAttribute(JwtRequestFilter.VERIFIED_USER_ID, 1L);
+		verify(request).setAttribute(JwtRequestFilter.VERIFIED_USER_ID, 1L);
 		Assertions.assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+	}
+
+	@DisplayName("Should not authorize refresh when the refresh token is expired")
+	@Transactional
+	@Test
+	void requestRefreshWithExpiredRefreshTokenTest() {
+
+		// build a refresh token signed with the refresh secret but already expired,
+		// so getUserIdFromToken throws ExpiredJwtException inside handleRefreshRequest
+		SecretKey key = Keys.hmacShaKeyFor(jwtConfig.getRefresh().getBytes(StandardCharsets.UTF_8));
+		String expiredRefresh = Jwts.builder().subject("1")
+				.issuedAt(new Date(System.currentTimeMillis() - 10_000))
+				.expiration(new Date(System.currentTimeMillis() - 5_000))
+				.signWith(key).compact();
+
+		Cookie refresh = new Cookie("refreshToken", expiredRefresh);
+		when(request.getCookies()).thenReturn(new Cookie[]{refresh});
+		when(request.getRequestURI()).thenReturn("/rest/Refresh/1");
+
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
+
+		// the request must not be authorized and no verified id may be exposed
+		verify(request, never()).setAttribute(eq(JwtRequestFilter.VERIFIED_USER_ID), any());
+		Assertions.assertNull(SecurityContextHolder.getContext().getAuthentication());
+	}
+
+	@DisplayName("Should not authorize refresh when the refresh token is malformed")
+	@Transactional
+	@Test
+	void requestRefreshWithMalformedRefreshTokenTest() {
+
+		// a token that cannot be parsed throws a (non-expiry) JwtException,
+		// exercising the generic catch block in handleRefreshRequest
+		Cookie refresh = new Cookie("refreshToken", "this-is-not-a-valid-jwt");
+		when(request.getCookies()).thenReturn(new Cookie[]{refresh});
+		when(request.getRequestURI()).thenReturn("/rest/Refresh/1");
+
+		JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(playerService, jwtTokenUtil, refreshTokenUtil);
+
+		assertDoesNotThrow(() -> jwtRequestFilter.doFilter(request, response, filterChain));
+
+		// the request must not be authorized and no verified id may be exposed
+		verify(request, never()).setAttribute(eq(JwtRequestFilter.VERIFIED_USER_ID), any());
+		Assertions.assertNull(SecurityContextHolder.getContext().getAuthentication());
 	}
 }

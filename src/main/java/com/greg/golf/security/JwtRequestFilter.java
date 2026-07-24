@@ -197,13 +197,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		try {
 
+			// getUserIdFromToken verifies the refresh token's signature and expiry:
+			// an expired token throws ExpiredJwtException and any malformed/invalid token
+			// throws another JwtException, both handled by the catch blocks below.
 			String userId = refreshTokenUtil.getUserIdFromToken(refreshToken);
 
 			Player player = playerService.getPlayer(Long.valueOf(userId)).orElseThrow();
 			playerService.cacheEvict(player);
 			player = playerService.getPlayer(Long.valueOf(userId)).orElseThrow();
-
-			UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<>());
 
 			// verify the presented refresh token is the one currently stored for the player;
 			// each use rotates it in the database, so an old token indicates a replay attempt
@@ -214,17 +215,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				return null;
 			}
 
-			if (refreshTokenUtil.validateToken(refreshToken, userDetails)) {
-				// store the verified player id so the controller can assert the path variable matches
-				request.setAttribute(VERIFIED_USER_ID, player.getId());
-				return userId;
-			}
-
-			// refresh token itself is expired — force re-authentication
-			log.info("Refresh token expired for player id: " + player.getId());
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			response.setHeader(WWW_AUTHENTICATE_HEADER, INVALID_TOKEN_VALUE);
-			return null;
+			// signature, expiry and currency are all confirmed — expose the verified id so the
+			// controller can assert the path variable matches the authenticated player
+			request.setAttribute(VERIFIED_USER_ID, player.getId());
+			return userId;
 
 		} catch (ExpiredJwtException e) {
 			log.info("Refresh token expired");
