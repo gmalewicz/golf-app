@@ -3,3 +3,4 @@
 | CR-01 | Endpoint GET /rest/TournamentResultRound/{resultId} shall return also field tee (string). It shall be added when record in database is created. It can be null, to cover old records in production database. |
 | CR-02 | Endpoint PATCH rest/ScoreCard should accept optional teeId (Long) field. If provided application shall update teeId for that round for that player. |
 | CR-03 | Finalization of online round shall save optional field teamId to player round table. |
+| CR-04 | Implement a page showing Stableford netto calculation for a 3/4 player HCP based tournament, with data retrieved the same way as for a 2-round tournament in a cycle. The tournament will be 1 round only. Data shall be presented on the frontend only, showing position, player name, STB netto for full HCP and HCP netto for 3/4. The user shall specify the tournament id the same way as for a cycle tournament. Put it in a separate menu called "3/4 HCP calculation". |

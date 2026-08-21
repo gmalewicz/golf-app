@@ -18,8 +18,8 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.20.0'
-description = 'add checks to editRound to protect backend'
+version = '3.21.0'
+description = 'fix for Iphone 15+ and Safari 15+ XSRF-TOKEN cookie issue'
 
 application {
     mainClass = 'com.greg.golf.Golf'
