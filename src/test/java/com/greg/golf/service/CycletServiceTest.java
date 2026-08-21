@@ -70,7 +70,7 @@ class CycleServiceTest {
 
         eagleResultDto = new EagleResultDto();
         eagleResultDto.setR(new int[]{40, 0, 0, 0});
-        eagleResultDto.setWhs(36.0F);
+        eagleResultDto.setWhs(11.0F);
         eagleResultDto.setLastName("Bond");
         eagleResultDto.setFirstName("James");
         eagleResultDto.setSeries(1);
@@ -123,6 +123,7 @@ class CycleServiceTest {
         cycleResult.setCycleScore(40);
         cycleResult.setTotal(40);
         cycleResult.setSeries(1);
+        cycleResult.setOldPlace(0);
         cycleResultRepository.save(cycleResult);
 
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
@@ -161,6 +162,7 @@ class CycleServiceTest {
         cycleResult.setCycleScore(70);
         cycleResult.setTotal(70);
         cycleResult.setSeries(1);
+        cycleResult.setOldPlace(0);
         cycleResultRepository.save(cycleResult);
 
         assertDoesNotThrow(() -> cycleService.removeLastCycleTournament(cycle));
@@ -414,20 +416,20 @@ class CycleServiceTest {
         cycle = cycleService.addCycle(cycle);
 
         // Tournament 1: Alpha 10, Beta 20 (both played 1 round -> not achieved)
-        addStrokePlayTournament("T1", strokePlayPlayer("Alpha", "A", 10),
+        addStrokePlayTournament("Tour1", strokePlayPlayer("Alpha", "A", 10),
                 strokePlayPlayer("Beta", "B", 20));
 
         // Tournament 2: Alpha 10, Beta 20 (both played 2 rounds -> still not achieved)
-        addStrokePlayTournament("T2", strokePlayPlayer("Alpha", "A", 10),
+        addStrokePlayTournament("Tour2", strokePlayPlayer("Alpha", "A", 10),
                 strokePlayPlayer("Beta", "B", 20));
 
         // Tournament 3: only Beta plays 5 (Beta played 3 -> achieved, Alpha still played 2)
-        addStrokePlayTournament("T3", strokePlayPlayer("Beta", "B", 5));
+        addStrokePlayTournament("Tour3", strokePlayPlayer("Beta", "B", 5));
 
         // Before Tournament 4 the standings are: Beta (achieved) rank 1, Alpha (not achieved) rank 2,
         // even though Alpha has fewer cumulative strokes. This is the case the fix must honour.
         // Tournament 4: only Alpha plays 5 (Alpha played 3 -> achieved)
-        addStrokePlayTournament("T4", strokePlayPlayer("Alpha", "A", 5));
+        addStrokePlayTournament("Tour4", strokePlayPlayer("Alpha", "A", 5));
 
         var results = cycleService.findCycleResults(cycle.getId());
         var alpha = results.stream().filter(r -> r.getPlayerName().contains("Alpha")).findFirst().orElseThrow();

@@ -168,13 +168,6 @@ class AccessControllerTest {
 				.content(objectMapper.writeValueAsString(output))).andExpect(status().isOk()).andReturn();
 	}
 
-	@DisplayName("Should attempt to refresh token without header with correct result")
-	@Test
-	void processAttemptRefreshTokenWithoutHeaderThenReturns200() throws Exception {
-
-		mockMvc.perform(get("/rest/Refresh/1")).andExpect(status().isOk());
-	}
-
 	@DisplayName("Should return 403 when refresh attempted without verified token attribute")
 	@Test
 	void processAttemptRefreshTokenWithoutHeaderThenReturns403() throws Exception {
