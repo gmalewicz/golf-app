@@ -103,6 +103,8 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 			.cors(Customizer.withDefaults());
 
 		CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		// match the auth cookies' profile so iOS Safari keeps the XSRF-TOKEN cookie as first-party
+		tokenRepository.setCookieCustomizer(cookie -> cookie.secure(true).sameSite("Strict").path("/"));
 		XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
 		// set the name of the attribute the CsrfToken will be populated on
 		delegate.setCsrfRequestAttributeName(null);
@@ -115,6 +117,9 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 				.ignoringRequestMatchers ("/rest/Authenticate", "/rest/AddPlayer", "/actuator/**", "/api/**", "/oauth2/**")
 				.csrfTokenRepository(tokenRepository)
 				.csrfTokenRequestHandler(requestHandler));
+
+		// re-seed the XSRF-TOKEN cookie on every response so an evicted cookie cannot cause a 403
+		httpSecurity.addFilterAfter(new CsrfCookieFilter(), UsernamePasswordAuthenticationFilter.class);
 
 		return httpSecurity.build();
 	}
