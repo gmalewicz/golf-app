@@ -18,7 +18,7 @@ plugins {
 }
 
 group = 'com.greg.golf'
-version = '3.21.0'
+version = '3.21.3'
 description = 'fix for Iphone 15+ and Safari 15+ XSRF-TOKEN cookie issue'
 
 application {
