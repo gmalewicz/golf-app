@@ -205,7 +205,7 @@ public class OnlineRoundService {
 	public void finish(Integer identifier) {
 
 		// get the online rounds from db
-		var onlineRounds = onlineRoundRepository.findByIdentifier(identifier);
+		var onlineRounds = onlineRoundRepository.findByIdentifierOrderByIdAsc(identifier);
 
 		// for now, it is assumed that children are retrieved
 
@@ -224,7 +224,7 @@ public class OnlineRoundService {
 
 		var course = new Course();
 		course.setId(courseId);
-		var onlineRounds = onlineRoundRepository.findByCourse(course);
+		var onlineRounds = onlineRoundRepository.findByCourseOrderByIdAsc(course);
 
 		onlineRounds.forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 
@@ -234,7 +234,7 @@ public class OnlineRoundService {
 	@Transactional(readOnly = true)
 	public List<OnlineRound> getOnlineRoundsForIdentifier(Integer identifier) {
 
-		var onlineRounds = onlineRoundRepository.findByIdentifier(identifier);
+		var onlineRounds = onlineRoundRepository.findByIdentifierOrderByIdAsc(identifier);
 
 		onlineRounds.forEach(or -> or.setScoreCardAPI(or.getScoreCard()));
 
