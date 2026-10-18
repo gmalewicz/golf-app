@@ -3,14 +3,12 @@ package com.greg.golf.security;
 import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
-import com.greg.golf.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -18,7 +16,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -40,21 +37,8 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 
 	@Getter @Setter private String allowedOrigins;
 
-
-	private final PasswordEncoder passwordEncoder;
-
-	private final UserService userService;
-
-
-	@Autowired
-	public WebSecurityConfiguration(@Lazy PasswordEncoder passwordEncoder, @Lazy UserService userService) {
-
-		this.passwordEncoder = passwordEncoder;
-		this.userService = userService;
-	}
-
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
@@ -64,7 +48,7 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
 										   @Autowired JwtRequestFilter jwtRequestFilter,
 										   @Autowired GolfOAuth2UserService oauth2UserService,
 										   @Autowired GolfAuthenticationSuccessHandler golfAuthenticationSuccessHandler,
-										   @Autowired GolfAuthenticationFailureHandler golfAuthenticationFailureHandler) throws Exception {
+										   @Autowired GolfAuthenticationFailureHandler golfAuthenticationFailureHandler) {
 
 		// Add a filter to validate the tokens with every request
 		httpSecurity

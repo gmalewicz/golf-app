@@ -2,12 +2,13 @@ package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.Instant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Getter
 @Setter
@@ -30,7 +31,8 @@ public class BaseRoundDto {
 	private Float mpFormat;
 
 	@NotNull
-	@Schema(description = "Date for a round", accessMode = READ_WRITE, pattern = "yyyy/MM/dd kk:mm")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd kk:mm")
-	private Date roundDate;
+	@Schema(description = "Date for a round", accessMode = READ_WRITE, pattern = UtcInstantJson.DATE_TIME_PATTERN)
+	@JsonSerialize(using = UtcInstantJson.DateTimeSerializer.class)
+	@JsonDeserialize(using = UtcInstantJson.DateTimeDeserializer.class)
+	private Instant roundDate;
 }

@@ -1,7 +1,7 @@
 package com.greg.golf.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public class Round {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "round_date")
-	private Date roundDate;
+	private Instant roundDate;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

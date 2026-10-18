@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -37,7 +35,6 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class LeagueServiceTest {
 
@@ -746,11 +743,7 @@ class LeagueServiceTest {
         leagueService.addLeague(league);
 
         player = playerService.getPlayer(1L).orElseThrow();
-        try {
-            player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword"));
-        } catch (Exception e) {
-            fail("Should not throw any exception");
-        }
+        assertDoesNotThrow(() -> player.setEmail(StringUtility.encryptString("test@gmail.com", "testPassword")));
         playerRepository.save(player);
 
         UserDetails userDetails = new User(player.getId().toString(), player.getPassword(), new ArrayList<SimpleGrantedAuthority>());
@@ -807,19 +800,11 @@ class LeagueServiceTest {
         // create notification
         leagueService.addNotification(leagueId);
 
-        try {
-            doNothing().when(emailService).sendEmail(any(), any(), any());
-        } catch (Exception e) {
-            fail("Method emailService.sendMail throws exception");
-        }
+        assertDoesNotThrow(() -> doNothing().when(emailService).sendEmail(any(), any(), any()));
 
         assertDoesNotThrow(() -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));
 
-        try {
-            doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any());
-        } catch (Exception e) {
-            fail("Method emailService.sendMail throws exception");
-        }
+        assertDoesNotThrow(() -> doThrow(MessagingException.class).when(emailService).sendEmail(any(), any(), any()));
 
         // verify if exception is caught
         assertThrows(GeneralException.class, () -> leagueService.processNotifications(leagueId, new LeagueResultDto[]{leagueResultDto}));

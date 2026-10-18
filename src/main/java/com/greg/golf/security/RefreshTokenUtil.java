@@ -2,7 +2,7 @@ package com.greg.golf.security;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 
 import com.greg.golf.entity.helpers.Common;
@@ -33,8 +33,9 @@ public class RefreshTokenUtil extends TokenUtil implements Serializable {
 	// compaction of the JWT to a URL-safe string
 	protected String doGenerateToken(Map<String, Object> claims, String subject) {
 
-		return Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
-				.expiration(new Date(System.currentTimeMillis() + Common.REFRESH_TOKEN_LIFETIME * 1000))
+		var now = Instant.now();
+		return Jwts.builder().claims(claims).subject(subject).claim(Claims.ISSUED_AT, now.getEpochSecond())
+				.claim(Claims.EXPIRATION, now.plusSeconds(Common.REFRESH_TOKEN_LIFETIME).getEpochSecond())
 				.signWith(getSigningKey(jwtConfig.getRefresh())).compact();
 	}
 

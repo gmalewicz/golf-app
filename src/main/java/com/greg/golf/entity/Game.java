@@ -1,6 +1,6 @@
 package com.greg.golf.entity;
 
-import java.util.Date;
+import java.time.Instant;
 
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
@@ -35,7 +35,7 @@ public class Game {
 	
 	@NotNull(message ="Data in ISO format") 
 	@Column(name = "game_date")
-	private Date gameDate;
+	private Instant gameDate;
 	
 	@NotNull
 	@Type(JsonBinaryType.class)

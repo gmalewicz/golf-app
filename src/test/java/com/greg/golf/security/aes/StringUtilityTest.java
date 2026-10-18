@@ -14,19 +14,16 @@ class StringUtilityTest {
 
     @DisplayName("Should encrypt and decrypt given string")
     @Test
-    void encryptDecryptStringTest() throws Exception{
+    void encryptDecryptStringTest() {
 
         var testString = "plainText12$";
         var password = "secret";
 
-        try{
+        Assertions.assertDoesNotThrow(() -> {
             var encryptedString = StringUtility.encryptString(testString, password);
             log.info("Encrypted string: " + encryptedString);
             var decryptedString = StringUtility.decryptString(encryptedString, password);
             Assertions.assertEquals(testString, decryptedString);
-
-        } catch (Exception e) {
-            Assertions.fail("Should not have thrown any exception");
-        }
+        });
     }
 }

@@ -1,13 +1,12 @@
 package com.greg.golf.repository;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -21,12 +20,10 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class TournamentResultRepositoryTest {
 
@@ -54,8 +51,8 @@ class TournamentResultRepositoryTest {
 
 		tournament = new Tournament();
 		tournament.setName("Test tournament");
-		tournament.setStartDate(new Date(1));
-		tournament.setEndDate(new Date(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);

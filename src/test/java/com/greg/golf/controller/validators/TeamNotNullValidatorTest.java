@@ -22,13 +22,13 @@ class TeamNotNullValidatorTest {
         validator = new TeamNotNullValidator();
         context = mock(ConstraintValidatorContext.class);
         ConstraintValidatorContext.ConstraintViolationBuilder builder = mock(ConstraintValidatorContext.ConstraintViolationBuilder.class);
+        ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext nodeBuilder =
+                mock(ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext.class);
 
         when(context.buildConstraintViolationWithTemplate(anyString()))
                 .thenReturn(builder);
         when(builder.addPropertyNode(anyString()))
-                .thenReturn(
-                        mock(ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext.class)
-                );
+                .thenReturn(nodeBuilder);
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.greg.golf.service;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import com.greg.golf.entity.helpers.Common;
@@ -8,7 +8,6 @@ import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -25,12 +24,10 @@ import com.greg.golf.repository.OnlineScoreCardRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class OnlineRoundService2Test {
 
@@ -59,7 +56,7 @@ class OnlineRoundService2Test {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);

@@ -1,6 +1,6 @@
 package com.greg.golf.service;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -47,7 +47,7 @@ public class RoundService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Round> findByDates(Date startDate, Date endDate) {
+	public List<Round> findByDates(Instant startDate, Instant endDate) {
 		return roundRepository.findByRoundDateBetweenOrderByRoundDateDesc(startDate, endDate);
 	}
 
@@ -60,7 +60,7 @@ public class RoundService {
 		round.getScoreCard().forEach(card -> card.setPlayer(player));
 
 		log.debug("start searching matching round");
-		// search for a round on the same course, the same date and tee time
+		// search for a round on the same course, the same Instant and tee time
 		log.debug(round.getRoundDate().toString());
 		Optional<Round> matchingRound = roundRepository.findRoundByCourseAndRoundDate(round.getCourse(),
 				round.getRoundDate());

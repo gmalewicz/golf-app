@@ -1,7 +1,7 @@
 package com.greg.golf.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -11,7 +11,6 @@ import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.modelmapper.ModelMapper;
@@ -36,13 +35,11 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class GameControllerTest {
 
@@ -76,7 +73,7 @@ class GameControllerTest {
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setFormat(Common.STROKE_PLAY_FORMAT);
-		round.setRoundDate(new Date(1));
+		round.setRoundDate(Instant.ofEpochMilli(1));
 		round.setScoreCard(new ArrayList<>());
 		ScoreCard scoreCard = new ScoreCard();
 		scoreCard.setHole(1);
@@ -108,7 +105,7 @@ class GameControllerTest {
 		
 		GameDto gameDto = new GameDto();
 		gameDto.setPlayer(modelMapper.map(player, PlayerDto.class));
-		gameDto.setGameDate(new Date());
+		gameDto.setGameDate(Instant.now());
 		gameDto.setGameId(1L);
 		gameDto.setStake(0.5f);
 		
@@ -134,7 +131,7 @@ class GameControllerTest {
 		
 		Game game = new Game();
 		game.setPlayer(player);
-		game.setGameDate(new Date());
+		game.setGameDate(Instant.now());
 		game.setGameId(1L);
 		game.setStake(0.5f);
 		

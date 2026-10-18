@@ -26,7 +26,7 @@
 }
 
 .tg th {
-	background-color: #657b83;
+	background-color: #586e75;
 	border-color: #93a1a1;
 	border-style: solid;
 	border-width: 0px;
@@ -50,7 +50,7 @@
 <body>
 	<h3>
 		<span th:text="${gameName}"></span> &nbsp; <span
-			th:text="${#dates.format(game.gameDate, 'dd-MM-yyyy HH:mm')}"></span>
+			th:text="${#temporals.format(game.gameDate, 'dd-MM-yyyy HH:mm')}"></span>
 	</h3>
 	<table id="game-tbl" class="tg">
 		<caption>Game Results</caption>

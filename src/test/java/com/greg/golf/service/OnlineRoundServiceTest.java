@@ -1,20 +1,18 @@
 package com.greg.golf.service;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import com.greg.golf.entity.helpers.Common;
 import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.greg.golf.entity.Course;
@@ -30,7 +28,6 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class OnlineRoundServiceTest {
 
@@ -88,7 +85,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -110,7 +107,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -140,7 +137,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -175,7 +172,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -195,7 +192,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -224,7 +221,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -262,7 +259,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(2);
@@ -325,7 +322,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -364,7 +361,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);
@@ -404,7 +401,7 @@ class OnlineRoundServiceTest {
 		onlineRound.setCourse(course);
 		onlineRound.setCourseTee(courseTee);
 		onlineRound.setPlayer(player);
-		onlineRound.setDate(new Date());
+		onlineRound.setDate(Instant.now());
 		onlineRound.setTeeTime("10:00");
 		onlineRound.setOwner(player.getId());
 		onlineRound.setIdentifier(1);

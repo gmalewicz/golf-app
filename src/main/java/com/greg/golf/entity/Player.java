@@ -110,7 +110,7 @@ public class Player implements Comparable<Player> {
 	@Override
 	public int compareTo(Player o) {
 		
-		return (int) (id - o.id);
+		return Long.compare(id, o.id);
 	}
 
 	@Override

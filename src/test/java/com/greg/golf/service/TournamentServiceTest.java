@@ -1,7 +1,7 @@
 package com.greg.golf.service;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
@@ -14,7 +14,6 @@ import com.greg.golf.security.aes.StringUtility;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -41,7 +39,6 @@ import static org.mockito.Mockito.doThrow;
 @Slf4j
 @EnableCaching
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class TournamentServiceTest {
 
@@ -82,7 +79,7 @@ class TournamentServiceTest {
 		var playerSet = new TreeSet<Player>();
 		playerSet.add(player);
 		round.setPlayer(playerSet);
-		round.setRoundDate(new Date(1));
+		round.setRoundDate(Instant.ofEpochMilli(1));
 		round.setFormat(Common.STROKE_PLAY_FORMAT);
 		round.setScoreCard(new ArrayList<>());
 
@@ -108,7 +105,7 @@ class TournamentServiceTest {
 		var playerSet2 = new TreeSet<Player>();
 		playerSet2.add(player);
 		round2.setPlayer(playerSet2);
-		round2.setRoundDate(new Date(3));
+		round2.setRoundDate(Instant.ofEpochMilli(3));
 		round2.setFormat(Common.STROKE_PLAY_FORMAT);
 		round2.setScoreCard(new ArrayList<>());
 		for (var i = 0; i < 18; i++) {
@@ -127,8 +124,8 @@ class TournamentServiceTest {
 		playerRoundRepository.updatePlayerRoundInfo(player.getWhs(), 135, 70.3f, 2L, 0, null, player.getId(), round2.getId());
 
 		var tournament = new Tournament();
-		tournament.setEndDate(new Date(1));
-		tournament.setStartDate(new Date(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
 		tournament.setName("Test Cup");
 		tournament.setPlayer(player);
 		tournament.setStatus(Tournament.STATUS_OPEN);
@@ -254,8 +251,8 @@ class TournamentServiceTest {
 		var player = playerService.getPlayer(1L).orElseThrow();
 
 		var tournament = new Tournament();
-		tournament.setEndDate(new Date(1));
-		tournament.setStartDate(new Date(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
 		tournament.setName("Test Cup2");
 		tournament.setPlayer(player);
 		tournament.setBestRounds(1);
@@ -796,7 +793,7 @@ class TournamentServiceTest {
 		var playerSet2 = new TreeSet<Player>();
 		playerSet2.add(player);
 		round2.setPlayer(playerSet2);
-		round2.setRoundDate(new Date(4));
+		round2.setRoundDate(Instant.ofEpochMilli(4));
 		round2.setFormat(Common.STROKE_PLAY_FORMAT);
 		round2.setScoreCard(new ArrayList<>());
 		for (var i = 0; i < 18; i++) {
@@ -1151,8 +1148,8 @@ class TournamentServiceTest {
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
 		var tournament = new Tournament();
-		tournament.setEndDate(new Date(1));
-		tournament.setStartDate(new Date(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
 		tournament.setName("Test Cup");
 		tournament.setPlayer(player);
 		tournament.setStatus(Tournament.STATUS_CLOSE);
