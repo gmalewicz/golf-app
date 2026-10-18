@@ -23,7 +23,6 @@ import com.greg.golf.util.GolfPostgresqlContainer;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @Slf4j
 @SpringBootTest
@@ -36,7 +35,7 @@ class TournamentResultRepositoryTest {
 	private JwtRequestFilter jwtRequestFilter;
 	
 	@Container
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+    public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	private static Tournament tournament;
 

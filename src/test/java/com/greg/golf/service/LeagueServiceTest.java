@@ -27,7 +27,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -51,7 +50,7 @@ class LeagueServiceTest {
     private EmailServiceImpl emailService;
 
     @Container
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
+    public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer
             .getInstance();
 
     private static Player player;

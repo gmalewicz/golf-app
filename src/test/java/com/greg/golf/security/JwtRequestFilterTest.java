@@ -26,7 +26,6 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -41,7 +40,7 @@ import java.util.Date;
 class JwtRequestFilterTest {
 
 	@Container
-	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
+	public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer
 			.getInstance();
 
 	@SuppressWarnings("unused")

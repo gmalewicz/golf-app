@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @Slf4j
 @SpringBootTest
@@ -23,7 +22,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public class AddPlayerTest {
 
     @Container
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+    public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
     @Autowired
     private PlayerService playerService;

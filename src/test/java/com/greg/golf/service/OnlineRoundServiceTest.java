@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
@@ -40,7 +39,7 @@ class OnlineRoundServiceTest {
 	private JwtRequestFilter jwtRequestFilter;
 
 	@Container
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+    public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	@SuppressWarnings("unused")
 	@Autowired

@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 import com.greg.golf.entity.Course;
 import com.greg.golf.entity.CourseTee;
 import com.greg.golf.entity.Player;
@@ -55,7 +54,7 @@ class RoundServiceTest {
 	private JwtRequestFilter jwtRequestFilter;
 
 	@Container
-	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
+	public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer
 			.getInstance();
 
 	private static Long roundId;

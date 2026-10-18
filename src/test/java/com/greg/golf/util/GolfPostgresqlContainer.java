@@ -1,8 +1,8 @@
 package com.greg.golf.util;
 
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
-public class GolfPostgresqlContainer extends PostgreSQLContainer<GolfPostgresqlContainer>{
+public class GolfPostgresqlContainer extends PostgreSQLContainer{
 
     private static final String IMAGE_VERSION = "postgres:13.1";
 
