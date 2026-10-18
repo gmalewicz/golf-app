@@ -1,6 +1,6 @@
 package com.greg.golf.entity;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -34,7 +34,7 @@ public class OnlineRound {
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Column(name = "date")
-	private Date date;
+	private Instant date;
 
 	@NotNull
 	@ToString.Exclude

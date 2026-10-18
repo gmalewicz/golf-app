@@ -2,12 +2,13 @@ package com.greg.golf.controller.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.Instant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Getter
 @Setter
@@ -21,14 +22,16 @@ public class TournamentDto {
 	private String name;
 
 	@NotNull
-	@Schema(description = "Tournament start date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
-	private Date startDate;
+	@Schema(description = "Tournament start date", accessMode = READ_WRITE, pattern = UtcInstantJson.DATE_PATTERN)
+	@JsonSerialize(using = UtcInstantJson.DateSerializer.class)
+	@JsonDeserialize(using = UtcInstantJson.DateDeserializer.class)
+	private Instant startDate;
 
 	@NotNull
-	@Schema(description = "Tournament end date", accessMode = READ_WRITE, pattern = "yyyy/MM/dd")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
-	private Date endDate;
+	@Schema(description = "Tournament end date", accessMode = READ_WRITE, pattern = UtcInstantJson.DATE_PATTERN)
+	@JsonSerialize(using = UtcInstantJson.DateSerializer.class)
+	@JsonDeserialize(using = UtcInstantJson.DateDeserializer.class)
+	private Instant endDate;
 
 	@NotNull
 	@Schema(description = "Number of best rounds from tournament to be included in the result, 0 - all rounds",

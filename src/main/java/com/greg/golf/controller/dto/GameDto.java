@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE;
-import java.util.Date;
+import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
@@ -35,7 +37,9 @@ public class GameDto {
 
 	@NotNull
 	@Schema(description = "Date in ISO format", accessMode = READ_WRITE)
-	private Date gameDate;
+	@JsonSerialize(using = UtcInstantJson.IsoSerializer.class)
+	@JsonDeserialize(using = UtcInstantJson.IsoDeserializer.class)
+	private Instant gameDate;
 
 	@NotNull
 	@Schema(description = "Game data", accessMode = READ_WRITE)

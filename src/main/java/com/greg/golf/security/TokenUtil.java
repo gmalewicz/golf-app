@@ -2,7 +2,7 @@ package com.greg.golf.security;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,8 +30,8 @@ public abstract class TokenUtil {
 	}
 
 	// retrieve expiration date from jwt token
-	public Date getExpirationDateFromToken(String token) {
-		return getClaimFromToken(token, Claims::getExpiration);
+	public Instant getExpirationDateFromToken(String token) {
+		return getClaimFromToken(token, claims -> claims.getExpiration().toInstant());
 	}
 
 	public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
@@ -45,7 +45,7 @@ public abstract class TokenUtil {
 	// check if the token has expired
 	private Boolean isTokenExpired(String token) {
 		final var expiration = getExpirationDateFromToken(token);
-		return expiration.before(new Date());
+		return expiration.isBefore(Instant.now());
 	}
 
 	// generate token for user

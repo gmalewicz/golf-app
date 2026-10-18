@@ -96,16 +96,24 @@ spring:
         debug: true
   datasource:
     url: jdbc:postgresql://localhost:5432/golf
+    password: welcome
   jpa:
     show_sql: true
   liquibase:
-    change-log: classpath:/db/dbChangeLog-dev.xml
+    change-log: classpath:/db/dbChangeLog-prod.xml
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 oauth2:
   redirect: http://localhost:4200/login
 management:
   health:
     mail:
       enabled: false
+cors:
+  allowedOrigins: localhost:4200
 
 ---
 
@@ -126,6 +134,11 @@ spring:
     show_sql: false
   liquibase:
     change-log: classpath:/db/dbChangeLog-prod.xml
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 oauth2:
   redirect: https://dgng.pl/login
 

@@ -80,7 +80,7 @@ public class OnlineScoreCardController extends BaseController {
 	@Operation(summary = "Adds online rounds")
 	@PostMapping(value = "/rest/OnlineRounds")
 	public List<OnlineRoundDto> addOnlineRounds(
-			@Parameter(description = "List of OnlineRound objects", required = true) @RequestBody @Valid List<OnlineRoundDto> onlineRounds) {
+			@Parameter(description = "List of OnlineRound objects", required = true) @RequestBody List<@Valid OnlineRoundDto> onlineRounds) {
 
 		log.info("trying to add onlineRounds");
 		List<OnlineRound> orLst = mapList(onlineRounds, OnlineRound.class);

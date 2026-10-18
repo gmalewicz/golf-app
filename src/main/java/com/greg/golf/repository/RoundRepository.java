@@ -1,6 +1,6 @@
 package com.greg.golf.repository;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,10 +19,10 @@ import com.greg.golf.entity.Round;
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
 	
-	 Optional<Round> findRoundByCourseAndRoundDate(Course course, Date roundDate);
+	 Optional<Round> findRoundByCourseAndRoundDate(Course course, Instant roundDate);
 	 
 	 @EntityGraph(attributePaths = { "player"})
-	 List<Round> findByRoundDateBetweenOrderByRoundDateDesc(Date startDate, Date endDate);
+	 List<Round> findByRoundDateBetweenOrderByRoundDateDesc(Instant startDate, Instant endDate);
 
 	 @EntityGraph(attributePaths = { "course"})
 	 List<Round> findByPlayerOrderByRoundDateDesc(Player player, Pageable pageable);

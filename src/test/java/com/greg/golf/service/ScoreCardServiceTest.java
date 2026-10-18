@@ -1,8 +1,9 @@
 package com.greg.golf.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.TreeSet;
 
 import com.greg.golf.entity.helpers.Common;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.greg.golf.entity.Player;
 import com.greg.golf.entity.Round;
@@ -34,7 +34,7 @@ class ScoreCardServiceTest {
 	private JwtRequestFilter jwtRequestFilter;
 
 	@Container
-	public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer
+	public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer
 			.getInstance();
 
 	private static Long roundId;
@@ -57,9 +57,8 @@ class ScoreCardServiceTest {
 		playerSet.add(player);
 		round.setPlayer(playerSet);
 		round.setFormat(Common.STROKE_PLAY_FORMAT);
-		var calendar = new GregorianCalendar();
-		calendar.set(2020, Calendar.JUNE, 12);
-		round.setRoundDate(calendar.getTime());
+		var roundDate = LocalDate.of(2020, 6, 12).atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toInstant();
+		round.setRoundDate(roundDate);
 		round.setScoreCard(new ArrayList<>());
 		var scoreCard = new ScoreCard();
 		scoreCard.setHole(1);

@@ -1,8 +1,8 @@
 package com.greg.golf.service;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
@@ -47,8 +47,8 @@ public class OnlineRoundService {
 	@Transactional
 	public List<OnlineRound> save(List<OnlineRound> onlineRounds) {
 		
-		var gc = new GregorianCalendar();
-		onlineRounds.forEach(or -> or.setDate(gc.getTime()));
+		var now = Instant.now();
+		onlineRounds.forEach(or -> or.setDate(now));
 
 		return onlineRoundRepository.saveAll(onlineRounds);
 
@@ -152,14 +152,12 @@ public class OnlineRoundService {
 		round.setPlayer(players);
 		round.setFormat(onlineRound.getFormat());
 		round.setMpFormat(onlineRound.getMpFormat());
-		var gc = new GregorianCalendar();
-		gc.setTime(onlineRound.getDate());
-
-		gc.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onlineRound.getTeeTime().substring(0, 2)) + 2);
-		gc.set(Calendar.MINUTE, Integer.parseInt(onlineRound.getTeeTime().substring(3, 5)));
-		gc.set(Calendar.MILLISECOND, gc.get(Calendar.MILLISECOND));
-
-		round.setRoundDate(gc.getTime());
+		var teeTime = onlineRound.getTeeTime();
+		round.setRoundDate(onlineRound.getDate().atZone(ZoneId.systemDefault())
+				.withHour(0)
+				.withMinute(Integer.parseInt(teeTime.substring(3, 5)))
+				.plusHours(Integer.parseInt(teeTime.substring(0, 2)) + 2L)
+				.toInstant());
 
 		// create map of scorecards that has been passed
 

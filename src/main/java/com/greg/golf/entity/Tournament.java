@@ -1,6 +1,6 @@
 package com.greg.golf.entity;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -30,13 +30,13 @@ public class Tournament {
 	@EqualsAndHashCode.Exclude
 	@Column(name = "start_date")
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
-	private Date startDate;
+	private Instant startDate;
 	
 	@NotNull
 	@EqualsAndHashCode.Exclude
 	@Column(name = "end_date")
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
-	private Date endDate;
+	private Instant endDate;
 
 	@EqualsAndHashCode.Exclude
 	@NotNull

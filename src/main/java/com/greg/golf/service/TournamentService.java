@@ -1,5 +1,7 @@
 package com.greg.golf.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -190,13 +192,8 @@ public class TournamentService {
     @Transactional
     public Tournament addTournament(Tournament tournament) {
 
-        // just to make the time adjustment
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(tournament.getEndDate());
-        calendar.roll(Calendar.DATE, 1);
-        calendar.roll(Calendar.HOUR, 23);
-
-        tournament.setEndDate(calendar.getTime());
+        // the tournament lasts until 11:00 UTC of the day after its end date
+        tournament.setEndDate(tournament.getEndDate().plus(1, ChronoUnit.DAYS).plus(11, ChronoUnit.HOURS));
         tournament.setStatus(Tournament.STATUS_OPEN);
 
         return tournamentRepository.save(tournament);
@@ -205,8 +202,7 @@ public class TournamentService {
     @Transactional
     public TournamentRound addRoundOnBehalf(Long tournamentId, Round round) {
 
-        var gc = new GregorianCalendar();
-        round.setRoundDate(gc.getTime());
+        round.setRoundDate(Instant.now());
 
         round = roundService.saveRound(round);
         entityManager.detach(round);

@@ -1,6 +1,5 @@
 package com.greg.golf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greg.golf.controller.dto.*;
 import com.greg.golf.entity.*;
 import com.greg.golf.entity.helpers.Common;
@@ -28,9 +27,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -85,7 +85,7 @@ class TournamentControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JsonMapper objectMapper = JsonMapper.builder().build();
 
 	@DisplayName("Should get all tournaments with correct result")
 	@Test
@@ -138,8 +138,8 @@ class TournamentControllerTest {
 		var input = new TournamentDto();
 		input.setId(1L);
 		input.setName("Test");
-		input.setStartDate(new Date(1));
-		input.setEndDate(new Date(1));
+		input.setStartDate(Instant.ofEpochMilli(1));
+		input.setEndDate(Instant.ofEpochMilli(1));
 		input.setBestRounds(0);
 
 		when(modelMapper.map(any(), any())).thenReturn(null);

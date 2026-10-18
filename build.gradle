@@ -3,32 +3,26 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.liquibase:liquibase-core:5.0.2'
+        classpath 'org.liquibase:liquibase-core:5.0.4'
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '4.0.5'
+    id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'application'
-    id 'org.sonarqube' version '7.0.1.6134'
+    id 'org.sonarqube' version '7.5.0.8588'
     id 'jacoco'
     id 'idea'
     id 'org.liquibase.gradle' version '3.1.0'
 }
 
 group = 'com.greg.golf'
-version = '3.21.3'
+version = '3.22.0'
 description = 'fix for Iphone 15+ and Safari 15+ XSRF-TOKEN cookie issue'
 
 application {
     mainClass = 'com.greg.golf.Golf'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.testcontainers:testcontainers-bom:1.20.5"
-    }
 }
 
 java {
@@ -52,7 +46,7 @@ tasks.named('jar') {
 }
 
 jacoco {
-    toolVersion = '0.8.11'
+    toolVersion = '0.8.15'
 }
 
 jacocoTestReport {
@@ -80,14 +74,14 @@ dependencies {
     implementation 'org.springframework.security:spring-security-messaging'
 
     implementation 'org.postgresql:postgresql'
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-73:3.15.2'
-    implementation 'com.google.guava:guava:33.5.0-jre'
-    implementation 'org.modelmapper:modelmapper:3.2.2'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-73:3.16.0'
+    implementation 'com.google.guava:guava:33.7.2-jre'
+    implementation 'org.modelmapper:modelmapper:3.2.7'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1'
 
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -102,19 +96,18 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-postgresql'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
-    testImplementation 'net.bytebuddy:byte-buddy-agent:1.17.8'
+    testImplementation 'net.bytebuddy:byte-buddy-agent'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     liquibaseRuntime sourceSets.main.output
-    liquibaseRuntime 'org.liquibase:liquibase-core:5.0.2'
-    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:5.0.2'
-    liquibaseRuntime 'info.picocli:picocli:4.7.6'
-    liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.15.2'
+    liquibaseRuntime 'org.liquibase:liquibase-core:5.0.4'
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate6:5.0.4'
+    liquibaseRuntime 'info.picocli:picocli:4.7.7'
+    liquibaseRuntime 'io.hypersistence:hypersistence-utils-hibernate-63:3.16.0'
 }
 
 configurations {
@@ -130,8 +123,8 @@ configurations {
         exclude group: 'io.hypersistence', module: 'hypersistence-utils-hibernate-73'
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             if (details.requested.group == 'org.hibernate.orm') {
-                details.useVersion '6.6.47.Final'
-                details.because 'liquibase-hibernate6:5.0.2 is not yet compatible with Hibernate 7'
+                details.useVersion '6.6.59.Final'
+                details.because 'liquibase-hibernate6 requires Hibernate 6'
             }
         }
     }

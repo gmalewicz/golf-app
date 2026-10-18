@@ -48,6 +48,8 @@ public class StringUtility {
     private static final int PBKDF2_SALT_SIZE = 16;
     private static final int PBKDF2_ITERATIONS = 32767;
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     private StringUtility() {
         throw new IllegalStateException("Utility class");
     }
@@ -61,9 +63,8 @@ public class StringUtility {
                     IllegalBlockSizeException,
                     BadPaddingException {
         // Generate a 128-bit salt using a CSPRNG.
-        SecureRandom rand = new SecureRandom();
         byte[] salt = new byte[PBKDF2_SALT_SIZE];
-        rand.nextBytes(salt);
+        RANDOM.nextBytes(salt);
 
         // Create an instance of PBKDF2 and derive a key.
         PBEKeySpec pwSpec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
@@ -114,9 +115,8 @@ public class StringUtility {
                     IllegalBlockSizeException,
                     BadPaddingException {
         // Generate a 96-bit nonce using a CSPRNG.
-        SecureRandom rand = new SecureRandom();
         byte[] nonce = new byte[ALGORITHM_NONCE_SIZE];
-        rand.nextBytes(nonce);
+        RANDOM.nextBytes(nonce);
 
         // Create the cipher instance and initialize.
         Cipher cipher = Cipher.getInstance(ALGORITHM_NAME);

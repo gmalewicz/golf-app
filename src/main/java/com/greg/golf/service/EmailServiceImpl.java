@@ -3,12 +3,12 @@ package com.greg.golf.service;
 import jakarta.mail.MessagingException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Component
+@Service
 public class EmailServiceImpl implements EmailService {
 
 	private final JavaMailSender javaMailSender;

@@ -3,13 +3,12 @@ package com.greg.golf.repository;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-import java.util.Date;
+import java.time.Instant;
 
 import com.greg.golf.security.JwtRequestFilter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +20,9 @@ import com.greg.golf.service.PlayerService;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class TournamentRepositoryTest {
 
@@ -37,7 +33,7 @@ class TournamentRepositoryTest {
 	private static Player player;
 
 	@Container
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+    public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 
 	@SuppressWarnings("unused")
 	@Autowired
@@ -56,8 +52,8 @@ class TournamentRepositoryTest {
 
 		Tournament tournament = new Tournament();
 		tournament.setName("Test tournament");
-		tournament.setStartDate(new Date(1));
-		tournament.setEndDate(new Date(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);
@@ -75,8 +71,8 @@ class TournamentRepositoryTest {
 
 		Tournament tournament = new Tournament();
 		tournament.setName("Test tournament");
-		tournament.setStartDate(new Date(1));
-		tournament.setEndDate(new Date(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);
@@ -94,8 +90,8 @@ class TournamentRepositoryTest {
 
 		Tournament tournament = new Tournament();
 		tournament.setName("Test tournament"); 
-		tournament.setStartDate(new Date(1));
-		tournament.setEndDate(new Date(1));
+		tournament.setStartDate(Instant.ofEpochMilli(1));
+		tournament.setEndDate(Instant.ofEpochMilli(1));
 		tournament.setPlayer(player);
 		tournament.setBestRounds(0);
 		tournament.setStatus(Tournament.STATUS_OPEN);

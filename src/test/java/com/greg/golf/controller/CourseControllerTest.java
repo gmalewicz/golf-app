@@ -7,7 +7,6 @@ import com.greg.golf.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +23,10 @@ import com.greg.golf.repository.FavouriteCourseRepository;
 import com.greg.golf.util.GolfPostgresqlContainer;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @Slf4j
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 class CourseControllerTest {
 
@@ -39,7 +35,7 @@ class CourseControllerTest {
 	private JwtRequestFilter jwtRequestFilter;
 	
 	@Container
-    public static PostgreSQLContainer<GolfPostgresqlContainer> postgreSQLContainer = GolfPostgresqlContainer.getInstance();
+    public static GolfPostgresqlContainer postgreSQLContainer = GolfPostgresqlContainer.getInstance();
 		
 	
 	private final CourseController courseController;
