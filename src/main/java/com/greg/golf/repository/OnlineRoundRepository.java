@@ -15,7 +15,7 @@ import com.greg.golf.entity.OnlineRound;
 public interface OnlineRoundRepository extends JpaRepository<OnlineRound, Long> {
 
 	@EntityGraph(attributePaths = {"scoreCard", "course", "courseTee", "player"})
-	List<OnlineRound> findByCourse(Course course);
+	List<OnlineRound> findByCourseOrderByIdAsc(Course course);
 	
 	
 	@EntityGraph(attributePaths = {"course", "courseTee", "player"})
@@ -25,5 +25,5 @@ public interface OnlineRoundRepository extends JpaRepository<OnlineRound, Long> 
 	void deleteByIdentifier(Integer identifier);
 	
 	@EntityGraph(attributePaths = {"scoreCard", "player", "course", "courseTee"})
-	List<OnlineRound> findByIdentifier(Integer identifier);
+	List<OnlineRound> findByIdentifierOrderByIdAsc(Integer identifier);
 }
