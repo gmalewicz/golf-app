@@ -27,7 +27,7 @@ public class BaseRoundDto {
 	private Integer format;
 
 	@Schema(description = "Match play allowance format", example = "0.5", accessMode = READ_ONLY, allowableValues = {
-			"0.5", "0.75", "0.9", "1" })
+			"0.5", "0.75", "0.85", "0.9", "1" })
 	private Float mpFormat;
 
 	@NotNull
