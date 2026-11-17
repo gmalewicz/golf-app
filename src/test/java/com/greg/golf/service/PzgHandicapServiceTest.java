@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.AfterEach;
@@ -19,8 +20,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.greg.golf.configurationproperties.PzgConfig;
+import com.greg.golf.entity.Player;
 import com.greg.golf.repository.PlayerRepository;
 import com.greg.golf.repository.projection.PlayerPzgId;
 import com.sun.net.httpserver.HttpServer;
@@ -204,5 +207,82 @@ class PzgHandicapServiceTest {
 
 		verify(playerRepository, never()).updateWhs(anyLong(), anyFloat());
 		org.junit.jupiter.api.Assertions.assertEquals(5, profileCnt.get());
+	}
+
+	private int onDemandStatus(PzgHandicapService service, long playerId) {
+		return org.junit.jupiter.api.Assertions.assertThrows(ResponseStatusException.class,
+				() -> service.updateHandicapOnDemand(playerId)).getStatusCode().value();
+	}
+
+	private Player playerWithPzgId(Long pzgId) {
+		var player = new Player();
+		player.setPzgId(pzgId);
+		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
+		return player;
+	}
+
+	@Test
+	void onDemandUpdatesWhsTest() {
+
+		profileBody = "{\"member\":{\"hcp\":\"8.4\"}}";
+		playerWithPzgId(100L);
+		when(playerRepository.updateWhs(1L, 8.4F)).thenReturn(1);
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertEquals(8.4F, service.updateHandicapOnDemand(1L));
+
+		verify(playerRepository).updateWhs(1L, 8.4F);
+	}
+
+	@Test
+	void onDemandDisabledReturnsConflictTest() {
+
+		config.setEnabled(false);
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertEquals(409, onDemandStatus(service, 1L));
+		org.junit.jupiter.api.Assertions.assertEquals(0, loginCnt.get());
+		verify(playerRepository, never()).updateWhs(anyLong(), anyFloat());
+	}
+
+	@Test
+	void onDemandUnknownPlayerReturnsNotFoundTest() {
+
+		when(playerRepository.findById(1L)).thenReturn(Optional.empty());
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertEquals(404, onDemandStatus(service, 1L));
+	}
+
+	@Test
+	void onDemandPlayerWithoutPzgIdReturnsBadRequestTest() {
+
+		playerWithPzgId(null);
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertEquals(400, onDemandStatus(service, 1L));
+		org.junit.jupiter.api.Assertions.assertEquals(0, loginCnt.get());
+	}
+
+	@Test
+	void onDemandInvalidHcpReturnsBadGatewayTest() {
+
+		profileBody = "{\"member\":{\"hcp\":99}}";
+		playerWithPzgId(100L);
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertEquals(502, onDemandStatus(service, 1L));
+		verify(playerRepository, never()).updateWhs(anyLong(), anyFloat());
+	}
+
+	@Test
+	void onDemandServiceUnavailableReturnsBadGatewayTest() {
+
+		playerWithPzgId(100L);
+		server.stop(0);
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertEquals(502, onDemandStatus(service, 1L));
+		verify(playerRepository, never()).updateWhs(anyLong(), anyFloat());
 	}
 }

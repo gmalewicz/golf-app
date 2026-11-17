@@ -296,6 +296,13 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
+	@ExceptionHandler(PzgUpdateException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(PzgUpdateException ex) {
+
+		var response = new ApiErrorResponse("31", String.valueOf(ex.getReason()));
+		return new ResponseEntity<>(response, ex.getStatusCode());
+	}
+
 	private String getLocalizedMessage(String translationKey, Object[] args)
 	{
 		Locale locale = LocaleContextHolder.getLocale();

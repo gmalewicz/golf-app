@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.greg.golf.configurationproperties.PzgConfig;
+import com.greg.golf.error.PzgUpdateException;
 import com.greg.golf.repository.PlayerRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +114,41 @@ public class PzgHandicapService {
 			log.warn("PZG handicap update failed for player id {} (pzgId {}): {}", playerId, pzgId, e.getMessage());
 			return false;
 		}
+	}
+
+	/**
+	 * On-demand refresh of the handicap of a single player (administrator action).
+	 *
+	 * @return the new handicap stored in Player.whs
+	 * @throws PzgUpdateException 409 when pzg.enabled is false, 404 when the player does not exist, 400 when
+	 *                                 the player has no pzgId, 502 when PZG fails or returns no valid handicap
+	 */
+	public float updateHandicapOnDemand(Long playerId) {
+
+		if (!pzgConfig.isEnabled()) {
+			throw new PzgUpdateException(HttpStatus.CONFLICT, "PZG integration is disabled");
+		}
+
+		var player = playerRepository.findById(playerId)
+				.orElseThrow(() -> new PzgUpdateException(HttpStatus.NOT_FOUND, "Player not found"));
+
+		if (player.getPzgId() == null) {
+			throw new PzgUpdateException(HttpStatus.BAD_REQUEST, "Player has no PZG id");
+		}
+
+		Optional<Float> whs;
+		try {
+			whs = fetchHandicap(player.getPzgId());
+		} catch (Exception e) {
+			log.warn("PZG handicap update failed for player id {} (pzgId {}): {}", playerId, player.getPzgId(),
+					e.getMessage());
+			throw new PzgUpdateException(HttpStatus.BAD_GATEWAY, "PZG service error");
+		}
+
+		var value = whs.orElseThrow(() -> new PzgUpdateException(HttpStatus.BAD_GATEWAY,
+				"PZG did not return a valid handicap"));
+		store(playerId, value);
+		return value;
 	}
 
 	private Optional<Float> fetchHandicap(Long pzgId) {

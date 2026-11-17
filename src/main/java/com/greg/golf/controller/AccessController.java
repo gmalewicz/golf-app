@@ -14,6 +14,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import com.greg.golf.entity.Player;
 import com.greg.golf.service.PlayerService;
+import com.greg.golf.service.PzgHandicapService;
 import com.greg.golf.service.helpers.GolfUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,9 +36,12 @@ public class AccessController extends BaseController {
 
 	private final PlayerService playerService;
 	private final JwtTokenUtil jwtTokenUtil;
+	private final PzgHandicapService pzgHandicapService;
 
-	public AccessController(ModelMapper modelMapper, PlayerService playerService, JwtTokenUtil jwtTokenUtil) {
+	public AccessController(ModelMapper modelMapper, PlayerService playerService, JwtTokenUtil jwtTokenUtil,
+			PzgHandicapService pzgHandicapService) {
 		super(modelMapper);
+		this.pzgHandicapService = pzgHandicapService;
 		this.playerService = playerService;
 		this.jwtTokenUtil = jwtTokenUtil;
 	}
@@ -228,6 +232,18 @@ public class AccessController extends BaseController {
 		playerService.updatePzgId(playerPzgIdDto.getId(), playerPzgIdDto.getPzgId());
 
 		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Access API")
+	@Operation(summary = "Administrative task: update WHS of the player from Polish Golf Association service.")
+	@PatchMapping(value = "/rest/PlayerWhsFromPzg")
+	@Secured("ROLE_ADMIN")
+	public PlayerWhsDto updatePlayerWhsFromPzg(@Valid
+			@Parameter(description = "Player id", required = true) @RequestBody IdDto idDto) {
+
+		log.info("trying to update WHS from PZG for player id: {}", idDto.getId());
+
+		return new PlayerWhsDto(idDto.getId(), pzgHandicapService.updateHandicapOnDemand(idDto.getId()));
 	}
 
 	@Tag(name = "Access API")
