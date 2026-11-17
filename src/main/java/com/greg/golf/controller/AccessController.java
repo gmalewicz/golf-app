@@ -217,6 +217,20 @@ public class AccessController extends BaseController {
 	}
 
 	@Tag(name = "Access API")
+	@Operation(summary = "Administrative task: set or clear Polish Golf Association identifier of the player.")
+	@PatchMapping(value = "/rest/PlayerPzgId")
+	@Secured("ROLE_ADMIN")
+	public HttpStatus updatePlayerPzgId(@Valid
+			@Parameter(description = "Player PZG id DTO object", required = true) @RequestBody PlayerPzgIdDto playerPzgIdDto) {
+
+		log.info("trying to update pzgId for player id: {}", playerPzgIdDto.getId());
+
+		playerService.updatePzgId(playerPzgIdDto.getId(), playerPzgIdDto.getPzgId());
+
+		return HttpStatus.OK;
+	}
+
+	@Tag(name = "Access API")
 	@Operation(summary = "Get list of players for nick starting from given string.")
 	@PostMapping(value = "/rest/SearchForPlayer")
 	public List<PlayerDto> searchForPlayer(

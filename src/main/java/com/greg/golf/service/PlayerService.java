@@ -18,6 +18,8 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -257,6 +259,17 @@ public class PlayerService {
 		} else {
             log.warn("nothing to update for player {}", persistedPlayer.getNick());
 		}
+	}
+
+	@CacheEvict(value = "player", key = "#playerId")
+	@Transactional
+	public void updatePzgId(@NonNull Long playerId, Long pzgId) {
+
+		var persistedPlayer = playerRepository.findById(playerId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+		persistedPlayer.setPzgId(pzgId);
+		playerRepository.save(persistedPlayer);
+		log.debug("pzgId updated for player {}", persistedPlayer.getNick());
 	}
 
 	@Transactional

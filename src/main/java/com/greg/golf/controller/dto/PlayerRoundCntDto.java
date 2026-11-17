@@ -35,6 +35,9 @@ public class PlayerRoundCntDto {
     @Schema(description = "Player role", example = "1", accessMode = READ_ONLY, minimum="0", maximum="1")
     private Long roundCnt;
 
+    @Schema(description = "Polish Golf Association member identifier, null when not set", example = "12345", accessMode = READ_ONLY, nullable = true)
+    private Long pzgId;
+
     @NotNull
     @Schema(description = "Player type", example = "0 - Local, 1 - Facebook", accessMode = READ_ONLY, minimum="0", maximum="1")
     private Integer type;
