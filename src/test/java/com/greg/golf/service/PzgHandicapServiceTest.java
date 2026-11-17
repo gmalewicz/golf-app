@@ -40,6 +40,7 @@ class PzgHandicapServiceTest {
 	private volatile String lastLoginBody;
 	private volatile boolean rejectFirstProfile;
 	private volatile boolean failProfile;
+	private volatile boolean failFirstLogin;
 
 	@BeforeEach
 	void setup() throws IOException {
@@ -50,7 +51,7 @@ class PzgHandicapServiceTest {
 			try (var in = ex.getRequestBody()) {
 				lastLoginBody = new String(in.readAllBytes(), StandardCharsets.UTF_8);
 			}
-			reply(ex, 200, "{\"token\":\"t" + loginCnt.get() + "\"}");
+			reply(ex, loginCnt.get() == 1 && failFirstLogin ? 500 : 200, "{\"token\":\"t" + loginCnt.get() + "\"}");
 		});
 		server.createContext("/api/_account1/member/get_profile", ex -> {
 			var call = profileCnt.incrementAndGet();
@@ -206,7 +207,21 @@ class PzgHandicapServiceTest {
 		service.updateAllHandicaps();
 
 		verify(playerRepository, never()).updateWhs(anyLong(), anyFloat());
-		org.junit.jupiter.api.Assertions.assertEquals(5, profileCnt.get());
+		org.junit.jupiter.api.Assertions.assertEquals(10, profileCnt.get());
+	}
+
+	@Test
+	void retriesOnceWhenFirstLoginFailsTest() {
+
+		failFirstLogin = true;
+		profileBody = "{\"member\":{\"hcp\":\"9.1\"}}";
+		when(playerRepository.updateWhs(1L, 9.1F)).thenReturn(1);
+		var service = new PzgHandicapService(config, playerRepository, cacheManager);
+
+		org.junit.jupiter.api.Assertions.assertTrue(service.updateHandicap(1L, 100L));
+
+		org.junit.jupiter.api.Assertions.assertEquals(2, loginCnt.get());
+		verify(playerRepository).updateWhs(1L, 9.1F);
 	}
 
 	private int onDemandStatus(PzgHandicapService service, long playerId) {

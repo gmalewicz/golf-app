@@ -3,6 +3,7 @@ package com.greg.golf.service;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -11,6 +12,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -30,6 +33,7 @@ public class PzgHandicapService {
 	private static final float MIN_WHS = -5.0F;
 	private static final float MAX_WHS = 54.0F;
 	private static final int MAX_CONSECUTIVE_FAILURES = 5;
+	private static final long RETRY_DELAY_MS = 500;
 
 	private final PzgConfig pzgConfig;
 	private final PlayerRepository playerRepository;
@@ -185,14 +189,34 @@ public class PzgHandicapService {
 
 		ProfileResponse response;
 		try {
-			response = restClient.get().uri(pzgConfig.getUrl() + PROFILE_PATH, pzgId)
-					.headers(h -> h.setBearerAuth(bearer)).retrieve().body(ProfileResponse.class);
+			response = withRetry(() -> restClient.get().uri(pzgConfig.getUrl() + PROFILE_PATH, pzgId)
+					.headers(h -> h.setBearerAuth(bearer)).retrieve().body(ProfileResponse.class));
 		} catch (HttpClientErrorException.Unauthorized e) {
 			throw e;
 		} catch (RestClientResponseException e) {
 			throw new IllegalStateException("PZG get_profile failed: " + describe(e), e);
 		}
 		return response;
+	}
+
+	/**
+	 * PZG sometimes answers the first call with 5xx or does not answer in time while the next one succeeds, so a
+	 * transient failure is retried once.
+	 */
+	private <T> T withRetry(Supplier<T> call) {
+
+		try {
+			return call.get();
+		} catch (HttpServerErrorException | ResourceAccessException e) {
+			log.debug("PZG call failed ({}) - retrying once", e.getMessage());
+			try {
+				Thread.sleep(RETRY_DELAY_MS);
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
+				throw e;
+			}
+			return call.get();
+		}
 	}
 
 	private static String describe(RestClientResponseException e) {
@@ -210,9 +234,9 @@ public class PzgHandicapService {
 
 		LoginResponse response;
 		try {
-			response = restClient.post().uri(pzgConfig.getUrl() + LOGIN_PATH)
+			response = withRetry(() -> restClient.post().uri(pzgConfig.getUrl() + LOGIN_PATH)
 					.body(Map.of("email", pzgConfig.getUsername(), "password", pzgConfig.getPassword()))
-					.retrieve().body(LoginResponse.class);
+					.retrieve().body(LoginResponse.class));
 		} catch (RestClientResponseException e) {
 			throw new IllegalStateException("PZG login failed: " + describe(e), e);
 		}
