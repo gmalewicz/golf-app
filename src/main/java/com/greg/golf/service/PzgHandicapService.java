@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.greg.golf.configurationproperties.PzgConfig;
@@ -182,8 +183,22 @@ public class PzgHandicapService {
 
 	private ProfileResponse getProfile(Long pzgId, String bearer) {
 
-		return restClient.get().uri(pzgConfig.getUrl() + PROFILE_PATH, pzgId)
-				.headers(h -> h.setBearerAuth(bearer)).retrieve().body(ProfileResponse.class);
+		ProfileResponse response;
+		try {
+			response = restClient.get().uri(pzgConfig.getUrl() + PROFILE_PATH, pzgId)
+					.headers(h -> h.setBearerAuth(bearer)).retrieve().body(ProfileResponse.class);
+		} catch (HttpClientErrorException.Unauthorized e) {
+			throw e;
+		} catch (RestClientResponseException e) {
+			throw new IllegalStateException("PZG get_profile failed: " + describe(e), e);
+		}
+		return response;
+	}
+
+	private static String describe(RestClientResponseException e) {
+
+		var body = e.getResponseBodyAsString();
+		return e.getStatusCode() + (body.isBlank() ? " [no body]" : " " + body.substring(0, Math.min(body.length(), 300)));
 	}
 
 	private String currentToken() {
@@ -193,9 +208,14 @@ public class PzgHandicapService {
 			return current;
 		}
 
-		var response = restClient.post().uri(pzgConfig.getUrl() + LOGIN_PATH)
-				.body(Map.of("email", pzgConfig.getUsername(), "password", pzgConfig.getPassword()))
-				.retrieve().body(LoginResponse.class);
+		LoginResponse response;
+		try {
+			response = restClient.post().uri(pzgConfig.getUrl() + LOGIN_PATH)
+					.body(Map.of("email", pzgConfig.getUsername(), "password", pzgConfig.getPassword()))
+					.retrieve().body(LoginResponse.class);
+		} catch (RestClientResponseException e) {
+			throw new IllegalStateException("PZG login failed: " + describe(e), e);
+		}
 
 		if (response == null || response.token() == null || response.token().isBlank()) {
 			throw new IllegalStateException("PZG login did not return a token");
