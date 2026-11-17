@@ -74,6 +74,12 @@ player:
   pageSize: 5
   minSearchLength: 3
   emailPwd: welcome
+pzg:
+  enabled: \${PZG_ENABLED:false}
+  url: https://eagle.polski.golf
+  username: \${PZG_USER:}
+  password: \${PZG:}
+  timeoutMs: 3000
 tournament:
   pageSize: 10
 league:

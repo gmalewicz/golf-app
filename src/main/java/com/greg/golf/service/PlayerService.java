@@ -175,6 +175,7 @@ public class PlayerService {
 		return new GolfUser(player.getNick(), player.getPassword(), new ArrayList<>(), player);
 	}
 
+
 	@SuppressWarnings("unused")
 	@CacheEvict(value = "player", key = "#player.id")
 	public void cacheEvict(@NonNull Player player) {

@@ -3,9 +3,11 @@ package com.greg.golf.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.greg.golf.repository.projection.PlayerPzgId;
 import com.greg.golf.repository.projection.PlayerRoundCnt;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -26,4 +28,12 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 	List<PlayerRoundCnt> getPlayerRoundCnt();
 
 	List<Player> findByNickContainingIgnoreCaseOrderByNickAsc(String nick, Pageable pageable);
+
+	@Query("SELECT p.id AS id, p.pzgId AS pzgId FROM Player p WHERE p.pzgId IS NOT NULL ORDER BY p.id")
+	List<PlayerPzgId> findPlayersWithPzgId();
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Player p SET p.whs = :whs WHERE p.id = :id")
+	int updateWhs(@Param("id") Long id, @Param("whs") Float whs);
 }

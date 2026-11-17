@@ -36,6 +36,11 @@ public class Player implements Comparable<Player> {
 	@Column(name = "whs")
 	private Float whs;
 
+	// Polish Golf Association member identifier, optional
+	@EqualsAndHashCode.Exclude
+	@Column(name = "pzg_id")
+	private Long pzgId;
+
 	@EqualsAndHashCode.Exclude
 	@NotNull
 	@Min(value = 0)
