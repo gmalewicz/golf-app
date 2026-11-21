@@ -68,6 +68,8 @@ class PzgHandicapServiceTest {
 		config = new PzgConfig();
 		config.setEnabled(true);
 		config.setUrl("http://localhost:" + server.getAddress().getPort());
+		config.setLoginPath("/api/_account1/auth/login");
+		config.setProfilePath("/api/_account1/member/get_profile?id={id}");
 		config.setUsername("user");
 		config.setPassword("pwd");
 		config.setTimeoutMs(1000);
