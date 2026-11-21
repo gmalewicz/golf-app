@@ -10,6 +10,9 @@ import com.greg.golf.security.oauth.GolfAuthenticationFailureHandler;
 import com.greg.golf.security.oauth.GolfAuthenticationSuccessHandler;
 import com.greg.golf.security.oauth.GolfOAuth2UserService;
 import com.greg.golf.service.PlayerService;
+import com.greg.golf.service.PzgHandicapService;
+import com.greg.golf.error.PzgUpdateException;
+import org.springframework.http.HttpStatus;
 import com.greg.golf.service.UserService;
 import com.greg.golf.service.helpers.GolfUser;
 import com.greg.golf.service.helpers.GolfUserDetails;
@@ -34,6 +37,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -45,6 +49,10 @@ class AccessControllerTest {
 	@SuppressWarnings("unused")
 	@MockitoBean
 	private PlayerService playerService;
+
+	@SuppressWarnings("unused")
+	@MockitoBean
+	private PzgHandicapService pzgHandicapService;
 
 	@SuppressWarnings("unused")
 	@MockitoBean
@@ -292,5 +300,36 @@ class AccessControllerTest {
 
 		mockMvc.perform(post("/rest/DeletePlayerEmail").contentType("application/json"))
 				.andExpect(status().isOk()).andReturn();
+	}
+
+	@DisplayName("Should update WHS from PZG with correct result")
+	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
+	void updatePlayerWhsFromPzgWhenValidInputThenReturns200() throws Exception {
+
+		var input = new IdDto();
+		input.setId(1L);
+
+		when(pzgHandicapService.updateHandicapOnDemand(1L)).thenReturn(12.3F);
+
+		mockMvc.perform(patch("/rest/PlayerWhsFromPzg").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1)).andExpect(jsonPath("$.whs").value(12.3));
+	}
+
+	@DisplayName("Should return PZG error status and message")
+	@Test
+	@WithMockUser(username="admin",roles={"USER","ADMIN"})
+	void updatePlayerWhsFromPzgWhenDisabledThenReturns409() throws Exception {
+
+		var input = new IdDto();
+		input.setId(1L);
+
+		when(pzgHandicapService.updateHandicapOnDemand(1L))
+				.thenThrow(new PzgUpdateException(HttpStatus.CONFLICT, "PZG integration is disabled"));
+
+		mockMvc.perform(patch("/rest/PlayerWhsFromPzg").contentType("application/json").characterEncoding("utf-8")
+				.content(objectMapper.writeValueAsString(input))).andExpect(status().isConflict())
+				.andExpect(jsonPath("$.message").value("PZG integration is disabled"));
 	}
 }

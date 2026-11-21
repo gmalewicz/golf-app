@@ -10,4 +10,5 @@ public interface PlayerRoundCnt {
     Integer getRole();
     Long getRoundCnt();
     Integer getType();
+    Long getPzgId();
 }

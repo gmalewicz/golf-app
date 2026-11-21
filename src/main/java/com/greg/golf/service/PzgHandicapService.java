@@ -1,0 +1,261 @@
+package com.greg.golf.service;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.greg.golf.configurationproperties.PzgConfig;
+import com.greg.golf.error.PzgUpdateException;
+import com.greg.golf.repository.PlayerRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class PzgHandicapService {
+
+	private static final float MIN_WHS = -5.0F;
+	private static final float MAX_WHS = 54.0F;
+	private static final int MAX_CONSECUTIVE_FAILURES = 5;
+	private static final long RETRY_DELAY_MS = 500;
+
+	private final PzgConfig pzgConfig;
+	private final PlayerRepository playerRepository;
+	private final CacheManager cacheManager;
+	private final RestClient restClient;
+	private final AtomicReference<String> token = new AtomicReference<>();
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	record LoginResponse(String token) {
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	record Member(Object hcp) {
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	record ProfileResponse(Member member) {
+	}
+
+	public PzgHandicapService(PzgConfig pzgConfig, PlayerRepository playerRepository, CacheManager cacheManager) {
+
+		this.pzgConfig = pzgConfig;
+		this.playerRepository = playerRepository;
+		this.cacheManager = cacheManager;
+
+		var requestFactory = new SimpleClientHttpRequestFactory();
+		requestFactory.setConnectTimeout(pzgConfig.getTimeoutMs());
+		requestFactory.setReadTimeout(pzgConfig.getTimeoutMs());
+		this.restClient = RestClient.builder().requestFactory(requestFactory).build();
+	}
+
+	public boolean isEnabled() {
+		return pzgConfig.isEnabled();
+	}
+
+	/**
+	 * Nightly refresh of the handicap of every player that has pzgId. Does nothing when pzg.enabled is false.
+	 * A run is aborted when PZG keeps failing, so an outage does not make it last for hours.
+	 */
+	@Scheduled(cron = "0 0 3 * * *", zone = "Europe/Warsaw")
+	public void updateAllHandicaps() {
+
+		if (!pzgConfig.isEnabled()) {
+			return;
+		}
+
+		var players = playerRepository.findPlayersWithPzgId();
+		log.info("PZG handicap update started for {} players", players.size());
+
+		int updated = 0;
+		int consecutiveFailures = 0;
+
+		for (var player : players) {
+			if (updateHandicap(player.getId(), player.getPzgId())) {
+				updated++;
+				consecutiveFailures = 0;
+			} else if (++consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+				log.error("PZG handicap update aborted after {} consecutive failures", consecutiveFailures);
+				break;
+			}
+		}
+
+		log.info("PZG handicap update finished: {} of {} players updated", updated, players.size());
+	}
+
+	/**
+	 * Reads the handicap of the player from PZG and stores it in Player.whs. Never throws - any problem is logged
+	 * and the existing whs value is kept.
+	 *
+	 * @return true when a valid handicap was stored
+	 */
+	public boolean updateHandicap(Long playerId, Long pzgId) {
+
+		if (!pzgConfig.isEnabled() || playerId == null || pzgId == null) {
+			return false;
+		}
+
+		try {
+			var whs = fetchHandicap(pzgId);
+			whs.ifPresent(value -> store(playerId, value));
+			return whs.isPresent();
+		} catch (Exception e) {
+			log.warn("PZG handicap update failed for player id {} (pzgId {}): {}", playerId, pzgId, e.getMessage());
+			return false;
+		}
+	}
+
+	/**
+	 * On-demand refresh of the handicap of a single player (administrator action).
+	 *
+	 * @return the new handicap stored in Player.whs
+	 * @throws PzgUpdateException 409 when pzg.enabled is false, 404 when the player does not exist, 400 when
+	 *                                 the player has no pzgId, 502 when PZG fails or returns no valid handicap
+	 */
+	public float updateHandicapOnDemand(Long playerId) {
+
+		if (!pzgConfig.isEnabled()) {
+			throw new PzgUpdateException(HttpStatus.CONFLICT, "PZG integration is disabled");
+		}
+
+		var player = playerRepository.findById(playerId)
+				.orElseThrow(() -> new PzgUpdateException(HttpStatus.NOT_FOUND, "Player not found"));
+
+		if (player.getPzgId() == null) {
+			throw new PzgUpdateException(HttpStatus.BAD_REQUEST, "Player has no PZG id");
+		}
+
+		Optional<Float> whs;
+		try {
+			whs = fetchHandicap(player.getPzgId());
+		} catch (Exception e) {
+			log.warn("PZG handicap update failed for player id {} (pzgId {}): {}", playerId, player.getPzgId(),
+					e.getMessage());
+			throw new PzgUpdateException(HttpStatus.BAD_GATEWAY, "PZG service error");
+		}
+
+		var value = whs.orElseThrow(() -> new PzgUpdateException(HttpStatus.BAD_GATEWAY,
+				"PZG did not return a valid handicap"));
+		store(playerId, value);
+		return value;
+	}
+
+	private Optional<Float> fetchHandicap(Long pzgId) {
+
+		ProfileResponse profile;
+		try {
+			profile = getProfile(pzgId, currentToken());
+		} catch (HttpClientErrorException.Unauthorized e) {
+			log.debug("PZG token expired - logging in again");
+			token.set(null);
+			profile = getProfile(pzgId, currentToken());
+		}
+
+		if (profile == null || profile.member() == null || profile.member().hcp() == null) {
+			log.warn("PZG returned no handicap for pzgId {}", pzgId);
+			return Optional.empty();
+		}
+
+		try {
+			var whs = Float.parseFloat(profile.member().hcp().toString().trim().replace(',', '.'));
+			if (Float.isNaN(whs) || whs < MIN_WHS || whs > MAX_WHS) {
+				log.warn("PZG returned handicap out of range for pzgId {}: {}", pzgId, whs);
+				return Optional.empty();
+			}
+			return Optional.of(whs);
+		} catch (NumberFormatException e) {
+			log.warn("PZG returned invalid handicap for pzgId {}: {}", pzgId, profile.member().hcp());
+			return Optional.empty();
+		}
+	}
+
+	private ProfileResponse getProfile(Long pzgId, String bearer) {
+
+		ProfileResponse response;
+		try {
+			response = withRetry(() -> restClient.get().uri(pzgConfig.getUrl() + pzgConfig.getProfilePath(), pzgId)
+					.headers(h -> h.setBearerAuth(bearer)).retrieve().body(ProfileResponse.class));
+		} catch (HttpClientErrorException.Unauthorized e) {
+			throw e;
+		} catch (RestClientResponseException e) {
+			throw new IllegalStateException("PZG get_profile failed: " + describe(e), e);
+		}
+		return response;
+	}
+
+	/**
+	 * PZG sometimes answers the first call with 5xx or does not answer in time while the next one succeeds, so a
+	 * transient failure is retried once.
+	 */
+	private <T> T withRetry(Supplier<T> call) {
+
+		try {
+			return call.get();
+		} catch (HttpServerErrorException | ResourceAccessException e) {
+			log.debug("PZG call failed ({}) - retrying once", e.getMessage());
+			try {
+				Thread.sleep(RETRY_DELAY_MS);
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
+				throw e;
+			}
+			return call.get();
+		}
+	}
+
+	private static String describe(RestClientResponseException e) {
+
+		var body = e.getResponseBodyAsString();
+		return e.getStatusCode() + (body.isBlank() ? " [no body]" : " " + body.substring(0, Math.min(body.length(), 300)));
+	}
+
+	private String currentToken() {
+
+		var current = token.get();
+		if (current != null) {
+			return current;
+		}
+
+		LoginResponse response;
+		try {
+			response = withRetry(() -> restClient.post().uri(pzgConfig.getUrl() + pzgConfig.getLoginPath())
+					.body(Map.of("email", pzgConfig.getUsername(), "password", pzgConfig.getPassword()))
+					.retrieve().body(LoginResponse.class));
+		} catch (RestClientResponseException e) {
+			throw new IllegalStateException("PZG login failed: " + describe(e), e);
+		}
+
+		if (response == null || response.token() == null || response.token().isBlank()) {
+			throw new IllegalStateException("PZG login did not return a token");
+		}
+
+		token.set(response.token());
+		log.debug("PZG login completed");
+		return response.token();
+	}
+
+	private void store(Long playerId, float whs) {
+
+		if (playerRepository.updateWhs(playerId, whs) > 0) {
+			Cache cache = cacheManager.getCache("player");
+			if (cache != null) {
+				cache.evict(playerId);
+			}
+			log.info("Handicap of player id {} updated from PZG to {}", playerId, whs);
+		}
+	}
+}

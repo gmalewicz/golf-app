@@ -15,6 +15,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -67,6 +69,27 @@ class PlayerServiceTest {
 		admin = playerRepository.save(adminPlayer);
 
 		log.info("Set up completed");
+	}
+
+	@DisplayName("Set and clear pzgId")
+	@Transactional
+	@Test
+	void updatePzgIdTest() {
+
+		playerService.updatePzgId(player.getId(), 4321L);
+		Assertions.assertEquals(4321L, playerService.getPlayer(player.getId()).orElseThrow().getPzgId());
+
+		playerService.updatePzgId(player.getId(), null);
+		Assertions.assertNull(playerService.getPlayer(player.getId()).orElseThrow().getPzgId());
+	}
+
+	@DisplayName("Update pzgId for nonexistent player")
+	@Transactional
+	@Test
+	void updatePzgIdForNonexistentPlayerTest() {
+
+		var ex = assertThrows(ResponseStatusException.class, () -> playerService.updatePzgId(-1L, 4321L));
+		Assertions.assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
 	}
 
 	@DisplayName("Reset password with success")
