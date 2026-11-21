@@ -75,12 +75,12 @@ player:
   minSearchLength: 3
   emailPwd: welcome
 pzg:
-  enabled: \${PZG_ENABLED:false}
+  enabled: false
   url: https://eagle.polski.golf
   loginPath: /api/_account1/auth/login
   profilePath: /api/_account1/member/get_profile?id={id}
-  username: \${PZG_USER:}
-  password: \${PZG:}
+  username: replace_it
+  password: replace_it
   timeoutMs: 3000
 tournament:
   pageSize: 10
@@ -122,6 +122,10 @@ management:
       enabled: false
 cors:
   allowedOrigins: localhost:4200
+pzg:
+  enabled: true
+  username: \${PZG_USER:replace_it}
+  password: \${PZG:replace_it}
 
 ---
 
