@@ -28,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PzgHandicapService {
 
-	private static final String LOGIN_PATH = "/api/_account1/auth/login";
-	private static final String PROFILE_PATH = "/api/_account1/member/get_profile?id={id}";
 	private static final float MIN_WHS = -5.0F;
 	private static final float MAX_WHS = 54.0F;
 	private static final int MAX_CONSECUTIVE_FAILURES = 5;
@@ -189,7 +187,7 @@ public class PzgHandicapService {
 
 		ProfileResponse response;
 		try {
-			response = withRetry(() -> restClient.get().uri(pzgConfig.getUrl() + PROFILE_PATH, pzgId)
+			response = withRetry(() -> restClient.get().uri(pzgConfig.getUrl() + pzgConfig.getProfilePath(), pzgId)
 					.headers(h -> h.setBearerAuth(bearer)).retrieve().body(ProfileResponse.class));
 		} catch (HttpClientErrorException.Unauthorized e) {
 			throw e;
@@ -234,7 +232,7 @@ public class PzgHandicapService {
 
 		LoginResponse response;
 		try {
-			response = withRetry(() -> restClient.post().uri(pzgConfig.getUrl() + LOGIN_PATH)
+			response = withRetry(() -> restClient.post().uri(pzgConfig.getUrl() + pzgConfig.getLoginPath())
 					.body(Map.of("email", pzgConfig.getUsername(), "password", pzgConfig.getPassword()))
 					.retrieve().body(LoginResponse.class));
 		} catch (RestClientResponseException e) {

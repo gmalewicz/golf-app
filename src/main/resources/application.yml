@@ -77,6 +77,8 @@ player:
 pzg:
   enabled: \${PZG_ENABLED:false}
   url: https://eagle.polski.golf
+  loginPath: /api/_account1/auth/login
+  profilePath: /api/_account1/member/get_profile?id={id}
   username: \${PZG_USER:}
   password: \${PZG:}
   timeoutMs: 3000

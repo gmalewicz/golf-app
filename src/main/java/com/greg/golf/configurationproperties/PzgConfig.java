@@ -14,6 +14,12 @@ public class PzgConfig {
 
 	private String url;
 
+	// path of the login endpoint, relative to url
+	private String loginPath = "/api/_account1/auth/login";
+
+	// path of the member profile endpoint, relative to url; {id} is replaced with pzgId
+	private String profilePath = "/api/_account1/member/get_profile?id={id}";
+
 	private String username;
 
 	private String password;
