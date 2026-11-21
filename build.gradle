@@ -77,7 +77,7 @@ dependencies {
     implementation 'io.hypersistence:hypersistence-utils-hibernate-73:3.16.0'
     implementation 'com.google.guava:guava:33.7.2-jre'
     implementation 'org.modelmapper:modelmapper:3.2.7'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0'
 
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
