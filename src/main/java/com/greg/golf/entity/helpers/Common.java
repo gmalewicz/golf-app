@@ -33,4 +33,5 @@ public class Common {
 	public static final int MATCH_PLAY_PLAY_FORMAT = 1;
 	public static final int FOUR_BALL_STROKE_PLAY_FORMAT = 2;
 	public static final int FOUR_BALL_MATCH_PLAY_FORMAT = 3;
+	public static final int TEXAS_SCRAMBLE_FORMAT = 4;
 }

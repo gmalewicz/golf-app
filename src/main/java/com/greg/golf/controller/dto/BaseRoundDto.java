@@ -22,8 +22,9 @@ public class BaseRoundDto {
 			"0 = stroke play, " +
 			"1 = match play, " +
 			"2 = four ball stroke play, " +
-			"3 = four ball stroke play",
-			example = "0", accessMode = READ_WRITE, allowableValues = {"0", "1", "2", "3"})
+			"3 = four ball stroke play, " +
+			"4 = texas scramble",
+			example = "0", accessMode = READ_WRITE, allowableValues = {"0", "1", "2", "3", "4"})
 	private Integer format;
 
 	@Schema(description = "Match play allowance format", example = "0.5", accessMode = READ_ONLY, allowableValues = {

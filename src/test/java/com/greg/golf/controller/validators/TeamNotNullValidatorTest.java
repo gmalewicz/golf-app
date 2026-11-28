@@ -62,7 +62,7 @@ class TeamNotNullValidatorTest {
         assertFalse(result);
         verify(context).disableDefaultConstraintViolation();
         verify(context).buildConstraintViolationWithTemplate(
-                "Team must not be null when format is FourBall MP or FourBall SP"
+                "Team must not be null when format is FourBall MP, FourBall SP or Texas Scramble"
         );
     }
 
@@ -77,15 +77,26 @@ class TeamNotNullValidatorTest {
         assertFalse(result);
         verify(context).disableDefaultConstraintViolation();
         verify(context).buildConstraintViolationWithTemplate(
-                "Team must not be null when format is FourBall MP or FourBall SP"
+                "Team must not be null when format is FourBall MP, FourBall SP or Texas Scramble"
         );
+    }
+
+    @Test
+    void shouldReturnFalseWhenFormatIsTexasScrambleAndTeamIsNull() {
+        OnlineRoundDto dto = mock(OnlineRoundDto.class);
+        when(dto.getFormat()).thenReturn(Common.TEXAS_SCRAMBLE_FORMAT);
+        when(dto.getTeam()).thenReturn(null);
+
+        boolean result = validator.isValid(dto, context);
+
+        assertFalse(result);
+        verify(context).disableDefaultConstraintViolation();
     }
 
     @Test
     void shouldReturnTrueWhenFormatIsFourBallAndTeamIsNotNull() {
         OnlineRoundDto dto = mock(OnlineRoundDto.class);
         when(dto.getFormat()).thenReturn(Common.FOUR_BALL_MATCH_PLAY_FORMAT);
-        when(dto.getTeam()).thenReturn(1);
 
         boolean result = validator.isValid(dto, context);
 
